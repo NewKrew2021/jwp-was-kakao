@@ -5,6 +5,8 @@ import utils.RequestHeaderParser;
 import java.util.List;
 
 public class RequestHeader {
+    private static final String STATIC_PATH_PREFIX = "./static";
+    private static final String TEMPLATE_PATH_PREFIX = "./templates";
     private final List<String> lines;
 
     private RequestHeader(List<String> lines) {
@@ -23,10 +25,10 @@ public class RequestHeader {
     public String getPath() {
         String path = RequestHeaderParser.getRequestPath(lines.get(0));
         if (requiresStaticResource(path)) {
-            return "./static" + path;
+            return STATIC_PATH_PREFIX + path;
         }
         if (requiresTemplate(path)) {
-            return "./templates" + path;
+            return TEMPLATE_PATH_PREFIX + path;
         }
         return path;
     }
