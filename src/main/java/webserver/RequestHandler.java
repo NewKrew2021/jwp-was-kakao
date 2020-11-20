@@ -2,6 +2,7 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.UserService;
 import utils.FileIoUtils;
 
 import java.io.BufferedReader;
@@ -17,11 +18,15 @@ import java.util.List;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String DEFAULT_BODY = "Hello World";
+    private static final String USER_CREATE_PATH = "/user/create";
 
     private Socket connection;
+    private UserService userService;
+
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        userService = new UserService();
     }
 
     public void run() {
@@ -33,7 +38,7 @@ public class RequestHandler implements Runnable {
             RequestHeader requestHeader = RequestHeader.of(readRequestHeader(bufferedReader));
             print(requestHeader);
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getBodyAsBytesFromPath(requestHeader.getPath());
+            byte[] body = getResponse(requestHeader);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -59,9 +64,12 @@ public class RequestHandler implements Runnable {
         return lines;
     }
 
-    private byte[] getBodyAsBytesFromPath(String path) {
+    private byte[] getResponse(RequestHeader header) {
         try {
-            return FileIoUtils.loadFileFromClasspath(path);
+            if (USER_CREATE_PATH.equals(header.getPath())) {
+                return userService.addUser(header.getParams()).toString().getBytes();
+            }
+            return FileIoUtils.loadFileFromClasspath(header.getPath());
         } catch (Exception e) {
             e.printStackTrace();
             return DEFAULT_BODY.getBytes();

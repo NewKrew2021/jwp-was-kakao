@@ -3,6 +3,7 @@ package webserver;
 import utils.RequestHeaderParser;
 
 import java.util.List;
+import java.util.Map;
 
 public class RequestHeader {
     private static final String STATIC_PATH_PREFIX = "./static";
@@ -43,5 +44,9 @@ public class RequestHeader {
                 path.startsWith("/css") ||
                 path.startsWith("/fonts") ||
                 path.startsWith("/images");
+    }
+
+    public Map<String, String> getParams() {
+        return RequestHeaderParser.getRequestParams(lines.get(0));
     }
 }

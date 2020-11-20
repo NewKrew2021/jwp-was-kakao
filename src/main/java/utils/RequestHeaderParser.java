@@ -1,10 +1,29 @@
 package utils;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public class RequestHeaderParser {
 
     private static final String delimiter = " ";
+    private static final int REQUEST_PATH_INDEX = 0;
+    private static final int REQUEST_PARAM_INDEX = 1;
+    private static final int REQUEST_PARAM_KEY_INDEX = 0;
+    private static final int REQUEST_PARAM_VALUE_INDEX = 1;
 
-    public static String getRequestPath(String requestHeaderFirstLine) {
-        return requestHeaderFirstLine.split(delimiter)[1];
+
+    public static String getRequestPath(String line) {
+        return filterHttpMethodAndVersion(line).split("\\?")[REQUEST_PATH_INDEX];
+    }
+
+    private static String filterHttpMethodAndVersion(String line) {
+        return line.split(delimiter)[1];
+    }
+
+    public static Map<String, String> getRequestParams(String line) {
+        return Arrays.stream(filterHttpMethodAndVersion(line).split("\\?")[REQUEST_PARAM_INDEX].split("&"))
+                .map(attribute -> attribute.split("="))
+                .collect(Collectors.toMap(param -> param[REQUEST_PARAM_KEY_INDEX], param -> param[REQUEST_PARAM_VALUE_INDEX]));
     }
 }

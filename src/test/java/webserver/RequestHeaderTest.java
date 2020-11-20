@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,5 +39,17 @@ public class RequestHeaderTest {
                 Arguments.arguments("GET /favicon.ico HTTP/1.1", "./templates/favicon.ico"),
                 Arguments.arguments("GET /css/bootstrap.min.css HTTP/1.1", "./static/css/bootstrap.min.css"),
                 Arguments.arguments("GET /js/jquery-2.2.0.min.js HTTP/1.1", "./static/js/jquery-2.2.0.min.js"));
+    }
+
+    @Test
+    public void getParams() {
+        RequestHeader header = RequestHeader.of(Arrays.asList("GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n"));
+
+        Map<String, String> params = header.getParams();
+
+        assertThat(params.get("userId")).isEqualTo("javajigi");
+        assertThat(params.get("password")).isEqualTo("password");
+        assertThat(params.get("name")).isEqualTo("%EB%B0%95%EC%9E%AC%EC%84%B1");
+        assertThat(params.get("email")).isEqualTo("javajigi%40slipp.net");
     }
 }
