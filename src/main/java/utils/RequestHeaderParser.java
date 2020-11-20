@@ -1,6 +1,6 @@
 package utils;
 
-public class RequestUtil {
+public class RequestHeaderParser {
 
     private static final String delimiter = " ";
 
