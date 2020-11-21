@@ -22,6 +22,7 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String DEFAULT_BODY = "Hello World";
     private static final String USER_CREATE_PATH = "/user/create";
+    private static final String USER_LOGIN_PATH = "/user/login";
 
     private Socket connection;
     private UserService userService;
@@ -54,9 +55,25 @@ public class RequestHandler implements Runnable {
             response302Header(dos, "http://" + requestHeader.getHost() + "/index.html");
             return "".getBytes();
         }
+        if (USER_LOGIN_PATH.equals(requestHeader.getPath())) {
+            if (login(requestHeader, requestBody)) {
+                response302HeaderWithCookie(dos, "http://" + requestHeader.getHost() + "/index.html", true);
+                return "".getBytes();
+            }
+            response302HeaderWithCookie(dos, "http://" + requestHeader.getHost() + "/user/login_failed.html", false);
+            return "".getBytes();
+        }
         byte[] body = getResponseBodyFromFile(requestHeader);
         response200Header(dos, body.length);
         return body;
+    }
+
+    private boolean login(RequestHeader header, String requestBody) {
+        String method = header.getMethod();
+        if ("POST".equals(method)) {
+            return userService.login(RequestBodyParser.getRequestParams(requestBody));
+        }
+        return false;
     }
 
     private String getRequestBody(BufferedReader bufferedReader, RequestHeader requestHeader) {
@@ -110,6 +127,25 @@ public class RequestHandler implements Runnable {
             return userService.addUser(RequestBodyParser.getRequestParams(requestBody)).toString().getBytes();
         }
         return "INVALID_METHOD".getBytes();
+    }
+
+    private void response302HeaderWithCookie(DataOutputStream dos, String location, boolean login) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            setCookie(dos, login);
+            dos.writeBytes("Location: " + location + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void setCookie(DataOutputStream dos, boolean login) throws IOException {
+        if (login) {
+            dos.writeBytes("Set-Cookie: logined=true; Path=/" + "\r\n");
+            return;
+        }
+        dos.writeBytes("Set-Cookie: logined=false; Path=/" + "\r\n");
     }
 
     private void response302Header(DataOutputStream dos, String location) {
