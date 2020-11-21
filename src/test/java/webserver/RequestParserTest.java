@@ -39,5 +39,12 @@ public class RequestParserTest {
     private static class RequestParser {
         public RequestParser(BufferedReader bufferedReader) {
         }
+
+        public HttpRequest parse() {
+            return new HttpRequest();
+        }
+    }
+
+    private static class HttpRequest {
     }
 }
