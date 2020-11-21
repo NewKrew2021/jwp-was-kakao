@@ -83,6 +83,10 @@ public class RequestHandler implements Runnable {
             return "".getBytes();
         }
         byte[] body = getResponseBodyFromFile(requestHeader);
+        if (requestHeader.getPath().endsWith(".css")) {
+            response200CssHeader(dos, body.length);
+            return body;
+        }
         response200Header(dos, body.length);
         return body;
     }
@@ -152,6 +156,8 @@ public class RequestHandler implements Runnable {
             return userService.addUser(header.getParams()).toString().getBytes();
         }
         if ("POST".equals(method)) {
+            System.out.println(requestBody);
+            System.out.println();
             return userService.addUser(RequestBodyParser.getRequestParams(requestBody)).toString().getBytes();
         }
         return "INVALID_METHOD".getBytes();
@@ -190,6 +196,17 @@ public class RequestHandler implements Runnable {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response200CssHeader(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {

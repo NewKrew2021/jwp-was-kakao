@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,5 +55,11 @@ public class RequestHeaderParserTest {
         String host = RequestHeaderParser.getHost("Host: localhost:8080");
 
         assertThat(host).isEqualTo("localhost:8080");
+    }
+
+    @Test
+    public void encode() throws UnsupportedEncodingException {
+        String email = "56%40gmail.com";
+        assertThat(URLDecoder.decode(email, "UTF-8")).isEqualTo("56@gmail.com");
     }
 }
