@@ -1,7 +1,6 @@
 package webserver;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpRequest;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -17,5 +16,10 @@ public class RequestParserTest {
                 + "Accept: */*"));
         //@formatter:on
         new RequestParser(bufferedReader);
+    }
+
+    private static class RequestParser {
+        public RequestParser(BufferedReader bufferedReader) {
+        }
     }
 }
