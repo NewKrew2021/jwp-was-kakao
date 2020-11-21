@@ -33,6 +33,14 @@ public class RequestParserTest {
         assertThat(httpRequest).isNotNull();
     }
 
+    @DisplayName("메소드를 파싱한다")
+    @Test
+    void parseMethod() {
+        HttpRequest httpRequest = requestParser.parse();
+        assertThat(httpRequest.getMethod()).isEqualTo("GET");
+    }
+
+
     private static class RequestParser {
         public RequestParser(BufferedReader bufferedReader) {
         }
