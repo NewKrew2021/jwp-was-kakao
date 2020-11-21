@@ -53,42 +53,90 @@ public class RequestHandler implements Runnable {
             print(requestHeader);
             String requestBody = getRequestBody(bufferedReader, requestHeader);
             DataOutputStream dos = new DataOutputStream(out);
-            responseBody(dos, getResponseBody(requestHeader, requestBody, dos));
+            renderResponse(dos, getResponse(requestHeader, requestBody, dos));
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private byte[] getResponseBody(RequestHeader requestHeader, String requestBody, DataOutputStream dos) {
+    private Response getResponse(RequestHeader requestHeader, String requestBody, DataOutputStream dos) {
         if (USER_CREATE_PATH.equals(requestHeader.getPath())) {
-            addUser(requestHeader, requestBody);
-            response302Header(dos, "http://" + requestHeader.getHost() + "/index.html");
-            return "".getBytes();
+            String method = requestHeader.getMethod();
+            if ("GET".equals(method)) {
+                userService.addUser(requestHeader.getParams());
+            }
+            if ("POST".equals(method)) {
+                userService.addUser(RequestBodyParser.getRequestParams(requestBody));
+            }
+            return new Response(
+                    ResponseHeader.builder()
+                            .protocol(Protocol.HTTP)
+                            .status(Status.REDIRECT)
+                            .location("http://" + requestHeader.getHost() + "/index.html")
+                            .build()
+            );
         }
         if (USER_LOGIN_PATH.equals(requestHeader.getPath())) {
             if (login(requestHeader, requestBody)) {
-                response302HeaderWithCookie(dos, "http://" + requestHeader.getHost() + "/index.html", true);
-                return "".getBytes();
+                return new Response(
+                        ResponseHeader.builder()
+                                .protocol(Protocol.HTTP)
+                                .status(Status.REDIRECT)
+                                .cookie("logined=true", "/")
+                                .location("http://" + requestHeader.getHost() + "/index.html")
+                                .build()
+                );
             }
-            response302HeaderWithCookie(dos, "http://" + requestHeader.getHost() + "/user/login_failed.html", false);
-            return "".getBytes();
+            return new Response(
+                    ResponseHeader.builder()
+                            .protocol(Protocol.HTTP)
+                            .status(Status.REDIRECT)
+                            .cookie("logined=false", "/")
+                            .location("http://" + requestHeader.getHost() + "/user/login_failed.html")
+                            .build()
+            );
         }
         if (USER_LIST_PATH.equals(requestHeader.getPath())) {
             if (requestHeader.isLogined()) {
                 byte[] usersBody = findAllUsers().getBytes();
-                response200Header(dos, usersBody.length);
-                return usersBody;
+                return new Response(
+                        ResponseHeader.builder()
+                                .protocol(Protocol.HTTP)
+                                .status(Status.OK)
+                                .contentType(ContentType.HTML)
+                                .contentLength(usersBody.length)
+                                .build(),
+                        usersBody
+                );
             }
-            response302Header(dos, "http://" + requestHeader.getHost() + "/user/login.html");
-            return "".getBytes();
+            return new Response(
+                    ResponseHeader.builder()
+                            .protocol(Protocol.HTTP)
+                            .status(Status.REDIRECT)
+                            .location("http://" + requestHeader.getHost() + "/user/login.html")
+                            .build());
         }
-        byte[] body = getResponseBodyFromFile(requestHeader);
+        byte[] bodyFromFile = getResponseBodyFromFile(requestHeader);
         if (requestHeader.getPath().endsWith(".css")) {
-            response200CssHeader(dos, body.length);
-            return body;
+            return new Response(
+                    ResponseHeader.builder()
+                            .protocol(Protocol.HTTP)
+                            .status(Status.OK)
+                            .contentType(ContentType.CSS)
+                            .contentLength(bodyFromFile.length)
+                            .build(),
+                    bodyFromFile
+            );
         }
-        response200Header(dos, body.length);
-        return body;
+        return new Response(
+                ResponseHeader.builder()
+                        .protocol(Protocol.HTTP)
+                        .status(Status.OK)
+                        .contentType(ContentType.HTML)
+                        .contentLength(bodyFromFile.length)
+                        .build(),
+                bodyFromFile
+        );
     }
 
     private String findAllUsers() {
@@ -163,60 +211,10 @@ public class RequestHandler implements Runnable {
         return "INVALID_METHOD".getBytes();
     }
 
-    private void response302HeaderWithCookie(DataOutputStream dos, String location, boolean login) {
+    private void renderResponse(DataOutputStream dos, Response response) {
         try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            setCookie(dos, login);
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void setCookie(DataOutputStream dos, boolean login) throws IOException {
-        if (login) {
-            dos.writeBytes("Set-Cookie: logined=true; Path=/" + "\r\n");
-            return;
-        }
-        dos.writeBytes("Set-Cookie: logined=false; Path=/" + "\r\n");
-    }
-
-    private void response302Header(DataOutputStream dos, String location) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response200CssHeader(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
+            dos.writeBytes(response.getHeader());
+            dos.write(response.getBody(), 0, response.getBody().length);
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
