@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RequestHeader {
-    private static final String STATIC_PATH_PREFIX = "./static";
-    private static final String TEMPLATE_PATH_PREFIX = "./templates";
+
     private final List<String> lines;
 
     private RequestHeader(List<String> lines) {
@@ -23,27 +22,8 @@ public class RequestHeader {
         return String.join("\n", lines);
     }
 
-    public String getPath() {
-        String path = RequestParser.getRequestPath(lines.get(0));
-        if (requiresStaticResource(path)) {
-            return STATIC_PATH_PREFIX + path;
-        }
-        if (requiresTemplate(path)) {
-            return TEMPLATE_PATH_PREFIX + path;
-        }
-        return path;
-    }
-
-    private boolean requiresTemplate(String path) {
-        return path.endsWith(".ico") ||
-                path.endsWith(".html");
-    }
-
-    private boolean requiresStaticResource(String path) {
-        return path.startsWith("/js") ||
-                path.startsWith("/css") ||
-                path.startsWith("/fonts") ||
-                path.startsWith("/images");
+    public RequestPath getPath() {
+        return new RequestPath(RequestParser.getRequestPath(lines.get(0)));
     }
 
     public Map<String, String> getParams() {

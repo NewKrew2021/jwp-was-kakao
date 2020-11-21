@@ -32,16 +32,16 @@ public class RequestHeaderTest {
     public void getTemplatePath(String firstLineOfHeader, String expectedPath) {
         RequestHeader header = RequestHeader.of(Arrays.asList(firstLineOfHeader));
 
-        String path = header.getPath();
+        String path = header.getPath().asUrl();
 
         assertThat(path).isEqualTo(expectedPath);
     }
 
     private static Stream<Arguments> getFirstLines() {
-        return Stream.of(Arguments.arguments("GET /index.html HTTP/1.1", "./templates/index.html"),
-                Arguments.arguments("GET /favicon.ico HTTP/1.1", "./templates/favicon.ico"),
-                Arguments.arguments("GET /css/bootstrap.min.css HTTP/1.1", "./static/css/bootstrap.min.css"),
-                Arguments.arguments("GET /js/jquery-2.2.0.min.js HTTP/1.1", "./static/js/jquery-2.2.0.min.js"));
+        return Stream.of(Arguments.arguments("GET /index.html HTTP/1.1", "/index.html"),
+                Arguments.arguments("GET /favicon.ico HTTP/1.1", "/favicon.ico"),
+                Arguments.arguments("GET /css/bootstrap.min.css HTTP/1.1", "/css/bootstrap.min.css"),
+                Arguments.arguments("GET /js/jquery-2.2.0.min.js HTTP/1.1", "/js/jquery-2.2.0.min.js"));
     }
 
     @Test
@@ -52,8 +52,8 @@ public class RequestHeaderTest {
 
         assertThat(params.get("userId")).isEqualTo("javajigi");
         assertThat(params.get("password")).isEqualTo("password");
-        assertThat(params.get("name")).isEqualTo("%EB%B0%95%EC%9E%AC%EC%84%B1");
-        assertThat(params.get("email")).isEqualTo("javajigi%40slipp.net");
+        assertThat(params.get("name")).isEqualTo("박재성");
+        assertThat(params.get("email")).isEqualTo("javajigi@slipp.net");
     }
 
     @ParameterizedTest
