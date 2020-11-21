@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,14 +43,38 @@ public class RequestParserTest {
 
 
     private static class RequestParser {
+        private final BufferedReader bufferedReader;
+
         public RequestParser(BufferedReader bufferedReader) {
+            this.bufferedReader = bufferedReader;
         }
 
         public HttpRequest parse() {
-            return new HttpRequest();
+            String requestLine = nextLine();
+            String[] requestLineSplit = requestLine.split(" ");
+            HttpRequest httpRequest = new HttpRequest();
+            httpRequest.setMethod(requestLineSplit[0]);
+            return httpRequest;
+        }
+
+        private String nextLine() {
+            try {
+                return bufferedReader.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     private static class HttpRequest {
+        private String method;
+
+        public String getMethod() {
+            return method;
+        }
+
+        public void setMethod(String method) {
+            this.method = method;
+        }
     }
 }
