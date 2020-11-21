@@ -30,4 +30,21 @@ public class RequestHeaderParserTest {
         assertThat(requestParam.get("name")).isEqualTo("%EB%B0%95%EC%9E%AC%EC%84%B1");
         assertThat(requestParam.get("email")).isEqualTo("javajigi%40slipp.net");
     }
+
+    @ParameterizedTest
+    @CsvSource(value = {"GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1:GET",
+            "POST /user/create HTTP/1.1:POST"
+    }, delimiter = ':')
+    public void getMethod(String firstLine, String expectedMethod) {
+        String method = RequestHeaderParser.getMethod(firstLine);
+
+        assertThat(method).isEqualTo(expectedMethod);
+    }
+
+    @Test
+    public void getContentLength() {
+        Integer contentLength = RequestHeaderParser.getContentLength("Content-Length: 59");
+
+        assertThat(contentLength).isEqualTo(59);
+    }
 }

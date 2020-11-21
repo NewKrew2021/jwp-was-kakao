@@ -4,9 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -43,7 +45,7 @@ public class RequestHeaderTest {
 
     @Test
     public void getParams() {
-        RequestHeader header = RequestHeader.of(Arrays.asList("GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n"));
+        RequestHeader header = RequestHeader.of(Collections.singletonList("GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1"));
 
         Map<String, String> params = header.getParams();
 
@@ -51,5 +53,42 @@ public class RequestHeaderTest {
         assertThat(params.get("password")).isEqualTo("password");
         assertThat(params.get("name")).isEqualTo("%EB%B0%95%EC%9E%AC%EC%84%B1");
         assertThat(params.get("email")).isEqualTo("javajigi%40slipp.net");
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1:GET",
+            "POST /user/create HTTP/1.1:POST"
+    }, delimiter = ':')
+    public void getMethod(String firstLine, String expectedMethod) {
+        RequestHeader header = RequestHeader.of(Collections.singletonList(firstLine));
+
+        String method = header.getMethod();
+
+        assertThat(method).isEqualTo(expectedMethod);
+    }
+
+    @Test
+    public void getContentLength() {
+        RequestHeader header = RequestHeader.of(Arrays.asList("POST /user/create HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Content-Length: 59",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Accept: */*"));
+
+        int contentLength = header.getContentLength();
+
+        assertThat(contentLength).isEqualTo(59);
+    }
+
+    @Test
+    public void getNullContentLength() {
+        RequestHeader header = RequestHeader.of(Arrays.asList("POST /user/create HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Accept: */*"));
+
+        assertThat(header.getContentLength()).isNull();
     }
 }

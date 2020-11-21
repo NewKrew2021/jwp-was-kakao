@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
 import utils.FileIoUtils;
+import utils.IOUtils;
+import utils.RequestBodyParser;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -14,6 +16,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -37,12 +40,28 @@ public class RequestHandler implements Runnable {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
             RequestHeader requestHeader = RequestHeader.of(readRequestHeader(bufferedReader));
             print(requestHeader);
+            String requestBody = getRequestBody(bufferedReader, requestHeader);
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getResponse(requestHeader);
+            byte[] body = getResponse(requestHeader, requestBody);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private String getRequestBody(BufferedReader bufferedReader, RequestHeader requestHeader) {
+        return Optional.ofNullable(requestHeader.getContentLength())
+                .map(contentLength -> readRequestBody(bufferedReader, contentLength))
+                .orElse("");
+    }
+
+    private String readRequestBody(BufferedReader bufferedReader, Integer contentLength) {
+        try {
+            return IOUtils.readData(bufferedReader, contentLength);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
         }
     }
 
@@ -64,16 +83,27 @@ public class RequestHandler implements Runnable {
         return lines;
     }
 
-    private byte[] getResponse(RequestHeader header) {
+    private byte[] getResponse(RequestHeader header, String requestBody) {
         try {
             if (USER_CREATE_PATH.equals(header.getPath())) {
-                return userService.addUser(header.getParams()).toString().getBytes();
+                return addUser(header, requestBody);
             }
             return FileIoUtils.loadFileFromClasspath(header.getPath());
         } catch (Exception e) {
             e.printStackTrace();
             return DEFAULT_BODY.getBytes();
         }
+    }
+
+    private byte[] addUser(RequestHeader header, String requestBody) {
+        String method = header.getMethod();
+        if ("GET".equals(method)) {
+            return userService.addUser(header.getParams()).toString().getBytes();
+        }
+        if ("POST".equals(method)) {
+            return userService.addUser(RequestBodyParser.getRequestParams(requestBody)).toString().getBytes();
+        }
+        return "INVALID_METHOD".getBytes();
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {

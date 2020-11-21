@@ -49,4 +49,16 @@ public class RequestHeader {
     public Map<String, String> getParams() {
         return RequestHeaderParser.getRequestParams(lines.get(0));
     }
+
+    public String getMethod() {
+        return RequestHeaderParser.getMethod(lines.get(0));
+    }
+
+    public Integer getContentLength() {
+        return lines.stream()
+                .filter(line -> line.contains("Content-Length"))
+                .map(RequestHeaderParser::getContentLength)
+                .findFirst()
+                .orElse(null);
+    }
 }
