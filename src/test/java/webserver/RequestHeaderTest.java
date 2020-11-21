@@ -102,4 +102,36 @@ public class RequestHeaderTest {
 
         assertThat(header.getHost()).isEqualTo("localhost:8080");
     }
+
+    @Test
+    public void isLoginedUser() {
+        RequestHeader header = RequestHeader.of(Arrays.asList("GET /index.html HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Accept: */*",
+                "Cookie: logined=true"));
+
+        assertThat(header.isLogined()).isEqualTo(true);
+    }
+
+    @Test
+    public void isNotLoginedUser() {
+        RequestHeader header = RequestHeader.of(Arrays.asList("GET /index.html HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Accept: */*",
+                "Cookie: logined=false"));
+
+        assertThat(header.isLogined()).isEqualTo(false);
+    }
+
+    @Test
+    public void noCookie() {
+        RequestHeader header = RequestHeader.of(Arrays.asList("GET /index.html HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Accept: */*"));
+
+        assertThat(header.isLogined()).isEqualTo(false);
+    }
 }

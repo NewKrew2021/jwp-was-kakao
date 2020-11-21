@@ -3,6 +3,8 @@ package service;
 import db.DataBase;
 import model.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,5 +20,9 @@ public class UserService {
         return Optional.ofNullable(DataBase.findUserById(attributeMap.get("userId")))
                 .map(user -> user.getPassword().equals(attributeMap.get("password")))
                 .orElse(false);
+    }
+
+    public List<User> findAll() {
+        return new ArrayList<>(DataBase.findAll());
     }
 }

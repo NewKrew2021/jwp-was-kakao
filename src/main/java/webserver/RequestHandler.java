@@ -1,5 +1,9 @@
 package webserver;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
+import model.UsersDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
@@ -23,14 +27,20 @@ public class RequestHandler implements Runnable {
     private static final String DEFAULT_BODY = "Hello World";
     private static final String USER_CREATE_PATH = "/user/create";
     private static final String USER_LOGIN_PATH = "/user/login";
+    private static final String USER_LIST_PATH = "/user/list";
 
     private Socket connection;
     private UserService userService;
+    private Handlebars handlebars;
 
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
         userService = new UserService();
+        TemplateLoader loader = new ClassPathTemplateLoader();
+        loader.setPrefix("/templates");
+        loader.setSuffix(".html");
+        handlebars = new Handlebars(loader);
     }
 
     public void run() {
@@ -63,9 +73,27 @@ public class RequestHandler implements Runnable {
             response302HeaderWithCookie(dos, "http://" + requestHeader.getHost() + "/user/login_failed.html", false);
             return "".getBytes();
         }
+        if (USER_LIST_PATH.equals(requestHeader.getPath())) {
+            if (requestHeader.isLogined()) {
+                byte[] usersBody = findAllUsers().getBytes();
+                response200Header(dos, usersBody.length);
+                return usersBody;
+            }
+            response302Header(dos, "http://" + requestHeader.getHost() + "/user/login.html");
+            return "".getBytes();
+        }
         byte[] body = getResponseBodyFromFile(requestHeader);
         response200Header(dos, body.length);
         return body;
+    }
+
+    private String findAllUsers() {
+        try {
+            return handlebars.compile("user/list").apply(new UsersDto(userService.findAll()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private boolean login(RequestHeader header, String requestBody) {

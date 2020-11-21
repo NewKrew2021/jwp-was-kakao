@@ -69,4 +69,12 @@ public class RequestHeader {
                 .findFirst()
                 .orElse(null);
     }
+
+    public boolean isLogined() {
+        return lines.stream()
+                .filter(line -> line.contains("Cookie"))
+                .map(line -> line.contains("logined=true"))
+                .findFirst()
+                .orElse(false);
+    }
 }
