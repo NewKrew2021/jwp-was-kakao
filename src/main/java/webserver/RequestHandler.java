@@ -45,8 +45,7 @@ public class RequestHandler implements Runnable {
     private HttpRequest parseRequest(InputStream in) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         RequestParser requestParser = new RequestParser(bufferedReader);
-        HttpRequest parse = requestParser.parse();
-        return parse;
+        return requestParser.parse();
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
