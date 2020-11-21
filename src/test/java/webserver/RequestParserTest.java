@@ -41,6 +41,13 @@ public class RequestParserTest {
         assertThat(httpRequest.getMethod()).isEqualTo("GET");
     }
 
+    @DisplayName("RequestURI 를 파싱한다")
+    @Test
+    void parseRequestURI() {
+        HttpRequest httpRequest = requestParser.parse();
+        assertThat(httpRequest.getRequestURI()).isEqualTo("/index.html");
+    }
+
 
     private static class RequestParser {
         private final BufferedReader bufferedReader;
