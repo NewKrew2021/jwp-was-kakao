@@ -34,4 +34,8 @@ public class RequestHeaderParser {
     public static Integer getContentLength(String line) {
         return Integer.parseInt(line.split(":")[1].trim());
     }
+
+    public static String getHost(String line) {
+        return line.substring(line.indexOf(":") + 1).trim();
+    }
 }

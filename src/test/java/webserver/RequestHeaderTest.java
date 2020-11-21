@@ -91,4 +91,15 @@ public class RequestHeaderTest {
 
         assertThat(header.getContentLength()).isNull();
     }
+
+    @Test
+    public void getHost() {
+        RequestHeader header = RequestHeader.of(Arrays.asList("POST /user/create HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Accept: */*"));
+
+        assertThat(header.getHost()).isEqualTo("localhost:8080");
+    }
 }

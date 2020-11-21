@@ -42,12 +42,21 @@ public class RequestHandler implements Runnable {
             print(requestHeader);
             String requestBody = getRequestBody(bufferedReader, requestHeader);
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getResponse(requestHeader, requestBody);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            responseBody(dos, getResponseBody(requestHeader, requestBody, dos));
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private byte[] getResponseBody(RequestHeader requestHeader, String requestBody, DataOutputStream dos) {
+        if (USER_CREATE_PATH.equals(requestHeader.getPath())) {
+            addUser(requestHeader, requestBody);
+            response302Header(dos, "http://" + requestHeader.getHost() + "/index.html");
+            return "".getBytes();
+        }
+        byte[] body = getResponseBodyFromFile(requestHeader);
+        response200Header(dos, body.length);
+        return body;
     }
 
     private String getRequestBody(BufferedReader bufferedReader, RequestHeader requestHeader) {
@@ -83,11 +92,8 @@ public class RequestHandler implements Runnable {
         return lines;
     }
 
-    private byte[] getResponse(RequestHeader header, String requestBody) {
+    private byte[] getResponseBodyFromFile(RequestHeader header) {
         try {
-            if (USER_CREATE_PATH.equals(header.getPath())) {
-                return addUser(header, requestBody);
-            }
             return FileIoUtils.loadFileFromClasspath(header.getPath());
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,6 +110,16 @@ public class RequestHandler implements Runnable {
             return userService.addUser(RequestBodyParser.getRequestParams(requestBody)).toString().getBytes();
         }
         return "INVALID_METHOD".getBytes();
+    }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {

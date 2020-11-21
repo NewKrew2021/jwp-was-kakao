@@ -47,4 +47,11 @@ public class RequestHeaderParserTest {
 
         assertThat(contentLength).isEqualTo(59);
     }
+
+    @Test
+    public void getHost() {
+        String host = RequestHeaderParser.getHost("Host: localhost:8080");
+
+        assertThat(host).isEqualTo("localhost:8080");
+    }
 }

@@ -61,4 +61,12 @@ public class RequestHeader {
                 .findFirst()
                 .orElse(null);
     }
+
+    public String getHost() {
+        return lines.stream()
+                .filter(line -> line.contains("Host"))
+                .map(RequestHeaderParser::getHost)
+                .findFirst()
+                .orElse(null);
+    }
 }
