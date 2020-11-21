@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String TEMPLATE_PATH = "./templates";
+    private static final String STATIC_PATH = "./static";
 
     private final Socket connection;
 
@@ -26,9 +27,14 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = parseRequest(in);
             String requestURI = httpRequest.getRequestURI();
+            logger.debug("requestURI: {}", requestURI);
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = FileIoUtils.loadFileFromClasspath(TEMPLATE_PATH + requestURI);
+            String basePath = TEMPLATE_PATH;
+            if (requestURI.startsWith("/css") || requestURI.startsWith("/js")) {
+                basePath = STATIC_PATH;
+            }
+            byte[] body = FileIoUtils.loadFileFromClasspath(basePath + requestURI);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException | URISyntaxException e) {
