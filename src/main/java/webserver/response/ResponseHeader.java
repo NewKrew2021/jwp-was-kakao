@@ -1,4 +1,8 @@
-package webserver;
+package webserver.response;
+
+import webserver.request.ContentType;
+import webserver.request.Protocol;
+import webserver.request.Status;
 
 import java.util.Optional;
 
@@ -19,7 +23,7 @@ public class ResponseHeader {
         return new Builder();
     }
 
-    static class Builder {
+    public static class Builder {
         private ResponseHeader header;
 
         public Builder() {

@@ -9,7 +9,14 @@ import org.slf4j.LoggerFactory;
 import service.UserService;
 import utils.FileIoUtils;
 import utils.IOUtils;
-import utils.RequestBodyParser;
+import utils.RequestParser;
+import webserver.request.ContentType;
+import webserver.request.Protocol;
+import webserver.request.Request;
+import webserver.request.RequestHeader;
+import webserver.request.Status;
+import webserver.response.Response;
+import webserver.response.ResponseHeader;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -51,54 +58,63 @@ public class RequestHandler implements Runnable {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
             RequestHeader requestHeader = RequestHeader.of(readRequestHeader(bufferedReader));
             print(requestHeader);
-            String requestBody = getRequestBody(bufferedReader, requestHeader);
-            DataOutputStream dos = new DataOutputStream(out);
-            renderResponse(dos, getResponse(requestHeader, requestBody, dos));
+            Request request = new Request(requestHeader, getRequestBody(bufferedReader, requestHeader));
+            renderResponse(new DataOutputStream(out), getResponse(request));
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private Response getResponse(RequestHeader requestHeader, String requestBody, DataOutputStream dos) {
-        if (USER_CREATE_PATH.equals(requestHeader.getPath())) {
-            String method = requestHeader.getMethod();
+    private Response getResponse(Request request) {
+        String path = request.getHeader().getPath();
+        if (USER_CREATE_PATH.equals(path)) {
+            String method = request.getHeader().getMethod();
             if ("GET".equals(method)) {
-                userService.addUser(requestHeader.getParams());
+                userService.addUser(request.getHeader().getParams());
             }
             if ("POST".equals(method)) {
-                userService.addUser(RequestBodyParser.getRequestParams(requestBody));
+                userService.addUser(RequestParser.getRequestParamsFromBody(request.getBody()));
             }
             return new Response(
                     ResponseHeader.builder()
                             .protocol(Protocol.HTTP)
                             .status(Status.REDIRECT)
-                            .location("http://" + requestHeader.getHost() + "/index.html")
+                            .location("http://" + request.getHeader().getHost() + "/index.html")
                             .build()
             );
         }
-        if (USER_LOGIN_PATH.equals(requestHeader.getPath())) {
-            if (login(requestHeader, requestBody)) {
-                return new Response(
-                        ResponseHeader.builder()
-                                .protocol(Protocol.HTTP)
-                                .status(Status.REDIRECT)
-                                .cookie("logined=true", "/")
-                                .location("http://" + requestHeader.getHost() + "/index.html")
-                                .build()
-                );
+        if (USER_LOGIN_PATH.equals(path)) {
+            String method = request.getHeader().getMethod();
+            if ("POST".equals(method)) {
+                if (userService.login(RequestParser.getRequestParamsFromBody(request.getBody()))) {
+                    return new Response(
+                            ResponseHeader.builder()
+                                    .protocol(Protocol.HTTP)
+                                    .status(Status.REDIRECT)
+                                    .cookie("logined=true", "/")
+                                    .location("http://" + request.getHeader().getHost() + "/index.html")
+                                    .build()
+                    );
+                }
             }
             return new Response(
                     ResponseHeader.builder()
                             .protocol(Protocol.HTTP)
                             .status(Status.REDIRECT)
                             .cookie("logined=false", "/")
-                            .location("http://" + requestHeader.getHost() + "/user/login_failed.html")
+                            .location("http://" + request.getHeader().getHost() + "/user/login_failed.html")
                             .build()
             );
         }
-        if (USER_LIST_PATH.equals(requestHeader.getPath())) {
-            if (requestHeader.isLogined()) {
-                byte[] usersBody = findAllUsers().getBytes();
+        if (USER_LIST_PATH.equals(path)) {
+            if (request.getHeader().isLogined()) {
+                byte[] usersBody;
+                try {
+                    usersBody = handlebars.compile("user/list").apply(new UsersDto(userService.findAll())).getBytes();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    usersBody = "".getBytes();
+                }
                 return new Response(
                         ResponseHeader.builder()
                                 .protocol(Protocol.HTTP)
@@ -113,11 +129,17 @@ public class RequestHandler implements Runnable {
                     ResponseHeader.builder()
                             .protocol(Protocol.HTTP)
                             .status(Status.REDIRECT)
-                            .location("http://" + requestHeader.getHost() + "/user/login.html")
+                            .location("http://" + request.getHeader().getHost() + "/user/login.html")
                             .build());
         }
-        byte[] bodyFromFile = getResponseBodyFromFile(requestHeader);
-        if (requestHeader.getPath().endsWith(".css")) {
+        byte[] bodyFromFile;
+        try {
+            bodyFromFile = FileIoUtils.loadFileFromClasspath(request.getHeader().getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+            bodyFromFile = DEFAULT_BODY.getBytes();
+        }
+        if (path.endsWith(".css")) {
             return new Response(
                     ResponseHeader.builder()
                             .protocol(Protocol.HTTP)
@@ -137,23 +159,6 @@ public class RequestHandler implements Runnable {
                         .build(),
                 bodyFromFile
         );
-    }
-
-    private String findAllUsers() {
-        try {
-            return handlebars.compile("user/list").apply(new UsersDto(userService.findAll()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    private boolean login(RequestHeader header, String requestBody) {
-        String method = header.getMethod();
-        if ("POST".equals(method)) {
-            return userService.login(RequestBodyParser.getRequestParams(requestBody));
-        }
-        return false;
     }
 
     private String getRequestBody(BufferedReader bufferedReader, RequestHeader requestHeader) {
@@ -187,28 +192,6 @@ public class RequestHandler implements Runnable {
             line = bufferedReader.readLine();
         }
         return lines;
-    }
-
-    private byte[] getResponseBodyFromFile(RequestHeader header) {
-        try {
-            return FileIoUtils.loadFileFromClasspath(header.getPath());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return DEFAULT_BODY.getBytes();
-        }
-    }
-
-    private byte[] addUser(RequestHeader header, String requestBody) {
-        String method = header.getMethod();
-        if ("GET".equals(method)) {
-            return userService.addUser(header.getParams()).toString().getBytes();
-        }
-        if ("POST".equals(method)) {
-            System.out.println(requestBody);
-            System.out.println();
-            return userService.addUser(RequestBodyParser.getRequestParams(requestBody)).toString().getBytes();
-        }
-        return "INVALID_METHOD".getBytes();
     }
 
     private void renderResponse(DataOutputStream dos, Response response) {

@@ -1,6 +1,10 @@
 package webserver;
 
 import org.junit.jupiter.api.Test;
+import webserver.request.ContentType;
+import webserver.request.Protocol;
+import webserver.request.Status;
+import webserver.response.ResponseHeader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

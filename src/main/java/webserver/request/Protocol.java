@@ -1,12 +1,11 @@
-package webserver;
+package webserver.request;
 
-public enum ContentType {
-    HTML("text/html;charset=utf-8"),
-    CSS("text/css");
+public enum Protocol {
+    HTTP("HTTP/1.1");
 
     private final String message;
 
-    ContentType(String message) {
+    Protocol(String message) {
         this.message = message;
     }
 

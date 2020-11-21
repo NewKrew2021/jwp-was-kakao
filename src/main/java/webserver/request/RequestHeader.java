@@ -1,6 +1,6 @@
-package webserver;
+package webserver.request;
 
-import utils.RequestHeaderParser;
+import utils.RequestParser;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class RequestHeader {
     }
 
     public String getPath() {
-        String path = RequestHeaderParser.getRequestPath(lines.get(0));
+        String path = RequestParser.getRequestPath(lines.get(0));
         if (requiresStaticResource(path)) {
             return STATIC_PATH_PREFIX + path;
         }
@@ -47,17 +47,17 @@ public class RequestHeader {
     }
 
     public Map<String, String> getParams() {
-        return RequestHeaderParser.getRequestParams(lines.get(0));
+        return RequestParser.getRequestParams(lines.get(0));
     }
 
     public String getMethod() {
-        return RequestHeaderParser.getMethod(lines.get(0));
+        return RequestParser.getMethod(lines.get(0));
     }
 
     public Integer getContentLength() {
         return lines.stream()
                 .filter(line -> line.contains("Content-Length"))
-                .map(RequestHeaderParser::getContentLength)
+                .map(RequestParser::getContentLength)
                 .findFirst()
                 .orElse(null);
     }
@@ -65,7 +65,7 @@ public class RequestHeader {
     public String getHost() {
         return lines.stream()
                 .filter(line -> line.contains("Host"))
-                .map(RequestHeaderParser::getHost)
+                .map(RequestParser::getHost)
                 .findFirst()
                 .orElse(null);
     }
