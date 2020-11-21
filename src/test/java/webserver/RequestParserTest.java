@@ -48,6 +48,12 @@ public class RequestParserTest {
         assertThat(httpRequest.getRequestURI()).isEqualTo("/index.html");
     }
 
+    @DisplayName("프로토콜을 를 파싱한다")
+    @Test
+    void parseProtocol() {
+        HttpRequest httpRequest = requestParser.parse();
+        assertThat(httpRequest.getProtocol()).isEqualTo("HTTP/1.1");
+    }
 
     private static class RequestParser {
         private final BufferedReader bufferedReader;
