@@ -13,7 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RequestParserTest {
 
     private BufferedReader bufferedReader;
-    private RequestParser requestParser;
 
     @BeforeEach
     void setUp() {
@@ -24,34 +23,32 @@ public class RequestParserTest {
                 + "Connection: keep-alive\n"
                 + "Accept: */*"));
         //@formatter:on
-        requestParser = new RequestParser(bufferedReader);
     }
 
     @DisplayName("HttpRequest 를 생성한다")
     @Test
     void createHttpRequest() {
-        HttpRequest httpRequest = requestParser.parse();
-        assertThat(httpRequest).isNotNull();
+        assertThat(new RequestParser(bufferedReader).parse()).isNotNull();
     }
 
     @DisplayName("메소드를 파싱한다")
     @Test
     void parseMethod() {
-        HttpRequest httpRequest = requestParser.parse();
+        HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
         assertThat(httpRequest.getMethod()).isEqualTo("GET");
     }
 
     @DisplayName("RequestURI 를 파싱한다")
     @Test
     void parseRequestURI() {
-        HttpRequest httpRequest = requestParser.parse();
+        HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
         assertThat(httpRequest.getRequestURI()).isEqualTo("/index.html");
     }
 
     @DisplayName("프로토콜을 를 파싱한다")
     @Test
     void parseProtocol() {
-        HttpRequest httpRequest = requestParser.parse();
+        HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
         assertThat(httpRequest.getProtocol()).isEqualTo("HTTP/1.1");
     }
 
@@ -63,13 +60,13 @@ public class RequestParserTest {
         }
 
         public HttpRequest parse() {
+            return parseRequestLine();
+        }
+
+        private HttpRequest parseRequestLine() {
             String requestLine = nextLine();
             String[] requestLineSplit = requestLine.split(" ");
-            HttpRequest httpRequest = new HttpRequest();
-            httpRequest.setMethod(requestLineSplit[0]);
-            httpRequest.setRequestURI(requestLineSplit[1]);
-            httpRequest.setProtocol(requestLineSplit[2]);
-            return httpRequest;
+            return new HttpRequest(requestLineSplit[0], requestLineSplit[1], requestLineSplit[2]);
         }
 
         private String nextLine() {
@@ -82,32 +79,26 @@ public class RequestParserTest {
     }
 
     private static class HttpRequest {
-        private String method;
-        private String requestURI;
-        private String protocol;
+        private final String method;
+        private final String requestURI;
+        private final String protocol;
+
+        public HttpRequest(String method, String requestURI, String protocol) {
+            this.method = method;
+            this.requestURI = requestURI;
+            this.protocol = protocol;
+        }
 
         public String getMethod() {
             return method;
-        }
-
-        public void setMethod(String method) {
-            this.method = method;
         }
 
         public String getRequestURI() {
             return requestURI;
         }
 
-        public void setRequestURI(String requestURI) {
-            this.requestURI = requestURI;
-        }
-
         public String getProtocol() {
             return protocol;
-        }
-
-        public void setProtocol(String protocol) {
-            this.protocol = protocol;
         }
     }
 }
