@@ -68,6 +68,7 @@ public class RequestParserTest {
             HttpRequest httpRequest = new HttpRequest();
             httpRequest.setMethod(requestLineSplit[0]);
             httpRequest.setRequestURI(requestLineSplit[1]);
+            httpRequest.setProtocol(requestLineSplit[2]);
             return httpRequest;
         }
 
@@ -83,6 +84,7 @@ public class RequestParserTest {
     private static class HttpRequest {
         private String method;
         private String requestURI;
+        private String protocol;
 
         public String getMethod() {
             return method;
@@ -98,6 +100,14 @@ public class RequestParserTest {
 
         public void setRequestURI(String requestURI) {
             this.requestURI = requestURI;
+        }
+
+        public String getProtocol() {
+            return protocol;
+        }
+
+        public void setProtocol(String protocol) {
+            this.protocol = protocol;
         }
     }
 }
