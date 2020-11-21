@@ -24,10 +24,8 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            RequestParser requestParser = new RequestParser(bufferedReader);
-            HttpRequest parse = requestParser.parse();
-            String requestURI = parse.getRequestURI();
+            HttpRequest httpRequest = parseRequest(in);
+            String requestURI = httpRequest.getRequestURI();
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = FileIoUtils.loadFileFromClasspath(TEMPLATE_PATH + requestURI);
@@ -36,6 +34,13 @@ public class RequestHandler implements Runnable {
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private HttpRequest parseRequest(InputStream in) {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        RequestParser requestParser = new RequestParser(bufferedReader);
+        HttpRequest parse = requestParser.parse();
+        return parse;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
