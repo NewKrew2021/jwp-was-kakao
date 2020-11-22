@@ -17,7 +17,9 @@ class RequestParser {
     private HttpRequest parseRequestLine() {
         String requestLine = nextLine();
         String[] requestLineSplit = requestLine.split(" ");
-        return new HttpRequest(requestLineSplit[0], requestLineSplit[1], requestLineSplit[2]);
+        String requestURI = requestLineSplit[1];
+        String[] requestURIToken = requestURI.split("\\?");
+        return new HttpRequest(requestLineSplit[0], requestURIToken[0], requestLineSplit[2]);
     }
 
     private String nextLine() {
