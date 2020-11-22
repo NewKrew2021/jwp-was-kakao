@@ -18,6 +18,8 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
 
 class RequestParser {
+    public static final String HEADER_KEY_VALUE_SPLITTER = ": ";
+    public static final String QUERY_SPLITTER = "\\?";
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BufferedReader bufferedReader;
 
@@ -34,7 +36,7 @@ class RequestParser {
         logger.debug("requestLine: {}", requestLine);
         String[] requestLineToken = requestLine.split(" ");
         String requestURI = requestLineToken[1];
-        String[] requestURIToken = requestURI.split("\\?");
+        String[] requestURIToken = requestURI.split(QUERY_SPLITTER);
 
         HttpRequest httpRequest = new HttpRequest(requestLineToken[0], requestURIToken[0], requestLineToken[2]);
         if (requestURIToken.length == 2) {
@@ -50,7 +52,7 @@ class RequestParser {
         String headerLine;
         while (!(headerLine = nextLine()).equals("")) {
             logger.debug("headerLine: {}", headerLine);
-            String[] header = headerLine.split(": ");
+            String[] header = headerLine.split(HEADER_KEY_VALUE_SPLITTER);
             httpRequest.addHeader(header[0], header[1]);
         }
     }
