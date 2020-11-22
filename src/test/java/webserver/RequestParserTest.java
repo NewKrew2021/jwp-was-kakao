@@ -8,9 +8,13 @@ import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.HashMap;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Map;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RequestParserTest {
@@ -76,35 +80,49 @@ public class RequestParserTest {
         @Test
         void parse() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getUser()).isEqualTo(new User("javajigi", "password", "박재성", "javagigi@slipp.net"));
+            assertThat(httpRequest.getUser()).isEqualTo(new User( //
+                    "javajigi",  //
+                    "password",  //
+                    "박재성",  //
+                    "javagigi@slipp.net"));
         }
 
         @DisplayName("query stirng 문자열을 Map 으로 변환한다.")
         @Test
         void queryStringLineToMap() {
-            QueryStringParser queryStringParser = new QueryStringParser("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+            QueryStringParser queryStringParser = new QueryStringParser( //
+                    "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
             assertThat(queryStringParser.parse()) //
                     .containsEntry("userId", "javajigi") //
                     .containsEntry("password", "password") //
                     .containsEntry("name", "박재성") //
                     .containsEntry("email", "javajigi@slipp.net");
-
         }
 
         private class QueryStringParser {
-            private String queryString;
+            private final String queryString;
 
             public QueryStringParser(String queryString) {
                 this.queryString = queryString;
             }
 
             public Map<String, String> parse() {
-                Map<String, String> params = new HashMap<>();
-                params.put("userId", "javajigi");
-                params.put("password", "password");
-                params.put("name", "박재성");
-                params.put("email", "javajigi@slipp.net");
-                return params;
+                String[] queryStringToken = queryString.split("&");
+                return Arrays.stream(queryStringToken) //
+                        .map(token -> token.split("=")) //
+                        .map(keyValueArray -> {
+                            return new String[]{keyValueArray[0], decode(keyValueArray[1])};
+                        }) //
+                        .collect(toMap(keyValueArray -> keyValueArray[0], //
+                                keyValueArray -> keyValueArray[1]));
+            }
+
+            private String decode(String s) {
+                try {
+                    return URLDecoder.decode(s, UTF_8.toString());
+                } catch (UnsupportedEncodingException e) {
+                    throw new IllegalStateException(e);
+                }
             }
         }
     }
