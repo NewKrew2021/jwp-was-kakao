@@ -16,8 +16,8 @@ public class RequestParserTest {
     private BufferedReader bufferedReader;
 
     @Nested
-    @DisplayName("페이지를 로드한다")
-    class PageLoad {
+    @DisplayName("메소드, requestURI, 프로토콜을 파싱한다")
+    class RequestLine {
         @BeforeEach
         void setUp() {
             //@formatter:off
@@ -92,7 +92,36 @@ public class RequestParserTest {
                     .containsEntry("name", "박재성") //
                     .containsEntry("email", "javajigi@slipp.net");
         }
-
     }
 
+    @Nested
+    @DisplayName("헤더를 파싱한다")
+    class Headers {
+        @BeforeEach
+        void setUp() {
+            //@formatter:off
+            bufferedReader = new BufferedReader(new StringReader(
+                    "POST /user/create HTTP/1.1\n" +
+                            "Host: localhost:8080\n" +
+                            "Connection: keep-alive\n" +
+                            "Content-Length: 59\n" +
+                            "Content-Type: application/x-www-form-urlencoded\n" +
+                            "Accept: */*\n" +
+                            "\n" +
+                            "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"));
+            //@formatter:on
+        }
+
+        @DisplayName("메소드를 파싱한다")
+        @Test
+        void parse() {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+            assertThat(httpRequest.getHeaders()) //
+                    .containsEntry("Host", "localhost:8080") //
+                    .containsEntry("Connection", "keep-alive") //
+                    .containsEntry("Content-Length", "59") //
+                    .containsEntry("Content-type", "application/x-www-form-urlencoded") //
+                    .containsEntry("Accept", "*/*");
+        }
+    }
 }
