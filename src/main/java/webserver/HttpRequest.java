@@ -2,6 +2,7 @@ package webserver;
 
 import model.User;
 
+import java.util.HashMap;
 import java.util.Map;
 
 class HttpRequest {
@@ -39,5 +40,15 @@ class HttpRequest {
 
     public Map<String, String> getQueryParams() {
         return queryParams;
+    }
+
+    public Map<String, String> getHeaders() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Host", "localhost:8080");
+        headers.put("Connection", "keep-alive");
+        headers.put("Content-Length", "59");
+        headers.put("Content-type", "application/x-www-form-urlencoded");
+        headers.put("Accept", "*/*");
+        return headers;
     }
 }
