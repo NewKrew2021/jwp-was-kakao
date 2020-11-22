@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,27 +32,27 @@ public class RequestParserTest {
 
         @DisplayName("HttpRequest 를 생성한다")
         @Test
-        void createHttpRequest() {
+        void createHttpRequest() throws IOException {
             assertThat(new RequestParser(bufferedReader).parse()).isNotNull();
         }
 
         @DisplayName("메소드를 파싱한다")
         @Test
-        void parseMethod() {
+        void parseMethod() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getMethod()).isEqualTo("GET");
         }
 
         @DisplayName("RequestURI 를 파싱한다")
         @Test
-        void parseRequestURI() {
+        void parseRequestURI() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getRequestURI()).isEqualTo("/index.html");
         }
 
         @DisplayName("프로토콜을 를 파싱한다")
         @Test
-        void parseProtocol() {
+        void parseProtocol() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getProtocol()).isEqualTo("HTTP/1.1");
         }
@@ -72,7 +73,7 @@ public class RequestParserTest {
         }
 
         @Test
-        void parse() {
+        void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getUser()).isEqualTo(new User( //
                     "javajigi",  //
@@ -113,7 +114,7 @@ public class RequestParserTest {
         }
 
         @Test
-        void parse() {
+        void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getHeaders()) //
                     .containsEntry("Host", "localhost:8080") //
@@ -133,16 +134,16 @@ public class RequestParserTest {
                     "POST /user/create HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
-                            "Content-Length: 59\n" +
+                            "Content-Length: 93\n" +
                             "Content-Type: application/x-www-form-urlencoded\n" +
                             "Accept: */*\n" +
                             "\n" +
-                            "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"));
+                            "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net\n"));
             //@formatter:on
         }
 
         @Test
-        void parse() {
+        void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getUser()).isEqualTo(new User( //
                     "javajigi",  //

@@ -11,7 +11,8 @@ class HttpRequest {
     private final String requestURI;
     private final String protocol;
     private Map<String, String> queryParams;
-    private Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
+    private Map<String, String> entity;
 
     public HttpRequest(String method, String requestURI, String protocol) {
         this.method = method;
@@ -32,7 +33,7 @@ class HttpRequest {
     }
 
     public User getUser() {
-        Map<String, String> queryParams = getQueryParams();
+        Map<String, String> queryParams = getEntity();
         return new User(queryParams.get("userId"), queryParams.get("password"), queryParams.get("name"), queryParams.get("email"));
     }
 
@@ -50,5 +51,13 @@ class HttpRequest {
 
     public void addHeader(String name, String value) {
         headers.put(name, value);
+    }
+
+    public void setEntity(Map<String, String> entity) {
+        this.entity = entity;
+    }
+
+    public Map<String, String> getEntity() {
+        return entity;
     }
 }

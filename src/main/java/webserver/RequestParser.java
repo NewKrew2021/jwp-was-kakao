@@ -5,12 +5,14 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Collections;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -27,8 +29,18 @@ class RequestParser {
         this.bufferedReader = bufferedReader;
     }
 
-    public HttpRequest parse() {
-        return parseRequestLine();
+    public HttpRequest parse() throws IOException {
+        HttpRequest httpRequest = parseRequestLine();
+
+        addHeaders(httpRequest);
+
+        int contentLength = Integer.parseInt(httpRequest.getHeaders().get("Content-Length"));
+        String entityString = IOUtils.readData(bufferedReader, contentLength);
+
+        QueryStringParser queryStringParser = new QueryStringParser(entityString);
+        Map<String, String> entity = queryStringParser.parse();
+        httpRequest.setEntity(Collections.unmodifiableMap(entity));
+        return httpRequest;
     }
 
     private HttpRequest parseRequestLine() {
@@ -42,9 +54,6 @@ class RequestParser {
         if (requestURIToken.length == 2) {
             httpRequest.setQueryParams(new QueryStringParser(requestURIToken[1]).parse());
         }
-
-        addHeaders(httpRequest);
-
         return httpRequest;
     }
 
