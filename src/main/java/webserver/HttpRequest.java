@@ -1,5 +1,7 @@
 package webserver;
 
+import model.User;
+
 class HttpRequest {
     private final String method;
     private final String requestURI;
@@ -21,5 +23,9 @@ class HttpRequest {
 
     public String getProtocol() {
         return protocol;
+    }
+
+    public User getUser() {
+        return new User("javajigi", "password", "박재성", "javagigi@slipp.net");
     }
 }
