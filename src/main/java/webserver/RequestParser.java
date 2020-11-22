@@ -1,12 +1,14 @@
 package webserver;
 
+import com.google.common.base.Splitter;
+import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Arrays;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -45,7 +47,9 @@ class RequestParser {
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     static class QueryStringParser {
+        public static final MapSplitter QUERY_STRING_SPLITTER = Splitter.on("&").withKeyValueSeparator("=");
         private final String queryString;
 
         public QueryStringParser(String queryString) {
@@ -53,16 +57,11 @@ class RequestParser {
         }
 
         public Map<String, String> parse() {
-            String[] queryStringToken = queryString.split("&");
-            return Arrays.stream(queryStringToken) //
-                    .map(token -> token.split("=")) //
-                    .map(keyValueArray -> {
-                        return new String[]{keyValueArray[0], decode(keyValueArray[1])};
-                    }) //
+            return QUERY_STRING_SPLITTER.split(queryString) //
+                    .entrySet().stream() //
+                    .map(entry -> new SimpleEntry<>(entry.getKey(), decode(entry.getValue()))) //
                     .collect(collectingAndThen(toMap( //
-                            keyValueArray -> keyValueArray[0], //
-                            keyValueArray -> keyValueArray[1]), //
-                            ImmutableMap::copyOf));
+                            SimpleEntry::getKey, SimpleEntry::getValue), ImmutableMap::copyOf));
         }
 
         private String decode(String s) {
