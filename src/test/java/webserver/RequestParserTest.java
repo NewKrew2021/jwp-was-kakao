@@ -1,5 +1,6 @@
 package webserver;
 
+import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -53,6 +54,27 @@ public class RequestParserTest {
         void parseProtocol() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getProtocol()).isEqualTo("HTTP/1.1");
+        }
+    }
+
+    @Nested
+    @DisplayName("query string 을 파싱한다.")
+    class QueryString {
+        @BeforeEach
+        void setUp() {
+            //@formatter:off
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n" +
+                            "Host: localhost:8080\n" +
+                            "Connection: keep-alive\n" +
+                            "Accept: */*\n"));
+            //@formatter:on
+        }
+
+        @Test
+        void parse() {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+            assertThat(httpRequest.getUser()).isEqualTo(new User("javajigi", "password", "박재성", "javagigi@slipp.net"));
         }
     }
 }
