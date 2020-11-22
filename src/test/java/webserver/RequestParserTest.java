@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -75,6 +76,18 @@ public class RequestParserTest {
         void parse() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getUser()).isEqualTo(new User("javajigi", "password", "박재성", "javagigi@slipp.net"));
+        }
+
+        @DisplayName("query stirng 문자열을 Map 으로 변환한다.")
+        @Test
+        void queryStringLineToMap() {
+            QueryStringParser queryStringParser = new QueryStringParser("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+            assertThat(queryStringParser.parse()) //
+                    .containsEntry("userId", "javajigi") //
+                    .containsEntry("password", "password") //
+                    .containsEntry("name", "박재성") //
+                    .containsEntry("email", "javajigi@slipp.net");
+
         }
     }
 }
