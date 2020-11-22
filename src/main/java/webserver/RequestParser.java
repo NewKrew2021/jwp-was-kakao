@@ -16,10 +16,10 @@ class RequestParser {
 
     private HttpRequest parseRequestLine() {
         String requestLine = nextLine();
-        String[] requestLineSplit = requestLine.split(" ");
-        String requestURI = requestLineSplit[1];
+        String[] requestLineToken = requestLine.split(" ");
+        String requestURI = requestLineToken[1];
         String[] requestURIToken = requestURI.split("\\?");
-        return new HttpRequest(requestLineSplit[0], requestURIToken[0], requestLineSplit[2]);
+        return new HttpRequest(requestLineToken[0], requestURIToken[0], requestLineToken[2]);
     }
 
     private String nextLine() {
