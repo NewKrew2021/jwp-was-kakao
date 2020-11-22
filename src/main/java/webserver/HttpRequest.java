@@ -33,8 +33,15 @@ class HttpRequest {
     }
 
     public User getUser() {
-        Map<String, String> queryParams = getEntity();
-        return new User(queryParams.get("userId"), queryParams.get("password"), queryParams.get("name"), queryParams.get("email"));
+        Map<String, String> queryParams = getQueryParams();
+        if (queryParams != null) {
+            return new User(queryParams.get("userId"), queryParams.get("password"), queryParams.get("name"), queryParams.get("email"));
+        }
+        Map<String, String> entity = getEntity();
+        if (entity != null) {
+            return new User(entity.get("userId"), entity.get("password"), entity.get("name"), entity.get("email"));
+        }
+        return null;
     }
 
     public void setQueryParams(Map<String, String> queryParams) {

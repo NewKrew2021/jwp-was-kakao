@@ -85,9 +85,9 @@ public class RequestParserTest {
         @DisplayName("query stirng 문자열을 Map 으로 변환한다.")
         @Test
         void queryStringLineToMap() {
-            RequestParser.QueryStringParser queryStringParser = new RequestParser.QueryStringParser( //
+            RequestParser.UrlEncodedStringParser urlEncodedStringParser = new RequestParser.UrlEncodedStringParser( //
                     "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
-            assertThat(queryStringParser.parse()) //
+            assertThat(urlEncodedStringParser.parse()) //
                     .containsEntry("userId", "javajigi") //
                     .containsEntry("password", "password") //
                     .containsEntry("name", "박재성") //
@@ -105,7 +105,7 @@ public class RequestParserTest {
                     "POST /user/create HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
-                            "Content-Length: 59\n" +
+                            "Content-Length: 93\n" +
                             "Content-Type: application/x-www-form-urlencoded\n" +
                             "Accept: */*\n" +
                             "\n" +
@@ -119,7 +119,7 @@ public class RequestParserTest {
             assertThat(httpRequest.getHeaders()) //
                     .containsEntry("Host", "localhost:8080") //
                     .containsEntry("Connection", "keep-alive") //
-                    .containsEntry("Content-Length", "59") //
+                    .containsEntry("Content-Length", "93") //
                     .containsEntry("Content-Type", "application/x-www-form-urlencoded") //
                     .containsEntry("Accept", "*/*");
         }

@@ -14,6 +14,7 @@ import java.net.URLDecoder;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -34,13 +35,28 @@ class RequestParser {
 
         addHeaders(httpRequest);
 
+        if (hasEntity(httpRequest)) {
+            httpRequest.setEntity(Collections.unmodifiableMap(getEntity(httpRequest)));
+        }
+
+        return httpRequest;
+    }
+
+    private Map<String, String> getEntity(HttpRequest httpRequest) throws IOException {
         int contentLength = Integer.parseInt(httpRequest.getHeaders().get("Content-Length"));
         String entityString = IOUtils.readData(bufferedReader, contentLength);
 
-        QueryStringParser queryStringParser = new QueryStringParser(entityString);
-        Map<String, String> entity = queryStringParser.parse();
-        httpRequest.setEntity(Collections.unmodifiableMap(entity));
-        return httpRequest;
+        UrlEncodedStringParser urlEncodedStringParser = new UrlEncodedStringParser(entityString);
+        return urlEncodedStringParser.parse();
+    }
+
+    private boolean hasEntity(HttpRequest httpRequest) {
+        String contentLengthHeader = httpRequest.getHeaders().get("Content-Length");
+        if (Objects.isNull(contentLengthHeader)) {
+            return false;
+        }
+
+        return Integer.parseInt(contentLengthHeader) > 0;
     }
 
     private HttpRequest parseRequestLine() {
@@ -52,7 +68,7 @@ class RequestParser {
 
         HttpRequest httpRequest = new HttpRequest(requestLineToken[0], requestURIToken[0], requestLineToken[2]);
         if (requestURIToken.length == 2) {
-            httpRequest.setQueryParams(new QueryStringParser(requestURIToken[1]).parse());
+            httpRequest.setQueryParams(new UrlEncodedStringParser(requestURIToken[1]).parse());
         }
         return httpRequest;
     }
@@ -75,11 +91,11 @@ class RequestParser {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    static class QueryStringParser {
+    static class UrlEncodedStringParser {
         public static final MapSplitter QUERY_STRING_SPLITTER = Splitter.on("&").withKeyValueSeparator("=");
         private final String queryString;
 
-        public QueryStringParser(String queryString) {
+        public UrlEncodedStringParser(String queryString) {
             this.queryString = queryString;
         }
 
