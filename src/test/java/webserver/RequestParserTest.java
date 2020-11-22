@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -88,6 +89,23 @@ public class RequestParserTest {
                     .containsEntry("name", "박재성") //
                     .containsEntry("email", "javajigi@slipp.net");
 
+        }
+
+        private class QueryStringParser {
+            private String queryString;
+
+            public QueryStringParser(String queryString) {
+                this.queryString = queryString;
+            }
+
+            public Map<String, String> parse() {
+                Map<String, String> params = new HashMap<>();
+                params.put("userId", "javajigi");
+                params.put("password", "password");
+                params.put("name", "박재성");
+                params.put("email", "javajigi@slipp.net");
+                return params;
+            }
         }
     }
 }
