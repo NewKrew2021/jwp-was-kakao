@@ -31,8 +31,9 @@ class RequestParser {
         String[] requestURIToken = requestURI.split("\\?");
 
         HttpRequest httpRequest = new HttpRequest(requestLineToken[0], requestURIToken[0], requestLineToken[2]);
-        QueryStringParser queryStringParser = new QueryStringParser(requestURIToken[1]);
-        httpRequest.setQueryParams(queryStringParser.parse());
+        if (requestURIToken.length == 2) {
+            httpRequest.setQueryParams(new QueryStringParser(requestURIToken[1]).parse());
+        }
         return httpRequest;
     }
 
