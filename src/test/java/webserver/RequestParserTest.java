@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedReader;
 import java.io.StringReader;
 
-import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RequestParserTest {
@@ -79,7 +78,7 @@ public class RequestParserTest {
                     "javajigi",  //
                     "password",  //
                     "박재성",  //
-                    "javagigi@slipp.net"));
+                    "javajigi@slipp.net"));
         }
 
         @DisplayName("query stirng 문자열을 Map 으로 변환한다.")
