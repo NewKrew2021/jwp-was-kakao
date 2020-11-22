@@ -3,6 +3,8 @@ package webserver;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
 
 class RequestParser {
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private final BufferedReader bufferedReader;
 
     public RequestParser(BufferedReader bufferedReader) {
@@ -28,6 +31,7 @@ class RequestParser {
 
     private HttpRequest parseRequestLine() {
         String requestLine = nextLine();
+        logger.debug("requestLine: {}", requestLine);
         String[] requestLineToken = requestLine.split(" ");
         String requestURI = requestLineToken[1];
         String[] requestURIToken = requestURI.split("\\?");
@@ -35,6 +39,13 @@ class RequestParser {
         HttpRequest httpRequest = new HttpRequest(requestLineToken[0], requestURIToken[0], requestLineToken[2]);
         if (requestURIToken.length == 2) {
             httpRequest.setQueryParams(new QueryStringParser(requestURIToken[1]).parse());
+        }
+
+        String headerLine;
+        while (!(headerLine = nextLine()).equals("")) {
+            logger.debug("headerLine: {}", headerLine);
+            String[] header = headerLine.split(": ");
+            httpRequest.addHeader(header[0], header[1]);
         }
         return httpRequest;
     }

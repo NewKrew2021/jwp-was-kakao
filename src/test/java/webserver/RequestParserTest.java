@@ -22,10 +22,10 @@ public class RequestParserTest {
         void setUp() {
             //@formatter:off
             bufferedReader = new BufferedReader(new StringReader(
-                    "GET /index.html HTTP/1.1\n"
-                            + "Host: localhost:8080\n"
-                            + "Connection: keep-alive\n"
-                            + "Accept: */*"));
+                    "GET /index.html HTTP/1.1\n" +
+                            "Host: localhost:8080\n" +
+                            "Connection: keep-alive\n" +
+                            "Accept: */*\n\n"));
             //@formatter:on
         }
 
@@ -67,7 +67,7 @@ public class RequestParserTest {
                     "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
-                            "Accept: */*\n"));
+                            "Accept: */*\n\n"));
             //@formatter:on
         }
 
@@ -112,7 +112,6 @@ public class RequestParserTest {
             //@formatter:on
         }
 
-        @DisplayName("메소드를 파싱한다")
         @Test
         void parse() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
@@ -120,7 +119,7 @@ public class RequestParserTest {
                     .containsEntry("Host", "localhost:8080") //
                     .containsEntry("Connection", "keep-alive") //
                     .containsEntry("Content-Length", "59") //
-                    .containsEntry("Content-type", "application/x-www-form-urlencoded") //
+                    .containsEntry("Content-Type", "application/x-www-form-urlencoded") //
                     .containsEntry("Accept", "*/*");
         }
     }

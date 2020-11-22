@@ -2,6 +2,7 @@ package webserver;
 
 import model.User;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ class HttpRequest {
     private final String requestURI;
     private final String protocol;
     private Map<String, String> queryParams;
+    private Map<String, String> headers = new HashMap<>();
 
     public HttpRequest(String method, String requestURI, String protocol) {
         this.method = method;
@@ -43,12 +45,10 @@ class HttpRequest {
     }
 
     public Map<String, String> getHeaders() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Host", "localhost:8080");
-        headers.put("Connection", "keep-alive");
-        headers.put("Content-Length", "59");
-        headers.put("Content-type", "application/x-www-form-urlencoded");
-        headers.put("Accept", "*/*");
-        return headers;
+        return Collections.unmodifiableMap(headers);
+    }
+
+    public void addHeader(String name, String value) {
+        headers.put(name, value);
     }
 }
