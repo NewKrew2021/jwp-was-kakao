@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
 
 class RequestParser {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BufferedReader bufferedReader;
 
     public RequestParser(BufferedReader bufferedReader) {
@@ -41,13 +41,18 @@ class RequestParser {
             httpRequest.setQueryParams(new QueryStringParser(requestURIToken[1]).parse());
         }
 
+        addHeaders(httpRequest);
+
+        return httpRequest;
+    }
+
+    private void addHeaders(HttpRequest httpRequest) {
         String headerLine;
         while (!(headerLine = nextLine()).equals("")) {
             logger.debug("headerLine: {}", headerLine);
             String[] header = headerLine.split(": ");
             httpRequest.addHeader(header[0], header[1]);
         }
-        return httpRequest;
     }
 
     private String nextLine() {
