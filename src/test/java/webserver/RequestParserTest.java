@@ -8,12 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Map;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -90,7 +85,7 @@ public class RequestParserTest {
         @DisplayName("query stirng 문자열을 Map 으로 변환한다.")
         @Test
         void queryStringLineToMap() {
-            QueryStringParser queryStringParser = new QueryStringParser( //
+            RequestParser.QueryStringParser queryStringParser = new RequestParser.QueryStringParser( //
                     "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
             assertThat(queryStringParser.parse()) //
                     .containsEntry("userId", "javajigi") //
@@ -99,31 +94,6 @@ public class RequestParserTest {
                     .containsEntry("email", "javajigi@slipp.net");
         }
 
-        private class QueryStringParser {
-            private final String queryString;
-
-            public QueryStringParser(String queryString) {
-                this.queryString = queryString;
-            }
-
-            public Map<String, String> parse() {
-                String[] queryStringToken = queryString.split("&");
-                return Arrays.stream(queryStringToken) //
-                        .map(token -> token.split("=")) //
-                        .map(keyValueArray -> {
-                            return new String[]{keyValueArray[0], decode(keyValueArray[1])};
-                        }) //
-                        .collect(toMap(keyValueArray -> keyValueArray[0], //
-                                keyValueArray -> keyValueArray[1]));
-            }
-
-            private String decode(String s) {
-                try {
-                    return URLDecoder.decode(s, UTF_8.toString());
-                } catch (UnsupportedEncodingException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-        }
     }
+
 }

@@ -2,6 +2,13 @@ package webserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toMap;
 
 class RequestParser {
     private final BufferedReader bufferedReader;
@@ -27,6 +34,33 @@ class RequestParser {
             return bufferedReader.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    static class QueryStringParser {
+        private final String queryString;
+
+        public QueryStringParser(String queryString) {
+            this.queryString = queryString;
+        }
+
+        public Map<String, String> parse() {
+            String[] queryStringToken = queryString.split("&");
+            return Arrays.stream(queryStringToken) //
+                    .map(token -> token.split("=")) //
+                    .map(keyValueArray -> {
+                        return new String[]{keyValueArray[0], decode(keyValueArray[1])};
+                    }) //
+                    .collect(toMap(keyValueArray -> keyValueArray[0], //
+                            keyValueArray -> keyValueArray[1]));
+        }
+
+        private String decode(String s) {
+            try {
+                return URLDecoder.decode(s, UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 }
