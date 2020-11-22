@@ -123,4 +123,32 @@ public class RequestParserTest {
                     .containsEntry("Accept", "*/*");
         }
     }
+    @Nested
+    @DisplayName("form entity 를 파싱한다")
+    class FormEntity {
+        @BeforeEach
+        void setUp() {
+            //@formatter:off
+            bufferedReader = new BufferedReader(new StringReader(
+                    "POST /user/create HTTP/1.1\n" +
+                            "Host: localhost:8080\n" +
+                            "Connection: keep-alive\n" +
+                            "Content-Length: 59\n" +
+                            "Content-Type: application/x-www-form-urlencoded\n" +
+                            "Accept: */*\n" +
+                            "\n" +
+                            "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"));
+            //@formatter:on
+        }
+
+        @Test
+        void parse() {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+            assertThat(httpRequest.getUser()).isEqualTo(new User( //
+                    "javajigi",  //
+                    "password",  //
+                    "박재성",  //
+                    "javajigi@slipp.net"));
+        }
+    }
 }
