@@ -10,7 +10,10 @@
 
 
 ## Todo
-* HttpRequest 에서 Request-Line 추출 
+* 회원가입
 
 ## Done
-* ~~모든 request header 출력~~ 
+* ~~모든 request header 출력~~
+* ~~HttpRequest 에서 Request-Line 추출~~
+* ~~Request URI 를 로딩하여 응답으로 내려주기~~
+* ~~static resource 요청처리~~ 

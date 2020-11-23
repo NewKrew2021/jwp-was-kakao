@@ -3,6 +3,7 @@ package webserver.http;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class HttpRequestTest {
     @DisplayName("http 요청에서 request line 정보를 가져올 수 있다")
     @Test
     void requestLine() {
-        List<String> httpRequestMessage = Arrays.asList("GET /index.html HTTP/1.1");
+        List<String> httpRequestMessage = new ArrayList<>();
+        httpRequestMessage.add("GET /index.html HTTP/1.1");
         httpRequestMessage.addAll(headers);
 
         HttpRequest httpRequest = new HttpRequest(httpRequestMessage);
@@ -34,7 +36,8 @@ public class HttpRequestTest {
     @Test
     void invalidRequestLine(){
         String invalidRequestLine = "GET HTTP/1.1";
-        List<String> httpRequestMessage = Arrays.asList(invalidRequestLine);
+        List<String> httpRequestMessage = new ArrayList<>();
+        httpRequestMessage.add(invalidRequestLine);
         httpRequestMessage.addAll(headers);
 
         assertThatThrownBy(() -> new HttpRequest(httpRequestMessage))

@@ -3,10 +3,14 @@ package webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.HttpRequest;
+import webserver.http.HttpRequestDispatcher;
+import webserver.http.HttpResponse;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class RequestHandler implements Runnable {
@@ -14,8 +18,11 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
 
+    private HttpRequestDispatcher httpRequestDispatcher;
+
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        this.httpRequestDispatcher = new HttpRequestDispatcher();
     }
 
     public void run() {
@@ -23,22 +30,17 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            HttpRequest httpRequest = parseHttpRequest(new InputStreamReader(in));
-
+            HttpRequest httpRequest = parseHttpRequest(in);
             printAllRequestHeaders(httpRequest);
-
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            HttpResponse httpResponse = new HttpResponse(out);
+            httpRequestDispatcher.dispatch(httpRequest, httpResponse);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private HttpRequest parseHttpRequest(InputStreamReader streamReader) {
-        HttpHeaderReader reader = new HttpHeaderReader(streamReader);
+    private HttpRequest parseHttpRequest(InputStream in) {
+        HttpHeaderReader reader = new HttpHeaderReader(new InputStreamReader(in));
         return new HttpRequest(reader.lines().collect(Collectors.toList()));
     }
 
@@ -46,23 +48,4 @@ public class RequestHandler implements Runnable {
         logger.debug(httpRequest.toString());
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 }
