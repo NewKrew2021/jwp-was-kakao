@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import com.google.common.collect.Sets;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -15,13 +16,9 @@ import utils.FileIoUtils;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -35,8 +32,7 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
+        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = parseRequest(in);
@@ -125,16 +121,28 @@ public class RequestHandler implements Runnable {
 
     private void responseStaticContent(String requestURI, DataOutputStream dos) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
-        response200Header(dos, body.length);
+        response200Header(dos, body.length, getContentType(requestURI));
         responseBody(dos, body);
     }
 
-    private String getBasePath(String requestURI) {
-        String basePath = TEMPLATE_PATH;
-        if (requestURI.startsWith("/css") || requestURI.startsWith("/js")) {
-            basePath = STATIC_PATH;
+    private String getContentType(String requestURI) {
+        switch (requestURI.substring(requestURI.lastIndexOf(".") + 1)) {
+            case "js":
+                return "application/js";
+            case "css":
+                return "text/css";
+            default:
+                return "text/html;charset=utf-8";
         }
-        return basePath;
+    }
+
+    private String getBasePath(String requestURI) {
+        return Sets.newHashSet("/css", "/js", "/fonts", "/images") //
+                .stream() //
+                .filter(requestURI::startsWith) //
+                .findAny() //
+                .map(path -> STATIC_PATH) //
+                .orElse(TEMPLATE_PATH);
     }
 
     private HttpRequest parseRequest(InputStream in) throws IOException {
@@ -143,10 +151,14 @@ public class RequestHandler implements Runnable {
         return requestParser.parse();
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int length) {
+        response200Header(dos, length, "text/html;charset=utf-8");
+    }
+
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -154,9 +166,6 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response302Header(DataOutputStream dos, String location) {
-        response302Header(dos, location, emptyList());
-    }
 
     private void response302Header(DataOutputStream dos, String location, List<String> headers) {
         try {
