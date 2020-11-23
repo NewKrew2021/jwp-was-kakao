@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -163,16 +164,18 @@ public class RequestParserTest {
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
                             "Accept: */*\n" +
-                            "Cookies: logined=true; Idea-32c00508=37ab5797-f595-40c6-b63f-d4e27524f593; Idea-32c008c9=b5b2b305-3b96-4335-9659-dfa0d33877fd;\n\n"));
+                            "Cookie: logined=true; Idea-32c00508=37ab5797-f595-40c6-b63f-d4e27524f593; Idea-32c008c9=b5b2b305-3b96-4335-9659-dfa0d33877fd\n\n"));
             //@formatter:on
         }
 
         @Test
         void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getCookies().asMap()) //
+
+            Map<String, String> cookiesMap = httpRequest.getCookies().asMap();
+            assertThat(cookiesMap) //
                     .containsEntry("logined", "true") //
-                    .containsEntry("Idea-32c00508", "32c00508=37ab5797-f595-40c6-b63f-d4e27524f593") //
+                    .containsEntry("Idea-32c00508", "37ab5797-f595-40c6-b63f-d4e27524f593") //
                     .containsEntry("Idea-32c008c9", "b5b2b305-3b96-4335-9659-dfa0d33877fd") ;
         }
     }
