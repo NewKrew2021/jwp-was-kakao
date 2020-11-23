@@ -10,11 +10,12 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -38,22 +39,16 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-            if (requestURI.equals("/user/create") && httpRequest.getMethod().equals("POST")) {
-                DataBase.addUser(httpRequest.getUser());
 
-                response302Header(dos, "/index.html");
+            if (requestURI.equals("/user/create") && httpRequest.getMethod().equals("POST")) {
+                Response response = handleUserCreate(httpRequest.getUser());
+                response302Header(dos, response.getLocation(), response.getHeaders());
                 return;
             }
 
             if (requestURI.equals("/user/login") && httpRequest.getMethod().equals("POST")) {
-                Map<String, String> entity = httpRequest.getEntity();
-                User user = DataBase.findUserById(entity.get("userId"));
-                if (user.getPassword().equals(entity.get("password"))) {
-                    response302Header(dos, "/index.html", singletonList("Set-Cookie: logined=true; Path=/"));
-                    return;
-                }
-
-                response302Header(dos, "/user/login_failed.html", singletonList("Set-Cookie: logined=false; Path=/"));
+                Response response = handleLogin(httpRequest.getEntity());
+                response302Header(dos, response.getLocation(), response.getHeaders());
                 return;
             }
 
@@ -61,6 +56,28 @@ public class RequestHandler implements Runnable {
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private Response handleLogin(Map<String, String> entity) {
+        User user = DataBase.findUserById(entity.get("userId"));
+        if (user.getPassword().equals(entity.get("password"))) {
+            Response response = new Response();
+            response.setLocation("/index.html");
+            response.setHeaders("Set-Cookie: logined=true; Path=/");
+            return response;
+        }
+
+        Response response = new Response();
+        response.setLocation("/user/login_failed.html");
+        response.setHeaders("Set-Cookie: logined=false; Path=/");
+        return response;
+    }
+
+    private Response handleUserCreate(User user) {
+        DataBase.addUser(user);
+        Response response = new Response();
+        response.setLocation("/index.html");
+        return response;
     }
 
     private void responseStaticContent(String requestURI, DataOutputStream dos) throws IOException, URISyntaxException {
@@ -117,6 +134,27 @@ public class RequestHandler implements Runnable {
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private static class Response {
+        private String location;
+        private final List<String> headers = new ArrayList<>();
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+
+        public void setHeaders(String headers) {
+            this.headers.add(headers);
+        }
+
+        public List<String> getHeaders() {
+            return Collections.unmodifiableList(headers);
         }
     }
 }
