@@ -1,6 +1,7 @@
 package webserver;
 
 import db.DataBase;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -9,6 +10,11 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -36,6 +42,18 @@ public class RequestHandler implements Runnable {
                 DataBase.addUser(httpRequest.getUser());
 
                 response302Header(dos, "/index.html");
+                return;
+            }
+
+            if (requestURI.equals("/user/login") && httpRequest.getMethod().equals("POST")) {
+                Map<String, String> entity = httpRequest.getEntity();
+                User user = DataBase.findUserById(entity.get("userId"));
+                if (user.getPassword().equals(entity.get("password"))) {
+                    response302Header(dos, "/index.html", singletonList("Set-Cookie: logined=true; Path=/"));
+                    return;
+                }
+
+                response302Header(dos, "/user/login_failed.html", singletonList("Set-Cookie: logined=false; Path=/"));
                 return;
             }
 
@@ -77,9 +95,16 @@ public class RequestHandler implements Runnable {
     }
 
     private void response302Header(DataOutputStream dos, String location) {
+        response302Header(dos, location, emptyList());
+    }
+
+    private void response302Header(DataOutputStream dos, String location, List<String> headers) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: " + location + "\r\n");
+            for (String header : headers) {
+                dos.writeBytes(header + "\r\n");
+            }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
