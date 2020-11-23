@@ -152,4 +152,28 @@ public class RequestParserTest {
                     "javajigi@slipp.net"));
         }
     }
+    @Nested
+    @DisplayName("쿠키를 파싱한다")
+    class Cookies {
+        @BeforeEach
+        void setUp() {
+            //@formatter:off
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /user/list HTTP/1.1\n" +
+                            "Host: localhost:8080\n" +
+                            "Connection: keep-alive\n" +
+                            "Accept: */*\n" +
+                            "Cookies: logined=true; Idea-32c00508=37ab5797-f595-40c6-b63f-d4e27524f593; Idea-32c008c9=b5b2b305-3b96-4335-9659-dfa0d33877fd;\n"));
+            //@formatter:on
+        }
+
+        @Test
+        void parse() throws IOException {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+            assertThat(httpRequest.getCookies().asMap()) //
+                    .containsEntry("logined", "true") //
+                    .containsEntry("Idea-32c00508", "32c00508=37ab5797-f595-40c6-b63f-d4e27524f593") //
+                    .containsEntry("Idea-32c008c9", "b5b2b305-3b96-4335-9659-dfa0d33877fd") ;
+        }
+    }
 }
