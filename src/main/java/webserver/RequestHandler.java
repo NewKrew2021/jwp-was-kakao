@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -30,16 +31,32 @@ public class RequestHandler implements Runnable {
             logger.debug("requestURI: {}", requestURI);
 
             DataOutputStream dos = new DataOutputStream(out);
-            String basePath = TEMPLATE_PATH;
-            if (requestURI.startsWith("/css") || requestURI.startsWith("/js")) {
-                basePath = STATIC_PATH;
+
+            if (requestURI.equals("/user/create") && httpRequest.getMethod().equals("POST")) {
+                DataBase.addUser(httpRequest.getUser());
+
+                response302Header(dos, "/index.html");
+                return;
             }
-            byte[] body = FileIoUtils.loadFileFromClasspath(basePath + requestURI);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+
+            responseStaticContent(requestURI, dos);
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void responseStaticContent(String requestURI, DataOutputStream dos) throws IOException, URISyntaxException {
+        byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
+        response200Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
+    private String getBasePath(String requestURI) {
+        String basePath = TEMPLATE_PATH;
+        if (requestURI.startsWith("/css") || requestURI.startsWith("/js")) {
+            basePath = STATIC_PATH;
+        }
+        return basePath;
     }
 
     private HttpRequest parseRequest(InputStream in) throws IOException {
@@ -53,6 +70,16 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
