@@ -96,5 +96,9 @@ class HttpRequest {
                             toMap(SimpleEntry::getKey, SimpleEntry::getValue), //
                             ImmutableMap::copyOf));
         }
+
+        public boolean contains(String cookie) {
+            return cookies.contains(cookie);
+        }
     }
 }

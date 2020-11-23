@@ -1,5 +1,10 @@
 package webserver;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Helper;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -9,12 +14,12 @@ import utils.FileIoUtils;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 
 public class RequestHandler implements Runnable {
@@ -49,6 +54,26 @@ public class RequestHandler implements Runnable {
             if (requestURI.equals("/user/login") && httpRequest.getMethod().equals("POST")) {
                 Response response = handleLogin(httpRequest.getEntity());
                 response302Header(dos, response.getLocation(), response.getHeaders());
+                return;
+            }
+
+            if (requestURI.equals("/user/list") && httpRequest.getMethod().equals("GET")) {
+                if (httpRequest.getCookies().contains("logined=true")) {
+                    TemplateLoader loader = new ClassPathTemplateLoader();
+                    loader.setPrefix("/templates");
+                    loader.setSuffix(".html");
+                    Handlebars handlebars = new Handlebars(loader);
+                    handlebars.registerHelper("inc", (Helper<Integer>) (context, options) -> context + 1);
+
+                    Template template = handlebars.compile("user/list");
+
+                    byte[] body = template.apply(DataBase.findAll()).getBytes(UTF_8);
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                } else {
+                    response302Header(dos, "/user/login.html");
+                }
+
                 return;
             }
 
@@ -95,7 +120,7 @@ public class RequestHandler implements Runnable {
     }
 
     private HttpRequest parseRequest(InputStream in) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, UTF_8));
         RequestParser requestParser = new RequestParser(bufferedReader);
         return requestParser.parse();
     }
