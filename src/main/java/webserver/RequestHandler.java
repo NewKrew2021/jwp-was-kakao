@@ -9,6 +9,7 @@ import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import utils.FileIoUtils;
 
 import java.io.*;
@@ -44,36 +45,21 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-
             if (requestURI.equals("/user/create") && httpRequest.getMethod().equals("POST")) {
                 Response response = handleUserCreate(httpRequest.getUser());
-                response302Header(dos, response.getLocation(), response.getHeaders());
+                response(dos, response);
                 return;
             }
 
             if (requestURI.equals("/user/login") && httpRequest.getMethod().equals("POST")) {
                 Response response = handleLogin(httpRequest.getEntity());
-                response302Header(dos, response.getLocation(), response.getHeaders());
+                response(dos, response);
                 return;
             }
 
             if (requestURI.equals("/user/list") && httpRequest.getMethod().equals("GET")) {
-                if (httpRequest.getCookies().contains("logined=true")) {
-                    TemplateLoader loader = new ClassPathTemplateLoader();
-                    loader.setPrefix("/templates");
-                    loader.setSuffix(".html");
-                    Handlebars handlebars = new Handlebars(loader);
-                    handlebars.registerHelper("inc", (Helper<Integer>) (context, options) -> context + 1);
-
-                    Template template = handlebars.compile("user/list");
-
-                    byte[] body = template.apply(DataBase.findAll()).getBytes(UTF_8);
-                    response200Header(dos, body.length);
-                    responseBody(dos, body);
-                } else {
-                    response302Header(dos, "/user/login.html");
-                }
-
+                Response response = handleList(httpRequest);
+                response(dos, response);
                 return;
             }
 
@@ -81,6 +67,38 @@ public class RequestHandler implements Runnable {
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void response(DataOutputStream dos, Response response) throws IOException {
+        if (StringUtils.hasText(response.getLocation())) {
+            response302Header(dos, response.getLocation(), response.getHeaders());
+        }
+
+        if (StringUtils.hasText(response.getViewName())) {
+            TemplateLoader loader = new ClassPathTemplateLoader();
+            loader.setPrefix("/templates");
+            loader.setSuffix(".html");
+            Handlebars handlebars = new Handlebars(loader);
+            handlebars.registerHelper("inc", (Helper<Integer>) (context, options) -> context + 1);
+
+            Template template = handlebars.compile(response.getViewName());
+            byte[] body = template.apply(response.getModel()).getBytes(UTF_8);
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+        }
+    }
+
+    private Response handleList(HttpRequest httpRequest) {
+        if (httpRequest.getCookies().contains("logined=true")) {
+            Response response = new Response();
+            response.setLocation("/user/login.html");
+            return response;
+        }
+
+        Response response = new Response();
+        response.setModel(DataBase.findAll());
+        response.setViewName("user/list");
+        return response;
     }
 
     private Response handleLogin(Map<String, String> entity) {
@@ -165,6 +183,8 @@ public class RequestHandler implements Runnable {
     private static class Response {
         private String location;
         private final List<String> headers = new ArrayList<>();
+        private Object model;
+        private String viewName;
 
         public void setLocation(String location) {
             this.location = location;
@@ -180,6 +200,22 @@ public class RequestHandler implements Runnable {
 
         public List<String> getHeaders() {
             return Collections.unmodifiableList(headers);
+        }
+
+        public void setModel(Object model) {
+            this.model = model;
+        }
+
+        public Object getModel() {
+            return model;
+        }
+
+        public void setViewName(String viewName) {
+            this.viewName = viewName;
+        }
+
+        public String getViewName() {
+            return viewName;
         }
     }
 }
