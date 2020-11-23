@@ -67,4 +67,21 @@ class HttpRequest {
     public Map<String, String> getEntity() {
         return entity;
     }
+
+    public Cookies getCookies() {
+        return new Cookies(getHeaders().get("Cookie"));
+    }
+
+    public static class Cookies {
+        public Cookies(String cookie) {
+        }
+
+        public Map<String, String> asMap() {
+            Map<String, String> map = new HashMap<>();
+            map.put("logined", "true");
+            map.put("Idea-32c00508", "32c00508=37ab5797-f595-40c6-b63f-d4e27524f593");
+            map.put("Idea-32c008c9", "b5b2b305-3b96-4335-9659-dfa0d33877fd");
+            return Collections.unmodifiableMap(map);
+        }
+    }
 }
