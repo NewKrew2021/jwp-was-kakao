@@ -10,7 +10,7 @@
 
 
 ## Todo
-* Request Line 에서 path 분리
+* HttpRequest 에서 Request-Line 추출 
 
 ## Done
 * ~~모든 request header 출력~~ 

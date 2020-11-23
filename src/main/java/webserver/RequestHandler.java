@@ -2,10 +2,12 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
+import webserver.http.HttpRequest;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -22,7 +24,9 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            parseHttpHeaders(new BufferedReader(new InputStreamReader(in)));
+            HttpRequest httpRequest = parseHttpRequest(new InputStreamReader(in));
+
+            printAllRequestHeaders(httpRequest);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "Hello World".getBytes();
@@ -33,23 +37,14 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void parseHttpHeaders(BufferedReader bufferedReader) {
-        printAllRequestHeaders(bufferedReader);
+    private HttpRequest parseHttpRequest(InputStreamReader streamReader) {
+        HttpHeaderReader reader = new HttpHeaderReader(streamReader);
+        return new HttpRequest(reader.lines().collect(Collectors.toList()));
     }
 
-    private void printAllRequestHeaders(BufferedReader reader) {
-        try {
-            String line;
-            do {
-                line = reader.readLine();
-                if (StringUtils.isEmpty(line)) break;
-                logger.debug(line);
-            } while (true);
-        } catch (IOException e){
-            throw new RequestHandlerException("HttpRequest Header 출력중에 문제가 발생했습니다", e);
-        }
+    private void printAllRequestHeaders(HttpRequest httpRequest) {
+        logger.debug(httpRequest.toString());
     }
-
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
