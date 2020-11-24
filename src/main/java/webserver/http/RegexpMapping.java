@@ -4,18 +4,20 @@ import webserver.http.controller.Controller;
 
 import java.util.regex.Pattern;
 
-class RegexpUriMapping implements UriMapping {
+class RegexpMapping implements HttpRequestMapping {
     private Pattern uriPattern;
+    private HttpMethod method;
     private final Controller controller;
 
-    RegexpUriMapping(String uriPatternRegexp, Controller controller) {
+    RegexpMapping(String uriPatternRegexp, HttpMethod method, Controller controller) {
         this.uriPattern = Pattern.compile(uriPatternRegexp);
+        this.method = method;
         this.controller = controller;
     }
 
     @Override
-    public boolean matches(String uri) {
-        return uriPattern.matcher(uri).matches();
+    public boolean matches(HttpRequest httpRequest) {
+        return uriPattern.matcher(httpRequest.getPath()).matches() && method == httpRequest.getMethod();
     }
 
     @Override

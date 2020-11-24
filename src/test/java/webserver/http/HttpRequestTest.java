@@ -19,8 +19,7 @@ public class HttpRequestTest {
             "Accept-Encoding: gzip,deflate"
     );
 
-
-    @DisplayName("http 요청에서 request line 정보를 가져올 수 있다")
+    @DisplayName("request message 에서 http request line 가져올 수 있다")
     @Test
     void requestLine() {
         List<String> httpRequestMessage = new ArrayList<>();
@@ -29,7 +28,8 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = new HttpRequest(httpRequestMessage);
 
-        assertThat(httpRequest.getRequestLine()).isEqualTo(new HttpRequestLine("GET", "/index.html", "HTTP/1.1"));
+        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
+        assertThat(httpRequest.getPath()).isEqualTo("/index.html");
     }
 
     @DisplayName("request line 형식이 올바르지 않으면 exception 이 발생한다")

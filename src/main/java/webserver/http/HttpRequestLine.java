@@ -1,21 +1,32 @@
 package webserver.http;
 
+import java.net.URI;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HttpRequestLine {
 
-    private String requestLineFormat = "(GET|PUT|POST|DELETE)\\s(.+)\\s(.+)";
+    private String requestLineFormat = "(GET|POST)\\s(.+)\\s(.+)";
     private Pattern requestLinePattern = Pattern.compile(requestLineFormat);
 
-    private String method;
-    private String uri;
+    private QueryParser queryParser = new QueryParser();
+
+    private HttpMethod method;
+    private URI uri;
     private String httpVersion;
+    private List<HttpRequestParam> params;
 
     public HttpRequestLine(String requestLineString){
         parse(requestLineString);
+    }
+
+    HttpRequestLine(String method, String uri, String httpVersion) {
+        this.method = HttpMethod.valueOf(method);
+        this.uri = URI.create(uri);
+        this.httpVersion = httpVersion;
     }
 
     private void parse(String requestLineString) {
@@ -23,23 +34,28 @@ public class HttpRequestLine {
         if( !matcher.matches() ){
             throw new InvalidHttpRequestMessageException("Request-Line 형식이 올바르지 않습니다. ( request-line: " + requestLineString + ")");
         }
-        method = matcher.group(1);
-        uri = matcher.group(2);
+        method = HttpMethod.valueOf(matcher.group(1));
+        uri = URI.create(matcher.group(2));
         httpVersion = matcher.group(3);
+
+        parseQuery(uri.getQuery());
     }
 
-    HttpRequestLine(String method, String uri, String httpVersion) {
-        this.method = method;
-        this.uri = uri;
-        this.httpVersion = httpVersion;
+    private void parseQuery(String query) {
+        params = queryParser.parse(query);
     }
 
-    public String getMethod() {
+
+    public HttpMethod getMethod() {
         return method;
     }
 
-    public String getUri() {
+    public URI getUri() {
         return uri;
+    }
+
+    public List<HttpRequestParam> getParams() {
+        return params;
     }
 
     public String getHttpVersion() {
@@ -65,4 +81,5 @@ public class HttpRequestLine {
     public int hashCode() {
         return Objects.hash(method, uri, httpVersion);
     }
+
 }

@@ -11,10 +11,9 @@ public class TemplateController implements Controller {
 
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
-        byte[] body = uriLoader.load(httpRequest.getRequestUri());
+        byte[] body = uriLoader.load(httpRequest.getPath());
         httpResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
         httpResponse.setBody(body);
-        httpResponse.send();
     }
 
 }

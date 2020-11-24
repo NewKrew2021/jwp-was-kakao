@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.HttpRequest;
@@ -20,6 +21,8 @@ public class RequestHandler implements Runnable {
 
     private HttpRequestDispatcher httpRequestDispatcher;
 
+    private DataBase db;
+
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
         this.httpRequestDispatcher = new HttpRequestDispatcher();
@@ -34,6 +37,7 @@ public class RequestHandler implements Runnable {
             printAllRequestHeaders(httpRequest);
             HttpResponse httpResponse = new HttpResponse(out);
             httpRequestDispatcher.dispatch(httpRequest, httpResponse);
+            httpResponse.send();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -45,7 +49,10 @@ public class RequestHandler implements Runnable {
     }
 
     private void printAllRequestHeaders(HttpRequest httpRequest) {
-        logger.debug(httpRequest.toString());
+        logger.debug("---- request line ----");
+        logger.debug(httpRequest.getRequestLine());
+        logger.debug("---- request header ----");
+        httpRequest.getHeaders().forEach(it -> logger.debug(it));
     }
 
 }

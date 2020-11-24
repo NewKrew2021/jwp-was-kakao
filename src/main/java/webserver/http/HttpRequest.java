@@ -16,12 +16,19 @@ public class HttpRequest {
         requestLine = new HttpRequestLine(requestLineString);
     }
 
-    public HttpRequestLine getRequestLine(){
-        return requestLine;
-    }
-
     public List<String> getHeaders() {
         return headers;
+    }
+
+    public List<HttpRequestParam> getParams() {
+        return requestLine.getParams();
+    }
+
+    public HttpRequestParam getParam(String name){
+        return requestLine.getParams().stream()
+                .filter(it -> it.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
     public String toString(){
@@ -31,8 +38,16 @@ public class HttpRequest {
         return sb.toString();
     }
 
-    public String getRequestUri() {
-        return requestLine.getUri();
+    public String getPath() {
+        return requestLine.getUri().getPath();
+    }
+
+    public String getRequestLine(){
+        return requestLine.toString();
+    }
+
+    public HttpMethod getMethod() {
+        return requestLine.getMethod();
     }
 }
 

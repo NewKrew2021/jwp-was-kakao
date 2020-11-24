@@ -21,9 +21,8 @@ public class Controllers {
 
         @Override
         public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
-            byte[] body = uriLoader.load(httpRequest.getRequestUri());
+            byte[] body = uriLoader.load(httpRequest.getPath());
             httpResponse.setBody(body);
-            httpResponse.send();
         }
     }
 }

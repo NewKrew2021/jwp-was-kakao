@@ -1,7 +1,10 @@
-
+### index.html 페이지
 GET http://localhost:8080/index.html
 
-###
+### 회원가입 페이지
 GET http://localhost:8080/user/form.html
+
+### 회원가입
+GET http://localhost:8080/user/create?userId=nio&password=password&name=최세환&email=sehan.choi@gmail.com
 
 ###

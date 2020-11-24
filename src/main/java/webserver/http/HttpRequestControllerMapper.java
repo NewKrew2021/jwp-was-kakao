@@ -4,7 +4,9 @@ import webserver.http.controller.Controller;
 
 public interface HttpRequestControllerMapper {
 
-    void addMapping(RegexpUriMapping mapping);
+    void addMapping(RegexpMapping mapping);
+
+    void addMapping(RegexpMapping... mappings);
 
     Controller getController(HttpRequest httpRequest);
 

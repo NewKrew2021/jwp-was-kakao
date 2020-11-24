@@ -15,6 +15,7 @@ public class HttpResponse {
 
     private DataOutputStream dos;
 
+    private String statusLine = "HTTP/1.1 200 OK";
     private List<HttpHeader> headers;
     private byte[] body;
 
@@ -26,6 +27,10 @@ public class HttpResponse {
     public void setBody(byte[] body) {
         this.body = body;
         addHeader("Content-Length", String.valueOf(body.length));
+    }
+
+    public void setStatusLine(String statusLine) {
+        this.statusLine = statusLine;
     }
 
     public void addHeader(String key, String value) {
@@ -48,7 +53,7 @@ public class HttpResponse {
     }
 
     private void writeHeader() throws IOException {
-        dos.writeBytes("HTTP/1.1 200 OK \r\n");
+        dos.writeBytes( statusLine + " \r\n");
         for( HttpHeader header : headers ){
             dos.writeBytes(header.toString() + "\r\n");
         }
@@ -56,7 +61,8 @@ public class HttpResponse {
     }
 
     private void writeBody() throws IOException {
-        dos.write(body, 0, body.length);
+        if( body != null && body.length > 0 )
+            dos.write(body, 0, body.length);
     }
 
     private void flush() throws IOException {
