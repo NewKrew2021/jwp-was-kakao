@@ -88,7 +88,7 @@ class RequestParser {
         try {
             return bufferedReader.readLine();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RequestReadException(e);
         }
     }
 
