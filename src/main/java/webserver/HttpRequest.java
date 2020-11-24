@@ -45,7 +45,7 @@ class HttpRequest {
         if (entity != null) {
             return User.createUser(entity);
         }
-        return null;
+        throw new IllegalStateException();
     }
 
     public void setQueryParams(Map<String, String> queryParams) {
