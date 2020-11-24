@@ -60,8 +60,8 @@ class HttpRequest {
         return Collections.unmodifiableMap(headers);
     }
 
-    public void addHeader(String name, String value) {
-        headers.put(name, value);
+    public void addHeaders(Map<String, String> added) {
+        headers.putAll(added);
     }
 
     public void setEntity(Map<String, String> entity) {

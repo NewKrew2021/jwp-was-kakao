@@ -12,11 +12,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
 
@@ -33,25 +34,24 @@ class RequestParser {
     public HttpRequest parse() throws IOException {
         HttpRequest httpRequest = parseRequestLine();
 
-        addHeaders(httpRequest);
-
-        if (hasEntity(httpRequest)) {
-            httpRequest.setEntity(Collections.unmodifiableMap(getEntity(httpRequest)));
-        }
+        httpRequest.addHeaders(getHeaders());
+        httpRequest.setEntity(getEntity(httpRequest.getHeaders().get("Content-Length")));
 
         return httpRequest;
     }
 
-    private Map<String, String> getEntity(HttpRequest httpRequest) throws IOException {
-        int contentLength = Integer.parseInt(httpRequest.getHeaders().get("Content-Length"));
-        String entityString = IOUtils.readData(bufferedReader, contentLength);
+    private Map<String, String> getEntity(String contentLengthHeader) throws IOException {
+        if (!hasEntity(contentLengthHeader)) {
+            return emptyMap();
+        }
+
+        String entityString = IOUtils.readData(bufferedReader, Integer.parseInt(contentLengthHeader));
 
         UrlEncodedStringParser urlEncodedStringParser = new UrlEncodedStringParser(entityString);
         return urlEncodedStringParser.parse();
     }
 
-    private boolean hasEntity(HttpRequest httpRequest) {
-        String contentLengthHeader = httpRequest.getHeaders().get("Content-Length");
+    private boolean hasEntity(String contentLengthHeader) {
         if (Objects.isNull(contentLengthHeader)) {
             return false;
         }
@@ -73,13 +73,15 @@ class RequestParser {
         return httpRequest;
     }
 
-    private void addHeaders(HttpRequest httpRequest) {
+    private Map<String, String> getHeaders() {
+        Map<String, String> headers = new HashMap<>();
         String headerLine;
         while (!(headerLine = nextLine()).equals("")) {
             logger.debug("headerLine: {}", headerLine);
             String[] header = headerLine.split(HEADER_KEY_VALUE_SPLITTER);
-            httpRequest.addHeader(header[0], header[1]);
+            headers.put(header[0], header[1]);
         }
+        return headers;
     }
 
     private String nextLine() {
