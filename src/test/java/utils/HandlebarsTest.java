@@ -33,7 +33,7 @@ public class HandlebarsTest {
         log.debug("ProfilePage : {}", profilePage);
     }
 
-    @DisplayName("리스트오 인덱스를 처리할 수 있다.")
+    @DisplayName("리스트와 인덱스를 처리할 수 있다.")
     @Test
     void listAndIndex() throws IOException {
 
