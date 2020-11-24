@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class User {
@@ -13,6 +14,10 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public static User createUser(Map<String, String> properties) {
+        return new User(properties.get("userId"), properties.get("password"), properties.get("name"), properties.get("email"));
     }
 
     public String getUserId() {
