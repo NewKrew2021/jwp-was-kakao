@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.HttpRequest;
 import webserver.http.HttpRequestDispatcher;
+import webserver.http.HttpRequestFactory;
 import webserver.http.HttpResponse;
 
 import java.io.IOException;
@@ -12,7 +13,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.stream.Collectors;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -33,7 +33,7 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = parseHttpRequest(in);
+            HttpRequest httpRequest = createHttpRequest(in);
             printAllRequestHeaders(httpRequest);
             HttpResponse httpResponse = new HttpResponse(out);
             httpRequestDispatcher.dispatch(httpRequest, httpResponse);
@@ -43,16 +43,15 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private HttpRequest parseHttpRequest(InputStream in) {
-        HttpHeaderReader reader = new HttpHeaderReader(new InputStreamReader(in));
-        return new HttpRequest(reader.lines().collect(Collectors.toList()));
+    private HttpRequest createHttpRequest(InputStream in) {
+        return new HttpRequestFactory().create(new InputStreamReader(in));
     }
 
     private void printAllRequestHeaders(HttpRequest httpRequest) {
         logger.debug("---- request line ----");
         logger.debug(httpRequest.getRequestLine());
         logger.debug("---- request header ----");
-        httpRequest.getHeaders().forEach(it -> logger.debug(it));
+        httpRequest.getHeaders().forEach(it -> logger.debug(it.toString()));
     }
 
 }

@@ -13,23 +13,25 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class HttpHeaderReader extends BufferedReader {
-    public HttpHeaderReader(Reader in) {
+/**
+ * Reader 에서 Http 
+ */
+public class HttpRequestMessageReader extends BufferedReader {
+    public HttpRequestMessageReader(Reader in) {
         super(in);
     }
 
-    @Override
-    public Stream<String> lines() {
+    public Stream<String> linesToEOH() {
         Iterator<String> iter = new Iterator() {
             String nextLine = null;
 
             @Override
             public boolean hasNext() {
-                if (!StringUtils.isEmpty(nextLine)) return true;
+                if (nextLine != null) return true;
 
                 try {
                     nextLine = readLine();
-                    return !StringUtils.isEmpty(nextLine);
+                    return !isEOH(nextLine);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
@@ -37,7 +39,7 @@ public class HttpHeaderReader extends BufferedReader {
 
             @Override
             public String next() {
-                if (!isEOH(nextLine) || hasNext()) {
+                if (nextLine != null || hasNext()) {
                     String line = nextLine;
                     nextLine = null;
                     return line;

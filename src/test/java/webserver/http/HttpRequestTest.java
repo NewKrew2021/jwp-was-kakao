@@ -12,21 +12,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class HttpRequestTest {
 
-    List<String> headers = Arrays.asList(
-            "Host: localhost:8080",
-            "Connection: Keep-Alive",
-            "User-Agent: Apache-HttpClient/4.5.12 (Java/11.0.8)",
-            "Accept-Encoding: gzip,deflate"
+    List<HttpHeader> headers = Arrays.asList(
+            new HttpHeader("Host: localhost:8080"),
+            new HttpHeader("Connection: Keep-Alive"),
+            new HttpHeader("User-Agent: Apache-HttpClient/4.5.12 (Java/11.0.8)"),
+            new HttpHeader("Accept-Encoding: gzip,deflate")
     );
 
     @DisplayName("request message 에서 http request line 가져올 수 있다")
     @Test
     void requestLine() {
-        List<String> httpRequestMessage = new ArrayList<>();
-        httpRequestMessage.add("GET /index.html HTTP/1.1");
-        httpRequestMessage.addAll(headers);
-
-        HttpRequest httpRequest = new HttpRequest(httpRequestMessage);
+        HttpRequest httpRequest = new HttpRequest("GET /index.html HTTP/1.1", headers, "");
 
         assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(httpRequest.getPath()).isEqualTo("/index.html");
@@ -36,11 +32,8 @@ public class HttpRequestTest {
     @Test
     void invalidRequestLine(){
         String invalidRequestLine = "GET HTTP/1.1";
-        List<String> httpRequestMessage = new ArrayList<>();
-        httpRequestMessage.add(invalidRequestLine);
-        httpRequestMessage.addAll(headers);
 
-        assertThatThrownBy(() -> new HttpRequest(httpRequestMessage))
+        assertThatThrownBy(() -> new HttpRequest(invalidRequestLine, headers, ""))
                 .isInstanceOf(InvalidHttpRequestMessageException.class);
     }
 

@@ -10,10 +10,11 @@
 
 
 ## Todo
-* 회원가입
+* POST 요청처리
 
 ## Done
 * ~~모든 request header 출력~~
 * ~~HttpRequest 에서 Request-Line 추출~~
 * ~~Request URI 를 로딩하여 응답으로 내려주기~~
-* ~~static resource 요청처리~~ 
+* ~~static resource 요청처리~~
+* ~~회원가입요청 처리~~

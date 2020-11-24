@@ -19,6 +19,7 @@ public class SignUpController implements Controller {
 
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
+        String body = httpRequest.getBody();
         validateParams(httpRequest.getParams());
         User newUser = new User(
                 httpRequest.getParam("userId").getValue(),

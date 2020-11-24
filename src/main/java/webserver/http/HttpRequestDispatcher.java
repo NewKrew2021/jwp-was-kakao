@@ -13,7 +13,7 @@ public class HttpRequestDispatcher {
     {
         httpRequestControllerMapper.addMapping(
                 new RegexpMapping("\\/.+\\.html", HttpMethod.GET, new TemplateController()),
-                new RegexpMapping("\\/user\\/create", HttpMethod.GET, new SignUpController())
+                new RegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController())
         );
     }
 
