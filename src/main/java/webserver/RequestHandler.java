@@ -137,11 +137,11 @@ public class RequestHandler implements Runnable {
     }
 
     private String getBasePath(String requestURI) {
-        return Sets.newHashSet("/css", "/js", "/fonts", "/images") //
-                .stream() //
-                .filter(requestURI::startsWith) //
-                .findAny() //
-                .map(path -> STATIC_PATH) //
+        return Sets.newHashSet("/css", "/js", "/fonts", "/images")
+                .stream()
+                .filter(requestURI::startsWith)
+                .findAny()
+                .map(path -> STATIC_PATH)
                 .orElse(TEMPLATE_PATH);
     }
 

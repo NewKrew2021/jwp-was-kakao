@@ -22,13 +22,13 @@ public class RequestParserTest {
     class RequestLine {
         @BeforeEach
         void setUp() {
-            //@formatter:off
+
             bufferedReader = new BufferedReader(new StringReader(
                     "GET /index.html HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
                             "Accept: */*\n\n"));
-            //@formatter:on
+
         }
 
         @DisplayName("HttpRequest 를 생성한다")
@@ -64,34 +64,34 @@ public class RequestParserTest {
     class QueryString {
         @BeforeEach
         void setUp() {
-            //@formatter:off
+
             bufferedReader = new BufferedReader(new StringReader(
                     "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
                             "Accept: */*\n\n"));
-            //@formatter:on
+
         }
 
         @Test
         void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getUser()).isEqualTo(new User( //
-                    "javajigi",  //
-                    "password",  //
-                    "박재성",  //
+            assertThat(httpRequest.getUser()).isEqualTo(new User(
+                    "javajigi",
+                    "password",
+                    "박재성",
                     "javajigi@slipp.net"));
         }
 
         @DisplayName("query stirng 문자열을 Map 으로 변환한다.")
         @Test
         void queryStringLineToMap() {
-            RequestParser.UrlEncodedStringParser urlEncodedStringParser = new RequestParser.UrlEncodedStringParser( //
+            RequestParser.UrlEncodedStringParser urlEncodedStringParser = new RequestParser.UrlEncodedStringParser(
                     "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
-            assertThat(urlEncodedStringParser.parse()) //
-                    .containsEntry("userId", "javajigi") //
-                    .containsEntry("password", "password") //
-                    .containsEntry("name", "박재성") //
+            assertThat(urlEncodedStringParser.parse())
+                    .containsEntry("userId", "javajigi")
+                    .containsEntry("password", "password")
+                    .containsEntry("name", "박재성")
                     .containsEntry("email", "javajigi@slipp.net");
         }
     }
@@ -101,7 +101,7 @@ public class RequestParserTest {
     class Headers {
         @BeforeEach
         void setUp() {
-            //@formatter:off
+
             bufferedReader = new BufferedReader(new StringReader(
                     "POST /user/create HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
@@ -111,17 +111,17 @@ public class RequestParserTest {
                             "Accept: */*\n" +
                             "\n" +
                             "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"));
-            //@formatter:on
+
         }
 
         @Test
         void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getHeaders()) //
-                    .containsEntry("Host", "localhost:8080") //
-                    .containsEntry("Connection", "keep-alive") //
-                    .containsEntry("Content-Length", "93") //
-                    .containsEntry("Content-Type", "application/x-www-form-urlencoded") //
+            assertThat(httpRequest.getHeaders())
+                    .containsEntry("Host", "localhost:8080")
+                    .containsEntry("Connection", "keep-alive")
+                    .containsEntry("Content-Length", "93")
+                    .containsEntry("Content-Type", "application/x-www-form-urlencoded")
                     .containsEntry("Accept", "*/*");
         }
     }
@@ -130,7 +130,7 @@ public class RequestParserTest {
     class FormEntity {
         @BeforeEach
         void setUp() {
-            //@formatter:off
+
             bufferedReader = new BufferedReader(new StringReader(
                     "POST /user/create HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
@@ -140,16 +140,16 @@ public class RequestParserTest {
                             "Accept: */*\n" +
                             "\n" +
                             "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net\n"));
-            //@formatter:on
+
         }
 
         @Test
         void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getUser()).isEqualTo(new User( //
-                    "javajigi",  //
-                    "password",  //
-                    "박재성",  //
+            assertThat(httpRequest.getUser()).isEqualTo(new User(
+                    "javajigi",
+                    "password",
+                    "박재성",
                     "javajigi@slipp.net"));
         }
     }
@@ -158,14 +158,14 @@ public class RequestParserTest {
     class Cookies {
         @BeforeEach
         void setUp() {
-            //@formatter:off
+
             bufferedReader = new BufferedReader(new StringReader(
                     "GET /user/list HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
                             "Accept: */*\n" +
                             "Cookie: logined=true; Idea-32c00508=37ab5797-f595-40c6-b63f-d4e27524f593; Idea-32c008c9=b5b2b305-3b96-4335-9659-dfa0d33877fd\n\n"));
-            //@formatter:on
+
         }
 
         @Test
@@ -173,9 +173,9 @@ public class RequestParserTest {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
 
             Map<String, String> cookiesMap = httpRequest.getCookies().asMap();
-            assertThat(cookiesMap) //
-                    .containsEntry("logined", "true") //
-                    .containsEntry("Idea-32c00508", "37ab5797-f595-40c6-b63f-d4e27524f593") //
+            assertThat(cookiesMap)
+                    .containsEntry("logined", "true")
+                    .containsEntry("Idea-32c00508", "37ab5797-f595-40c6-b63f-d4e27524f593")
                     .containsEntry("Idea-32c008c9", "b5b2b305-3b96-4335-9659-dfa0d33877fd") ;
         }
     }

@@ -100,10 +100,10 @@ class RequestParser {
         }
 
         public Map<String, String> parse() {
-            return QUERY_STRING_SPLITTER.split(queryString) //
-                    .entrySet().stream() //
-                    .map(entry -> new SimpleEntry<>(entry.getKey(), decode(entry.getValue()))) //
-                    .collect(collectingAndThen(toMap( //
+            return QUERY_STRING_SPLITTER.split(queryString)
+                    .entrySet().stream()
+                    .map(entry -> new SimpleEntry<>(entry.getKey(), decode(entry.getValue())))
+                    .collect(collectingAndThen(toMap(
                             SimpleEntry::getKey, SimpleEntry::getValue), ImmutableMap::copyOf));
         }
 

@@ -82,18 +82,18 @@ class HttpRequest {
         private final List<String> cookies;
 
         public Cookies(String cookie) {
-            cookies = Streams.stream(COOKIE_SPLITTER.split(cookie)) //
-                    .map(String::trim) //
+            cookies = Streams.stream(COOKIE_SPLITTER.split(cookie))
+                    .map(String::trim)
                     .collect(toList());
         }
 
         public Map<String, String> asMap() {
-            return cookies.stream() //
+            return cookies.stream()
                     .map(cookie -> {
                         String[] cookieToken = cookie.split(KEY_VALUE_SPLIT);
                         return new SimpleEntry<>(cookieToken[0], cookieToken[1]);
-                    }).collect(collectingAndThen( //
-                            toMap(SimpleEntry::getKey, SimpleEntry::getValue), //
+                    }).collect(collectingAndThen(
+                            toMap(SimpleEntry::getKey, SimpleEntry::getValue),
                             ImmutableMap::copyOf));
         }
 
