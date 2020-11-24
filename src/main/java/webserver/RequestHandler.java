@@ -16,9 +16,12 @@ import utils.FileIoUtils;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -41,19 +44,19 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-            if (requestURI.equals("/user/create") && httpRequest.getMethod().equals("POST")) {
+            if (requestURI.equals("/user/create") && POST.matches(httpRequest.getMethod())) {
                 Response response = handleUserCreate(httpRequest.getUser());
                 response(dos, response);
                 return;
             }
 
-            if (requestURI.equals("/user/login") && httpRequest.getMethod().equals("POST")) {
+            if (requestURI.equals("/user/login") && POST.matches(httpRequest.getMethod())) {
                 Response response = handleLogin(httpRequest.getEntity());
                 response(dos, response);
                 return;
             }
 
-            if (requestURI.equals("/user/list") && httpRequest.getMethod().equals("GET")) {
+            if (requestURI.equals("/user/list") && GET.matches(httpRequest.getMethod())) {
                 Response response = handleList(httpRequest);
                 response(dos, response);
                 return;
