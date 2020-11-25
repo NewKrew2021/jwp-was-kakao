@@ -1,36 +1,26 @@
 package webserver.http.controller;
 
-import db.DataBase;
-import model.User;
 import webserver.http.*;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class LoginController implements Controller{
 
-    private final List<String> requiredParams = Arrays.asList("userId","password");
-
-    private HttpRequestParamValidator paramValidator = new HttpRequestParamValidator(requiredParams);
+    private LoginAuthenticator loginAuthenticator = new LoginAuthenticator();
 
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
         List<HttpRequestParam> params = HttpRequestParams.convertFrom(httpRequest.getBody());
-        paramValidator.validate(params);
+        Login login = new Login(params);
 
-        Map<String, String> paramMap = params.stream()
-                .collect(Collectors.toMap(HttpRequestParam::getName, HttpRequestParam::getValue));
-
-        User found = DataBase.findUserById(paramMap.get("userId"));
-        if( found != null ){
+        if (loginAuthenticator.authenticate(login.getUserId(), login.getPassword())) {
             httpResponse.setStatus(HttpStatus.x302_Found);
             httpResponse.addHeader("Location", "/index.html");
+            httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
         } else {
             httpResponse.setStatus(HttpStatus.x302_Found);
             httpResponse.addHeader("Location", "/user/login_failed.html");
+            httpResponse.addHeader("Set-Cookie", "logined=false; Path=/");
         }
     }
-
 }

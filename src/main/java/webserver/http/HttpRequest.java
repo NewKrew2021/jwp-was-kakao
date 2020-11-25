@@ -78,7 +78,7 @@ public class HttpRequest {
         }
 
         public HttpRequest build() {
-            return new HttpRequest(requestLine, headers, body);
+            return new HttpRequest(requestLine, headers, body == null ? "" : body);
         }
     }
 }

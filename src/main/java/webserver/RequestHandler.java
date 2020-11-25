@@ -62,18 +62,18 @@ public class RequestHandler implements Runnable {
     }
 
     private void printAllRequestHeaders(HttpRequest httpRequest) {
-        logger.debug("---- request line ----");
+        logger.debug("---- request-line ----");
         logger.debug(httpRequest.getRequestLine());
-        logger.debug("---- request header ----");
+        logger.debug("---- request-header ----");
         httpRequest.getHeaders().forEach(it -> logger.debug(it.toString()));
-        logger.debug("---- reqeust body ----");
+        logger.debug("---- reqeust-body ----");
         logger.debug(httpRequest.getBody());
     }
 
     private void printAllResponseHeaders(HttpResponse httpResponse) {
-        logger.debug("---- response status line ---");
+        logger.debug("---- response-status-line ---");
         logger.debug(httpResponse.getStatusLine());
-        logger.debug("---- response header ----");
+        logger.debug("---- response-header ----");
         httpResponse.getHeaders().forEach(it -> logger.debug(it.toString()));
     }
 
