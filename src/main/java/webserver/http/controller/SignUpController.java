@@ -31,7 +31,7 @@ public class SignUpController implements Controller {
         );
         DataBase.addUser(newUser);
 
-        httpResponse.setStatusLine(MessageFormat.format("HTTP/1.1 {0} {1}", HttpStatus.x201_Created.getStatusCode(), HttpStatus.x201_Created.getReasonPhrase()));
+        httpResponse.setStatus(HttpStatus.x201_Created);
     }
 
     private void validateParams(List<HttpRequestParam> params) {

@@ -34,8 +34,11 @@ public class RequestHandler implements Runnable {
 
             HttpRequest httpRequest = createHttpRequest(in);
             printAllRequestHeaders(httpRequest);
+
             HttpResponse httpResponse = new HttpResponse(out);
             dispatcher.dispatch(httpRequest, httpResponse);
+
+            printAllResponseHeaders(httpResponse);
             httpResponse.send();
 
         } catch ( Exception e ){
@@ -66,5 +69,13 @@ public class RequestHandler implements Runnable {
         logger.debug("---- reqeust body ----");
         logger.debug(httpRequest.getBody());
     }
+
+    private void printAllResponseHeaders(HttpResponse httpResponse) {
+        logger.debug("---- response status line ---");
+        logger.debug(httpResponse.getStatusLine());
+        logger.debug("---- response header ----");
+        httpResponse.getHeaders().forEach(it -> logger.debug(it.toString()));
+    }
+
 
 }

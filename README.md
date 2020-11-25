@@ -10,7 +10,7 @@
 
 
 ## Todo
-* POST 요청처리
+
 
 ## Done
 * ~~모든 request header 출력~~
@@ -18,3 +18,5 @@
 * ~~Request URI 를 로딩하여 응답으로 내려주기~~
 * ~~static resource 요청처리~~
 * ~~회원가입요청 처리~~
+* ~~POST 요청처리~~
+* ~~response message 출력~~

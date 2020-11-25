@@ -13,7 +13,7 @@ public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
-    private DataOutputStream dos;
+    private final DataOutputStream dos;
 
     private String statusLine = "HTTP/1.1 200 OK";
     private List<HttpHeader> headers;
@@ -34,12 +34,16 @@ public class HttpResponse {
         this.status = status;
     }
 
-    public String getStatusLine(){
-        return "HTTP/1.1 " + status;
+    public HttpStatus getStatus(){
+        return status == null ? HttpStatus.x200_OK : status;
     }
 
-    public void setStatusLine(String statusLine) {
-        this.statusLine = statusLine;
+    public String getStatusLine(){
+        return "HTTP/1.1 " + getStatus();
+    }
+
+    public List<HttpHeader> getHeaders() {
+        return headers;
     }
 
     public void addHeader(String key, String value) {
@@ -52,17 +56,20 @@ public class HttpResponse {
 
     public void send(){
         try {
+            writeStatusLine();
             writeHeader();
             writeBody();
             flush();
         } catch ( IOException e ){
             throw new RuntimeException("Http 응답메세지를 보내는과정에 문제가 발생했습니다", e);
         }
+    }
 
+    private void writeStatusLine() throws IOException {
+        dos.writeBytes( getStatusLine() + " \r\n");
     }
 
     private void writeHeader() throws IOException {
-        dos.writeBytes( getStatusLine() + " \r\n");
         for( HttpHeader header : headers ){
             dos.writeBytes(header.toString() + "\r\n");
         }
