@@ -10,7 +10,7 @@
 
 
 ## Todo
-
+ 
 
 ## Done
 * ~~모든 request header 출력~~
@@ -20,3 +20,4 @@
 * ~~회원가입요청 처리~~
 * ~~POST 요청처리~~
 * ~~response message 출력~~
+* ~~회원가입 완료 후 index.html 페이지로 자동으로 이동 ( redirect )~~

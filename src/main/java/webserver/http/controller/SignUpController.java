@@ -31,7 +31,8 @@ public class SignUpController implements Controller {
         );
         DataBase.addUser(newUser);
 
-        httpResponse.setStatus(HttpStatus.x201_Created);
+        httpResponse.setStatus(HttpStatus.x302_Found);
+        httpResponse.addHeader("Location", "/index.html");
     }
 
     private void validateParams(List<HttpRequestParam> params) {
