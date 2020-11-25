@@ -12,6 +12,7 @@ public class Controllers {
     private static class NotFoundController implements Controller {
         @Override
         public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
+            httpResponse.setStatusLine("HTTP/1.1 404 NotFound");
         }
     }
 

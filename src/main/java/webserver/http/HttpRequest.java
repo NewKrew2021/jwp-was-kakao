@@ -8,18 +8,14 @@ public class HttpRequest {
     private List<HttpHeader> headers;
     private String body;
 
-    HttpRequest(String requestLine, List<HttpHeader> headers, String body) {
-        parseRequestLine(requestLine);
+    HttpRequest(HttpRequestLine requestLine, List<HttpHeader> headers, String body) {
+        this.requestLine = requestLine;
         this.headers = headers;
         this.body = body;
     }
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    private void parseRequestLine(String requestLineString) {
-        requestLine = new HttpRequestLine(requestLineString);
     }
 
     public List<HttpHeader> getHeaders() {
@@ -62,11 +58,11 @@ public class HttpRequest {
 
     static class Builder {
 
-        private String requestLine;
+        private HttpRequestLine requestLine;
         private List<HttpHeader> headers;
         private String body;
 
-        public Builder requestLine(String requestLine) {
+        public Builder requestLine(HttpRequestLine requestLine) {
             this.requestLine = requestLine;
             return this;
         }

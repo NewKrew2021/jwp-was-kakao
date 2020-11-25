@@ -19,7 +19,11 @@ public class HttpRequestDispatcher {
 
     public void dispatch(HttpRequest httpRequest, HttpResponse httpResponse){
         Controller controller = httpRequestControllerMapper.getController(httpRequest);
-        controller.execute(httpRequest, httpResponse);
+        try {
+            controller.execute(httpRequest, httpResponse);
+        } catch ( RuntimeException e ){
+            httpResponse.setStatus(HttpStatus.x500_InternalServerError);
+        }
     }
 
 }

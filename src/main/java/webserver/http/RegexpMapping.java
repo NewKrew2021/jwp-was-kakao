@@ -17,7 +17,8 @@ class RegexpMapping implements HttpRequestMapping {
 
     @Override
     public boolean matches(HttpRequest httpRequest) {
-        return uriPattern.matcher(httpRequest.getPath()).matches() && method == httpRequest.getMethod();
+        return uriPattern.matcher(httpRequest.getPath()).matches()
+                && method == httpRequest.getMethod();
     }
 
     @Override

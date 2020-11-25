@@ -1,5 +1,7 @@
 package utils;
 
+import webserver.HttpRequestMessageReader;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -16,5 +18,14 @@ public class IOUtils {
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);
         return String.copyValueOf(body);
+    }
+
+    public static String readAllRemainingData(BufferedReader reader) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int ch;
+        while( (ch = reader.read()) != -1 ){
+            sb.append((char)ch);
+        }
+        return sb.toString().trim();
     }
 }

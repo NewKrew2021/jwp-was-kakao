@@ -6,8 +6,17 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class HttpRequestLineTest {
+
+    @DisplayName("request line 형식이 올바르지 않으면 exception 이 발생한다")
+    @Test
+    void invalidRequestLine(){
+        assertThatThrownBy(() -> new HttpRequestLine("GET HTTP/1.1"))
+                .isInstanceOf(InvalidHttpRequestMessageException.class);
+    }
+
 
     @DisplayName("Request-Line 에서 URI 를 가져올 수 있다")
     @Test

@@ -1,11 +1,10 @@
 package webserver;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-
-import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -24,10 +23,9 @@ public class WebServer {
             logger.info("Web Application Server started {} port.", port);
 
             // 클라이언트가 연결될때까지 대기한다.
-            Socket connection;
-            while ((connection = listenSocket.accept()) != null) {
-                Thread thread = new Thread(new RequestHandler(connection));
-                thread.start();
+            while (true) {
+                Socket connection = listenSocket.accept();
+                new Thread(new RequestHandler(connection)).start();
             }
         }
     }

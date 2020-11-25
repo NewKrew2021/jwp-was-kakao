@@ -1,6 +1,5 @@
 package webserver;
 
-import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.HttpRequest;
@@ -19,27 +18,39 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
 
-    private HttpRequestDispatcher httpRequestDispatcher;
-
-    private DataBase db;
+    private final static HttpRequestDispatcher dispatcher = new HttpRequestDispatcher();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        this.httpRequestDispatcher = new HttpRequestDispatcher();
     }
 
+    @Override
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
+        try {
+            InputStream in = connection.getInputStream();
+            OutputStream out = connection.getOutputStream();
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = createHttpRequest(in);
             printAllRequestHeaders(httpRequest);
             HttpResponse httpResponse = new HttpResponse(out);
-            httpRequestDispatcher.dispatch(httpRequest, httpResponse);
+            dispatcher.dispatch(httpRequest, httpResponse);
             httpResponse.send();
-        } catch (IOException e) {
+
+        } catch ( Exception e ){
+            e.printStackTrace();
             logger.error(e.getMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+
+    private void closeConnection() {
+        try {
+            connection.close();
+        } catch (IOException e) {
+            throw new RuntimeException("socket close 과정에 문제가 발생했습니다", e);
         }
     }
 
@@ -52,6 +63,8 @@ public class RequestHandler implements Runnable {
         logger.debug(httpRequest.getRequestLine());
         logger.debug("---- request header ----");
         httpRequest.getHeaders().forEach(it -> logger.debug(it.toString()));
+        logger.debug("---- reqeust body ----");
+        logger.debug(httpRequest.getBody());
     }
 
 }

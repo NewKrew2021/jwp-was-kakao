@@ -1,7 +1,12 @@
 package webserver.http;
 
+import java.text.MessageFormat;
+
 public enum HttpStatus {
-    x201_Created(201, "Created");
+    x200_OK(200, "OK"),
+    x201_Created(201, "Created"),
+    x404_NotFound(404, "Not Found"),
+    x500_InternalServerError(500, "Internal Server Error" );
 
     private final String reasonPhrase;
     private final int statusCode;
@@ -17,5 +22,10 @@ public enum HttpStatus {
 
     public int getStatusCode() {
         return statusCode;
+    }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("{0} {1}", statusCode, reasonPhrase);
     }
 }
