@@ -1,13 +1,16 @@
 package webserver.http;
 
+import org.springframework.util.StringUtils;
 import utils.IOUtils;
-import webserver.HttpRequestMessageReader;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
+import java.io.UncheckedIOException;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class HttpRequestFactory {
 
@@ -67,6 +70,47 @@ public class HttpRequestFactory {
 
         } catch (IOException e) {
             throw new FailToCreateHttpRequestException("http message body 를 읽는도중 문제가 발생했습니다", e);
+        }
+    }
+
+    private class HttpRequestMessageReader extends BufferedReader {
+        public HttpRequestMessageReader(Reader in) {
+            super(in);
+        }
+
+        public Stream<String> linesToEOH() {
+            Iterator<String> iter = new Iterator() {
+                String nextLine = null;
+
+                @Override
+                public boolean hasNext() {
+                    if (nextLine != null) return true;
+
+                    try {
+                        nextLine = readLine();
+                        return !isEOH(nextLine);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }
+
+                @Override
+                public String next() {
+                    if (nextLine != null || hasNext()) {
+                        String line = nextLine;
+                        nextLine = null;
+                        return line;
+                    } else {
+                        throw new NoSuchElementException();
+                    }
+                }
+
+                private boolean isEOH(String nextLine){
+                    return StringUtils.isEmpty(nextLine);
+                }
+            };
+            return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                    iter, Spliterator.ORDERED | Spliterator.NONNULL), false);
         }
     }
 
