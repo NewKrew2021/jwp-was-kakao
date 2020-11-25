@@ -1,6 +1,7 @@
 package webserver.http;
 
 import webserver.http.controller.Controller;
+import webserver.http.controller.LoginController;
 import webserver.http.controller.SignUpController;
 import webserver.http.controller.TemplateController;
 
@@ -13,7 +14,8 @@ public class HttpRequestDispatcher {
     {
         httpRequestControllerMapper.addMapping(
                 new RegexpMapping("\\/.+\\.html", HttpMethod.GET, new TemplateController()),
-                new RegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController())
+                new RegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
+                new RegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController())
         );
     }
 

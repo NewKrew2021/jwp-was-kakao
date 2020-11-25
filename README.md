@@ -10,7 +10,7 @@
 
 
 ## Todo
- 
+* 로그인
 
 ## Done
 * ~~모든 request header 출력~~
@@ -21,3 +21,4 @@
 * ~~POST 요청처리~~
 * ~~response message 출력~~
 * ~~회원가입 완료 후 index.html 페이지로 자동으로 이동 ( redirect )~~
+* ~~로그인성공시 index.html 로 실패시 user/login_failed.html 페이지로 이동~~
