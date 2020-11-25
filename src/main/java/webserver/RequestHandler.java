@@ -33,8 +33,17 @@ public class RequestHandler implements Runnable {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
             Request request = RequestReader.read(bufferedReader);
             renderResponse(new DataOutputStream(out), router.getResponse(request));
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+            renderError();
+        }
+    }
+
+    private void renderError() {
+        try (OutputStream out = connection.getOutputStream()) {
+            renderResponse(new DataOutputStream(out), Response.error());
+        } catch (IOException exception) {
+            logger.error(exception.getMessage());
         }
     }
 

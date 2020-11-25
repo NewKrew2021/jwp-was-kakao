@@ -13,12 +13,12 @@ public class FileController {
         return getFileResponse(path, ContentType.HTML);
     }
 
-    private Response getFileResponse(RequestPath path, ContentType css) {
+    private Response getFileResponse(RequestPath path, ContentType contentType) {
         try {
-            return Response.file(FileIoUtils.loadFileFromClasspath(path.asFilePath()), css);
+            return Response.file(FileIoUtils.loadFileFromClasspath(path.asFilePath()), contentType);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.error();
+            throw new RuntimeException(e);
         }
     }
 }

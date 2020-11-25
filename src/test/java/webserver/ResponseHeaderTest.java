@@ -25,7 +25,7 @@ public class ResponseHeaderTest {
 
     @Test
     public void cookie() {
-        ResponseHeader header = ResponseHeader.builder().cookie("logined=true", "/").build();
+        ResponseHeader header = ResponseHeader.builder().cookie(Cookie.login()).build();
 
         assertThat(header.toString()).isEqualTo("Set-Cookie: logined=true; Path=/\r\n\r\n");
     }

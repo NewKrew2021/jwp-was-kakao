@@ -1,5 +1,6 @@
 package webserver.response;
 
+import webserver.Cookie;
 import webserver.request.ContentType;
 import webserver.request.Protocol;
 import webserver.request.Request;
@@ -64,12 +65,12 @@ public class Response {
         );
     }
 
-    public static Response redirectWithCookie(Request request, String cookie, String path) {
+    public static Response redirectWithCookie(Request request, Cookie cookie, String path) {
         return new Response(
                 ResponseHeader.builder()
                         .protocol(Protocol.HTTP)
                         .status(Status.REDIRECT)
-                        .cookie(cookie, "/")
+                        .cookie(cookie)
                         .location("http://" + request.getHeader().getHost() + path)
                         .build()
         );

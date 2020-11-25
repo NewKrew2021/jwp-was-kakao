@@ -45,9 +45,9 @@ public class RequestParserTest {
 
     @Test
     public void getContentLength() {
-        Integer contentLength = RequestParser.getContentLength("Content-Length: 59");
+        String contentLength = RequestParser.getContentLength("Content-Length: 59");
 
-        assertThat(contentLength).isEqualTo(59);
+        assertThat(contentLength).isEqualTo("59");
     }
 
     @Test

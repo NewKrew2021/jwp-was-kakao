@@ -1,5 +1,6 @@
 package webserver.response;
 
+import webserver.Cookie;
 import webserver.request.ContentType;
 import webserver.request.Protocol;
 import webserver.request.Status;
@@ -50,6 +51,12 @@ public class ResponseHeader {
             return this;
         }
 
+        public Builder cookie(Cookie cookie) {
+            header.setCookie(cookie.getContent());
+            header.setCookiePath(cookie.getPath());
+            return this;
+        }
+
         public Builder location(String location) {
             header.setLocation(location);
             return this;
@@ -97,11 +104,21 @@ public class ResponseHeader {
     @Override
     public String toString() {
         return String.join("",
-                Optional.ofNullable(protocol).map(protocol -> String.format("%s %s \r\n", protocol.getMessage(), status.getMessage())).orElse(""),
-                Optional.ofNullable(cookie).map(cookie -> String.format("Set-Cookie: %s; Path=%s\r\n", cookie, cookiePath)).orElse(""),
-                Optional.ofNullable(location).map(location -> String.format("Location: %s\r\n", location)).orElse(""),
-                Optional.ofNullable(contentType).map(contentType -> String.format("Content-Type: %s\r\n", contentType.getMessage())).orElse(""),
-                Optional.ofNullable(contentLength).map(contentLength -> String.format("Content-Length: %d\r\n", contentLength)).orElse(""),
+                Optional.ofNullable(protocol)
+                        .map(protocol -> String.format("%s %s \r\n", protocol.getMessage(), status.getMessage()))
+                        .orElseThrow(RuntimeException::new),
+                Optional.ofNullable(cookie)
+                        .map(cookie -> String.format("Set-Cookie: %s; Path=%s\r\n", cookie, cookiePath))
+                        .orElse(""),
+                Optional.ofNullable(location)
+                        .map(location -> String.format("Location: %s\r\n", location))
+                        .orElse(""),
+                Optional.ofNullable(contentType)
+                        .map(contentType -> String.format("Content-Type: %s\r\n", contentType.getMessage()))
+                        .orElse(""),
+                Optional.ofNullable(contentLength)
+                        .map(contentLength -> String.format("Content-Length: %d\r\n", contentLength))
+                        .orElse(""),
                 "\r\n"
         );
     }

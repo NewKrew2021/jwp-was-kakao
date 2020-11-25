@@ -112,7 +112,7 @@ public class RequestHeaderTest {
                 "Accept: */*",
                 "Cookie: logined=true"));
 
-        assertThat(header.isLogined()).isEqualTo(true);
+        assertThat(header.cookieContains(Cookie.login())).isEqualTo(true);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class RequestHeaderTest {
                 "Accept: */*",
                 "Cookie: logined=false"));
 
-        assertThat(header.isLogined()).isEqualTo(false);
+        assertThat(header.cookieContains(Cookie.login())).isEqualTo(false);
     }
 
     @Test
@@ -133,6 +133,6 @@ public class RequestHeaderTest {
                 "Connection: keep-alive",
                 "Accept: */*"));
 
-        assertThat(header.isLogined()).isEqualTo(false);
+        assertThat(header.cookieContains(Cookie.login())).isEqualTo(false);
     }
 }

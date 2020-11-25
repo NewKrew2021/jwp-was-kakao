@@ -1,5 +1,6 @@
 package webserver.request;
 
+import org.springframework.util.ObjectUtils;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -26,7 +27,7 @@ public class RequestReader {
             return IOUtils.readData(bufferedReader, contentLength);
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
+            throw new RuntimeException(e);
         }
     }
 
@@ -38,10 +39,7 @@ public class RequestReader {
     private static List<String> readRequestHeader(BufferedReader bufferedReader) throws IOException {
         List<String> lines = new ArrayList<>();
         String line = bufferedReader.readLine();
-        while (!"".equals(line)) {
-            if (line == null) {
-                break;
-            }
+        while (!ObjectUtils.isEmpty(line)) {
             lines.add(line);
             line = bufferedReader.readLine();
         }
