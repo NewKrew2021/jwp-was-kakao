@@ -5,11 +5,10 @@ import model.User;
 
 public class LoginAuthenticator {
 
-    public boolean authenticate(String userId, String password) {
+    public void authenticate(String userId, String password) {
         User user = getUser(userId);
-        if (user == null) return false;
-        if (!user.getPassword().equals(password)) return false;
-        return true;
+        if (user == null) throw new NotExistUserException(userId);
+        if (!user.getPassword().equals(password)) throw new InvalidPasswordException(userId);
     }
 
     private User getUser(String userId) {
