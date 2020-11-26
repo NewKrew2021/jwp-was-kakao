@@ -6,8 +6,8 @@ import service.UserService;
 import utils.RequestParser;
 import utils.TemplateUtils;
 import webserver.request.ContentType;
-import webserver.request.Request;
-import webserver.response.Response;
+import webserver.request.HttpRequest;
+import webserver.response.HttpResponse;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class UserController {
         handlebars = TemplateUtils.getHandleBars();
     }
 
-    public Response getResponse(Request request) {
+    public HttpResponse getResponse(HttpRequest request) {
         String path = request.getHeader().getPath().asUrl();
         String method = request.getHeader().getMethod();
         if (USER_CREATE_PATH.equals(path)) {
@@ -49,45 +49,45 @@ public class UserController {
                 return showUsers(request);
             }
         }
-        return Response.notFound();
+        return HttpResponse.notFound();
     }
 
-    private Response addUserByPost(Request request) {
+    private HttpResponse addUserByPost(HttpRequest request) {
         userService.addUser(RequestParser.getRequestParamsFromBody(request.getBody()));
-        return Response.redirect(request, "/index.html");
+        return HttpResponse.redirect(request, "/index.html");
     }
 
-    private Response addUserByGet(Request request) {
+    private HttpResponse addUserByGet(HttpRequest request) {
         userService.addUser(request.getHeader().getParams());
-        return Response.redirect(request, "/index.html");
+        return HttpResponse.redirect(request, "/index.html");
     }
 
-    private Response login(Request request) {
+    private HttpResponse login(HttpRequest request) {
         if (userService.login(RequestParser.getRequestParamsFromBody(request.getBody()))) {
-            return Response.redirectWithCookie(request, Cookie.login(), "/index.html");
+            return HttpResponse.redirectWithCookie(request, Cookie.login(), "/index.html");
         }
-        return Response.redirectWithCookie(request, Cookie.logout(), "/user/login_failed.html");
+        return HttpResponse.redirectWithCookie(request, Cookie.logout(), "/user/login_failed.html");
     }
 
-    private Response showUsers(Request request) {
+    private HttpResponse showUsers(HttpRequest request) {
         if (isLogined(request)) {
             return users();
         }
-        return Response.redirect(request, "/user/login.html");
+        return HttpResponse.redirect(request, "/user/login.html");
     }
 
-    private boolean isLogined(Request request) {
+    private boolean isLogined(HttpRequest request) {
         return request.getHeader()
                 .cookieContains(Cookie.login());
     }
 
-    private Response users() {
+    private HttpResponse users() {
         try {
-            return Response.file(handlebars.compile("user/list")
+            return HttpResponse.file(handlebars.compile("user/list")
                     .apply(new UsersDto(userService.findAll())).getBytes(), ContentType.HTML);
         } catch (IOException e) {
             e.printStackTrace();
-            return Response.error();
+            return HttpResponse.error();
         }
     }
 

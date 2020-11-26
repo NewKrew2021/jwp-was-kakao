@@ -1,10 +1,10 @@
 package webserver.request;
 
-public class Request {
+public class HttpRequest {
     private final RequestHeader header;
     private final String body;
 
-    public Request(RequestHeader header, String body) {
+    public HttpRequest(RequestHeader header, String body) {
         this.header = header;
         this.body = body;
     }

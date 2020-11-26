@@ -1,8 +1,8 @@
 package webserver;
 
-import webserver.request.Request;
+import webserver.request.HttpRequest;
 import webserver.request.RequestPath;
-import webserver.response.Response;
+import webserver.response.HttpResponse;
 
 public class Router {
     public static final String USER_PATH = "/user";
@@ -15,7 +15,7 @@ public class Router {
         fileController = new FileController();
     }
 
-    public Response getResponse(Request request) {
+    public HttpResponse getResponse(HttpRequest request) {
         RequestPath path = request.getHeader().getPath();
         if (path.requiresFile()) {
             return fileController.getFileResponse(path);
@@ -23,6 +23,6 @@ public class Router {
         if (path.startsWith(USER_PATH)) {
             return userController.getResponse(request);
         }
-        return Response.notFound();
+        return HttpResponse.notFound();
     }
 }

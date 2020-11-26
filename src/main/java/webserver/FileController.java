@@ -3,19 +3,19 @@ package webserver;
 import utils.FileIoUtils;
 import webserver.request.ContentType;
 import webserver.request.RequestPath;
-import webserver.response.Response;
+import webserver.response.HttpResponse;
 
 public class FileController {
-    public Response getFileResponse(RequestPath path) {
+    public HttpResponse getFileResponse(RequestPath path) {
         if (path.requiresCss()) {
             return getFileResponse(path, ContentType.CSS);
         }
         return getFileResponse(path, ContentType.HTML);
     }
 
-    private Response getFileResponse(RequestPath path, ContentType contentType) {
+    private HttpResponse getFileResponse(RequestPath path, ContentType contentType) {
         try {
-            return Response.file(FileIoUtils.loadFileFromClasspath(path.asFilePath()), contentType);
+            return HttpResponse.file(FileIoUtils.loadFileFromClasspath(path.asFilePath()), contentType);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

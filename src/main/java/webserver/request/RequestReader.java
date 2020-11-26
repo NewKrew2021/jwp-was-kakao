@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class RequestReader {
-    public static Request read(BufferedReader bufferedReader) throws IOException {
+    public static HttpRequest read(BufferedReader bufferedReader) throws IOException {
         RequestHeader requestHeader = RequestHeader.of(readRequestHeader(bufferedReader));
         print(requestHeader);
-        return new Request(requestHeader, getRequestBody(bufferedReader, requestHeader));
+        return new HttpRequest(requestHeader, getRequestBody(bufferedReader, requestHeader));
     }
 
     private static String getRequestBody(BufferedReader bufferedReader, RequestHeader requestHeader) {

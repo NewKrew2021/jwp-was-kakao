@@ -2,9 +2,9 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.request.Request;
+import webserver.request.HttpRequest;
 import webserver.request.RequestReader;
-import webserver.response.Response;
+import webserver.response.HttpResponse;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -31,7 +31,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            Request request = RequestReader.read(bufferedReader);
+            HttpRequest request = RequestReader.read(bufferedReader);
             renderResponse(new DataOutputStream(out), router.getResponse(request));
         } catch (Exception ex) {
             logger.error(ex.getMessage());
@@ -41,13 +41,13 @@ public class RequestHandler implements Runnable {
 
     private void renderError() {
         try (OutputStream out = connection.getOutputStream()) {
-            renderResponse(new DataOutputStream(out), Response.error());
+            renderResponse(new DataOutputStream(out), HttpResponse.error());
         } catch (IOException exception) {
             logger.error(exception.getMessage());
         }
     }
 
-    private void renderResponse(DataOutputStream dos, Response response) {
+    private void renderResponse(DataOutputStream dos, HttpResponse response) {
         try {
             dos.writeBytes(response.getHeader());
             dos.write(response.getBody(), 0, response.getBody().length);

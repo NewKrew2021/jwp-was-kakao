@@ -2,27 +2,27 @@ package webserver.response;
 
 import webserver.Cookie;
 import webserver.request.ContentType;
+import webserver.request.HttpRequest;
 import webserver.request.Protocol;
-import webserver.request.Request;
 import webserver.request.Status;
 
-public class Response {
+public class HttpResponse {
 
     private final ResponseHeader header;
     private final byte[] body;
 
-    public Response(ResponseHeader header) {
+    public HttpResponse(ResponseHeader header) {
         this.header = header;
         this.body = "".getBytes();
     }
 
-    public Response(ResponseHeader header, byte[] body) {
+    public HttpResponse(ResponseHeader header, byte[] body) {
         this.header = header;
         this.body = body;
     }
 
-    public static Response error() {
-        return new Response(ResponseHeader.builder()
+    public static HttpResponse error() {
+        return new HttpResponse(ResponseHeader.builder()
                 .protocol(Protocol.HTTP)
                 .status(Status.INTERNAL_SERVER_ERROR)
                 .build());
@@ -36,15 +36,15 @@ public class Response {
         return body;
     }
 
-    public static Response notFound() {
-        return new Response(ResponseHeader.builder()
+    public static HttpResponse notFound() {
+        return new HttpResponse(ResponseHeader.builder()
                 .protocol(Protocol.HTTP)
                 .status(Status.NOT_FOUND)
                 .build());
     }
 
-    public static Response file(byte[] bodyFromFile, ContentType contentType) {
-        return new Response(
+    public static HttpResponse file(byte[] bodyFromFile, ContentType contentType) {
+        return new HttpResponse(
                 ResponseHeader.builder()
                         .protocol(Protocol.HTTP)
                         .status(Status.OK)
@@ -55,8 +55,8 @@ public class Response {
         );
     }
 
-    public static Response redirect(Request request, String path) {
-        return new Response(
+    public static HttpResponse redirect(HttpRequest request, String path) {
+        return new HttpResponse(
                 ResponseHeader.builder()
                         .protocol(Protocol.HTTP)
                         .status(Status.REDIRECT)
@@ -65,8 +65,8 @@ public class Response {
         );
     }
 
-    public static Response redirectWithCookie(Request request, Cookie cookie, String path) {
-        return new Response(
+    public static HttpResponse redirectWithCookie(HttpRequest request, Cookie cookie, String path) {
+        return new HttpResponse(
                 ResponseHeader.builder()
                         .protocol(Protocol.HTTP)
                         .status(Status.REDIRECT)
