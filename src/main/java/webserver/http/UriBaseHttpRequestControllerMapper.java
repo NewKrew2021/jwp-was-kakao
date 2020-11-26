@@ -9,7 +9,7 @@ import java.util.List;
 
 public class UriBaseHttpRequestControllerMapper implements HttpRequestControllerMapper {
 
-    private List<RegexpMapping> mappings = new ArrayList<>();
+    private List<HttpRequestMapping> mappings = new ArrayList<>();
 
     public static UriBaseHttpRequestControllerMapper withDefaultMappings() {
         return new UriBaseHttpRequestControllerMapper(
@@ -24,12 +24,12 @@ public class UriBaseHttpRequestControllerMapper implements HttpRequestController
     }
 
     @Override
-    public void addMapping(RegexpMapping mapping){
+    public void addMapping(HttpRequestMapping mapping){
         mappings.add(mapping);
     }
 
     @Override
-    public void addMapping(RegexpMapping... mappings) {
+    public void addMapping(HttpRequestMapping... mappings) {
         Arrays.stream(mappings).forEach(this::addMapping);
     }
 
@@ -37,7 +37,7 @@ public class UriBaseHttpRequestControllerMapper implements HttpRequestController
     public Controller getController(HttpRequest httpRequest) {
         return mappings.stream()
                 .filter(it -> it.matches(httpRequest))
-                .map(RegexpMapping::getController)
+                .map(HttpRequestMapping::getController)
                 .findFirst()
                 .orElse(Controllers.NOT_FOUND);
     }
