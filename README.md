@@ -10,7 +10,7 @@
 
 
 ## Todo
-* 로그인
+* 인증이 필요한 페이지는 인증정보가 있어야 접근 할 수 있다
 
 ## Done
 * ~~모든 request header 출력~~
@@ -22,3 +22,4 @@
 * ~~response message 출력~~
 * ~~회원가입 완료 후 index.html 페이지로 자동으로 이동 ( redirect )~~
 * ~~로그인성공시 index.html 로 실패시 user/login_failed.html 페이지로 이동~~
+* ~~로그인성공시 쿠키설정~~

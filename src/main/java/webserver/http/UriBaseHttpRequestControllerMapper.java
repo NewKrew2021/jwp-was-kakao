@@ -1,7 +1,7 @@
 package webserver.http;
 
-import webserver.http.controller.Controller;
 import webserver.http.controller.Controllers;
+import webserver.http.dispatcher.HttpRequestMapping;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,15 +11,11 @@ public class UriBaseHttpRequestControllerMapper implements HttpRequestController
 
     private List<HttpRequestMapping> mappings = new ArrayList<>();
 
-    public static UriBaseHttpRequestControllerMapper withDefaultMappings() {
-        return new UriBaseHttpRequestControllerMapper(
-                new RegexpMapping("\\/css\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
-                new RegexpMapping("\\/js\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
-                new RegexpMapping("\\/fonts\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE)
-        );
+    public UriBaseHttpRequestControllerMapper(List<HttpRequestMapping> mappings) {
+        this.mappings.addAll(mappings);
     }
 
-    public UriBaseHttpRequestControllerMapper(RegexpMapping... mappings) {
+    public UriBaseHttpRequestControllerMapper(HttpRequestMapping... mappings) {
         this.mappings.addAll(Arrays.asList(mappings));
     }
 

@@ -1,6 +1,7 @@
-package webserver.http;
+package webserver.http.dispatcher;
 
-import webserver.http.controller.Controller;
+import webserver.http.HttpRequest;
+import webserver.http.Controller;
 
 public interface HttpRequestMapping {
 

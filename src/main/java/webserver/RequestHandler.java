@@ -2,10 +2,13 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.http.HttpRequest;
-import webserver.http.HttpRequestDispatcher;
-import webserver.http.HttpRequestFactory;
-import webserver.http.HttpResponse;
+import webserver.http.*;
+import webserver.http.controller.Controllers;
+import webserver.http.controller.LoginController;
+import webserver.http.controller.SignUpController;
+import webserver.http.controller.TemplateController;
+import webserver.http.dispatcher.DefaultHttpRequestDispatcher;
+import webserver.http.dispatcher.HttpRequestDispatcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +21,14 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
 
-    private final static HttpRequestDispatcher dispatcher = new HttpRequestDispatcher();
+    private final static HttpRequestDispatcher dispatcher = new DefaultHttpRequestDispatcher(
+            new RegexpMapping("\\/css\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
+            new RegexpMapping("\\/js\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
+            new RegexpMapping("\\/fonts\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
+            new RegexpMapping("\\/.+\\.html", HttpMethod.GET, new TemplateController()),
+            new RegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
+            new RegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController())
+    );
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -41,7 +51,7 @@ public class RequestHandler implements Runnable {
             printAllResponseHeaders(httpResponse);
             httpResponse.send();
 
-        } catch ( Exception e ){
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
         } finally {

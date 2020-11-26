@@ -1,6 +1,6 @@
 package webserver.http;
 
-import webserver.http.controller.Controller;
+import webserver.http.dispatcher.HttpRequestMapping;
 
 public interface HttpRequestControllerMapper {
 

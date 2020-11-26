@@ -1,9 +1,6 @@
 package webserver.http.controller;
 
-import webserver.http.HttpRequest;
-import webserver.http.HttpRequestUriLoader;
-import webserver.http.HttpResponse;
-import webserver.http.HttpStatus;
+import webserver.http.*;
 
 public class Controllers {
 
