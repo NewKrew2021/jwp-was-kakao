@@ -34,10 +34,10 @@ class QueryParserTest {
         assertThat(params)
                 .hasSize(4)
                 .containsExactly(
-                        new HttpRequestParam("userId", "javajigi"),
-                        new HttpRequestParam("password", "password"),
-                        new HttpRequestParam("name", "박재성"),
-                        new HttpRequestParam("email", "javajigi@slipp.net")
+                        new HttpRequestParam("userId=javajigi"),
+                        new HttpRequestParam("password=password"),
+                        new HttpRequestParam("name=박재성"),
+                        new HttpRequestParam("email=javajigi@slipp.net")
                 );
     }
 

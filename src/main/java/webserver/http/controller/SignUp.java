@@ -12,11 +12,8 @@ public class SignUp implements RequestDataObject {
     private String name;
     private String email;
 
-    private final List<String> requiredParams = Arrays.asList("userId", "password", "name", "email");
-    private HttpRequestParamValidator paramValidator = new HttpRequestParamValidator(requiredParams);
-
     public SignUp(List<HttpRequestParam> params) {
-        paramValidator.validate(params);
+        validate(params);
 
         userId = getValue(params, "userId");
         password = getValue(params, "password");
@@ -38,5 +35,10 @@ public class SignUp implements RequestDataObject {
 
     public String getEmail() {
         return email;
+    }
+
+    @Override
+    public List<RequestDataObjectValidator> getValidators() {
+        return Arrays.asList(new RequiredParamConstraint("userId", "password", "name", "email"));
     }
 }

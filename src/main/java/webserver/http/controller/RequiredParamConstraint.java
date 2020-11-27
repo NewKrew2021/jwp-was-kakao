@@ -3,17 +3,23 @@ package webserver.http.controller;
 import org.springframework.util.StringUtils;
 import webserver.http.HttpRequestParam;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HttpRequestParamValidator {
+public class RequiredParamConstraint implements RequestDataObjectValidator{
 
     private List<String> requiredParams;
 
-    public HttpRequestParamValidator(List<String> requiredParams) {
+    public RequiredParamConstraint(String... requiredParams) {
+        this(Arrays.asList(requiredParams));
+    }
+
+    public RequiredParamConstraint(List<String> requiredParams) {
         this.requiredParams = requiredParams;
     }
 
+    @Override
     public void validate(List<HttpRequestParam> params) {
         List<String> inputParams = params.stream()
                 .map(HttpRequestParam::getName)
@@ -39,3 +45,4 @@ public class HttpRequestParamValidator {
 
 
 }
+

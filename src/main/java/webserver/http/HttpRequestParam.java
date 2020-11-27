@@ -1,22 +1,28 @@
 package webserver.http;
 
+import utils.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Objects;
 
 public class HttpRequestParam {
+
     public static HttpRequestParam empty = new HttpRequestParam("", "");
+
     private String name;
-    private String value;
+    private String value = "";
 
     public HttpRequestParam(String paramString){
-        String[] parts = paramString.split("=");
-        if( parts.length == 0 ) throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
+        if( StringUtils.isEmpty(paramString) ) throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
 
+        String[] parts = paramString.split("=");
         name = parts[0];
         if( parts.length == 2 )
             value = parts[1];
     }
 
-    public HttpRequestParam(String name, String value) {
+    private HttpRequestParam(String name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -26,7 +32,12 @@ public class HttpRequestParam {
     }
 
     public String getValue() {
-        return value;
+        try {
+            return URLDecoder.decode(value, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new HttpRequestParamValueEncodingException("url decode 중 문제가 발생했습니다", e);
+        }
     }
 
     @Override
