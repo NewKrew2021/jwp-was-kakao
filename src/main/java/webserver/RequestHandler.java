@@ -1,13 +1,12 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.model.Request;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,13 +22,22 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+            handle(new Request(in),  new DataOutputStream(out));
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void handle(Request request, DataOutputStream dos) {
+        try {
+            byte[] body = request.getRequestedResource();
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            // TODO: response with 5xx
+            e.printStackTrace();
+        } catch (URISyntaxException | NullPointerException e) {
+            response404Header(dos);
         }
     }
 
@@ -44,12 +52,30 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void response404Header(DataOutputStream dos) {
+        ResponseWriter writer = new ResponseWriter(dos);
+        writer.println("HTTP/1.1 404 NOT FOUND");
+        writer.println();
+        writer.flush();
+    }
+
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    static class ResponseWriter extends PrintWriter {
+        ResponseWriter(OutputStream out) {
+            super(out, false);
+        }
+
+        @Override
+        public void println() {
+            write("\r\n");
         }
     }
 }
