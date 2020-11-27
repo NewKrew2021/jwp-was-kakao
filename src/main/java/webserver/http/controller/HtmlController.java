@@ -1,10 +1,12 @@
 package webserver.http.controller;
 
+import utils.ClasspathFileLoader;
+import utils.FileLoader;
 import webserver.http.*;
 
-public class TemplateController implements Controller {
+public class HtmlController implements Controller {
 
-    private HttpRequestUriLoader uriLoader = HttpRequestUriLoader.fileLoader("./templates");
+    private FileLoader uriLoader = new ClasspathFileLoader("./templates");
 
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {

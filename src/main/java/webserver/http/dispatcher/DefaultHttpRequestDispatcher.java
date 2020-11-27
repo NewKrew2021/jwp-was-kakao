@@ -21,7 +21,8 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
         try {
             controller.execute(httpRequest, httpResponse);
         } catch (RuntimeException e) {
-            httpResponse.setStatus(HttpStatus.x500_InternalServerError);
+            e.printStackTrace();
+             httpResponse.setStatus(HttpStatus.x500_InternalServerError);
         }
     }
 

@@ -16,4 +16,7 @@ POST http://localhost:8080/user/create
 Content-Type: application/x-www-form-urlencoded
 
 userId=nio&password=password&name=%EC%B5%9C%EC%84%B8%ED%99%98&email=sehan.choi%40gmail.com
+### 유저 리스트
+GET http://localhost:8080/user/list
+
 ###

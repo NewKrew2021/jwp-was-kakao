@@ -3,10 +3,7 @@ package webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.*;
-import webserver.http.controller.Controllers;
-import webserver.http.controller.LoginController;
-import webserver.http.controller.SignUpController;
-import webserver.http.controller.TemplateController;
+import webserver.http.controller.*;
 import webserver.http.dispatcher.DefaultHttpRequestDispatcher;
 import webserver.http.dispatcher.HttpRequestDispatcher;
 
@@ -21,13 +18,16 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
 
+    private final static Controller STATIC_RESOURCE_CONTROLLER = new StaticResourceController("./static");
+
     private final static HttpRequestDispatcher dispatcher = new DefaultHttpRequestDispatcher(
-            new RegexpMapping("\\/css\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
-            new RegexpMapping("\\/js\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
-            new RegexpMapping("\\/fonts\\/.+", HttpMethod.GET, Controllers.STATIC_RESOURCE),
-            new RegexpMapping("\\/.+\\.html", HttpMethod.GET, new TemplateController()),
+            new RegexpMapping("\\/css\\/.+", HttpMethod.GET, STATIC_RESOURCE_CONTROLLER),
+            new RegexpMapping("\\/js\\/.+", HttpMethod.GET, STATIC_RESOURCE_CONTROLLER),
+            new RegexpMapping("\\/fonts\\/.+", HttpMethod.GET, STATIC_RESOURCE_CONTROLLER),
+            new RegexpMapping("\\/.+\\.html", HttpMethod.GET, new HtmlController()),
             new RegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
-            new RegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController())
+            new RegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController()),
+            new RegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController())
     );
 
     public RequestHandler(Socket connectionSocket) {
