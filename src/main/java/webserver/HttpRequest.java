@@ -3,11 +3,10 @@ package webserver;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
-import model.User;
 
 import java.util.*;
 
-import static java.util.AbstractMap.*;
+import static java.util.AbstractMap.SimpleEntry;
 import static java.util.stream.Collectors.*;
 
 class HttpRequest {
@@ -34,18 +33,6 @@ class HttpRequest {
 
     public String getProtocol() {
         return protocol;
-    }
-
-    public User getUser() {
-        Map<String, String> queryParams = getQueryParams();
-        if (queryParams != null) {
-            return User.createUser(queryParams);
-        }
-        Map<String, String> entity = getEntity();
-        if (entity != null) {
-            return User.createUser(entity);
-        }
-        throw new IllegalStateException();
     }
 
     public void setQueryParams(Map<String, String> queryParams) {

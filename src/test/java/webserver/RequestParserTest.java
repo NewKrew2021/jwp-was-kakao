@@ -76,7 +76,7 @@ public class RequestParserTest {
         @Test
         void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getUser()).isEqualTo(new User(
+            assertThat(getUser(httpRequest)).isEqualTo(new User(
                     "javajigi",
                     "password",
                     "박재성",
@@ -146,7 +146,7 @@ public class RequestParserTest {
         @Test
         void parse() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getUser()).isEqualTo(new User(
+            assertThat(getUser(httpRequest)).isEqualTo(new User(
                     "javajigi",
                     "password",
                     "박재성",
@@ -188,5 +188,17 @@ public class RequestParserTest {
 
             assertThat(httpRequest.getCookies()).isNull();
         }
+    }
+
+    public static User getUser(HttpRequest httpRequest) {
+        Map<String, String> queryParams = httpRequest.getQueryParams();
+        if (queryParams != null) {
+            return User.createUser(queryParams);
+        }
+        Map<String, String> entity = httpRequest.getEntity();
+        if (entity != null) {
+            return User.createUser(entity);
+        }
+        throw new IllegalStateException();
     }
 }
