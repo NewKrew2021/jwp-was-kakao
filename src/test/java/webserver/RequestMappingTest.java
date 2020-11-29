@@ -1,12 +1,10 @@
 package webserver;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.stream.Stream;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,38 +18,53 @@ public class RequestMappingTest {
     }
 
     @DisplayName("여러개의 컨트롤러로 매핑이 가능하다")
-    @ParameterizedTest
-    @MethodSource("mappingConfig")
-    void controllerMapping(String uri, Controller controller) {
-        RequestMapping requestMapping = new RequestMapping(uri, controller);
-        assertThat(requestMapping.getController("uri")).isEqualTo(controller);
-    }
+    @Test
+    void controllerMapping() {
+        Map<String, Controller> uriMapping = ImmutableMap.of(
+                "/index", new IndexController(),
+                "/health_check", new HealthCheckController());
 
-    private static Stream<Arguments> mappingConfig() {
-        return Stream.of(
-                Arguments.of("/index", new IndexController()),
-                Arguments.of("/health_check", new HealthCheckController())
-        );
-    }
+        RequestMapping requestMapping = new RequestMapping(uriMapping);
 
-    private static class IndexController {
-
+        uriMapping.forEach((uri, controller) ->
+                                   assertThat(requestMapping.getController(uri)).isEqualTo(controller));
     }
 
     private static class RequestMapping {
-        private final String uri;
-        private final IndexController indexController;
+        private final Map<String, Controller> uriMapping;
 
         public RequestMapping(String uri, IndexController indexController) {
-            this.uri = uri;
-            this.indexController = indexController;
+            this(ImmutableMap.of(uri, indexController));
         }
 
-        public IndexController getController(String uri) {
-            if (uri.equals(uri)) {
-                return indexController;
-            }
-            return null;
+        public RequestMapping(Map<String, Controller> uriMapping) {
+
+            this.uriMapping = uriMapping;
+        }
+
+        public Controller getController(String uri) {
+            return uriMapping.get(uri);
+        }
+
+    }
+
+    @FunctionalInterface
+    private interface Controller {
+        void execute();
+
+    }
+
+    private static class IndexController implements Controller {
+        @Override
+        public void execute() {
+
+        }
+    }
+
+    private static class HealthCheckController implements Controller {
+        @Override
+        public void execute() {
+
         }
     }
 }
