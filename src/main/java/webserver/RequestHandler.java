@@ -1,10 +1,5 @@
 package webserver;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Helper;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import db.DataBase;
@@ -13,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import utils.FileIoUtils;
+import utils.TemplateUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -68,19 +64,15 @@ public class RequestHandler implements Runnable {
     }
 
     private void response(DataOutputStream dos, Response response) throws IOException {
-        if (StringUtils.hasText(response.getLocation())) {
-            response302Header(dos, response.getLocation(), response.getHeaders());
+        if (response.isRedirect()) {
+            response302Header(dos, response.getHeaders());
         }
 
         if (StringUtils.hasText(response.getViewName())) {
-            TemplateLoader loader = new ClassPathTemplateLoader();
-            loader.setPrefix("/templates");
-            loader.setSuffix(".html");
-            Handlebars handlebars = new Handlebars(loader);
-            handlebars.registerHelper("inc", (Helper<Integer>) (context, options) -> context + 1);
+            byte[] body = TemplateUtils.getTemplate(response.getViewName())
+                    .apply(response.getModel())
+                    .getBytes(UTF_8);
 
-            Template template = handlebars.compile(response.getViewName());
-            byte[] body = template.apply(response.getModel()).getBytes(UTF_8);
             response200Header(dos, body.length);
             responseBody(dos, body);
         }
@@ -181,10 +173,9 @@ public class RequestHandler implements Runnable {
     }
 
 
-    private void response302Header(DataOutputStream dos, String location, List<String> headers) {
+    private void response302Header(DataOutputStream dos, List<String> headers) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
             for (String header : headers) {
                 dos.writeBytes(header + "\r\n");
             }

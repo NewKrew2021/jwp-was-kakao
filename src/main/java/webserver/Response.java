@@ -41,4 +41,9 @@ class Response {
     public String getViewName() {
         return viewName;
     }
+
+    public boolean isRedirect() {
+        return headers.stream()
+                .anyMatch(header -> header.startsWith("Location: "));
+    }
 }
