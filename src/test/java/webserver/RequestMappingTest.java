@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,20 +35,17 @@ public class RequestMappingTest {
     @DisplayName("매핑이 존재하지 않으면 예외가 발생한다")
     @Test
     void notFound() {
-        Map<String, Controller> uriMapping = ImmutableMap.of(
-                "/index", new IndexController(),
-                "/health_check", new HealthCheckController());
-
         RequestMapping requestMapping = new RequestMapping("/index", () -> {});
 
         assertThatThrownBy(() -> requestMapping.getController("/non_exists"))
-                .isInstanceOf(ControllerNotFoundException.class);
+                .isInstanceOf(ControllerNotFoundException.class)
+                .hasMessage("Not Found: %s", "/non_exists");
     }
 
     private static class RequestMapping {
         private final Map<String, Controller> uriMapping;
 
-        public RequestMapping(String uri, IndexController indexController) {
+        public RequestMapping(String uri, Controller indexController) {
             this(ImmutableMap.of(uri, indexController));
         }
 
@@ -57,7 +55,11 @@ public class RequestMappingTest {
         }
 
         public Controller getController(String uri) {
-            return uriMapping.get(uri);
+            Controller controller = uriMapping.get(uri);
+            if (Objects.isNull(controller)) {
+                throw new ControllerNotFoundException(uri);
+            }
+            return controller;
         }
 
     }
@@ -79,6 +81,12 @@ public class RequestMappingTest {
         @Override
         public void execute() {
 
+        }
+    }
+
+    private static class ControllerNotFoundException extends RuntimeException {
+        public ControllerNotFoundException(String uri) {
+            super(String.format("Not Found: %s", uri));
         }
     }
 }
