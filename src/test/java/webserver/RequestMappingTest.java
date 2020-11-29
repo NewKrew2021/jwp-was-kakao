@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,34 +41,6 @@ public class RequestMappingTest {
                 .hasMessage("Not Found: %s", "/non_exists");
     }
 
-    private static class RequestMapping {
-        private final Map<String, Controller> uriMapping;
-
-        public RequestMapping(String uri, Controller indexController) {
-            this(ImmutableMap.of(uri, indexController));
-        }
-
-        public RequestMapping(Map<String, Controller> uriMapping) {
-
-            this.uriMapping = uriMapping;
-        }
-
-        public Controller getController(String uri) {
-            Controller controller = uriMapping.get(uri);
-            if (Objects.isNull(controller)) {
-                throw new ControllerNotFoundException(uri);
-            }
-            return controller;
-        }
-
-    }
-
-    @FunctionalInterface
-    private interface Controller {
-        Response execute(HttpRequest httpRequest);
-
-    }
-
     private static class IndexController implements Controller {
         @Override
         public Response execute(HttpRequest httpRequest) {
@@ -84,9 +55,4 @@ public class RequestMappingTest {
         }
     }
 
-    private static class ControllerNotFoundException extends RuntimeException {
-        public ControllerNotFoundException(String uri) {
-            super(String.format("Not Found: %s", uri));
-        }
-    }
 }
