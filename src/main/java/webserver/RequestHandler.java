@@ -86,9 +86,10 @@ public class RequestHandler implements Runnable {
     }
 
     public static Response handleList(HttpRequest httpRequest) {
-        if (httpRequest.getCookies().contains("logined=true")) {
+        if (!httpRequest.getCookies().contains("logined=true")) {
             Response response = new Response();
             response.setLocation("/user/login.html");
+            response.setHeaders("Location: /user/login.html");
             return response;
         }
 
