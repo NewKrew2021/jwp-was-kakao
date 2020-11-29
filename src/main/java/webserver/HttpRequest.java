@@ -73,7 +73,9 @@ class HttpRequest {
     }
 
     public Cookies getCookies() {
-        return new Cookies(getHeaders().get("Cookie"));
+        return Optional.ofNullable(getHeaders().get("Cookie"))
+                .map(Cookies::new)
+                .orElse(null);
     }
 
     public static class Cookies {

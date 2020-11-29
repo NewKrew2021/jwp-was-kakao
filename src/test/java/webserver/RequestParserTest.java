@@ -158,14 +158,12 @@ public class RequestParserTest {
     class Cookies {
         @BeforeEach
         void setUp() {
-
             bufferedReader = new BufferedReader(new StringReader(
                     "GET /user/list HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
                             "Connection: keep-alive\n" +
                             "Accept: */*\n" +
                             "Cookie: logined=true; Idea-32c00508=37ab5797-f595-40c6-b63f-d4e27524f593; Idea-32c008c9=b5b2b305-3b96-4335-9659-dfa0d33877fd\n\n"));
-
         }
 
         @Test
@@ -177,6 +175,18 @@ public class RequestParserTest {
                     .containsEntry("logined", "true")
                     .containsEntry("Idea-32c00508", "37ab5797-f595-40c6-b63f-d4e27524f593")
                     .containsEntry("Idea-32c008c9", "b5b2b305-3b96-4335-9659-dfa0d33877fd") ;
+        }
+
+        @Test
+        void cookieHeaderNotExists() throws IOException {
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /user/list HTTP/1.1\n" +
+                    "Host: localhost:8080\n" +
+                    "Connection: keep-alive\n" +
+                    "Accept: */*\n\n"));
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+
+            assertThat(httpRequest.getCookies()).isNull();
         }
     }
 }
