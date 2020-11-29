@@ -18,18 +18,20 @@ public class RequestMappingTest {
 
     }
 
-    private class RequestMapping {
+    private static class RequestMapping {
         private final String uri;
         private final IndexController indexController;
 
         public RequestMapping(String uri, IndexController indexController) {
-
             this.uri = uri;
             this.indexController = indexController;
         }
 
         public IndexController getController(String uri) {
-            return indexController;
+            if (uri.equals(uri)) {
+                return indexController;
+            }
+            return null;
         }
     }
 }
