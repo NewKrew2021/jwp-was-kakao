@@ -56,9 +56,9 @@ public class RequestHandler implements Runnable {
 
     private Response handleRequest(HttpRequest httpRequest) {
         return new RequestMapping(ImmutableMap.of(
-                "/usr/create", this::handleUserCreate,
-                "/user/login", this::handleLogin,
-                "/user/list", this::handleList))
+                "/usr/create", RequestHandler::handleUserCreate,
+                "/user/login", RequestHandler::handleLogin,
+                "/user/list", RequestHandler::handleList))
                 .getController(httpRequest.getRequestURI())
                 .execute(httpRequest);
     }
@@ -82,7 +82,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private Response handleList(HttpRequest httpRequest) {
+    public static Response handleList(HttpRequest httpRequest) {
         if (httpRequest.getCookies().contains("logined=true")) {
             Response response = new Response();
             response.setLocation("/user/login.html");
@@ -95,7 +95,7 @@ public class RequestHandler implements Runnable {
         return response;
     }
 
-    private Response handleLogin(HttpRequest httpRequest) {
+    public static  Response handleLogin(HttpRequest httpRequest) {
         Map<String, String> entity = httpRequest.getEntity();
         User user = DataBase.findUserById(entity.get("userId"));
         if (user.getPassword().equals(entity.get("password"))) {
@@ -111,7 +111,7 @@ public class RequestHandler implements Runnable {
         return response;
     }
 
-    private Response handleUserCreate(HttpRequest httpRequest) {
+    public static  Response handleUserCreate(HttpRequest httpRequest) {
         User user = httpRequest.getUser();
         DataBase.addUser(user);
         Response response = new Response();
