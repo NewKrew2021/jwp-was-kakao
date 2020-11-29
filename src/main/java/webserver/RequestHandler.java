@@ -19,6 +19,7 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -86,7 +87,7 @@ public class RequestHandler implements Runnable {
     }
 
     public static Response handleList(HttpRequest httpRequest) {
-        if (!httpRequest.getCookies().contains("logined=true")) {
+        if (!isLogin(httpRequest)) {
             Response response = new Response();
             response.setLocation("/user/login.html");
             response.setHeaders("Location: /user/login.html");
@@ -97,6 +98,12 @@ public class RequestHandler implements Runnable {
         response.setModel(DataBase.findAll());
         response.setViewName("user/list");
         return response;
+    }
+
+    private static boolean isLogin(HttpRequest httpRequest) {
+        return Optional.ofNullable(httpRequest.getCookies())
+                .map(cookies -> cookies.contains("logined=true"))
+                .isPresent();
     }
 
     public static  Response handleLogin(HttpRequest httpRequest) {

@@ -43,7 +43,6 @@ class RequestHandlerTest {
     @Test
     void handleListWhenNotLoggedIn() {
         HttpRequest httpRequest = createRequest("/user/list");
-        httpRequest.addHeaders(ImmutableMap.of("Cookie", ""));
         assertThat(RequestHandler.handleList(httpRequest).getHeaders())
                 .containsExactly("Location: /user/login.html");
     }
