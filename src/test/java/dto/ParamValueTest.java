@@ -6,18 +6,16 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 public class ParamValueTest {
 
 
-    @DisplayName("ParamValue 생성 테스트 : 빈 값인 경우 에러 발생")
+    @DisplayName("ParamValue 생성 테스트 : 빈 값")
     @Test
     void create1() {
         Optional<String> optionalParam = Optional.empty();
 
-        assertThatIllegalArgumentException().isThrownBy(
-                () -> ParamValue.of(optionalParam));
+        assertThat(optionalParam).isEmpty();
     }
 
     @DisplayName("ParamValue 생성 테스트")
@@ -26,7 +24,9 @@ public class ParamValueTest {
         Optional<String> optionalParam = Optional.of(
                 "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
 
-        ParamValue paramValue = ParamValue.of(optionalParam);
-        assertThat(paramValue).isEqualToComparingFieldByField(ParamValue.of(optionalParam));
+        Optional<ParamValue> paramValue = ParamValue.of(optionalParam);
+
+        assertThat(optionalParam).isNotEmpty();
+        assertThat(paramValue.get()).isEqualToComparingFieldByField(ParamValue.of(optionalParam).get());
     }
 }

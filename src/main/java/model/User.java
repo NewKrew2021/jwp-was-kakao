@@ -1,5 +1,8 @@
 package model;
 
+import utils.MessageUtils;
+import validator.InputValidator;
+
 import java.util.Objects;
 
 public class User {
@@ -10,6 +13,12 @@ public class User {
     private final String email;
 
     public User(String userId, String password, String name, String email) {
+        validate(userId);
+        validate(password);
+        validate(name);
+        validate(email);
+        validateEmail(email);
+
         this.userId = userId;
         this.password = password;
         this.name = name;
@@ -51,5 +60,17 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(userId, password, name, email);
+    }
+
+    private static void validate(String value) {
+        if (!InputValidator.isValidEmpty(value)) {
+            throw new IllegalArgumentException(MessageUtils.INVALID_USER_PARAM);
+        }
+    }
+
+    private static void validateEmail(String email) {
+        if (!InputValidator.isValidEmail(email)) {
+            throw new IllegalArgumentException(MessageUtils.INVALID_USER_EMAIL);
+        }
     }
 }

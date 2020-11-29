@@ -1,6 +1,6 @@
 package dto;
 
-import utils.MessageUtils;
+import utils.DecodeUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,29 +18,24 @@ public class ParamValue {
         this.paramMap = paramMap;
     }
 
-    public static ParamValue of(Optional<String> optionalParam) {
+    public static Optional<ParamValue> of(Optional<String> optionalParam) {
         Map<String, String> paramMap = new HashMap<>();
 
-        String param = validate(optionalParam);
-        String[] splitParam = param.split(REGEX_AMPERSAND);
+        if (optionalParam.isPresent()) {
+            String[] splitParam = optionalParam.get().split(REGEX_AMPERSAND);
 
-        Arrays.stream(splitParam).forEach(v -> {
-            String[] data = v.split(REGEX_EQUALS);
-            paramMap.put(data[0], data[1]);
-        });
+            Arrays.stream(splitParam).forEach(v -> {
+                String[] data = v.split(REGEX_EQUALS);
+                paramMap.put(data[0], DecodeUtils.decodeUTF8(data[1]));
+            });
 
-        return new ParamValue(paramMap);
+            return Optional.of(new ParamValue(paramMap));
+        }
+
+        return Optional.empty();
     }
 
     public String getValue(String key) {
         return paramMap.get(key);
     }
-
-    private static String validate(Optional<String> param) {
-        if (param.isPresent()) {
-            return param.get();
-        }
-        throw new IllegalArgumentException(MessageUtils.INVALID_PARAM_VALUE);
-    }
-
 }
