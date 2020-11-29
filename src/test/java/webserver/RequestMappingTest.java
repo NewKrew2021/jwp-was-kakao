@@ -35,7 +35,7 @@ public class RequestMappingTest {
     @DisplayName("매핑이 존재하지 않으면 예외가 발생한다")
     @Test
     void notFound() {
-        RequestMapping requestMapping = new RequestMapping("/index", () -> {});
+        RequestMapping requestMapping = new RequestMapping("/index", (httpRequest) -> null);
 
         assertThatThrownBy(() -> requestMapping.getController("/non_exists"))
                 .isInstanceOf(ControllerNotFoundException.class)
@@ -66,21 +66,21 @@ public class RequestMappingTest {
 
     @FunctionalInterface
     private interface Controller {
-        void execute();
+        Response execute(HttpRequest httpRequest);
 
     }
 
     private static class IndexController implements Controller {
         @Override
-        public void execute() {
-
+        public Response execute(HttpRequest httpRequest) {
+            return null;
         }
     }
 
     private static class HealthCheckController implements Controller {
         @Override
-        public void execute() {
-
+        public Response execute(HttpRequest httpRequest) {
+            return null;
         }
     }
 
