@@ -2,20 +2,20 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
-    private static final String REGEX_BLANK = " ";
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private URIFactory uriFactory;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        this.uriFactory = new URIFactory();
     }
 
     public void run() {
@@ -24,11 +24,13 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String line = br.readLine();
-            printRequest(br, line);
+            String requestPath = br.readLine();
+            printRequest(br, requestPath);
+
+            uriFactory.create(requestPath);
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getBody(line);
+            byte[] body = ParseURI.getBody(requestPath);
 
             response200Header(dos, body.length);
             responseBody(dos, body);
@@ -45,24 +47,6 @@ public class RequestHandler implements Runnable {
             logger.info(line);
             line = bufferedReader.readLine();
         }
-    }
-
-    public byte[] getBody(String path) {
-        try {
-            return FileIoUtils.loadFileFromClasspath(getPath(path.split(REGEX_BLANK)[1]));
-        } catch (Exception e) {
-            return "Hello World".getBytes();
-        }
-    }
-
-    public String getPath(String path) {
-        if (path.startsWith("/css")
-                || path.startsWith("/fonts")
-                || path.startsWith("/images")
-                || path.startsWith("/js")) {
-            return "./static" + path;
-        }
-        return "./templates" + path;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
