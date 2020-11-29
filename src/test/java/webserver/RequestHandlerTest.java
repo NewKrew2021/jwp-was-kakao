@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RequestHandlerTest {
     @Test
     void handleUserCreate() {
-        HttpRequest httpRequest = new HttpRequest("POST", "/usr/create", "HTTP 1.1");
+        HttpRequest httpRequest = createRequest("/usr/create");
         httpRequest.setEntity(ImmutableMap.of("userId", "red"));
         assertThat(RequestHandler.handleUserCreate(httpRequest).getLocation())
                 .isEqualTo("/index.html");
@@ -16,7 +16,7 @@ class RequestHandlerTest {
 
     @Test
     void handleLoginSuccess() {
-        HttpRequest httpRequest = new HttpRequest("POST", "/user/login", "HTTP 1.1");
+        HttpRequest httpRequest = createRequest("/user/login");
         httpRequest.setEntity(ImmutableMap.of("userId", "blue", "password", "1234"));
         assertThat(RequestHandler.handleLogin(httpRequest).getHeaders())
                 .containsExactly("Set-Cookie: logined=true; Path=/", "Location: /index.html");
@@ -24,9 +24,13 @@ class RequestHandlerTest {
 
     @Test
     void handleLoginFailed() {
-        HttpRequest httpRequest = new HttpRequest("POST", "/user/login", "HTTP 1.1");
+        HttpRequest httpRequest = createRequest("/user/login");
         httpRequest.setEntity(ImmutableMap.of("userId", "blue", "password", "0000"));
         assertThat(RequestHandler.handleLogin(httpRequest).getHeaders())
                 .containsExactly("Set-Cookie: logined=false; Path=/", "Location: /user/login_failed.html");
+    }
+
+    private HttpRequest createRequest(String uri) {
+        return new HttpRequest("POST", uri, "HTTP 1.1");
     }
 }
