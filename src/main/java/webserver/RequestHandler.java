@@ -42,30 +42,32 @@ public class RequestHandler implements Runnable {
             String requestURI = httpRequest.getRequestURI();
             logger.debug("requestURI: {}", requestURI);
 
-            DataOutputStream dos = new DataOutputStream(out);
+            Response response = handleRequest(httpRequest);
 
-            if (requestURI.equals("/user/create") && POST.matches(httpRequest.getMethod())) {
-                Response response = handleUserCreate(httpRequest.getUser());
-                response(dos, response);
+            if (response != null) {
+                response(new DataOutputStream(out), response);
                 return;
             }
 
-            if (requestURI.equals("/user/login") && POST.matches(httpRequest.getMethod())) {
-                Response response = handleLogin(httpRequest.getEntity());
-                response(dos, response);
-                return;
-            }
-
-            if (requestURI.equals("/user/list") && GET.matches(httpRequest.getMethod())) {
-                Response response = handleList(httpRequest);
-                response(dos, response);
-                return;
-            }
-
-            responseStaticContent(requestURI, dos);
+            responseStaticContent(requestURI, new DataOutputStream(out));
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private Response handleRequest(HttpRequest httpRequest) {
+        if (httpRequest.getRequestURI().equals("/user/create") && POST.matches(httpRequest.getMethod())) {
+            return handleUserCreate(httpRequest.getUser());
+        }
+
+        if (httpRequest.getRequestURI().equals("/user/login") && POST.matches(httpRequest.getMethod())) {
+            return handleLogin(httpRequest.getEntity());
+        }
+
+        if (httpRequest.getRequestURI().equals("/user/list") && GET.matches(httpRequest.getMethod())) {
+            return handleList(httpRequest);
+        }
+        throw new IllegalArgumentException();
     }
 
     private void response(DataOutputStream dos, Response response) throws IOException {
