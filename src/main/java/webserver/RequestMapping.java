@@ -3,7 +3,6 @@ package webserver;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.Optional;
 
 class RequestMapping {
     private final Map<String, Controller> uriMapping;
@@ -17,8 +16,7 @@ class RequestMapping {
     }
 
     public Controller getController(String uri) {
-        return Optional.ofNullable(uriMapping.get(uri))
-                .orElseThrow(() -> new ControllerNotFoundException(uri));
+        return uriMapping.get(uri);
     }
 
 }

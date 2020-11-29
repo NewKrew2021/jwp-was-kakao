@@ -55,12 +55,15 @@ public class RequestHandler implements Runnable {
     }
 
     private Response handleRequest(HttpRequest httpRequest) {
-        return new RequestMapping(ImmutableMap.of(
+        Controller controller = new RequestMapping(ImmutableMap.of(
                 "/usr/create", RequestHandler::handleUserCreate,
                 "/user/login", RequestHandler::handleLogin,
                 "/user/list", RequestHandler::handleList))
-                .getController(httpRequest.getRequestURI())
-                .execute(httpRequest);
+                .getController(httpRequest.getRequestURI());
+        if (controller == null) {
+            return null; // TODO 향후 static controller 로 교체한다
+        }
+        return controller.execute(httpRequest);
     }
 
     private void response(DataOutputStream dos, Response response) throws IOException {
