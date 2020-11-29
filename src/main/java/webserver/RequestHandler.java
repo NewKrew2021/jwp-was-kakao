@@ -1,11 +1,14 @@
 package webserver;
 
+import dto.RequestValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,29 +26,19 @@ public class RequestHandler implements Runnable {
                      connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String requestPath = br.readLine();
-            printRequest(br, requestPath);
+            RequestValue requestValue = RequestValue.of(in);
+            requestValue.printRequest();
 
-            uriFactory.create(requestPath);
+            Request request = Request.of(requestValue);
+            uriFactory.create(request);
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = ParseURI.getBody(requestPath);
+            byte[] body = ResponseHandler.getBody(requestValue.getURL());
 
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
-        }
-    }
-
-    public void printRequest(BufferedReader bufferedReader, String line) throws IOException {
-        while (!"".equals(line)) {
-            if (line == null) {
-                break;
-            }
-            logger.info(line);
-            line = bufferedReader.readLine();
         }
     }
 
