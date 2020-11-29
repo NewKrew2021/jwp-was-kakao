@@ -38,7 +38,14 @@ class RequestHandlerTest {
         Response response = RequestHandler.handleList(httpRequest);
         assertAll(() -> assertThat(response.getViewName()).isEqualTo("user/list"),
                   () -> assertThat(response.getModel()).isNotNull());
+    }
 
+    @Test
+    void handleListWhenNotLoggedIn() {
+        HttpRequest httpRequest = createRequest("/user/list");
+        httpRequest.addHeaders(ImmutableMap.of("Cookie", ""));
+        assertThat(RequestHandler.handleList(httpRequest).getHeaders())
+                .containsExactly("Location: /user/login.html");
     }
 
     private HttpRequest createRequest(String uri) {
