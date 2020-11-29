@@ -5,18 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 class Response {
-    private String location;
     private final List<String> headers = new ArrayList<>();
     private Object model;
     private String viewName;
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getLocation() {
-        return location;
-    }
 
     public void setHeaders(String headers) {
         this.headers.add(headers);

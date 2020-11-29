@@ -81,7 +81,6 @@ public class RequestHandler implements Runnable {
     public static Response handleList(HttpRequest httpRequest) {
         if (!isLogin(httpRequest)) {
             Response response = new Response();
-            response.setLocation("/user/login.html");
             response.setHeaders("Location: /user/login.html");
             return response;
         }
@@ -103,14 +102,12 @@ public class RequestHandler implements Runnable {
         User user = DataBase.findUserById(entity.get("userId"));
         if (user.getPassword().equals(entity.get("password"))) {
             Response response = new Response();
-            response.setLocation("/index.html"); // TODO 로케이션 헤더로 변경
             response.setHeaders("Set-Cookie: logined=true; Path=/");
             response.setHeaders("Location: /index.html");
             return response;
         }
 
         Response response = new Response();
-        response.setLocation("/user/login_failed.html");
         response.setHeaders("Set-Cookie: logined=false; Path=/");
         response.setHeaders("Location: /user/login_failed.html");
         return response;
@@ -121,7 +118,6 @@ public class RequestHandler implements Runnable {
         DataBase.addUser(user);
         Response response = new Response();
         response.setHeaders("Location: /index.html");
-        response.setLocation("/index.html");
         return response;
     }
 
