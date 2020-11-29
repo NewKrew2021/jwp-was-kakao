@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import db.DataBase;
 import model.User;
@@ -20,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -56,18 +55,12 @@ public class RequestHandler implements Runnable {
     }
 
     private Response handleRequest(HttpRequest httpRequest) {
-        if (httpRequest.getRequestURI().equals("/user/create") && POST.matches(httpRequest.getMethod())) {
-            return handleUserCreate(httpRequest.getUser());
-        }
-
-        if (httpRequest.getRequestURI().equals("/user/login") && POST.matches(httpRequest.getMethod())) {
-            return handleLogin(httpRequest.getEntity());
-        }
-
-        if (httpRequest.getRequestURI().equals("/user/list") && GET.matches(httpRequest.getMethod())) {
-            return handleList(httpRequest);
-        }
-        throw new IllegalArgumentException();
+        return new RequestMapping(ImmutableMap.of(
+                "/usr/create", this::handleUserCreate,
+                "/user/login", this::handleLogin,
+                "/user/list", this::handleList))
+                .getController(httpRequest.getRequestURI())
+                .execute(httpRequest);
     }
 
     private void response(DataOutputStream dos, Response response) throws IOException {
@@ -102,7 +95,8 @@ public class RequestHandler implements Runnable {
         return response;
     }
 
-    private Response handleLogin(Map<String, String> entity) {
+    private Response handleLogin(HttpRequest httpRequest) {
+        Map<String, String> entity = httpRequest.getEntity();
         User user = DataBase.findUserById(entity.get("userId"));
         if (user.getPassword().equals(entity.get("password"))) {
             Response response = new Response();
@@ -117,7 +111,8 @@ public class RequestHandler implements Runnable {
         return response;
     }
 
-    private Response handleUserCreate(User user) {
+    private Response handleUserCreate(HttpRequest httpRequest) {
+        User user = httpRequest.getUser();
         DataBase.addUser(user);
         Response response = new Response();
         response.setLocation("/index.html");
