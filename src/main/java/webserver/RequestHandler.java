@@ -115,7 +115,7 @@ public class RequestHandler implements Runnable {
     }
 
     public static  Response handleUserCreate(HttpRequest httpRequest) {
-        User user = httpRequest.getUser();
+        User user = User.createUser(httpRequest.getEntity());
         DataBase.addUser(user);
         Response response = new Response();
         response.setLocation("/index.html");
