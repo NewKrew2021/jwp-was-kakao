@@ -103,8 +103,9 @@ public class RequestHandler implements Runnable {
         User user = DataBase.findUserById(entity.get("userId"));
         if (user.getPassword().equals(entity.get("password"))) {
             Response response = new Response();
-            response.setLocation("/index.html");
+            response.setLocation("/index.html"); // TODO 로케이션 헤더로 변경
             response.setHeaders("Set-Cookie: logined=true; Path=/");
+            response.setHeaders("Location: /index.html");
             return response;
         }
 
