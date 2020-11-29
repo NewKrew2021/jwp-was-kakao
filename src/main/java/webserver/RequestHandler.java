@@ -128,6 +128,7 @@ public class RequestHandler implements Runnable {
         User user = User.createUser(httpRequest.getEntity());
         DataBase.addUser(user);
         Response response = new Response();
+        response.setHeaders("Location: /index.html");
         response.setLocation("/index.html");
         return response;
     }

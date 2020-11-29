@@ -11,8 +11,8 @@ class RequestHandlerTest {
     void handleUserCreate() {
         HttpRequest httpRequest = createRequest("/usr/create");
         httpRequest.setEntity(ImmutableMap.of("userId", "red"));
-        assertThat(RequestHandler.handleUserCreate(httpRequest).getLocation())
-                .isEqualTo("/index.html");
+        assertThat(RequestHandler.handleUserCreate(httpRequest).getHeaders())
+                .containsExactly("Location: /index.html");
     }
 
     @Test
