@@ -21,4 +21,12 @@ class RequestHandlerTest {
         assertThat(RequestHandler.handleLogin(httpRequest).getHeaders())
                 .containsExactly("Set-Cookie: logined=true; Path=/", "Location: /index.html");
     }
+
+    @Test
+    void handleLoginFailed() {
+        HttpRequest httpRequest = new HttpRequest("POST", "/user/login", "HTTP 1.1");
+        httpRequest.setEntity(ImmutableMap.of("userId", "blue", "password", "0000"));
+        assertThat(RequestHandler.handleLogin(httpRequest).getHeaders())
+                .containsExactly("Set-Cookie: logined=false; Path=/", "Location: /user/login_failed.html");
+    }
 }

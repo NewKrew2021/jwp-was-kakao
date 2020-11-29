@@ -112,6 +112,7 @@ public class RequestHandler implements Runnable {
         Response response = new Response();
         response.setLocation("/user/login_failed.html");
         response.setHeaders("Set-Cookie: logined=false; Path=/");
+        response.setHeaders("Location: /user/login_failed.html");
         return response;
     }
 
