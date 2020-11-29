@@ -1,15 +1,15 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
+
+import java.io.*;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
+    private static final String REGEX_BLANK = " ";
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
@@ -20,17 +20,49 @@ public class RequestHandler implements Runnable {
 
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
+                     connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            String line = br.readLine();
+            printRequest(br, line);
+
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+            byte[] body = getBody(line);
+
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    public void printRequest(BufferedReader bufferedReader, String line) throws IOException {
+        while (!"".equals(line)) {
+            if (line == null) {
+                break;
+            }
+            logger.info(line);
+            line = bufferedReader.readLine();
+        }
+    }
+
+    public byte[] getBody(String path) {
+        try {
+            return FileIoUtils.loadFileFromClasspath(getPath(path.split(REGEX_BLANK)[1]));
+        } catch (Exception e) {
+            return "Hello World".getBytes();
+        }
+    }
+
+    public String getPath(String path) {
+        if (path.startsWith("/css")
+                || path.startsWith("/fonts")
+                || path.startsWith("/images")
+                || path.startsWith("/js")) {
+            return "./static" + path;
+        }
+        return "./templates" + path;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
