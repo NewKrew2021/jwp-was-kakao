@@ -1,21 +1,19 @@
 package webserver;
 
-import dto.ParamValue;
+import model.User;
+import model.factory.UserFactory;
 import service.UserService;
-
-import java.util.Optional;
 
 public class URIFactory {
 
     private UserService userService = new UserService();
 
-    public void create(String path) {
-        String uri = ParseURI.getURI(path);
-        Optional<String> params = ParseURI.getParams(path);
+    public void create(Request reqeust) {
+        String uri = reqeust.getURLPath();
 
         if (uri.startsWith("/user/create")) {
-            ParamValue paramVale = ParamValue.of(params);
-            userService.create(paramVale);
+            User user = UserFactory.create(reqeust.getParamMap());
+            userService.create(user);
         }
     }
 }

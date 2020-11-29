@@ -32,12 +32,12 @@ public class UserFactoryTest {
     @DisplayName("User Map Param으로 User 생성 테스트")
     @Test
     void createUser() {
-        ParamValue paramValue = ParamValue.of(Optional.of(
+        Optional<ParamValue> paramValue = ParamValue.of(Optional.of(
                 "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"));
 
-        User user = UserFactory.create(paramValue);
+        User user = UserFactory.create(paramValue.get());
         assertThat(user).isEqualTo(
-                new User("javajigi", "password", "%EB%B0%95%EC%9E%AC%EC%84%B1", "javajigi%40slipp.net"));
+                new User("javajigi", "password", "박재성", "javajigi@slipp.net"));
     }
 
 }
