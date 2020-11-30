@@ -30,21 +30,39 @@ public class RequestHandler implements Runnable {
             requestValue.printRequest();
 
             Request request = Request.of(requestValue);
-            uriFactory.create(request);
+            Response response = uriFactory.create(request);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = ResponseHandler.getBody(requestValue.getURL());
 
-            response200Header(dos, body.length);
+            responseHeader(dos, response);
+            responseContent(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+
+    private void responseHeader(DataOutputStream dos, Response response) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            String format = String.format("HTTP/1.1 %s \r\n", response.descHttpStatusCode());
+            dos.writeBytes(format);
+
+            response.getAddHttpDesc().forEach(value -> {
+                try {
+                    dos.writeBytes(value);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void responseContent(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");

@@ -18,6 +18,12 @@ public class ParamValue {
         this.paramMap = paramMap;
     }
 
+    public static ParamValue of(String key, String value) {
+        Map<String, String> map = new HashMap<>();
+        map.put(key, value);
+        return new ParamValue(map);
+    }
+
     public static Optional<ParamValue> of(Optional<String> optionalParam) {
         Map<String, String> paramMap = new HashMap<>();
 
@@ -33,6 +39,10 @@ public class ParamValue {
         }
 
         return Optional.empty();
+    }
+
+    public Map<String, String> getParamMap() {
+        return paramMap;
     }
 
     public String getValue(String key) {
