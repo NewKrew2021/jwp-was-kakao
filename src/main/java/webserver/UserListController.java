@@ -9,7 +9,7 @@ public class UserListController implements Controller {
     public Response execute(HttpRequest httpRequest) {
         if (!isLogin(httpRequest)) {
             Response response = new Response();
-            response.setStatus("302 Found");
+            response.setStatus(ResponseStatus.SEE_OTHER);
             response.setHeaders("Location: /user/login.html");
             return response;
         }

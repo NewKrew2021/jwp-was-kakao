@@ -3,6 +3,7 @@ package webserver;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static webserver.ResponseStatus.SEE_OTHER;
 
 class ResponseTest {
     @Test
@@ -15,7 +16,7 @@ class ResponseTest {
     @Test
     void setStatusWith302() {
         Response response = new Response();
-        response.setStatus(ResponseStatus.SEE_OTHER);
+        response.setStatus(SEE_OTHER);
         assertThat(response.isRedirect()).isTrue();
         assertThat(response.getHeaders()).containsExactly("HTTP/1.1 302 Found ");
     }
@@ -27,4 +28,5 @@ class ResponseTest {
         assertThat(response.isRedirect()).isFalse();
         assertThat(response.getHeaders()).containsExactly("HTTP/1.1 200 OK ");
     }
+
 }

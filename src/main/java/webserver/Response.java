@@ -9,7 +9,7 @@ class Response {
     private Object model;
     private String viewName;
     private byte[] body;
-    private String status = "200 OK";
+    private ResponseStatus status = ResponseStatus.OK;
 
     public void setHeaders(String headers) {
         this.headers.add(headers);
@@ -17,7 +17,7 @@ class Response {
 
     public List<String> getHeaders() {
         ArrayList<String> result = new ArrayList<>();
-        result.add(String.format("HTTP/1.1 %s ", status));
+        result.add(String.format("HTTP/1.1 %s ", status.getStatusValue()));
         result.addAll(headers);
         return Collections.unmodifiableList(result);
     }
@@ -39,7 +39,7 @@ class Response {
     }
 
     public boolean isRedirect() {
-        return "302 Found".equals(status) || headers.stream()
+        return status == ResponseStatus.SEE_OTHER || headers.stream()
                 .anyMatch(header -> header.startsWith("Location: "));
     }
 
@@ -51,7 +51,7 @@ class Response {
         return body;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ResponseStatus status) {
         this.status = status;
     }
 }

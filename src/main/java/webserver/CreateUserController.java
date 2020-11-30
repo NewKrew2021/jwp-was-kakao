@@ -9,7 +9,7 @@ public class CreateUserController implements Controller {
         User user = User.createUser(httpRequest.getEntity());
         DataBase.addUser(user);
         Response response = new Response();
-        response.setStatus("302 Found");
+        response.setStatus(ResponseStatus.SEE_OTHER);
         response.setHeaders("Location: /index.html");
         return response;
     }
