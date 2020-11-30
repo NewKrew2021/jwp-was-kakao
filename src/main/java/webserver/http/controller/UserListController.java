@@ -2,30 +2,19 @@ package webserver.http.controller;
 
 import db.DataBase;
 import model.User;
-import utils.ClasspathFileLoader;
-import utils.FileLoader;
-import webserver.http.*;
-import webserver.http.template.TemplateEngine;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserListController implements Controller {
-
-    private TemplateEngine templateEngine = TemplateEngine.handlebars();
+public class UserListController extends HandlebarsController {
 
     @Override
-    public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
+    protected Object getModelData() {
         Collection<User> users = DataBase.findAll();
-
         Map<String, Object> data = new HashMap<>();
         data.put("users", users);
-        String output = templateEngine.apply(httpRequest.getPath(), data);
-
-        httpResponse.setStatus(HttpStatus.x200_OK);
-        httpResponse.setContentType(ContentTypes.TEXT_HTML_UTF8);
-        httpResponse.setBody(output.getBytes());
+        return data;
     }
 
 }
