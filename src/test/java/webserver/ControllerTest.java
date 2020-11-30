@@ -83,6 +83,12 @@ class ControllerTest {
     enum MimeType {
         APPLICATION_JS("application/js", "js"),
         TEXT_CSS("text/css", "css"),
+        IMAGE_PNG("image/png", "png"),
+        IMAGE_SVG("image/svg+xml", "svg"),
+        FONT_TTF("font/ttf", "ttf"),
+        FONT_WOFF("font/woff", "woff"),
+        FONT_WOFF2("font/woff2", "woff2"),
+        FONT_EOT("application/vnd.ms-fontobject", "eot"),
         TEXT_HTML("text/html", "html");
 
         private final String mimeTypeValue;
