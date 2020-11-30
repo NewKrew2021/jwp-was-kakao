@@ -57,6 +57,13 @@ public class HttpRequestParserTest {
 		assertThat(requestBody).isEqualTo("userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
 	}
 
+	@Test
+	@DisplayName("응답데이터의 컨텐츠 타입을 요청주소에 따라 변경한다.")
+	public void getContentTypeTest() {
+		setStyleSheetsData();
+		assertThat(underTest.getContentType()).isEqualTo("text/css");
+	}
+
 	private void setRequestData() {
 		Reader reader = new StringReader("GET /index.html HTTP/1.1\n" +
 				"Host: localhost:8080\n" +
@@ -76,5 +83,16 @@ public class HttpRequestParserTest {
 				"userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
 
 		underTest = new HttpRequstParser(new BufferedReader(reader));
+	}
+
+	private void setStyleSheetsData() {
+		Reader reader = new StringReader("GET /css/styles.css HTTP/1.1\n" +
+				"Host: localhost:8080\n" +
+				"Connection: keep-alive\n" +
+				"Content-Type: application/x-www-form-urlencoded\n" +
+				"Accept: */*\n\n");
+
+		underTest = new HttpRequstParser(new BufferedReader(reader));
+		underTest.getRequestHeaders();
 	}
 }

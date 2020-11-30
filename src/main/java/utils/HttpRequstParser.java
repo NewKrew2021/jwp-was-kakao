@@ -11,6 +11,9 @@ public class HttpRequstParser {
 	public static final String HEADER_SPLIT_DELIMETER = ": ";
 	private static final String DELEMITER = " ";
 	private static final String CONTENT_LENGTH = "Content-Length";
+	private static final String CONTENT_TYPE_CSS = "text/css";
+	private static final String CONENT_TYPE_JS = "text/javascript";
+	private static final String CONTENT_TYPE_DEFAULT = "text/html;charset=UTF-8";
 	private BufferedReader bufferedReader;
 	private HttpMethod httpMethod;
 	private String requestPath;
@@ -85,5 +88,13 @@ public class HttpRequstParser {
 				.filter(header -> "Cookie".equals(header.getKey())
 						&& "logined=true".equals(header.getValue()))
 				.findAny().isPresent();
+	}
+
+	public String getContentType() {
+		if (requestPath.endsWith(".css"))
+			return CONTENT_TYPE_CSS;
+		if (requestPath.endsWith(".js"))
+			return CONENT_TYPE_JS;
+		return CONTENT_TYPE_DEFAULT;
 	}
 }

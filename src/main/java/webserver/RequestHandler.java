@@ -71,7 +71,7 @@ public class RequestHandler implements Runnable {
                     Template template = handlebars.compile("user/list");
 
                     byte[] body = template.apply(members).getBytes();
-                    response200Header(dos, body.length);
+                    response200Header(dos, body.length, requstParser.getContentType());
                     responseBody(dos, body);
                     return;
                 }
@@ -79,7 +79,7 @@ public class RequestHandler implements Runnable {
                 return;
             }
             byte[] body = getBody(requstParser);
-            response200Header(dos, body.length);
+            response200Header(dos, body.length, requstParser.getContentType());
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -109,10 +109,12 @@ public class RequestHandler implements Runnable {
         return requstParser.getRequstParameters(requestBody);
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            if (!contentType.isEmpty()) {
+                dos.writeBytes("Content-Type: " + contentType + "\r\n");
+            }
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
