@@ -1,5 +1,7 @@
 package webserver;
 
+import domain.HttpRequestHeader;
+import utils.HttpRequstParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -9,7 +11,6 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RequestHandler implements Runnable {
@@ -28,10 +29,12 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            List<String> requestHeaders = getRequestHeaders(bufferedReader);
-            String requestPath = RequestPathUtils.getRequestPath(requestHeaders.get(0));
+            HttpRequstParser requstParser = new HttpRequstParser(bufferedReader);
+            List<HttpRequestHeader> headers = requstParser.getRequestHeaders();
+            printRequestHeaders(headers); //헤더 출력
+
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getBody(requestPath);
+            byte[] body = getBody(requstParser.getRequestPath());  //첫번째 라인 value가 Path
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -40,7 +43,7 @@ public class RequestHandler implements Runnable {
     }
 
     private byte[] getBody(String requestPath) {
-        logger.info("requestPath : {}", requestPath);
+        logger.debug("requestPath : {}", requestPath);
         try {
             if ("/".equals(requestPath)) {
                 return DEFAULT_RESPONSE.getBytes();
@@ -52,20 +55,9 @@ public class RequestHandler implements Runnable {
         return DEFAULT_RESPONSE.getBytes();
     }
 
-    private List<String> getRequestHeaders(BufferedReader bufferedReader) {
-        List<String> headers = new ArrayList<>();
-        try {
-            String line = "";
-            while (!"".equals(line = bufferedReader.readLine())) {
-                System.out.println(line); //헤더 출력
-                headers.add(line);
-            }
-        }catch (IOException ex) {
-            logger.error(ex.getMessage());
-        }
-        return headers;
+    private void printRequestHeaders(List<HttpRequestHeader> headers) {
+        headers.forEach(header -> logger.debug(header.toString()));
     }
-
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
