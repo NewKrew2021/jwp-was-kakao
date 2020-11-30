@@ -1,5 +1,6 @@
 package webserver;
 
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,10 @@ import java.net.Socket;
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
+    private static final RequestMapping REQUEST_MAPPING = new RequestMapping(ImmutableMap.of(
+            "/usr/create", new CreateUserController(),
+            "/user/login", new LoginController(),
+            "/user/list", new UserListController()));
 
     public static void main(String[] args) throws Exception {
         int port = 0;
@@ -25,7 +30,7 @@ public class WebServer {
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                Thread thread = new Thread(new RequestHandler(connection));
+                Thread thread = new Thread(new RequestHandler(connection, REQUEST_MAPPING));
                 thread.start();
             }
         }

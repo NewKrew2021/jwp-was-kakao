@@ -1,6 +1,5 @@
 package webserver;
 
-import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -17,9 +16,11 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final Socket connection;
+    private final RequestMapping requestMapping;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, RequestMapping requestMapping) {
         this.connection = connectionSocket;
+        this.requestMapping = requestMapping;
     }
 
     public void run() {
@@ -39,17 +40,9 @@ public class RequestHandler implements Runnable {
     }
 
     private Response handleRequest(HttpRequest httpRequest) throws Exception {
-        return Optional.ofNullable(getController(httpRequest))
+        return Optional.ofNullable(requestMapping.getController(httpRequest.getRequestURI()))
                 .orElseGet(StaticContentController::new)
                 .execute(httpRequest);
-    }
-
-    private Controller getController(HttpRequest httpRequest) {
-        return new RequestMapping(ImmutableMap.of(
-                "/usr/create", httpRequest1 -> new CreateUserController().execute(httpRequest1),
-                "/user/login", httpRequest2 -> new LoginController().execute(httpRequest2),
-                "/user/list", httpRequest3 -> new UserListController().execute(httpRequest3)))
-                .getController(httpRequest.getRequestURI());
     }
 
     private void response(DataOutputStream dos, Response response) throws IOException {
