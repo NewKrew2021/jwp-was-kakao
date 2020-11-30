@@ -3,6 +3,9 @@ package webserver;
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import webserver.controller.Controller;
+import webserver.http.HttpRequest;
+import webserver.http.Response;
 
 import java.util.Map;
 

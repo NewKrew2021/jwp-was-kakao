@@ -1,9 +1,12 @@
-package webserver;
+package webserver.controller;
 
 import com.google.common.collect.Sets;
 import utils.FileIoUtils;
+import webserver.http.HttpRequest;
+import webserver.http.MimeType;
+import webserver.http.Response;
 
-class StaticContentController implements Controller {
+public class StaticContentController implements Controller {
     private static final String TEMPLATE_PATH = "./templates";
     private static final String STATIC_PATH = "./static";
 

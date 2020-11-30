@@ -4,6 +4,8 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import webserver.http.Response;
+import webserver.http.ResponseStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

@@ -1,9 +1,9 @@
-package webserver;
+package webserver.http;
 
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static webserver.ResponseStatus.SEE_OTHER;
+import static webserver.http.ResponseStatus.SEE_OTHER;
 
 class ResponseTest {
     @Test

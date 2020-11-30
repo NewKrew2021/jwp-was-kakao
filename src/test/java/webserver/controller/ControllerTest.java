@@ -1,7 +1,9 @@
-package webserver;
+package webserver.controller;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
+import webserver.http.HttpRequest;
+import webserver.http.Response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -64,12 +66,14 @@ class ControllerTest {
                       Response response = controller.execute(createRequest("/css/bootstrap.min.css"));
                       assertThat(response.getHeaders()).containsExactly(
                               "HTTP/1.1 200 OK ",
+                              "Content-Length: 109518",
                               "Content-Type: text/css");
                   },
                   () -> {
                       Response response = controller.execute(createRequest("/js/jquery-2.2.0.min.js"));
                       assertThat(response.getHeaders()).containsExactly(
                               "HTTP/1.1 200 OK ",
+                              "Content-Length: 85589",
                               "Content-Type: application/js");
                   });
     }

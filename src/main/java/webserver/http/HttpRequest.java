@@ -1,4 +1,4 @@
-package webserver;
+package webserver.http;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -9,7 +9,7 @@ import java.util.*;
 import static java.util.AbstractMap.SimpleEntry;
 import static java.util.stream.Collectors.*;
 
-class HttpRequest {
+public class HttpRequest {
     private final String method;
     private final String requestURI;
     private final String protocol;

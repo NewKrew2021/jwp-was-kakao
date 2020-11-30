@@ -1,10 +1,10 @@
-package webserver;
+package webserver.http;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class Response {
+public class Response {
     private final List<String> headers = new ArrayList<>();
     private Object model;
     private String viewName;

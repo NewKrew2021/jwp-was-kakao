@@ -1,8 +1,8 @@
-package webserver;
+package webserver.http;
 
 import java.util.stream.Stream;
 
-enum MimeType {
+public enum MimeType {
     APPLICATION_JS("application/js", "js"),
     TEXT_CSS("text/css", "css"),
     IMAGE_PNG("image/png", "png"),
