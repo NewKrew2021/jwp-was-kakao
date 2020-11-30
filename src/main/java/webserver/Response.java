@@ -24,6 +24,10 @@ public class Response {
         return new Response(httpStatus, Optional.of(httpValue));
     }
 
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
     public String descHttpStatusCode() {
         return httpStatus.descHttpStatusCode();
     }

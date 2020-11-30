@@ -8,26 +8,26 @@ import java.util.Optional;
 
 public class Request {
 
-    private final String path;
+    private final String urlPath;
     private final String method;
     private final Optional<ParamValue> paramMap;
 
-    private Request(String path, String method, Optional<ParamValue> paramMap) {
-        this.path = path;
+    private Request(String urlPath, String method, Optional<ParamValue> paramMap) {
+        this.urlPath = urlPath;
         this.method = method;
         this.paramMap = paramMap;
     }
 
     public static Request of(RequestValue requestValue) {
-        String url = requestValue.getURL();
+        String urlPath = requestValue.getURLPath();
         String method = requestValue.getMethod();
         Optional<ParamValue> param = ParamValue.of(requestValue.getParams());
 
-        return new Request(url, method, param);
+        return new Request(urlPath, method, param);
     }
 
     public String getURLPath() {
-        return this.path;
+        return this.urlPath;
     }
 
     public ParamValue getParamMap() {

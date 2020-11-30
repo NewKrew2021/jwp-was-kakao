@@ -14,7 +14,7 @@ public class ParamValue {
 
     private final Map<String, String> paramMap;
 
-    private ParamValue(Map<String, String> paramMap) {
+    public ParamValue(Map<String, String> paramMap) {
         this.paramMap = paramMap;
     }
 
