@@ -7,6 +7,7 @@ enum MimeType {
     TEXT_CSS("text/css", "css"),
     IMAGE_PNG("image/png", "png"),
     IMAGE_SVG("image/svg+xml", "svg"),
+    IMAGE_ICON("image/x-icon", "ico"),
     FONT_TTF("font/ttf", "ttf"),
     FONT_WOFF("font/woff", "woff"),
     FONT_WOFF2("font/woff2", "woff2"),
