@@ -14,7 +14,6 @@ public class HttpRequstParser {
 	private BufferedReader bufferedReader;
 	private HttpMethod httpMethod;
 	private String requestPath;
-	private List<HttpRequestHeader> httpRequestHeaders;
 
 	public HttpRequstParser(BufferedReader bufferedReader) {
 		this.bufferedReader = bufferedReader;
@@ -37,13 +36,12 @@ public class HttpRequstParser {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		this.httpRequestHeaders = headers;
 		return headers;
 	}
 
-	public String getRequestBody() {
+	public String getRequestBody(List<HttpRequestHeader> requestHeaders) {
 		try {
-			HttpRequestHeader contentLengthHeader = httpRequestHeaders.stream()
+			HttpRequestHeader contentLengthHeader = requestHeaders.stream()
 					.filter(header -> header.getKey().equals(CONTENT_LENGTH))
 					.findFirst()
 					.orElse(new HttpRequestHeader(CONTENT_LENGTH, "0"));

@@ -39,7 +39,7 @@ public class RequestHandler implements Runnable {
             printRequestHeaders(headers); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getBody(requstParser);
+            byte[] body = getBody(requstParser, headers);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -47,7 +47,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private byte[] getBody(HttpRequstParser requstParser) {
+    private byte[] getBody(HttpRequstParser requstParser, List<HttpRequestHeader> headers) {
         final String requestPath = requstParser.getRequestPath();
         logger.debug("requestPath : {}", requestPath);
         try {
@@ -55,7 +55,7 @@ public class RequestHandler implements Runnable {
                 return DEFAULT_RESPONSE.getBytes();
             }
             if (requestPath.startsWith(USER_JOIN_REQUEST) && HttpMethod.POST == requstParser.getHttpMethod()) {
-                String requestBody = requstParser.getRequestBody();
+                String requestBody = requstParser.getRequestBody(headers);
                 Map<String, String> parameterMap = requstParser.getRequstParameters(requestBody);
                 memberService.joinMember(parameterMap);
                 return DEFAULT_RESPONSE.getBytes();
