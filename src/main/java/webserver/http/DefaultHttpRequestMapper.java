@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UriBaseHttpRequestMapper<T> implements HttpRequestMapper {
+public class DefaultHttpRequestMapper<T> implements HttpRequestMapper {
 
     private List<HttpRequestMapping<T>> mappings = new ArrayList<>();
 
-    public UriBaseHttpRequestMapper(List<HttpRequestMapping<T>> mappings) {
+    public DefaultHttpRequestMapper(List<HttpRequestMapping<T>> mappings) {
         this.mappings.addAll(mappings);
     }
 
-    public UriBaseHttpRequestMapper(HttpRequestMapping<T>... mappings) {
+    public DefaultHttpRequestMapper(HttpRequestMapping<T>... mappings) {
         this.mappings.addAll(Arrays.asList(mappings));
     }
 

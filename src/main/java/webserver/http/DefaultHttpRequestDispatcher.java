@@ -1,6 +1,4 @@
-package webserver.http.dispatcher;
-
-import webserver.http.*;
+package webserver.http;
 
 import java.util.List;
 
@@ -9,11 +7,11 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
     private HttpRequestMapper<Controller> httpRequestMapper;
 
     public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings) {
-        httpRequestMapper = new UriBaseHttpRequestMapper(mappings);
+        httpRequestMapper = new DefaultHttpRequestMapper(mappings);
     }
 
     public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings) {
-        httpRequestMapper = new UriBaseHttpRequestMapper(mappings);
+        httpRequestMapper = new DefaultHttpRequestMapper(mappings);
     }
 
     public void dispatch(HttpRequest httpRequest, HttpResponse httpResponse) {

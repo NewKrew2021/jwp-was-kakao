@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import webserver.http.*;
 import webserver.http.authentication.CookieAuthenticator;
 import webserver.http.controller.*;
-import webserver.http.dispatcher.DefaultHttpRequestDispatcher;
+import webserver.http.DefaultHttpRequestDispatcher;
 
 import java.io.IOException;
 import java.net.ServerSocket;

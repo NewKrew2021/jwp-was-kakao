@@ -17,7 +17,6 @@ public class HttpResponse {
     private final DataOutputStream dos;
 
     private List<HttpHeader> headers;
-    private HttpHeader setCookieHeader;
     private String cookie;
     private byte[] body;
     private HttpStatus status;
