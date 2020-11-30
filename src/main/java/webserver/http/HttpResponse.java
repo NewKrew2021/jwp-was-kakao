@@ -1,5 +1,6 @@
 package webserver.http;
 
+import ch.qos.logback.classic.pattern.ClassOfCallerConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,17 +55,6 @@ public class HttpResponse {
         headers.add(new HttpHeader("Content-Type", contentType) );
     }
 
-    public void send(){
-        try {
-            writeStatusLine();
-            writeHeader();
-            writeBody();
-            flush();
-        } catch ( IOException e ){
-            throw new RuntimeException("Http 응답메세지를 보내는과정에 문제가 발생했습니다", e);
-        }
-    }
-
     private void writeStatusLine() throws IOException {
         dos.writeBytes( getStatusLine() + " \r\n");
     }
@@ -85,4 +75,20 @@ public class HttpResponse {
         dos.flush();
     }
 
+    public void sendRedirect(String location) {
+        setStatus(HttpStatus.x302_Found);
+        addHeader("Location", location);
+        send();
+    }
+
+    public void send(){
+        try {
+            writeStatusLine();
+            writeHeader();
+            writeBody();
+            flush();
+        } catch ( IOException e ){
+            throw new RuntimeException("Http 응답메세지를 보내는과정에 문제가 발생했습니다", e);
+        }
+    }
 }

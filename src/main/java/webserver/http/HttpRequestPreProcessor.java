@@ -3,7 +3,7 @@ package webserver.http;
 /**
  * http request 가 controller 에 전달되기 전에 전처리 작업을 수행합니다.
  */
-public interface RequestPreProcessor {
+public interface HttpRequestPreProcessor {
 
     /**
      * PreProcessor 가 처리할 request 인지 판단합니다.

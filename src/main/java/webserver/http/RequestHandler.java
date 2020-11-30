@@ -2,8 +2,6 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.http.controller.*;
-import webserver.http.dispatcher.DefaultHttpRequestDispatcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,50 +11,48 @@ import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    public static final String LOGIN_PAGE = "./login.html";
 
-    private Socket connection;
+    private final Socket connection;
+    private final HttpRequestDispatcher dispatcher;
+    private final HttpRequestPreProcessor preProcessor;
 
-    private final static Controller STATIC_RESOURCE_CONTROLLER = new StaticResourceController("./static");
-
-    private final static HttpRequestDispatcher dispatcher = new DefaultHttpRequestDispatcher(
-            new RegexpMapping("\\/css\\/.+", HttpMethod.GET, STATIC_RESOURCE_CONTROLLER),
-            new RegexpMapping("\\/js\\/.+", HttpMethod.GET, STATIC_RESOURCE_CONTROLLER),
-            new RegexpMapping("\\/fonts\\/.+", HttpMethod.GET, STATIC_RESOURCE_CONTROLLER),
-            new RegexpMapping("\\/.+\\.html", HttpMethod.GET, new HtmlController()),
-            new RegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
-            new RegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController()),
-            new RegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController())
-    );
-
-//    private RequestPreProcessor preProcessor = new RequestPreProcessor();
-
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor preProcessor) {
         this.connection = connectionSocket;
+        this.preProcessor = preProcessor;
+        this.dispatcher = requestDispatcher;
     }
 
     @Override
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
+
+        HttpRequest httpRequest;
+        HttpResponse httpResponse = null;
         try {
             InputStream in = connection.getInputStream();
             OutputStream out = connection.getOutputStream();
 
-            HttpRequest httpRequest = createHttpRequest(in);
+            httpRequest = createHttpRequest(in);
             printAllRequestHeaders(httpRequest);
+            httpResponse = new HttpResponse(out);
 
-            HttpResponse httpResponse = new HttpResponse(out);
-
-//            preProcessor.execute(httpRequest, httpResponse);
-
+            preProcessor.execute(httpRequest, httpResponse);
             dispatcher.dispatch(httpRequest, httpResponse);
 
             printAllResponseHeaders(httpResponse);
             httpResponse.send();
-
+        } catch (AuthenticationException e){
+            logger.debug(e.getMessage());
+            httpResponse.sendRedirect(LOGIN_PAGE);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
+
+            httpResponse.setStatus(HttpStatus.x500_InternalServerError);
+            httpResponse.setBody(e.getMessage().getBytes());
+            httpResponse.send();
         } finally {
             closeConnection();
         }

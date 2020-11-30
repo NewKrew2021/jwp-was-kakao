@@ -20,7 +20,7 @@ public class SignUpController implements Controller {
                 signUp.getEmail()
         );
         DataBase.addUser(newUser);
-
+        
         httpResponse.setStatus(HttpStatus.x302_Found);
         httpResponse.addHeader("Location", "/index.html");
     }
