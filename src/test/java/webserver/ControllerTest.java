@@ -4,10 +4,11 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import utils.FileIoUtils;
 
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static webserver.RequestHandler.getBasePath;
-import static webserver.RequestHandler.getContentType;
 
 class ControllerTest {
     @Test
@@ -74,8 +75,33 @@ class ControllerTest {
             byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
             Response response = new Response();
             response.setBody(body);
-            response.setHeaders("Content-Type: " + getContentType(requestURI));
+            response.setHeaders("Content-Type: " + MimeType.fromFileName(requestURI).getMimeTypeValue());
             return response;
+        }
+    }
+
+    enum MimeType {
+        APPLICATION_JS("application/js", "js"),
+        TEXT_CSS("text/css", "css"),
+        TEXT_HTML("text/html", "html");
+
+        private final String mimeTypeValue;
+        private final String fileExtension;
+
+        MimeType(String mimeTypeValue, String fileExtension) {
+            this.mimeTypeValue = mimeTypeValue;
+            this.fileExtension = fileExtension;
+        }
+
+        public String getMimeTypeValue() {
+            return mimeTypeValue;
+        }
+
+        public static MimeType fromFileName(String fileName) {
+            return Stream.of(values())
+                    .filter(mimeType -> fileName.endsWith(mimeType.fileExtension))
+                    .findAny()
+                    .orElse(MimeType.TEXT_HTML);
         }
     }
 }
