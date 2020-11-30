@@ -12,7 +12,9 @@ class ControllerTest {
         HttpRequest httpRequest = createRequest("/usr/create");
         httpRequest.setEntity(ImmutableMap.of("userId", "red"));
         assertThat(new CreateUserController().execute(httpRequest).getHeaders())
-                .containsExactly("Location: /index.html");
+                .containsExactly(
+                        "HTTP/1.1 302 Found ",
+                        "Location: /index.html");
     }
 
     @Test
@@ -20,7 +22,10 @@ class ControllerTest {
         HttpRequest httpRequest = createRequest("/user/login");
         httpRequest.setEntity(ImmutableMap.of("userId", "blue", "password", "1234"));
         assertThat(new LoginController().execute(httpRequest).getHeaders())
-                .containsExactly("Set-Cookie: logined=true; Path=/", "Location: /index.html");
+                .containsExactly(
+                        "HTTP/1.1 302 Found ",
+                        "Set-Cookie: logined=true; Path=/",
+                        "Location: /index.html");
     }
 
     @Test
@@ -28,7 +33,10 @@ class ControllerTest {
         HttpRequest httpRequest = createRequest("/user/login");
         httpRequest.setEntity(ImmutableMap.of("userId", "blue", "password", "0000"));
         assertThat(new LoginController().execute(httpRequest).getHeaders())
-                .containsExactly("Set-Cookie: logined=false; Path=/", "Location: /user/login_failed.html");
+                .containsExactly(
+                        "HTTP/1.1 302 Found ",
+                        "Set-Cookie: logined=false; Path=/",
+                        "Location: /user/login_failed.html");
     }
 
     @Test
@@ -44,7 +52,9 @@ class ControllerTest {
     void userListControllerWhenNotLoggedIn() {
         HttpRequest httpRequest = createRequest("/user/list");
         assertThat(new UserListController().execute(httpRequest).getHeaders())
-                .containsExactly("Location: /user/login.html");
+                .containsExactly(
+                        "HTTP/1.1 302 Found ",
+                        "Location: /user/login.html");
     }
 
     @Test
@@ -52,11 +62,15 @@ class ControllerTest {
         StaticContentController controller = new StaticContentController();
         assertAll(() -> {
                       Response response = controller.execute(createRequest("/css/bootstrap.min.css"));
-                      assertThat(response.getHeaders()).containsExactly("Content-Type: text/css");
+                      assertThat(response.getHeaders()).containsExactly(
+                              "HTTP/1.1 200 OK ",
+                              "Content-Type: text/css");
                   },
                   () -> {
                       Response response = controller.execute(createRequest("/js/jquery-2.2.0.min.js"));
-                      assertThat(response.getHeaders()).containsExactly("Content-Type: application/js");
+                      assertThat(response.getHeaders()).containsExactly(
+                              "HTTP/1.1 200 OK ",
+                              "Content-Type: application/js");
                   });
     }
 
