@@ -2,7 +2,6 @@ package webserver;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -13,7 +12,6 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -77,23 +75,9 @@ public class RequestHandler implements Runnable {
     }
 
     public static Response handleList(HttpRequest httpRequest) {
-        if (!isLogin(httpRequest)) {
-            Response response = new Response();
-            response.setHeaders("Location: /user/login.html");
-            return response;
-        }
-
-        Response response = new Response();
-        response.setModel(DataBase.findAll());
-        response.setViewName("user/list");
-        return response;
+        return new UserListController().execute(httpRequest);
     }
 
-    private static boolean isLogin(HttpRequest httpRequest) {
-        return Optional.ofNullable(httpRequest.getCookies())
-                .map(cookies -> cookies.contains("logined=true"))
-                .isPresent();
-    }
 
     public static  Response handleLogin(HttpRequest httpRequest) {
         return new LoginController().execute(httpRequest);
