@@ -40,9 +40,7 @@ public class HttpRequestParser {
         if (isFirstLine()) {
             String[] firstLine = inputLine.split(" ");
             method = firstLine[0];
-            String[] pathAndParams =  firstLine[1].split("\\?");
-            path = pathAndParams[0];
-            parseParameters(pathAndParams[1]);
+            parsePathAndParameters(firstLine[1]);
             return;
         }
         String[] headerLine = inputLine.split(":", 2);
@@ -53,9 +51,10 @@ public class HttpRequestParser {
         return method == null && path == null && parameters.isEmpty();
     }
 
-    private void parseParameters(String paramString) {
-        String[] params = paramString.split("&");
-        Stream.of(params)
+    private void parsePathAndParameters(String pathAndParams) {
+        String[] tokens = pathAndParams.split("[?&]");
+        path = tokens[0];
+        Stream.of(tokens).skip(1)
                 .map(param -> param.split("="))
                 .forEach(p -> parameters.put(p[0], p[1]));
     }
