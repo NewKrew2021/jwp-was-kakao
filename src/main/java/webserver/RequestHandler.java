@@ -114,11 +114,7 @@ public class RequestHandler implements Runnable {
     }
 
     public static  Response handleUserCreate(HttpRequest httpRequest) {
-        User user = User.createUser(httpRequest.getEntity());
-        DataBase.addUser(user);
-        Response response = new Response();
-        response.setHeaders("Location: /index.html");
-        return response;
+        return new CreateUserController().execute(httpRequest);
     }
 
     private void responseStaticContent(String requestURI, DataOutputStream dos) throws IOException, URISyntaxException {
