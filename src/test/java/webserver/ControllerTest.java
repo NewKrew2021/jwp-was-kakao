@@ -2,13 +2,9 @@ package webserver;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
-import utils.FileIoUtils;
-
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static webserver.RequestHandler.getBasePath;
 
 class ControllerTest {
     @Test
@@ -68,46 +64,4 @@ class ControllerTest {
         return new HttpRequest("POST", uri, "HTTP 1.1");
     }
 
-    private static class StaticContentController implements Controller {
-        @Override
-        public Response execute(HttpRequest httpRequest) throws Exception {
-            String requestURI = httpRequest.getRequestURI();
-            byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
-            Response response = new Response();
-            response.setBody(body);
-            response.setHeaders("Content-Type: " + MimeType.fromFileName(requestURI).getMimeTypeValue());
-            return response;
-        }
-    }
-
-    enum MimeType {
-        APPLICATION_JS("application/js", "js"),
-        TEXT_CSS("text/css", "css"),
-        IMAGE_PNG("image/png", "png"),
-        IMAGE_SVG("image/svg+xml", "svg"),
-        FONT_TTF("font/ttf", "ttf"),
-        FONT_WOFF("font/woff", "woff"),
-        FONT_WOFF2("font/woff2", "woff2"),
-        FONT_EOT("application/vnd.ms-fontobject", "eot"),
-        TEXT_HTML("text/html", "html");
-
-        private final String mimeTypeValue;
-        private final String fileExtension;
-
-        MimeType(String mimeTypeValue, String fileExtension) {
-            this.mimeTypeValue = mimeTypeValue;
-            this.fileExtension = fileExtension;
-        }
-
-        public String getMimeTypeValue() {
-            return mimeTypeValue;
-        }
-
-        public static MimeType fromFileName(String fileName) {
-            return Stream.of(values())
-                    .filter(mimeType -> fileName.endsWith(mimeType.fileExtension))
-                    .findAny()
-                    .orElse(MimeType.TEXT_HTML);
-        }
-    }
 }
