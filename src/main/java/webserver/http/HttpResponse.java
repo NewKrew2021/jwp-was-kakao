@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +67,10 @@ public class HttpResponse {
 
     public void setContentType(String contentType) {
         headers.add(new HttpHeader("Content-Type", contentType));
+    }
+
+    public void setContentType(MimeType mimeType, Charset charset) {
+        headers.add(new HttpHeader("Content-Type", MessageFormat.format("{0}; {1}", mimeType, charset)));
     }
 
     private void writeStatusLine() throws IOException {

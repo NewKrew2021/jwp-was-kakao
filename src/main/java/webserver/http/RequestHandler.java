@@ -44,6 +44,9 @@ public class RequestHandler implements Runnable {
         } catch (AuthenticationException e) {
             logger.debug(e.getMessage());
             httpResponse.sendRedirect(LOGIN_PAGE);
+        } catch (HttpStatusCodeException e ){
+            httpResponse.setStatus(e.getStatus());
+            httpResponse.send();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
