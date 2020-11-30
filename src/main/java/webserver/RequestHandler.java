@@ -35,16 +35,10 @@ public class RequestHandler implements Runnable {
 
             Response response = handleRequest(httpRequest);
 
-            response(new DataOutputStream(out), response);
+            responseHandler.response(new DataOutputStream(out), response);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private Response handleRequest(HttpRequest httpRequest) throws Exception {
-        return Optional.ofNullable(requestMapping.getController(httpRequest.getRequestURI()))
-                .orElseGet(StaticContentController::new)
-                .execute(httpRequest);
     }
 
     private HttpRequest parseRequest(InputStream in) throws IOException {
@@ -53,7 +47,10 @@ public class RequestHandler implements Runnable {
         return requestParser.parse();
     }
 
-    void response(DataOutputStream dos, Response response) throws IOException {
-        responseHandler.response(dos, response);
+    private Response handleRequest(HttpRequest httpRequest) throws Exception {
+        return Optional.ofNullable(requestMapping.getController(httpRequest.getRequestURI()))
+                .orElseGet(StaticContentController::new)
+                .execute(httpRequest);
     }
+
 }
