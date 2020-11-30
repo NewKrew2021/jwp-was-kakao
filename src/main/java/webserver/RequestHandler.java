@@ -1,17 +1,20 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
+import utils.RequestPathUtils;
+
 import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import utils.RequestPathUtils;
-
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
+    private static final String DEFAULT_RESPONSE = "Hello World";
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -24,12 +27,11 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             List<String> requestHeaders = getRequestHeaders(bufferedReader);
-            printRequestHeader(requestHeaders);
             String requestPath = RequestPathUtils.getRequestPath(requestHeaders.get(0));
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+            byte[] body = getBody(requestPath);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -37,21 +39,31 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private byte[] getBody(String requestPath) {
+        logger.info("requestPath : {}", requestPath);
+        try {
+            if ("/".equals(requestPath)) {
+                return DEFAULT_RESPONSE.getBytes();
+            }
+            return FileIoUtils.loadFileFromClasspath(RequestPathUtils.getResourcePath(requestPath));
+        } catch (IOException | URISyntaxException ex) {
+            logger.error(ex.getMessage());
+        }
+        return DEFAULT_RESPONSE.getBytes();
+    }
+
     private List<String> getRequestHeaders(BufferedReader bufferedReader) {
         List<String> headers = new ArrayList<>();
         try {
             String line = "";
-            for (int i = 1; (line = bufferedReader.readLine()) != null; i++) {
+            while (!"".equals(line = bufferedReader.readLine())) {
+                System.out.println(line); //헤더 출력
                 headers.add(line);
             }
         }catch (IOException ex) {
             logger.error(ex.getMessage());
         }
         return headers;
-    }
-
-    private void printRequestHeader(List<String> headers) {
-        headers.forEach(header -> System.out.println(header));
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
