@@ -19,4 +19,12 @@ class ResponseTest {
         assertThat(response.isRedirect()).isTrue();
         assertThat(response.getHeaders()).containsExactly("HTTP/1.1 302 Found ");
     }
+
+
+    @Test
+    void defaultStatus() {
+        Response response = new Response();
+        assertThat(response.isRedirect()).isFalse();
+        assertThat(response.getHeaders()).containsExactly("HTTP/1.1 200 OK ");
+    }
 }
