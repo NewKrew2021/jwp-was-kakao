@@ -3,10 +3,8 @@ package webserver.http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -36,9 +34,10 @@ public class HttpRequestParser {
         return new HttpRequest(method, path, parameters, headers);
     }
 
-    private void handleLine(String inputLine) {
+    private void handleLine(String inputLine) throws UnsupportedEncodingException {
         if (isFirstLine()) {
-            String[] firstLine = inputLine.split(" ");
+            String urlDecoded = URLDecoder.decode(inputLine, "utf-8");
+            String[] firstLine = urlDecoded.split(" ");
             method = firstLine[0];
             parsePathAndParameters(firstLine[1]);
             return;
