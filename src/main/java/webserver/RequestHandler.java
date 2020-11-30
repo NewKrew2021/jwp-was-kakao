@@ -2,6 +2,7 @@ package webserver;
 
 import domain.HttpMethod;
 import domain.HttpRequestHeader;
+import model.User;
 import service.MemberService;
 import utils.HttpRequstParser;
 import org.slf4j.Logger;
@@ -39,8 +40,18 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
             if (memberService.isMemberJoinRequst(requstParser)) {
-                memberService.joinMember(requstParser, headers);
-                response302Header(dos, "/index.html");
+                memberService.joinMember(getMemberInfo(requstParser, headers));
+                response302Header(dos, "/index.html", "");
+                return;
+            }
+            if (memberService.memberLoginRequest(requstParser)) {
+                boolean isLogin = memberService.memberLogin(getMemberInfo(requstParser, headers));
+                if (!isLogin) {
+                    response302Header(dos, "/user/login_failed.html", "Set-Cookie: logined=false;");
+                    return;
+                }
+                response302Header(dos, "/index.html", "Set-Cookie: logined=true;");
+                return;
             }
             byte[] body = getBody(requstParser);
             response200Header(dos, body.length);
@@ -68,6 +79,11 @@ public class RequestHandler implements Runnable {
         headers.forEach(header -> logger.debug(header.toString()));
     }
 
+    protected Map<String, String> getMemberInfo(HttpRequstParser requstParser, List<HttpRequestHeader> headers) {
+        String requestBody = requstParser.getRequestBody(headers);
+        return requstParser.getRequstParameters(requestBody);
+    }
+
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
@@ -79,10 +95,13 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response302Header(DataOutputStream dos, String location) {
+    private void response302Header(DataOutputStream dos, String location, String cookie) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: " + location + "\r\n");
+            if (!cookie.isEmpty()) {
+                dos.writeBytes(cookie + " Path=/" + "\r\n");
+            }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
