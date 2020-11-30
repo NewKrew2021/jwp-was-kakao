@@ -19,7 +19,6 @@ import java.util.Map;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String DEFAULT_RESPONSE = "Hello World";
-    private static final String USER_JOIN_REQUEST = "/user/create";
     private static final MemberService memberService = new MemberService();
     private Socket connection;
 
@@ -39,7 +38,11 @@ public class RequestHandler implements Runnable {
             printRequestHeaders(headers); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getBody(requstParser, headers);
+            if (memberService.isMemberJoinRequst(requstParser)) {
+                memberService.joinMember(requstParser, headers);
+                response302Header(dos, "/index.html");
+            }
+            byte[] body = getBody(requstParser);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -47,17 +50,11 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private byte[] getBody(HttpRequstParser requstParser, List<HttpRequestHeader> headers) {
+    private byte[] getBody(HttpRequstParser requstParser) {
         final String requestPath = requstParser.getRequestPath();
         logger.debug("requestPath : {}", requestPath);
         try {
             if ("/".equals(requestPath)) {
-                return DEFAULT_RESPONSE.getBytes();
-            }
-            if (requestPath.startsWith(USER_JOIN_REQUEST) && HttpMethod.POST == requstParser.getHttpMethod()) {
-                String requestBody = requstParser.getRequestBody(headers);
-                Map<String, String> parameterMap = requstParser.getRequstParameters(requestBody);
-                memberService.joinMember(parameterMap);
                 return DEFAULT_RESPONSE.getBytes();
             }
             return FileIoUtils.loadFileFromClasspath(RequestPathUtils.getResourcePath(requestPath));
@@ -70,11 +67,22 @@ public class RequestHandler implements Runnable {
     private void printRequestHeaders(List<HttpRequestHeader> headers) {
         headers.forEach(header -> logger.debug(header.toString()));
     }
+
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
