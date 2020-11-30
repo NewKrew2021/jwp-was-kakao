@@ -1,11 +1,9 @@
-package webserver;
+package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.http.*;
 import webserver.http.controller.*;
 import webserver.http.dispatcher.DefaultHttpRequestDispatcher;
-import webserver.http.dispatcher.HttpRequestDispatcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +28,8 @@ public class RequestHandler implements Runnable {
             new RegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController())
     );
 
+//    private RequestPreProcessor preProcessor = new RequestPreProcessor();
+
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
@@ -46,6 +46,9 @@ public class RequestHandler implements Runnable {
             printAllRequestHeaders(httpRequest);
 
             HttpResponse httpResponse = new HttpResponse(out);
+
+//            preProcessor.execute(httpRequest, httpResponse);
+
             dispatcher.dispatch(httpRequest, httpResponse);
 
             printAllResponseHeaders(httpResponse);

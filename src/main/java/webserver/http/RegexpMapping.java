@@ -1,18 +1,16 @@
 package webserver.http;
 
-import webserver.http.dispatcher.HttpRequestMapping;
-
 import java.util.regex.Pattern;
 
-public class RegexpMapping implements HttpRequestMapping {
+public class RegexpMapping<T> implements HttpRequestMapping {
     private Pattern uriPattern;
     private HttpMethod method;
-    private final Controller controller;
+    private final T target;
 
-    public RegexpMapping(String uriPatternRegexp, HttpMethod method, Controller controller) {
+    public RegexpMapping(String uriPatternRegexp, HttpMethod method, T target) {
         this.uriPattern = Pattern.compile(uriPatternRegexp);
         this.method = method;
-        this.controller = controller;
+        this.target = target;
     }
 
     @Override
@@ -22,7 +20,7 @@ public class RegexpMapping implements HttpRequestMapping {
     }
 
     @Override
-    public Controller getController() {
-        return controller;
+    public T getTarget() {
+        return target;
     }
 }

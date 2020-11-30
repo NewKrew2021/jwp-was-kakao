@@ -6,18 +6,18 @@ import java.util.List;
 
 public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
 
-    private HttpRequestControllerMapper httpRequestControllerMapper;
+    private HttpRequestMapper<Controller> httpRequestMapper;
 
     public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings){
-        httpRequestControllerMapper = new UriBaseHttpRequestControllerMapper(mappings);
+        httpRequestMapper = new UriBaseHttpRequestMapper(mappings);
     }
 
     public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings){
-        httpRequestControllerMapper = new UriBaseHttpRequestControllerMapper(mappings);
+        httpRequestMapper = new UriBaseHttpRequestMapper(mappings);
     }
 
     public void dispatch(HttpRequest httpRequest, HttpResponse httpResponse) {
-        Controller controller = httpRequestControllerMapper.getController(httpRequest);
+        Controller controller = httpRequestMapper.getTarget(httpRequest);
         try {
             controller.execute(httpRequest, httpResponse);
         } catch (RuntimeException e) {

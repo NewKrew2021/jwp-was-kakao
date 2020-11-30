@@ -1,21 +1,18 @@
 package webserver.http;
 
-import webserver.http.controller.Controllers;
-import webserver.http.dispatcher.HttpRequestMapping;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UriBaseHttpRequestControllerMapper implements HttpRequestControllerMapper {
+public class UriBaseHttpRequestMapper<T> implements HttpRequestMapper {
 
-    private List<HttpRequestMapping> mappings = new ArrayList<>();
+    private List<HttpRequestMapping<T>> mappings = new ArrayList<>();
 
-    public UriBaseHttpRequestControllerMapper(List<HttpRequestMapping> mappings) {
+    public UriBaseHttpRequestMapper(List<HttpRequestMapping<T>> mappings) {
         this.mappings.addAll(mappings);
     }
 
-    public UriBaseHttpRequestControllerMapper(HttpRequestMapping... mappings) {
+    public UriBaseHttpRequestMapper(HttpRequestMapping<T>... mappings) {
         this.mappings.addAll(Arrays.asList(mappings));
     }
 
@@ -30,12 +27,13 @@ public class UriBaseHttpRequestControllerMapper implements HttpRequestController
     }
 
     @Override
-    public Controller getController(HttpRequest httpRequest) {
+    public T getTarget(HttpRequest httpRequest) {
         return mappings.stream()
                 .filter(it -> it.matches(httpRequest))
-                .map(HttpRequestMapping::getController)
+                .map(HttpRequestMapping::getTarget)
                 .findFirst()
-                .orElse(Controllers.NOT_FOUND);
+                .orElse(null);
+
     }
 
 }
