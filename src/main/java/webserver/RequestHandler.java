@@ -4,13 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import utils.FileIoUtils;
 import utils.TemplateUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,12 +32,7 @@ public class RequestHandler implements Runnable {
 
             Response response = handleRequest(httpRequest);
 
-            if (response != null) {
-                response(new DataOutputStream(out), response);
-                return;
-            }
-
-            responseStaticContent(requestURI, new DataOutputStream(out));
+            response(new DataOutputStream(out), response);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -65,38 +57,11 @@ public class RequestHandler implements Runnable {
             response302Header(dos, response.getHeaders());
         }
 
-        byte[] body = null;
-        if (StringUtils.hasText(response.getViewName())) {
-            body = TemplateUtils.getTemplate(response.getViewName())
-                    .apply(response.getModel())
-                    .getBytes(UTF_8);
-        }
+        byte[] body = getContentBody(response);
+        response.setHeaders("Content-Length: " + body.length);
 
-        if (response.getBody() != null) {
-            body = response.getBody();
-        }
-
-        if (body != null) {
-            response200Header(dos, body.length, response.getHeaders());
-            responseBody(dos, body);
-        }
-    }
-
-    private void responseStaticContent(String requestURI, DataOutputStream dos) throws IOException, URISyntaxException {
-        byte[] body = FileIoUtils.loadFileFromClasspath(StaticContentController.getBasePath(requestURI) + requestURI);
-        response200Header(dos, body.length, getContentType(requestURI));
+        response200Header(dos, response.getHeaders());
         responseBody(dos, body);
-    }
-
-    public static String getContentType(String requestURI) {
-        switch (requestURI.substring(requestURI.lastIndexOf(".") + 1)) {
-            case "js":
-                return "application/js";
-            case "css":
-                return "text/css";
-            default:
-                return "text/html;charset=utf-8";
-        }
     }
 
     private HttpRequest parseRequest(InputStream in) throws IOException {
@@ -105,15 +70,23 @@ public class RequestHandler implements Runnable {
         return requestParser.parse();
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        response200Header(dos, lengthOfBodyContent, Collections.singletonList("Content: " + contentType));
+    private byte[] getContentBody(Response response) throws IOException {
+        if (StringUtils.hasText(response.getViewName())) {
+            return TemplateUtils.getTemplate(response.getViewName())
+                    .apply(response.getModel())
+                    .getBytes(UTF_8);
+        }
+
+        if (response.getBody() != null) {
+            return response.getBody();
+        }
+        return new byte[0];
     }
 
-    private void response200Header(DataOutputStream dos, int length, List<String> headers) {
+    private void response200Header(DataOutputStream dos, List<String> headers) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             writeHeaders(dos, headers);
-            dos.writeBytes("Content-Length: " + length + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
