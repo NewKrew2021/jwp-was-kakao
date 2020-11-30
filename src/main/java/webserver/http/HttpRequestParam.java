@@ -8,19 +8,25 @@ import java.util.Objects;
 
 public class HttpRequestParam {
 
-    public static HttpRequestParam empty = new HttpRequestParam("", "");
-
+    public static final String DEFAULT_CHARACTER_ENCODING = "utf-8";
     private String name;
-    private String value = "";
+    private String value;
 
     public HttpRequestParam(String paramString) {
         if (StringUtils.isEmpty(paramString))
             throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
-
         String[] parts = paramString.split("=");
-        name = parts[0];
-        if (parts.length == 2)
-            value = parts[1];
+        if (parts.length > 2 ) throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
+
+        if (parts.length == 1 ) {
+            this.name = parts[0];
+            this.value = "";
+        }
+
+        if ( parts.length == 2 ){
+            this.name = parts[0];
+            this.value = parts[1];
+        }
     }
 
     private HttpRequestParam(String name, String value) {
@@ -34,10 +40,9 @@ public class HttpRequestParam {
 
     public String getValue() {
         try {
-            return URLDecoder.decode(value, "utf-8");
+            return URLDecoder.decode(value, DEFAULT_CHARACTER_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            throw new HttpRequestParamValueEncodingException("url decode 중 문제가 발생했습니다", e);
+            throw new HttpRequestParamException("http request param decode 중 문제가 발생했습니다. (value: " + value + ")", e);
         }
     }
 

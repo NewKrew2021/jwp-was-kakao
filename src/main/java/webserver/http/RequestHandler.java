@@ -11,7 +11,7 @@ import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    public static final String LOGIN_PAGE = "./login.html";
+    private static final String LOGIN_PAGE = "./login.html";
 
     private final Socket connection;
     private final HttpRequestDispatcher dispatcher;

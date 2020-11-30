@@ -3,9 +3,9 @@ package webserver.http.controller;
 import db.DataBase;
 import model.User;
 
-public class LoginAuthenticator {
+public class LoginService {
 
-    public void authenticate(String userId, String password) {
+    public void login(String userId, String password) {
         User user = getUser(userId);
         if (user == null) throw new NotExistUserException(userId);
         if (!user.getPassword().equals(password)) throw new InvalidPasswordException(userId);

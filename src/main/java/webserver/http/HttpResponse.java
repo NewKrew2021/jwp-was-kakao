@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class HttpResponse {
@@ -15,8 +16,9 @@ public class HttpResponse {
 
     private final DataOutputStream dos;
 
-    private String statusLine = "HTTP/1.1 200 OK";
     private List<HttpHeader> headers;
+    private HttpHeader setCookieHeader;
+    private String cookie;
     private byte[] body;
     private HttpStatus status;
 
@@ -43,11 +45,23 @@ public class HttpResponse {
     }
 
     public List<HttpHeader> getHeaders() {
-        return headers;
+        List<HttpHeader> allHeaders = new ArrayList<>();
+        allHeaders.addAll(Collections.unmodifiableList(headers));
+        if( cookie != null ) allHeaders.add(new HttpHeader("Set-Cookie", cookie));
+
+        return allHeaders;
+    }
+
+    public void addHeader(HttpHeader header){
+        headers.add(header);
     }
 
     public void addHeader(String key, String value) {
-        this.headers.add(new HttpHeader(key, value));
+        headers.add(new HttpHeader(key, value));
+    }
+
+    public void setCookie(String setCookieHeaderValue) {
+        cookie = setCookieHeaderValue;
     }
 
     public void setContentType(String contentType) {
@@ -59,7 +73,7 @@ public class HttpResponse {
     }
 
     private void writeHeader() throws IOException {
-        for (HttpHeader header : headers) {
+        for (HttpHeader header : getHeaders()) {
             dos.writeBytes(header.toString() + "\r\n");
         }
         dos.writeBytes("\r\n");
@@ -74,10 +88,16 @@ public class HttpResponse {
         dos.flush();
     }
 
-    public void sendRedirect(String location) {
+    public void sendRedirect(String location, String contentType, List<HttpHeader> headers){
         setStatus(HttpStatus.x302_Found);
+        setContentType(contentType);
         addHeader("Location", location);
+        headers.stream().forEach(this::addHeader);
         send();
+    }
+
+    public void sendRedirect(String location) {
+        sendRedirect(location, "text/html", new ArrayList<>());
     }
 
     public void send() {

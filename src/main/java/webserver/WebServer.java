@@ -21,13 +21,13 @@ public class WebServer {
     public WebServer() {
         Controller staticResourceController = new StaticResourceController("./static");
         requestDispatcher = new DefaultHttpRequestDispatcher(
-                new RegexpMapping("\\/css\\/.+", HttpMethod.GET, staticResourceController),
-                new RegexpMapping("\\/js\\/.+", HttpMethod.GET, staticResourceController),
-                new RegexpMapping("\\/fonts\\/.+", HttpMethod.GET, staticResourceController),
-                new RegexpMapping("\\/.+\\.html", HttpMethod.GET, new HtmlController()),
-                new RegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
-                new RegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController()),
-                new RegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController())
+                new PathRegexpMapping("\\/css\\/.+", HttpMethod.GET, staticResourceController),
+                new PathRegexpMapping("\\/js\\/.+", HttpMethod.GET, staticResourceController),
+                new PathRegexpMapping("\\/fonts\\/.+", HttpMethod.GET, staticResourceController),
+                new PathRegexpMapping("\\/.+\\.html", HttpMethod.GET, new HtmlController()),
+                new PathRegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
+                new PathRegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController()),
+                new PathRegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController())
         );
         preProcessor = new CookieAuthenticator("/user/list");
     }

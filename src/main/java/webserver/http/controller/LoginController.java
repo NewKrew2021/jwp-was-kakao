@@ -4,13 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class LoginController implements Controller {
 
     private Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    private LoginAuthenticator loginAuthenticator = new LoginAuthenticator();
+    private LoginService loginService = new LoginService();
 
     @Override
     public void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
@@ -18,15 +19,12 @@ public class LoginController implements Controller {
         Login login = new Login(params);
 
         try {
-            loginAuthenticator.authenticate(login.getUserId(), login.getPassword());
-            httpResponse.setStatus(HttpStatus.x302_Found);
-            httpResponse.addHeader("Location", "/index.html");
-            httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
-        } catch (AuthenticationException e) {
-            logger.debug(e.getMessage(), e.getCause());
-            httpResponse.setStatus(HttpStatus.x302_Found);
-            httpResponse.addHeader("Location", "/user/login_failed.html");
-            httpResponse.addHeader("Set-Cookie", "logined=false; Path=/");
+            loginService.login(login.getUserId(), login.getPassword());
+            httpResponse.setCookie("logined=true; Path=/");
+            httpResponse.sendRedirect("/index.html");
+        } catch (LoginException e) {
+            httpResponse.setCookie("logined=false; Path=/");
+            httpResponse.sendRedirect("/user/login_failed.html");
         }
     }
 }
