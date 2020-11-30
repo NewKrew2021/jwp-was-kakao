@@ -1,6 +1,7 @@
 package webserver;
 
 import domain.HttpRequestHeader;
+import service.MemberService;
 import utils.HttpRequstParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +13,13 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String DEFAULT_RESPONSE = "Hello World";
+    private static final String USER_JOIN_REQUEST = "/user/create";
+    private static final MemberService memberService = new MemberService();
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -34,7 +38,7 @@ public class RequestHandler implements Runnable {
             printRequestHeaders(headers); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getBody(requstParser.getRequestPath());  //첫번째 라인 value가 Path
+            byte[] body = getBody(requstParser);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -42,10 +46,16 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private byte[] getBody(String requestPath) {
+    private byte[] getBody(HttpRequstParser requstParser) {
+        final String requestPath = requstParser.getRequestPath();
         logger.debug("requestPath : {}", requestPath);
         try {
             if ("/".equals(requestPath)) {
+                return DEFAULT_RESPONSE.getBytes();
+            }
+            if (requestPath.startsWith(USER_JOIN_REQUEST)) {
+                Map<String, String> parameterMap = requstParser.getRequstParameters(requestPath);
+                memberService.joinMember(parameterMap);
                 return DEFAULT_RESPONSE.getBytes();
             }
             return FileIoUtils.loadFileFromClasspath(RequestPathUtils.getResourcePath(requestPath));

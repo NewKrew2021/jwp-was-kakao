@@ -9,8 +9,10 @@ import java.io.BufferedReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HttpRequestParserTest {
 	private HttpRequstParser underTest;
@@ -40,4 +42,17 @@ public class HttpRequestParserTest {
 		underTest.getRequestHeaders();
 		assertThat(underTest.getRequestPath()).isEqualTo("/index.html");
 	}
+
+	@Test
+	@DisplayName("요청 url에서 쿼리 파라미터를 파싱한다.")
+	public void getRequestParamters() {
+		String input = "/user/create?userId=adeldel&password=adeldel&name=adeldel&email=adeldel.daum.net";
+		Map<String, String> parameters = underTest.getRequstParameters(input);
+		assertThat(parameters).hasSize(4);
+		assertTrue(parameters.containsKey("userId"));
+		assertTrue(parameters.containsKey("password"));
+		assertTrue(parameters.containsKey("name"));
+		assertTrue(parameters.containsKey("email"));
+	}
+
 }
