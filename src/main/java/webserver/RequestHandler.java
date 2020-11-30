@@ -1,5 +1,6 @@
 package webserver;
 
+import com.github.jknack.handlebars.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -45,16 +46,13 @@ public class RequestHandler implements Runnable {
                 .execute(httpRequest);
     }
 
-    private void response(DataOutputStream dos, Response response) throws IOException {
-        if (response.isRedirect()) {
-            response302Header(dos, response.getHeaders());
+    void response(DataOutputStream dos, Response response) throws IOException {
+        if (StringUtils.hasText(response.getViewName())) {
+            setBody(response);
         }
 
-        byte[] body = getContentBody(response);
-        response.setHeaders("Content-Length: " + body.length);
-
-        response200Header(dos, response.getHeaders());
-        responseBody(dos, body);
+        responseHeader(dos, response.getHeaders());
+        responseBody(dos, response.getBody());
     }
 
     private HttpRequest parseRequest(InputStream in) throws IOException {
@@ -63,52 +61,28 @@ public class RequestHandler implements Runnable {
         return requestParser.parse();
     }
 
-    private byte[] getContentBody(Response response) throws IOException {
-        if (StringUtils.hasText(response.getViewName())) {
-            return TemplateUtils.getTemplate(response.getViewName())
-                    .apply(response.getModel())
-                    .getBytes(UTF_8);
-        }
-
-        if (response.getBody() != null) {
-            return response.getBody();
-        }
-        return new byte[0];
+    private void setBody(Response response) throws IOException {
+        response.setBody(getTemplate(response).apply(response.getModel())
+                .getBytes(UTF_8));
     }
 
-    private void response200Header(DataOutputStream dos, List<String> headers) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            writeHeaders(dos, headers);
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    Template getTemplate(Response response) throws IOException {
+        return TemplateUtils.getTemplate(response.getViewName());
     }
 
-    private void response302Header(DataOutputStream dos, List<String> headers) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            writeHeaders(dos, headers);
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void writeHeaders(DataOutputStream dos, List<String> headers) throws IOException {
+    private void responseHeader(DataOutputStream dos, List<String> headers) throws IOException {
         for (String header : headers) {
             dos.writeBytes(header + "\r\n");
         }
+        dos.writeBytes("\r\n");
     }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    private void responseBody(DataOutputStream dos, byte[] body) throws IOException {
+        if (body == null) {
+            return;
         }
+        dos.write(body, 0, body.length);
+        dos.flush();
     }
 
 }

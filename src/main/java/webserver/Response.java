@@ -18,6 +18,9 @@ class Response {
     public List<String> getHeaders() {
         ArrayList<String> result = new ArrayList<>();
         result.add(String.format("HTTP/1.1 %s ", status.getStatusValue()));
+        if (body != null) {
+            result.add("Content-Length: " + body.length);
+        }
         result.addAll(headers);
         return Collections.unmodifiableList(result);
     }
