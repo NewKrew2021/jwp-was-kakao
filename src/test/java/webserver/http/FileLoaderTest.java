@@ -16,7 +16,7 @@ abstract class FileLoaderTest {
     @DisplayName("classPath 에 있는 uri 를 load 해서 byte[] 로 return 한다")
     @Test
     void load(){
-        byte[] content = fileLoader.load("/uri-1.html");
+        byte[] content = fileLoader.load("/handlebars.html");
 
         assertThat(content).isEqualTo("uri-1 content".getBytes());
     }
