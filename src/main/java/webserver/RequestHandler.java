@@ -1,13 +1,16 @@
 package webserver;
 
-import domain.HttpMethod;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import domain.HttpRequestHeader;
 import model.User;
-import service.MemberService;
-import utils.HttpRequstParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.MemberService;
 import utils.FileIoUtils;
+import utils.HttpRequstParser;
 import utils.RequestPathUtils;
 
 import java.io.*;
@@ -21,7 +24,15 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String DEFAULT_RESPONSE = "Hello World";
     private static final MemberService memberService = new MemberService();
+    private static final Handlebars handlebars;
     private Socket connection;
+
+    static {
+        TemplateLoader loader = new ClassPathTemplateLoader();
+        loader.setPrefix("/templates");
+        loader.setSuffix(".html");
+        handlebars = new Handlebars(loader);
+    }
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -51,6 +62,20 @@ public class RequestHandler implements Runnable {
                     return;
                 }
                 response302Header(dos, "/index.html", "Set-Cookie: logined=true;");
+                return;
+            }
+            if (memberService.isMemberListRequest(requstParser)) {
+                if (requstParser.isLoginCookie(headers)) {
+                    System.out.println("isLoginCookie!!!!");
+                    List<User> members = memberService.getAllMembers();
+                    Template template = handlebars.compile("user/list");
+
+                    byte[] body = template.apply(members).getBytes();
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                    return;
+                }
+                response302Header(dos, "/user/login.html", "Set-Cookie: logined=false;");
                 return;
             }
             byte[] body = getBody(requstParser);

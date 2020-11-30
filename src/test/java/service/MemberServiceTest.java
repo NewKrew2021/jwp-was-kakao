@@ -3,7 +3,6 @@ package service;
 import db.DataBase;
 import domain.HttpRequestHeader;
 import model.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import utils.HttpRequstParser;
@@ -60,6 +59,25 @@ public class MemberServiceTest {
 		assertFalse(underTest.memberLogin(getMemberInfo(httpRequstParser, headers)));
 	}
 
+	@Test
+	@DisplayName("회원목록 호출인지  확인한다.")
+	public void isMemberListRequestTest() {
+		setListRequestData();
+		assertTrue(underTest.isMemberListRequest(httpRequstParser));
+	}
+
+	@Test
+	@DisplayName("모든 회원정보를 가져온다.")
+	public void getAllMembersTest() {
+		//회원가입
+		joinMemberRequestData();
+		underTest.joinMember(getMemberInfo(httpRequstParser, headers));
+		//모든회원 조회
+		List<User> members = underTest.getAllMembers();
+		assertThat(members).hasSize(1);
+		assertThat(members.get(0).getUserId()).isEqualTo("adeldel");
+	}
+
 	private void joinMemberRequestData() {
 		Reader reader = new StringReader("POST /user/create HTTP/1.1\n" +
 				"Host: localhost:8080\n" +
@@ -86,6 +104,16 @@ public class MemberServiceTest {
 		headers = httpRequstParser.getRequestHeaders();
 	}
 
+	private void setListRequestData() {
+		Reader reader = new StringReader("GET /user/list HTTP/1.1\n" +
+				"Host: localhost:8080\n" +
+				"Connection: keep-alive\n" +
+				"Content-Type: application/x-www-form-urlencoded\n" +
+				"Accept: */*\n\n");
+
+		httpRequstParser = new HttpRequstParser(new BufferedReader(reader));
+		headers = httpRequstParser.getRequestHeaders();
+	}
 	private Map<String, String> getMemberInfo(HttpRequstParser requstParser, List<HttpRequestHeader> headers) {
 		String requestBody = requstParser.getRequestBody(headers);
 		return requstParser.getRequstParameters(requestBody);

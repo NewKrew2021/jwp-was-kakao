@@ -67,7 +67,6 @@ public class HttpRequstParser {
 		return requestPath;
 	}
 
-	/** URL에서 파라미터를 파싱한다 **/
 	private Map<String, String> getQueryMap(String query) {
 		if (query == null)
 			return null;
@@ -79,5 +78,12 @@ public class HttpRequstParser {
 			parameters.put(name, value);
 		}
 		return parameters;
+	}
+
+	public boolean isLoginCookie(List<HttpRequestHeader> headers) {
+		return headers.stream()
+				.filter(header -> "Cookie".equals(header.getKey())
+						&& "logined=true".equals(header.getValue()))
+				.findAny().isPresent();
 	}
 }
