@@ -49,9 +49,9 @@ public class RequestHandler implements Runnable {
 
     private Response handleRequest(HttpRequest httpRequest) {
         Controller controller = new RequestMapping(ImmutableMap.of(
-                "/usr/create", RequestHandler::handleUserCreate,
-                "/user/login", RequestHandler::handleLogin,
-                "/user/list", RequestHandler::handleList))
+                "/usr/create", httpRequest1 -> new CreateUserController().execute(httpRequest1),
+                "/user/login", httpRequest2 -> new LoginController().execute(httpRequest2),
+                "/user/list", httpRequest3 -> new UserListController().execute(httpRequest3)))
                 .getController(httpRequest.getRequestURI());
         if (controller == null) {
             return null; // TODO 향후 static controller 로 교체한다
@@ -74,18 +74,6 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    public static Response handleList(HttpRequest httpRequest) {
-        return new UserListController().execute(httpRequest);
-    }
-
-
-    public static  Response handleLogin(HttpRequest httpRequest) {
-        return new LoginController().execute(httpRequest);
-    }
-
-    public static  Response handleUserCreate(HttpRequest httpRequest) {
-        return new CreateUserController().execute(httpRequest);
-    }
 
     private void responseStaticContent(String requestURI, DataOutputStream dos) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
