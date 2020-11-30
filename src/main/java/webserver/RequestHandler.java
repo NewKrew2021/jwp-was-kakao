@@ -42,12 +42,12 @@ public class RequestHandler implements Runnable {
             }
 
             responseStaticContent(requestURI, new DataOutputStream(out));
-        } catch (IOException | URISyntaxException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
 
-    private Response handleRequest(HttpRequest httpRequest) {
+    private Response handleRequest(HttpRequest httpRequest) throws Exception {
         Controller controller = new RequestMapping(ImmutableMap.of(
                 "/usr/create", httpRequest1 -> new CreateUserController().execute(httpRequest1),
                 "/user/login", httpRequest2 -> new LoginController().execute(httpRequest2),
@@ -74,7 +74,6 @@ public class RequestHandler implements Runnable {
         }
     }
 
-
     private void responseStaticContent(String requestURI, DataOutputStream dos) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
         response200Header(dos, body.length, getContentType(requestURI));
@@ -92,7 +91,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private String getBasePath(String requestURI) {
+    public static String getBasePath(String requestURI) {
         return Sets.newHashSet("/css", "/js", "/fonts", "/images")
                 .stream()
                 .filter(requestURI::startsWith)

@@ -2,6 +2,6 @@ package webserver;
 
 @FunctionalInterface
 interface Controller {
-    Response execute(HttpRequest httpRequest);
+    Response execute(HttpRequest httpRequest) throws Exception;
 
 }

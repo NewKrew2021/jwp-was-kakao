@@ -2,9 +2,11 @@ package webserver;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
+import utils.FileIoUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static webserver.RequestHandler.getBasePath;
 
 class ControllerTest {
     @Test
@@ -48,14 +50,25 @@ class ControllerTest {
     }
 
     @Test
-    void staticContentController() {
+    void staticContentController() throws Exception {
         StaticContentController controller = new StaticContentController();
-        assertThat(controller.execute(createRequest("/css/bootstrap.min.css"))
-                           .getHeaders())
-                .containsExactly("Content-Type: text/css");
+        Response response = controller.execute(createRequest("/css/bootstrap.min.css"));
+        assertThat(response.getHeaders()).containsExactly("Content-Type: text/css");
     }
 
     private HttpRequest createRequest(String uri) {
         return new HttpRequest("POST", uri, "HTTP 1.1");
+    }
+
+    private static class StaticContentController implements Controller {
+        @Override
+        public Response execute(HttpRequest httpRequest) throws Exception {
+            String requestURI = httpRequest.getRequestURI();
+            byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
+            Response response = new Response();
+            response.setBody(body);
+            response.setHeaders("Content-Type: text/css");
+            return response;
+        }
     }
 }

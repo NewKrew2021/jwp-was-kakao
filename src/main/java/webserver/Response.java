@@ -8,6 +8,7 @@ class Response {
     private final List<String> headers = new ArrayList<>();
     private Object model;
     private String viewName;
+    private byte[] body;
 
     public void setHeaders(String headers) {
         this.headers.add(headers);
@@ -36,5 +37,13 @@ class Response {
     public boolean isRedirect() {
         return headers.stream()
                 .anyMatch(header -> header.startsWith("Location: "));
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
+    }
+
+    public byte[] getBody() {
+        return body;
     }
 }
