@@ -2,6 +2,7 @@ package context;
 
 import controller.Controller;
 import controller.StaticFileController;
+import controller.UserCreateController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ public class ApplicationContext {
 
     public ApplicationContext() {
         controllerMap = new HashMap<>();
+        controllerMap.put(UserCreateController.PATH, new UserCreateController());
 
         defaultController = new StaticFileController();
     }

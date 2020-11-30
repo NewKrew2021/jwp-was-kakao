@@ -10,8 +10,12 @@ import java.io.OutputStream;
 public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
-    private HttpCode responseCode;
+    private final HttpCode responseCode;
     private byte[] body;
+
+    public HttpResponse(HttpCode responseCode) {
+        this.responseCode = responseCode;
+    }
 
     public HttpResponse(HttpCode responseCode, byte[] body) {
         this.responseCode = responseCode;
@@ -20,25 +24,27 @@ public class HttpResponse {
 
     public void response(OutputStream out) {
         DataOutputStream dos = new DataOutputStream(out);
-        // TODO: 200 말고 다른거..
-        response200Header(dos, body.length);
-        responseBody(dos, body);
+        writeResponseCodeHeader(dos);
+
+        if (body != null) {
+            writeResponseBody(dos, body);
+        }
     }
 
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void writeResponseCodeHeader(DataOutputStream dos) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
+            String responseCodeHeader = String.format("HTTP/1.1 %s %s \r\n", responseCode.getStatusCode(), responseCode.getMessage());
+            dos.writeBytes(responseCodeHeader);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
+    private void writeResponseBody(DataOutputStream dos, byte[] body) {
         try {
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " +  body.length + "\r\n");
+            dos.writeBytes("\r\n");
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
