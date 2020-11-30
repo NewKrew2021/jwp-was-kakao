@@ -7,6 +7,7 @@ import utils.FileIoUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static webserver.RequestHandler.getBasePath;
+import static webserver.RequestHandler.getContentType;
 
 class ControllerTest {
     @Test
@@ -50,10 +51,16 @@ class ControllerTest {
     }
 
     @Test
-    void staticContentController() throws Exception {
+    void staticContentController() {
         StaticContentController controller = new StaticContentController();
-        Response response = controller.execute(createRequest("/css/bootstrap.min.css"));
-        assertThat(response.getHeaders()).containsExactly("Content-Type: text/css");
+        assertAll(() -> {
+                      Response response = controller.execute(createRequest("/css/bootstrap.min.css"));
+                      assertThat(response.getHeaders()).containsExactly("Content-Type: text/css");
+                  },
+                  () -> {
+                      Response response = controller.execute(createRequest("/js/jquery-2.2.0.min.js"));
+                      assertThat(response.getHeaders()).containsExactly("Content-Type: application/js");
+                  });
     }
 
     private HttpRequest createRequest(String uri) {
@@ -67,7 +74,7 @@ class ControllerTest {
             byte[] body = FileIoUtils.loadFileFromClasspath(getBasePath(requestURI) + requestURI);
             Response response = new Response();
             response.setBody(body);
-            response.setHeaders("Content-Type: text/css");
+            response.setHeaders("Content-Type: " + getContentType(requestURI));
             return response;
         }
     }

@@ -80,7 +80,7 @@ public class RequestHandler implements Runnable {
         responseBody(dos, body);
     }
 
-    private String getContentType(String requestURI) {
+    public static String getContentType(String requestURI) {
         switch (requestURI.substring(requestURI.lastIndexOf(".") + 1)) {
             case "js":
                 return "application/js";
