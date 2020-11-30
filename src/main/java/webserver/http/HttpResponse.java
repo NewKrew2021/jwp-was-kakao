@@ -30,15 +30,15 @@ public class HttpResponse {
         addHeader("Content-Length", String.valueOf(body.length));
     }
 
-    public void setStatus(HttpStatus status){
+    public void setStatus(HttpStatus status) {
         this.status = status;
     }
 
-    public HttpStatus getStatus(){
+    public HttpStatus getStatus() {
         return status == null ? HttpStatus.x200_OK : status;
     }
 
-    public String getStatusLine(){
+    public String getStatusLine() {
         return "HTTP/1.1 " + getStatus();
     }
 
@@ -47,26 +47,26 @@ public class HttpResponse {
     }
 
     public void addHeader(String key, String value) {
-        this.headers.add(new HttpHeader(key,value));
+        this.headers.add(new HttpHeader(key, value));
     }
 
-    public void setContentType(String contentType){
-        headers.add(new HttpHeader("Content-Type", contentType) );
+    public void setContentType(String contentType) {
+        headers.add(new HttpHeader("Content-Type", contentType));
     }
 
     private void writeStatusLine() throws IOException {
-        dos.writeBytes( getStatusLine() + " \r\n");
+        dos.writeBytes(getStatusLine() + " \r\n");
     }
 
     private void writeHeader() throws IOException {
-        for( HttpHeader header : headers ){
+        for (HttpHeader header : headers) {
             dos.writeBytes(header.toString() + "\r\n");
         }
         dos.writeBytes("\r\n");
     }
 
     private void writeBody() throws IOException {
-        if( body != null && body.length > 0 )
+        if (body != null && body.length > 0)
             dos.write(body, 0, body.length);
     }
 
@@ -80,13 +80,13 @@ public class HttpResponse {
         send();
     }
 
-    public void send(){
+    public void send() {
         try {
             writeStatusLine();
             writeHeader();
             writeBody();
             flush();
-        } catch ( IOException e ){
+        } catch (IOException e) {
             throw new RuntimeException("Http 응답메세지를 보내는과정에 문제가 발생했습니다", e);
         } finally {
             logger.debug("---- response-status-line ---");

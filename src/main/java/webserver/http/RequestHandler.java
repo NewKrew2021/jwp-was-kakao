@@ -34,14 +34,14 @@ public class RequestHandler implements Runnable {
             InputStream in = connection.getInputStream();
             OutputStream out = connection.getOutputStream();
 
-            httpRequest = createHttpRequest(in);
+            httpRequest = new HttpRequestFactory().create(new InputStreamReader(in));
             httpResponse = new HttpResponse(out);
 
             preProcessor.execute(httpRequest, httpResponse);
             dispatcher.dispatch(httpRequest, httpResponse);
 
             httpResponse.send();
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             logger.debug(e.getMessage());
             httpResponse.sendRedirect(LOGIN_PAGE);
         } catch (Exception e) {
@@ -62,10 +62,6 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException("socket close 과정에 문제가 발생했습니다", e);
         }
-    }
-
-    private HttpRequest createHttpRequest(InputStream in) {
-        return new HttpRequestFactory().create(new InputStreamReader(in));
     }
 
 }

@@ -5,9 +5,9 @@ import java.text.MessageFormat;
 public enum HttpStatus {
     x200_OK(200, "OK"),
     x201_Created(201, "Created"),
-    x302_Found(302, "Found" ),
+    x302_Found(302, "Found"),
     x404_NotFound(404, "Not Found"),
-    x500_InternalServerError(500, "Internal Server Error" );
+    x500_InternalServerError(500, "Internal Server Error");
 
     private final String reasonPhrase;
     private final int statusCode;

@@ -105,7 +105,7 @@ public class HttpRequestFactory {
                     }
                 }
 
-                private boolean isEOH(String nextLine){
+                private boolean isEOH(String nextLine) {
                     return StringUtils.isEmpty(nextLine);
                 }
             };

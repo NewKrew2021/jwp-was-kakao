@@ -10,7 +10,7 @@ public class StaticResourceController implements Controller {
 
     private FileLoader fileLoader;
 
-    public StaticResourceController(String basePath){
+    public StaticResourceController(String basePath) {
         fileLoader = new ClasspathFileLoader(basePath);
     }
 

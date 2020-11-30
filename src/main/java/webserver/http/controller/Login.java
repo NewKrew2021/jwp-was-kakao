@@ -27,6 +27,6 @@ public class Login implements RequestDataObject {
 
     @Override
     public List<RequestDataObjectValidator> getValidators() {
-        return Arrays.asList(new RequiredParamConstraint("userId","password"));
+        return Arrays.asList(new RequiredParamConstraint("userId", "password"));
     }
 }

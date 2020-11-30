@@ -18,7 +18,7 @@ public class WebServer {
     private HttpRequestDispatcher requestDispatcher;
     private HttpRequestPreProcessor preProcessor;
 
-    public WebServer(){
+    public WebServer() {
         Controller staticResourceController = new StaticResourceController("./static");
         requestDispatcher = new DefaultHttpRequestDispatcher(
                 new RegexpMapping("\\/css\\/.+", HttpMethod.GET, staticResourceController),

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class CookieParser {
 
     public List<Cookie> parse(String cookieHeaderValue) {
-        if(StringUtils.isEmpty(cookieHeaderValue) ) return new ArrayList<>();
+        if (StringUtils.isEmpty(cookieHeaderValue)) return new ArrayList<>();
 
         List<String> kvPairs = Arrays.asList(cookieHeaderValue.split(";"));
 
@@ -20,7 +20,7 @@ public class CookieParser {
                 .collect(Collectors.toList());
     }
 
-    private Cookie createCookie(String kvString){
+    private Cookie createCookie(String kvString) {
         List<String> parts = Arrays.stream(kvString.split("="))
                 .map(String::trim)
                 .collect(Collectors.toList());

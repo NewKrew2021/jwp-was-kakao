@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class QueryParser {
 
     public List<HttpRequestParam> parse(String query) {
-        if( StringUtils.isEmpty(query) ) return new ArrayList();
+        if (StringUtils.isEmpty(query)) return new ArrayList();
 
         String[] params = query.split("&");
         return Arrays.stream(params)

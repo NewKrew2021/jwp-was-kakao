@@ -8,11 +8,11 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
 
     private HttpRequestMapper<Controller> httpRequestMapper;
 
-    public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings){
+    public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings) {
         httpRequestMapper = new UriBaseHttpRequestMapper(mappings);
     }
 
-    public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings){
+    public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings) {
         httpRequestMapper = new UriBaseHttpRequestMapper(mappings);
     }
 
@@ -22,7 +22,7 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
             controller.execute(httpRequest, httpResponse);
         } catch (RuntimeException e) {
             e.printStackTrace();
-             httpResponse.setStatus(HttpStatus.x500_InternalServerError);
+            httpResponse.setStatus(HttpStatus.x500_InternalServerError);
         }
     }
 

@@ -7,6 +7,7 @@ public interface HttpRequestPreProcessor {
 
     /**
      * PreProcessor 가 처리할 request 인지 판단합니다.
+     *
      * @param httpRequest
      * @return
      */
@@ -14,6 +15,7 @@ public interface HttpRequestPreProcessor {
 
     /**
      * matches 가 true 요청에 대해서 apply 가 실행된다.
+     *
      * @param httpRequest
      * @param httpResponse
      */
@@ -25,8 +27,8 @@ public interface HttpRequestPreProcessor {
      * @param httpRequest
      * @param httpResponse
      */
-    default void execute(HttpRequest httpRequest, HttpResponse httpResponse){
-        if( matches(httpRequest) ){
+    default void execute(HttpRequest httpRequest, HttpResponse httpResponse) {
+        if (matches(httpRequest)) {
             apply(httpRequest, httpResponse);
         }
     }

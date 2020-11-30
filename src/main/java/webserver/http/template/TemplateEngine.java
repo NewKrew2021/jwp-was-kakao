@@ -9,7 +9,7 @@ public interface TemplateEngine {
 
     String apply(String template, Object data);
 
-    static TemplateEngine handlebars(){
+    static TemplateEngine handlebars() {
         return new HandlebarsTemplateEngine();
     }
 
@@ -24,5 +24,5 @@ public interface TemplateEngine {
                 throw new TemplateEngineException("template 변환중 문제가 발생했습니다", e);
             }
         }
-   }
+    }
 }

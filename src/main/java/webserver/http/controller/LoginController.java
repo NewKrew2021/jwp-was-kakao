@@ -6,7 +6,7 @@ import webserver.http.*;
 
 import java.util.List;
 
-public class LoginController implements Controller{
+public class LoginController implements Controller {
 
     private Logger logger = LoggerFactory.getLogger(LoginController.class);
 
@@ -22,8 +22,8 @@ public class LoginController implements Controller{
             httpResponse.setStatus(HttpStatus.x302_Found);
             httpResponse.addHeader("Location", "/index.html");
             httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
-        } catch ( AuthenticationException e ){
-            logger.debug( e.getMessage(), e.getCause() );
+        } catch (AuthenticationException e) {
+            logger.debug(e.getMessage(), e.getCause());
             httpResponse.setStatus(HttpStatus.x302_Found);
             httpResponse.addHeader("Location", "/user/login_failed.html");
             httpResponse.addHeader("Set-Cookie", "logined=false; Path=/");

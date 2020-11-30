@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RequiredParamConstraint implements RequestDataObjectValidator{
+public class RequiredParamConstraint implements RequestDataObjectValidator {
 
     private List<String> requiredParams;
 

@@ -19,7 +19,7 @@ public class HttpRequestLine {
     private String httpVersion;
     private List<HttpRequestParam> params;
 
-    public HttpRequestLine(String requestLineString){
+    public HttpRequestLine(String requestLineString) {
         parse(requestLineString);
     }
 
@@ -31,7 +31,7 @@ public class HttpRequestLine {
 
     private void parse(String requestLineString) {
         Matcher matcher = requestLinePattern.matcher(requestLineString);
-        if( !matcher.matches() ){
+        if (!matcher.matches()) {
             throw new InvalidHttpRequestMessageException("Request-Line 형식이 올바르지 않습니다. ( request-line: " + requestLineString + ")");
         }
         method = HttpMethod.valueOf(matcher.group(1));

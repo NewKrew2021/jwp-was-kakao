@@ -13,12 +13,13 @@ public class HttpRequestParam {
     private String name;
     private String value = "";
 
-    public HttpRequestParam(String paramString){
-        if( StringUtils.isEmpty(paramString) ) throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
+    public HttpRequestParam(String paramString) {
+        if (StringUtils.isEmpty(paramString))
+            throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
 
         String[] parts = paramString.split("=");
         name = parts[0];
-        if( parts.length == 2 )
+        if (parts.length == 2)
             value = parts[1];
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Cookie 기반 인증을 처리합니다.
- *
+ * <p>
  * 1. cookie 에 logined=true 가 존재하면 인증통과
  * 2. cookie 에 logined=false 이거나 값이 존재하지 않으면 인증실패 AuthenticationException 을 던진다.
  */
@@ -17,7 +17,7 @@ public class CookieAuthenticator implements HttpRequestPreProcessor, Authenticat
 
     private List<String> matchedPaths;
 
-    public CookieAuthenticator(String... matchedPaths){
+    public CookieAuthenticator(String... matchedPaths) {
         this.matchedPaths = Arrays.asList(matchedPaths);
     }
 
@@ -37,13 +37,13 @@ public class CookieAuthenticator implements HttpRequestPreProcessor, Authenticat
 
     @Override
     public void authenticate(HttpRequest httpRequest) throws AuthenticationException {
-        if( !isLogined(httpRequest) )
+        if (!isLogined(httpRequest))
             throw new AuthenticationException("해당 요청은 인증이 필요합니다. ( path: " + httpRequest.getPath() + " )");
     }
 
     private boolean isLogined(HttpRequest httpRequest) {
         String logined = httpRequest.getCookie(AUTHENTICATION_COOKIE_NAME);
-        if( logined == null ) return false;
+        if (logined == null) return false;
         return Boolean.valueOf(logined);
     }
 }

@@ -15,8 +15,9 @@ public class HttpHeader {
     }
 
     public HttpHeader(String header) {
-        if(StringUtils.isEmpty(header)) throw new IllegalArgumentException("header 형식이 올바르지 않습니다 ( header 가 null or 빈문자열 )");
-        String [] parts = header.split(":");
+        if (StringUtils.isEmpty(header))
+            throw new IllegalArgumentException("header 형식이 올바르지 않습니다 ( header 가 null or 빈문자열 )");
+        String[] parts = header.split(":");
         key = parts[0].trim();
         value = parts[1].trim();
     }

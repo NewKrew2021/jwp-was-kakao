@@ -6,7 +6,7 @@ public class HttpRequestParams {
 
     private static QueryParser queryParser = new QueryParser();
 
-    public static List<HttpRequestParam> convertFrom(String queryString){
+    public static List<HttpRequestParam> convertFrom(String queryString) {
         return queryParser.parse(queryString);
     }
 

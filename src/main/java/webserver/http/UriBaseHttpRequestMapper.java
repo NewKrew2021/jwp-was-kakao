@@ -17,7 +17,7 @@ public class UriBaseHttpRequestMapper<T> implements HttpRequestMapper {
     }
 
     @Override
-    public void addMapping(HttpRequestMapping mapping){
+    public void addMapping(HttpRequestMapping mapping) {
         mappings.add(mapping);
     }
 
