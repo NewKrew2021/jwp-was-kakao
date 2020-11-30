@@ -3,7 +3,6 @@ package webserver;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import db.DataBase;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -14,7 +13,6 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -98,19 +96,7 @@ public class RequestHandler implements Runnable {
     }
 
     public static  Response handleLogin(HttpRequest httpRequest) {
-        Map<String, String> entity = httpRequest.getEntity();
-        User user = DataBase.findUserById(entity.get("userId"));
-        if (user.getPassword().equals(entity.get("password"))) {
-            Response response = new Response();
-            response.setHeaders("Set-Cookie: logined=true; Path=/");
-            response.setHeaders("Location: /index.html");
-            return response;
-        }
-
-        Response response = new Response();
-        response.setHeaders("Set-Cookie: logined=false; Path=/");
-        response.setHeaders("Location: /user/login_failed.html");
-        return response;
+        return new LoginController().execute(httpRequest);
     }
 
     public static  Response handleUserCreate(HttpRequest httpRequest) {
