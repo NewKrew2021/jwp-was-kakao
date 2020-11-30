@@ -1,5 +1,6 @@
 package webserver;
 
+import domain.HttpMethod;
 import domain.HttpRequestHeader;
 import service.MemberService;
 import utils.HttpRequstParser;
@@ -53,8 +54,9 @@ public class RequestHandler implements Runnable {
             if ("/".equals(requestPath)) {
                 return DEFAULT_RESPONSE.getBytes();
             }
-            if (requestPath.startsWith(USER_JOIN_REQUEST)) {
-                Map<String, String> parameterMap = requstParser.getRequstParameters(requestPath);
+            if (requestPath.startsWith(USER_JOIN_REQUEST) && HttpMethod.POST == requstParser.getHttpMethod()) {
+                String requestBody = requstParser.getRequestBody();
+                Map<String, String> parameterMap = requstParser.getRequstParameters(requestBody);
                 memberService.joinMember(parameterMap);
                 return DEFAULT_RESPONSE.getBytes();
             }
