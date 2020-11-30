@@ -1,14 +1,10 @@
 package webserver;
 
-import com.github.jknack.handlebars.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-import utils.TemplateUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -18,10 +14,15 @@ public class RequestHandler implements Runnable {
 
     private final Socket connection;
     private final RequestMapping requestMapping;
+    private final ResponseHandler responseHandler;
 
     public RequestHandler(Socket connectionSocket, RequestMapping requestMapping) {
+        this(connectionSocket, requestMapping, new ResponseHandler());
+    }
+    public RequestHandler(Socket connectionSocket, RequestMapping requestMapping, ResponseHandler responseHandler) {
         this.connection = connectionSocket;
         this.requestMapping = requestMapping;
+        this.responseHandler = responseHandler;
     }
 
     public void run() {
@@ -46,43 +47,13 @@ public class RequestHandler implements Runnable {
                 .execute(httpRequest);
     }
 
-    void response(DataOutputStream dos, Response response) throws IOException {
-        if (StringUtils.hasText(response.getViewName())) {
-            setBody(response);
-        }
-
-        responseHeader(dos, response.getHeaders());
-        responseBody(dos, response.getBody());
-    }
-
     private HttpRequest parseRequest(InputStream in) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, UTF_8));
         RequestParser requestParser = new RequestParser(bufferedReader);
         return requestParser.parse();
     }
 
-    private void setBody(Response response) throws IOException {
-        response.setBody(getTemplate(response).apply(response.getModel())
-                .getBytes(UTF_8));
+    void response(DataOutputStream dos, Response response) throws IOException {
+        responseHandler.response(dos, response);
     }
-
-    Template getTemplate(Response response) throws IOException {
-        return TemplateUtils.getTemplate(response.getViewName());
-    }
-
-    private void responseHeader(DataOutputStream dos, List<String> headers) throws IOException {
-        for (String header : headers) {
-            dos.writeBytes(header + "\r\n");
-        }
-        dos.writeBytes("\r\n");
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) throws IOException {
-        if (body == null) {
-            return;
-        }
-        dos.write(body, 0, body.length);
-        dos.flush();
-    }
-
 }

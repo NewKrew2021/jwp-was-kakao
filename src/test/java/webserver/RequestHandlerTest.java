@@ -18,7 +18,12 @@ class RequestHandlerTest {
 
     @BeforeEach
     void setUp() {
-        requestHandler = new RequestHandler(null, null);
+        requestHandler = new RequestHandler(null, null, new ResponseHandler() {
+            @Override
+            Template getTemplate(Response response) throws IOException {
+                return new Handlebars().compileInline("{{this}}");
+            }
+        });
         out = new ByteArrayOutputStream();
     }
 
@@ -47,13 +52,6 @@ class RequestHandlerTest {
 
     @Test
     void ok_with_template() throws IOException {
-        requestHandler = new RequestHandler(null, null) {
-            @Override
-            Template getTemplate(Response response) throws IOException {
-                return new Handlebars().compileInline("{{this}}");
-            }
-        };
-
         Response response = new Response();
         String message = "Hello World!";
         response.setModel(message);
