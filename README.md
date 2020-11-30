@@ -19,3 +19,6 @@
 
 #### 요구사항 3)
 * http://localhost:8080/user/form.html 파일의 form 태그 method를 get에서 post로 수정한 후 회원가입 기능이 정상적으로 동작하도록 구현한다.
+
+#### 요구사항 4)
+* redirect 방식처럼 회원가입을 완료한 후 “index.html”로 이동한다.
