@@ -47,6 +47,14 @@ class ControllerTest {
                 .containsExactly("Location: /user/login.html");
     }
 
+    @Test
+    void staticContentController() {
+        StaticContentController controller = new StaticContentController();
+        assertThat(controller.execute(createRequest("/css/bootstrap.min.css"))
+                           .getHeaders())
+                .containsExactly("Content-Type: text/css");
+    }
+
     private HttpRequest createRequest(String uri) {
         return new HttpRequest("POST", uri, "HTTP 1.1");
     }
