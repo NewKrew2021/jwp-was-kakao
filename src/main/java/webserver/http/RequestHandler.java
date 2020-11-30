@@ -35,13 +35,11 @@ public class RequestHandler implements Runnable {
             OutputStream out = connection.getOutputStream();
 
             httpRequest = createHttpRequest(in);
-            printAllRequestHeaders(httpRequest);
             httpResponse = new HttpResponse(out);
 
             preProcessor.execute(httpRequest, httpResponse);
             dispatcher.dispatch(httpRequest, httpResponse);
 
-            printAllResponseHeaders(httpResponse);
             httpResponse.send();
         } catch (AuthenticationException e){
             logger.debug(e.getMessage());
@@ -69,22 +67,5 @@ public class RequestHandler implements Runnable {
     private HttpRequest createHttpRequest(InputStream in) {
         return new HttpRequestFactory().create(new InputStreamReader(in));
     }
-
-    private void printAllRequestHeaders(HttpRequest httpRequest) {
-        logger.debug("---- request-line ----");
-        logger.debug(httpRequest.getRequestLine());
-        logger.debug("---- request-header ----");
-        httpRequest.getHeaders().forEach(it -> logger.debug(it.toString()));
-        logger.debug("---- reqeust-body ----");
-        logger.debug(httpRequest.getBody());
-    }
-
-    private void printAllResponseHeaders(HttpResponse httpResponse) {
-        logger.debug("---- response-status-line ---");
-        logger.debug(httpResponse.getStatusLine());
-        logger.debug("---- response-header ----");
-        httpResponse.getHeaders().forEach(it -> logger.debug(it.toString()));
-    }
-
 
 }

@@ -1,6 +1,5 @@
 package webserver.http;
 
-import ch.qos.logback.classic.pattern.ClassOfCallerConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +88,11 @@ public class HttpResponse {
             flush();
         } catch ( IOException e ){
             throw new RuntimeException("Http 응답메세지를 보내는과정에 문제가 발생했습니다", e);
+        } finally {
+            logger.debug("---- response-status-line ---");
+            logger.debug(getStatusLine());
+            logger.debug("---- response-header ----");
+            getHeaders().forEach(it -> logger.debug(it.toString()));
         }
     }
 }

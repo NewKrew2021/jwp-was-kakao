@@ -1,5 +1,8 @@
 package webserver.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 import webserver.http.utils.CookieParser;
 
 import java.util.ArrayList;
@@ -7,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HttpRequest {
-
     private HttpRequestLine requestLine;
     private List<HttpHeader> headers;
     private List<Cookie> cookies;
@@ -84,6 +86,7 @@ public class HttpRequest {
 
 
     static class Builder {
+        private Logger logger = LoggerFactory.getLogger(Builder.class);
 
         private HttpRequestLine requestLine;
         private List<HttpHeader> headers = new ArrayList<>();
@@ -111,7 +114,16 @@ public class HttpRequest {
 
         public HttpRequest build() {
             if( requestLine == null ) throw new IllegalArgumentException("request line 이 비어 있습니다");
-            return new HttpRequest(requestLine, headers, body == null ? "" : body);
+            HttpRequest httpRequest = new HttpRequest(requestLine, headers, body == null ? "" : body);
+
+            logger.debug("---- request-line ----");
+            logger.debug(httpRequest.getRequestLine());
+            logger.debug("---- request-header ----");
+            httpRequest.getHeaders().forEach(it -> logger.debug(it.toString()));
+            logger.debug("---- reqeust-body ----");
+            logger.debug(httpRequest.getBody());
+
+            return httpRequest;
         }
     }
 }
