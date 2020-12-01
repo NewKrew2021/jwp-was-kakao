@@ -1,9 +1,6 @@
 package context;
 
-import controller.Controller;
-import controller.StaticFileController;
-import controller.UserCreateController;
-import controller.UserLoginController;
+import controller.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +15,7 @@ public class ApplicationContext {
         // TODO: controller 만들때마다 넣어줘야되네..
         controllerMap.put(UserCreateController.PATH, new UserCreateController());
         controllerMap.put(UserLoginController.PATH, new UserLoginController());
+        controllerMap.put(UserListController.PATH, new UserListController());
 
         defaultController = new StaticFileController();
     }

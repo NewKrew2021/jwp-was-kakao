@@ -39,10 +39,10 @@ public class HttpRequest {
     }
 
     public void getBodyInMap(Map<String, String> output) {
-        if (!headers.containsKey(ContentType.CONTENT_TYPE)) {
+        if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
             throw new UnsupportedOperationException("HttpRequest does not support form body");
         }
-        String contentType = headers.get(ContentType.CONTENT_TYPE);
+        String contentType = headers.get(HttpHeaders.CONTENT_TYPE);
 
         if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
             FormUrlencodedBodyParser.parse(body, output);
@@ -50,6 +50,16 @@ public class HttpRequest {
         }
 
         throw new UnsupportedOperationException("HttpRequest does not support form body, Content-Type=" + contentType);
+    }
+
+    public void getCookiesInMap(Map<String, String> output) {
+        if (!headers.containsKey(HttpHeaders.COOKIE)) {
+            logger.debug("empty cookies");
+            return;
+        }
+
+        String cookieString = headers.get(HttpHeaders.COOKIE);
+        CookieParser.parse(cookieString, output);
     }
 
 }

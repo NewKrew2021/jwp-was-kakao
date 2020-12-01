@@ -3,6 +3,8 @@ package service;
 import db.DataBase;
 import model.User;
 
+import java.util.Collection;
+
 public class UserService {
 
     public static void addNewUser(String userId, String password, String name, String email) {
@@ -17,6 +19,10 @@ public class UserService {
         }
 
         return user.getPassword().equals(password);
+    }
+
+    public static Collection<User> getAllUsers() {
+        return DataBase.findAll();
     }
 
 }
