@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,14 +70,12 @@ public class HttpRequestParserTest {
                             .containsEntry("Content-Length", "93")
                             .containsEntry("Content-Type", "application/x-www-form-urlencoded")
                             .containsEntry("Accept", "*/*");
-                    try {
-                        assertThat(req.getBodyInMap()).containsEntry("userId", "javajigi")
-                                .containsEntry("password", "password")
-                                .containsEntry("name", "박재성")
-                                .containsEntry("email", "javajigi@slipp.net");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    Map<String, String> body = new HashMap<>();
+                    req.getBodyInMap(body);
+                    assertThat(body).containsEntry("userId", "javajigi")
+                            .containsEntry("password", "password")
+                            .containsEntry("name", "박재성")
+                            .containsEntry("email", "javajigi@slipp.net");
                 });
     }
 }

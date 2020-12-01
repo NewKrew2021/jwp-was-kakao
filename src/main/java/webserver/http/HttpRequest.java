@@ -3,7 +3,6 @@ package webserver.http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class HttpRequest {
@@ -39,15 +38,15 @@ public class HttpRequest {
         return headers;
     }
 
-    public Map<String, String> getBodyInMap() throws IOException {
+    public void getBodyInMap(Map<String, String> output) {
         if (!headers.containsKey(ContentType.CONTENT_TYPE)) {
             throw new UnsupportedOperationException("HttpRequest does not support form body");
         }
         String rawContentType = headers.get(ContentType.CONTENT_TYPE);
 
-        // TODO: 호출할때마다 객체 생성
         if (ContentType.APPLICATION_FORM_URLENCODED.isEqualTo(rawContentType)) {
-            return FormUrlencodedBodyParser.parse(body);
+            FormUrlencodedBodyParser.parse(body, output);
+            return;
         }
 
         throw new UnsupportedOperationException("HttpRequest does not support form body, Content-Type=" + rawContentType);
