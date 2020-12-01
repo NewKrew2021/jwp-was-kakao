@@ -2,9 +2,7 @@ package controller;
 
 import exceptions.NoSuchResource;
 import utils.FileIoUtils;
-import webserver.http.HttpCode;
-import webserver.http.HttpRequest;
-import webserver.http.HttpResponse;
+import webserver.http.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,7 +15,18 @@ public class StaticFileController extends Controller {
     @Override
     protected HttpResponse handleGet(HttpRequest httpRequest) {
         byte[] body = findResource(httpRequest.getPath());
-        return new HttpResponse(HttpCode._200, body);
+
+        String contentType = ContentType.TEXT_HTML_UTF8;
+        if (httpRequest.getPath().endsWith(".css")) {
+            contentType = ContentType.TEXT_CSS_UTF8;
+        }
+        if (httpRequest.getPath().endsWith(".js")) {
+            contentType = ContentType.APPLICATION_JAVASCRIPT;
+        }
+        return new HttpResponseBuilder().with200OK()
+                .withBody(body)
+                .withContentType(contentType)
+                .build();
     }
 
     private byte[] findResource(String path) {

@@ -21,24 +21,26 @@ public class HttpResponse {
     private Map<String, String> headers = new HashMap<>();
     private byte[] body;
 
-    public HttpResponse() {}
+    public HttpResponse() {
+        headers.put(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_HTML_UTF8);
+    }
 
     public HttpResponse(HttpCode responseCode) {
+        this();
         this.responseCode = responseCode;
     }
 
     public HttpResponse(HttpCode responseCode, byte[] body) {
-        this.responseCode = responseCode;
+        this(responseCode);
         this.body = body;
-    }
-
-    public HttpResponse(HttpCode responseCode, Map<String, String> headers) {
-        this.responseCode = responseCode;
-        this.headers = headers;
     }
 
     public void setResponseCode(HttpCode responseCode) {
         this.responseCode = responseCode;
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
     }
 
     public void addHeader(String key, String value) {
@@ -78,8 +80,6 @@ public class HttpResponse {
 
     private void writeResponseBody(DataOutputStream dos) {
         try {
-            // TODO : css 등 Content-Type 구분 필요
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " +  body.length + "\r\n");
             dos.writeBytes("\r\n");
             dos.write(body, 0, body.length);
