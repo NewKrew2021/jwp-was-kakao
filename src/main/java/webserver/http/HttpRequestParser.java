@@ -2,6 +2,7 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.IOUtils;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -11,11 +12,13 @@ import java.util.stream.Stream;
 
 public class HttpRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
+    private static final String HEADER_CONTENT_LENGTH = "Content-Length";
 
     private HttpMethod method = null;
     private String path = null;
     private Map<String, String> parameters = new HashMap<>();
     private Map<String, String> headers = new HashMap<>();
+    private String body;
 
     public HttpRequestParser() { }
 
@@ -28,10 +31,16 @@ public class HttpRequestParser {
             inputLine = br.readLine();
         }
 
+        if (headers.containsKey(HEADER_CONTENT_LENGTH)) {
+            int contentLength = Integer.parseInt(headers.get(HEADER_CONTENT_LENGTH));
+
+            body = IOUtils.readData(br, contentLength);
+        }
+
         logger.debug("method={}, path={}", method, path);
         logger.debug("parameters : {}", parameters);
         logger.debug("headers : {}", headers);
-        return new HttpRequest(method, path, parameters, headers);
+        return new HttpRequest(method, path, parameters, headers, body);
     }
 
     private void handleLine(String inputLine) throws UnsupportedEncodingException {

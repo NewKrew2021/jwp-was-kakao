@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class StaticFileController extends Controller {
 
     @Override
-    public HttpResponse handleGet(HttpRequest httpRequest) {
+    protected HttpResponse handleGet(HttpRequest httpRequest) {
         byte[] body = findResource(httpRequest.getPath());
         return new HttpResponse(HttpCode._200, body);
     }
