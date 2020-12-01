@@ -42,14 +42,14 @@ public class HttpRequest {
         if (!headers.containsKey(ContentType.CONTENT_TYPE)) {
             throw new UnsupportedOperationException("HttpRequest does not support form body");
         }
-        String rawContentType = headers.get(ContentType.CONTENT_TYPE);
+        String contentType = headers.get(ContentType.CONTENT_TYPE);
 
-        if (ContentType.APPLICATION_FORM_URLENCODED.isEqualTo(rawContentType)) {
+        if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
             FormUrlencodedBodyParser.parse(body, output);
             return;
         }
 
-        throw new UnsupportedOperationException("HttpRequest does not support form body, Content-Type=" + rawContentType);
+        throw new UnsupportedOperationException("HttpRequest does not support form body, Content-Type=" + contentType);
     }
 
 }

@@ -6,6 +6,7 @@ import service.UserService;
 import webserver.http.HttpCode;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
+import webserver.http.HttpResponseBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class UserCreateController extends Controller {
         Map<String, String> parameters = httpRequest.getParameters();
         addNewUserWithMap(parameters);
 
-        return new HttpResponse(HttpCode._200);
+        return HttpResponse._200_OK;
     }
 
     @Override
@@ -28,7 +29,7 @@ public class UserCreateController extends Controller {
         Map<String, String> body = new HashMap<>();
         httpRequest.getBodyInMap(body);
         addNewUserWithMap(body);
-        return new HttpResponse(HttpCode._200);
+        return HttpResponseBuilder.build302Redirect("/index.html");
     }
 
     private void addNewUserWithMap(Map<String, String> parameters) {

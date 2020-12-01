@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 public class HttpResponse {
     public static final HttpResponse _200_OK = new HttpResponse(HttpCode._200);
@@ -15,6 +16,7 @@ public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
     private final HttpCode responseCode;
+    private Map<String, String> headers;
     private byte[] body;
 
     public HttpResponse(HttpCode responseCode) {
@@ -26,12 +28,21 @@ public class HttpResponse {
         this.body = body;
     }
 
+    public HttpResponse(HttpCode responseCode, Map<String, String> headers) {
+        this.responseCode = responseCode;
+        this.headers = headers;
+    }
+
     public void response(OutputStream out) {
         DataOutputStream dos = new DataOutputStream(out);
         writeResponseCodeHeader(dos);
 
+        if (headers != null) {
+            writeHeaders(dos);
+        }
+
         if (body != null) {
-            writeResponseBody(dos, body);
+            writeResponseBody(dos);
         }
     }
 
@@ -44,7 +55,18 @@ public class HttpResponse {
         }
     }
 
-    private void writeResponseBody(DataOutputStream dos, byte[] body) {
+    private void writeHeaders(DataOutputStream dos) {
+        headers.forEach((key, value) -> {
+            String header = String.format("%s: %s \r\n", key, value);
+            try {
+                dos.writeBytes(header);
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+            }
+        });
+    }
+
+    private void writeResponseBody(DataOutputStream dos) {
         try {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " +  body.length + "\r\n");
