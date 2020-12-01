@@ -3,7 +3,6 @@ package controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
-import webserver.http.HttpCode;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.HttpResponseBuilder;
@@ -14,7 +13,7 @@ import java.util.Map;
 public class UserCreateController extends Controller {
     public static final String PATH = "/user/create";
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserCreateController.class);
 
     @Override
     protected HttpResponse handleGet(HttpRequest httpRequest) {
@@ -29,7 +28,9 @@ public class UserCreateController extends Controller {
         Map<String, String> body = new HashMap<>();
         httpRequest.getBodyInMap(body);
         addNewUserWithMap(body);
-        return HttpResponseBuilder.build302Redirect("/index.html");
+        return new HttpResponseBuilder()
+                .with302Redirect("/index.html")
+                .build();
     }
 
     private void addNewUserWithMap(Map<String, String> parameters) {

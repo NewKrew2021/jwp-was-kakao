@@ -9,4 +9,14 @@ public class UserService {
         DataBase.addUser(new User(userId, password, name, email));
     }
 
+    public static boolean isLoginSuccessful(String userId, String password) {
+        User user = DataBase.findUserById(userId);
+
+        if (user == null) {
+            return false;
+        }
+
+        return user.getPassword().equals(password);
+    }
+
 }

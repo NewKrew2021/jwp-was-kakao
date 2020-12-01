@@ -1,13 +1,25 @@
 package webserver.http;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class HttpResponseBuilder {
 
-    public static HttpResponse build302Redirect(String location) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put(HttpHeaders.LOCATION, location);
-        return new HttpResponse(HttpCode._302, headers);
+    private HttpResponse response;
+
+    public HttpResponseBuilder() {
+        response = new HttpResponse();
+    }
+
+    public HttpResponseBuilder with302Redirect(String location) {
+        response.setResponseCode(HttpCode._302);
+        response.addHeader(HttpHeaders.LOCATION, location);
+        return this;
+    }
+
+    public HttpResponseBuilder withSetCookie(SetCookie setCookie) {
+        response.addHeader(HttpHeaders.SET_COOKIE, setCookie.toString());
+        return this;
+    }
+
+    public HttpResponse build() {
+        return response;
     }
 }

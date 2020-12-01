@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
@@ -15,9 +16,11 @@ public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
-    private final HttpCode responseCode;
-    private Map<String, String> headers;
+    private HttpCode responseCode = HttpCode._200;
+    private Map<String, String> headers = new HashMap<>();
     private byte[] body;
+
+    public HttpResponse() {}
 
     public HttpResponse(HttpCode responseCode) {
         this.responseCode = responseCode;
@@ -33,13 +36,19 @@ public class HttpResponse {
         this.headers = headers;
     }
 
+    public void setResponseCode(HttpCode responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public void addHeader(String key, String value) {
+        headers.put(key, value);
+    }
+
     public void response(OutputStream out) {
         DataOutputStream dos = new DataOutputStream(out);
         writeResponseCodeHeader(dos);
 
-        if (headers != null) {
-            writeHeaders(dos);
-        }
+        writeHeaders(dos);
 
         if (body != null) {
             writeResponseBody(dos);
@@ -68,6 +77,7 @@ public class HttpResponse {
 
     private void writeResponseBody(DataOutputStream dos) {
         try {
+            // TODO : css 등 Content-Type 구분 필요
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " +  body.length + "\r\n");
             dos.writeBytes("\r\n");
