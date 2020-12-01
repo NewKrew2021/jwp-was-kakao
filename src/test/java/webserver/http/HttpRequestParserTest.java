@@ -17,7 +17,7 @@ public class HttpRequestParserTest {
 
         assertThat(new HttpRequestParser().parse(new ByteArrayInputStream(sample.getBytes())))
                 .satisfies(req -> {
-                    assertThat(req.getMethod()).isEqualTo("GET");
+                    assertThat(req.getMethod()).isEqualTo(HttpMethod.GET);
                     assertThat(req.getPath()).isEqualTo("/index.html");
                     assertThat(req.getParameters()).containsEntry("test", "123");
                     assertThat(req.getHeaders()).containsEntry("Host", "localhost:8080")
@@ -35,7 +35,7 @@ public class HttpRequestParserTest {
 
         assertThat(new HttpRequestParser().parse(new ByteArrayInputStream(sample.getBytes())))
                 .satisfies(req -> {
-                    assertThat(req.getMethod()).isEqualTo("GET");
+                    assertThat(req.getMethod()).isEqualTo(HttpMethod.GET);
                     assertThat(req.getPath()).isEqualTo("/user/create");
                     assertThat(req.getParameters()).containsEntry("userId", "javajigi")
                             .containsEntry("password", "password")

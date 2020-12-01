@@ -12,15 +12,15 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class StaticFileController implements Controller {
+public class StaticFileController extends Controller {
 
     @Override
-    public HttpResponse handleRequest(HttpRequest httpRequest) throws NoSuchResource {
+    public HttpResponse handleGet(HttpRequest httpRequest) {
         byte[] body = findResource(httpRequest.getPath());
-        return new HttpResponse(HttpCode._200_OK, body);
+        return new HttpResponse(HttpCode._200, body);
     }
 
-    private byte[] findResource(String path) throws NoSuchResource {
+    private byte[] findResource(String path) {
         return Stream.of("./templates", "./static")
                 .map(resourceRoot -> tryFindResource(resourceRoot, path))
                 .filter(Optional::isPresent)

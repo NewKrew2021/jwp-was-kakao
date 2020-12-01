@@ -8,19 +8,19 @@ import java.util.Map;
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
-    private String method;
+    private HttpMethod method;
     private String path;
     private Map<String, String> parameters;
     private Map<String, String> headers;
 
-    public HttpRequest(String method, String path, Map<String, String> paramters, Map<String, String> headers) {
+    public HttpRequest(HttpMethod method, String path, Map<String, String> paramters, Map<String, String> headers) {
         this.method = method;
         this.path = path;
         this.parameters = paramters;
         this.headers = headers;
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 

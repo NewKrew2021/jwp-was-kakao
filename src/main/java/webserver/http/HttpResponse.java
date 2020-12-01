@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class HttpResponse {
+    public static final HttpResponse _200_OK = new HttpResponse(HttpCode._200);
+    public static final HttpResponse _404_NOT_FOUND = new HttpResponse(HttpCode._404);
+    public static final HttpResponse _405_METHOD_NOT_ALLOWED = new HttpResponse(HttpCode._405);
+
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
     private final HttpCode responseCode;

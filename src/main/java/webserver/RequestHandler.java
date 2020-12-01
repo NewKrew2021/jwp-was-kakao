@@ -12,7 +12,6 @@ import controller.Controller;
 import exceptions.NoSuchResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
 import webserver.http.HttpRequest;
 import webserver.http.HttpRequestParser;
 import webserver.http.HttpResponse;
@@ -37,10 +36,6 @@ public class RequestHandler implements Runnable {
             Controller controller = applicationContext.getControllerForPath(httpRequest.getPath());
             HttpResponse httpResponse = controller.handleRequest(httpRequest);
             httpResponse.response(out);
-
-        } catch (NoSuchResource e) {
-            // TODO: 404 NOT FOUND
-            logger.error(e.getMessage());
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

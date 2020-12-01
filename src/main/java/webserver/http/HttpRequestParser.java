@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class HttpRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
 
-    private String method = null;
+    private HttpMethod method = null;
     private String path = null;
     private Map<String, String> parameters = new HashMap<>();
     private Map<String, String> headers = new HashMap<>();
@@ -38,7 +38,7 @@ public class HttpRequestParser {
         if (isFirstLine()) {
             String urlDecoded = URLDecoder.decode(inputLine, "utf-8");
             String[] firstLine = urlDecoded.split(" ");
-            method = firstLine[0];
+            method = HttpMethod.valueOf(firstLine[0].trim());
             parsePathAndParameters(firstLine[1]);
             return;
         }
