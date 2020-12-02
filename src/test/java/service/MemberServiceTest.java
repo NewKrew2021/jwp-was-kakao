@@ -25,7 +25,7 @@ public class MemberServiceTest {
 	@DisplayName("회원가입요청인지 확인한다.")
 	public void isJoinMemberTest() {
 		joinMemberRequestData();
-		assertTrue(underTest.isMemberJoinRequst(httpRequest));
+		assertTrue(underTest.isJoinReq(httpRequest));
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class MemberServiceTest {
 	@DisplayName("로그인 요청인지 확인한다.")
 	public void memberLoginRequestTest() {
 		loginRequstData("password");
-		assertTrue(underTest.memberLoginRequest(httpRequest));
+		assertTrue(underTest.isLoginReq(httpRequest));
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class MemberServiceTest {
 	@DisplayName("회원목록 호출인지  확인한다.")
 	public void isMemberListRequestTest() {
 		setListRequestData();
-		assertTrue(underTest.isMemberListRequest(httpRequest));
+		assertTrue(underTest.isMembersReq(httpRequest));
 	}
 
 	@Test
@@ -114,6 +114,5 @@ public class MemberServiceTest {
 	private void makeHttpRequest(Reader reader) {
 		httpRequstParser = new HttpRequstParser(new BufferedReader(reader));
 		httpRequest = httpRequstParser.requestParse();
-
 	}
 }

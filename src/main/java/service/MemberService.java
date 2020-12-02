@@ -1,6 +1,7 @@
 package service;
 
 import db.DataBase;
+import domain.ActionSegment;
 import domain.HttpMethod;
 import domain.HttpRequest;
 import model.User;
@@ -10,12 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MemberService {
-	private static final String USER_JOIN_REQUEST = "/user/create";
-	private static final String USER_LOGIN_REQUEST = "/user/login";
-	private static final String USER_LIST_REQUEST = "/user/list";
-
-	public boolean isMemberJoinRequst(HttpRequest httpRequest) {
-		return httpRequest.getPath().startsWith(USER_JOIN_REQUEST)
+	public boolean isJoinReq(HttpRequest httpRequest) {
+		return httpRequest.getPath().startsWith(ActionSegment.JOIN.getUri())
 				&& HttpMethod.POST == httpRequest.getMethod();
 	}
 
@@ -24,8 +21,8 @@ public class MemberService {
 		DataBase.addUser(user);
 	}
 
-	public boolean memberLoginRequest(HttpRequest httpRequest) {
-		return httpRequest.getPath().startsWith(USER_LOGIN_REQUEST)
+	public boolean isLoginReq(HttpRequest httpRequest) {
+		return httpRequest.getPath().startsWith(ActionSegment.LOGIN.getUri())
 				&& HttpMethod.POST == httpRequest.getMethod();
 	}
 
@@ -37,8 +34,8 @@ public class MemberService {
 		return memberInfo.get("password").equals(user.getPassword());
 	}
 
-	public boolean isMemberListRequest(HttpRequest httpRequest) {
-		return httpRequest.getPath().startsWith(USER_LIST_REQUEST)
+	public boolean isMembersReq(HttpRequest httpRequest) {
+		return httpRequest.getPath().startsWith(ActionSegment.LIST.getUri())
 				&& HttpMethod.GET == httpRequest.getMethod();
 	}
 

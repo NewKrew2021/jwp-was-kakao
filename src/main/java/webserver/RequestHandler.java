@@ -23,7 +23,6 @@ import java.util.List;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final String DEFAULT_RESPONSE = "Hello World";
     private static final MemberService memberService = new MemberService();
     private static final Handlebars handlebars;
     private Socket connection;
@@ -52,12 +51,12 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse httpResponse = new HttpResponse(dos);
-            if (memberService.isMemberJoinRequst(httpRequest)) {
+            if (memberService.isJoinReq(httpRequest)) {
                 memberService.joinMember(httpRequest.getRequestParam());
                 httpResponse.response302Header("/index.html", "");
                 return;
             }
-            if (memberService.memberLoginRequest(httpRequest)) {
+            if (memberService.isLoginReq(httpRequest)) {
                 boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
                 if (!isLogin) {
                     httpResponse.response302Header("/user/login_failed.html", "Set-Cookie: logined=false;");
@@ -66,36 +65,22 @@ public class RequestHandler implements Runnable {
                 httpResponse.response302Header("/index.html", "Set-Cookie: logined=true;");
                 return;
             }
-            if (memberService.isMemberListRequest(httpRequest)) {
+            if (memberService.isMembersReq(httpRequest)) {
                 if (requstParser.isLoginCookie(httpRequest.getCookies())) {
                     List<User> members = memberService.getAllMembers();
                     Template template = handlebars.compile("user/list");
 
                     byte[] body = template.apply(members).getBytes();
-                    httpResponse.response200Header(body, httpRequest.getMimeType());
+                    httpResponse.response200Header(httpRequest);
                     return;
                 }
                 httpResponse.response302Header("/user/login.html", "Set-Cookie: logined=false;");
                 return;
             }
-            byte[] body = getBody(httpRequest.getPath());
-            httpResponse.response200Header(body, httpRequest.getMimeType());
+            httpResponse.response200Header(httpRequest);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private byte[] getBody(String requestPath) {
-        logger.debug("requestPath : {}", requestPath);
-        try {
-            if ("/".equals(requestPath)) {
-                return DEFAULT_RESPONSE.getBytes();
-            }
-            return FileIoUtils.loadFileFromClasspath(RequestPathUtils.getResourcePath(requestPath));
-        } catch (IOException | URISyntaxException ex) {
-            logger.error(ex.getMessage());
-        }
-        return DEFAULT_RESPONSE.getBytes();
     }
 
     private void printRequestHeaders(List<HttpHeader> headers) {

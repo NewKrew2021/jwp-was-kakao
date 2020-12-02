@@ -106,9 +106,9 @@ public class HttpRequstParser {
 
 	public boolean isLoginCookie(Map<String, String> cookies) {
 		return cookies.keySet().stream()
-				.filter(key -> "logined".equals(key)
-						&& "true".equals(cookies.get(key)))
-				.findAny().isPresent();
+				.filter(key -> "logined".equals(key) && "true".equals(cookies.get(key)))
+				.findAny()
+				.isPresent();
 	}
 
 	private MimeType getMimeType(String path) {

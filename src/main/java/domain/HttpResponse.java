@@ -1,20 +1,26 @@
 package domain;
 
+import utils.FileIoUtils;
+import utils.RequestPathUtils;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class HttpResponse {
+	private static final String DEFAULT_RESPONSE = "Hello World";
 	private DataOutputStream dos;
 
 	public HttpResponse(DataOutputStream dos) {
 		this.dos = dos;
 	}
 
-	public void response200Header(byte[] body, MimeType mimeType) {
+	public void response200Header(HttpRequest httpRequest) {
+		byte[] body = getBody(httpRequest.getPath());
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			if (mimeType != null) {
-				dos.writeBytes("Content-Type: " + mimeType.getType() + "\r\n");
+			if (httpRequest.getMimeType() != null) {
+				dos.writeBytes("Content-Type: " + httpRequest.getMimeType().getType() + "\r\n");
 			}
 			dos.writeBytes("Content-Length: " + body.length + "\r\n");
 			dos.writeBytes("\r\n");
@@ -34,6 +40,17 @@ public class HttpResponse {
 			}
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
+			throw new RuntimeException();
+		}
+	}
+
+	private byte[] getBody(String requestPath) {
+		try {
+			if ("/".equals(requestPath)) {
+				return DEFAULT_RESPONSE.getBytes();
+			}
+			return FileIoUtils.loadFileFromClasspath(RequestPathUtils.getResourcePath(requestPath));
+		} catch (IOException | URISyntaxException ex) {
 			throw new RuntimeException();
 		}
 	}
