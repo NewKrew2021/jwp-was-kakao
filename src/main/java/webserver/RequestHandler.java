@@ -4,7 +4,8 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
-import domain.HttpRequestHeader;
+import domain.HttpHeader;
+import domain.HttpRequest;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -46,17 +46,17 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             HttpRequstParser requstParser = new HttpRequstParser(bufferedReader);
-            List<HttpRequestHeader> headers = requstParser.getRequestHeaders();
-            printRequestHeaders(headers); //헤더 출력
+            HttpRequest httpRequest = requstParser.requestParse();
+            printRequestHeaders(httpRequest.getHeaders()); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
-            if (memberService.isMemberJoinRequst(requstParser)) {
-                memberService.joinMember(getMemberInfo(requstParser, headers));
+            if (memberService.isMemberJoinRequst(httpRequest)) {
+                memberService.joinMember(httpRequest.getRequestParam());
                 response302Header(dos, "/index.html", "");
                 return;
             }
-            if (memberService.memberLoginRequest(requstParser)) {
-                boolean isLogin = memberService.memberLogin(getMemberInfo(requstParser, headers));
+            if (memberService.memberLoginRequest(httpRequest)) {
+                boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
                 if (!isLogin) {
                     response302Header(dos, "/user/login_failed.html", "Set-Cookie: logined=false;");
                     return;
@@ -64,30 +64,29 @@ public class RequestHandler implements Runnable {
                 response302Header(dos, "/index.html", "Set-Cookie: logined=true;");
                 return;
             }
-            if (memberService.isMemberListRequest(requstParser)) {
-                if (requstParser.isLoginCookie(headers)) {
+            if (memberService.isMemberListRequest(httpRequest)) {
+                if (requstParser.isLoginCookie(httpRequest.getCookies())) {
                     System.out.println("isLoginCookie!!!!");
                     List<User> members = memberService.getAllMembers();
                     Template template = handlebars.compile("user/list");
 
                     byte[] body = template.apply(members).getBytes();
-                    response200Header(dos, body.length, requstParser.getContentType());
+                    response200Header(dos, body.length, httpRequest.getMimeType().getType());
                     responseBody(dos, body);
                     return;
                 }
                 response302Header(dos, "/user/login.html", "Set-Cookie: logined=false;");
                 return;
             }
-            byte[] body = getBody(requstParser);
-            response200Header(dos, body.length, requstParser.getContentType());
+            byte[] body = getBody(httpRequest.getPath());
+            response200Header(dos, body.length, httpRequest.getMimeType().getType());
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private byte[] getBody(HttpRequstParser requstParser) {
-        final String requestPath = requstParser.getRequestPath();
+    private byte[] getBody(String requestPath) {
         logger.debug("requestPath : {}", requestPath);
         try {
             if ("/".equals(requestPath)) {
@@ -100,13 +99,8 @@ public class RequestHandler implements Runnable {
         return DEFAULT_RESPONSE.getBytes();
     }
 
-    private void printRequestHeaders(List<HttpRequestHeader> headers) {
+    private void printRequestHeaders(List<HttpHeader> headers) {
         headers.forEach(header -> logger.debug(header.toString()));
-    }
-
-    protected Map<String, String> getMemberInfo(HttpRequstParser requstParser, List<HttpRequestHeader> headers) {
-        String requestBody = requstParser.getRequestBody(headers);
-        return requstParser.getRequstParameters(requestBody);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {

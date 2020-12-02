@@ -1,7 +1,7 @@
 package service;
 
 import db.DataBase;
-import domain.HttpRequestHeader;
+import domain.HttpRequest;
 import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,20 +19,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MemberServiceTest {
 	private MemberService underTest = new MemberService();
 	private HttpRequstParser httpRequstParser;
-	private List<HttpRequestHeader> headers;
+	private HttpRequest httpRequest;
 
 	@Test
 	@DisplayName("회원가입요청인지 확인한다.")
 	public void isJoinMemberTest() {
 		joinMemberRequestData();
-		assertTrue(underTest.isMemberJoinRequst(httpRequstParser));
+		assertTrue(underTest.isMemberJoinRequst(httpRequest));
 	}
 
 	@Test
 	@DisplayName("회원가입시 유저 정보를 저장한다")
 	public void joinMemberTest() {
 		joinMemberRequestData();
-		underTest.joinMember(getMemberInfo(httpRequstParser, headers));
+		underTest.joinMember(httpRequest.getRequestParam());
 		User user = DataBase.findUserById("adeldel");
 		assertThat(user.getName()).isEqualTo("adeldel");
 		assertThat(user.getPassword()).isEqualTo("password");
@@ -43,27 +42,27 @@ public class MemberServiceTest {
 	@DisplayName("로그인 요청인지 확인한다.")
 	public void memberLoginRequestTest() {
 		loginRequstData("password");
-		assertTrue(underTest.memberLoginRequest(httpRequstParser));
+		assertTrue(underTest.memberLoginRequest(httpRequest));
 	}
 
 	@Test
 	@DisplayName("로그인시 유저정보를 확인한다.")
 	public void loginRequestTest() {
 		joinMemberRequestData();
-		underTest.joinMember(getMemberInfo(httpRequstParser, headers));
+		underTest.joinMember(httpRequest.getRequestParam());
 
 		loginRequstData("password");
-		assertTrue(underTest.memberLogin(getMemberInfo(httpRequstParser, headers)));
+		assertTrue(underTest.memberLogin(httpRequest.getRequestParam()));
 
 		loginRequstData("wrong_password");
-		assertFalse(underTest.memberLogin(getMemberInfo(httpRequstParser, headers)));
+		assertFalse(underTest.memberLogin(httpRequest.getRequestParam()));
 	}
 
 	@Test
 	@DisplayName("회원목록 호출인지  확인한다.")
 	public void isMemberListRequestTest() {
 		setListRequestData();
-		assertTrue(underTest.isMemberListRequest(httpRequstParser));
+		assertTrue(underTest.isMemberListRequest(httpRequest));
 	}
 
 	@Test
@@ -71,7 +70,7 @@ public class MemberServiceTest {
 	public void getAllMembersTest() {
 		//회원가입
 		joinMemberRequestData();
-		underTest.joinMember(getMemberInfo(httpRequstParser, headers));
+		underTest.joinMember(httpRequest.getRequestParam());
 		//모든회원 조회
 		List<User> members = underTest.getAllMembers();
 		assertThat(members).hasSize(1);
@@ -87,8 +86,7 @@ public class MemberServiceTest {
 				"Accept: */*\n\n" +
 				"userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
 
-		httpRequstParser = new HttpRequstParser(new BufferedReader(reader));
-		headers = httpRequstParser.getRequestHeaders();
+		makeHttpRequest(reader);
 	}
 
 	private void loginRequstData(String password) {
@@ -100,8 +98,7 @@ public class MemberServiceTest {
 				"Accept: */*\n\n" +
 				"userId=adeldel&password=" + password);
 
-		httpRequstParser = new HttpRequstParser(new BufferedReader(reader));
-		headers = httpRequstParser.getRequestHeaders();
+		makeHttpRequest(reader);
 	}
 
 	private void setListRequestData() {
@@ -111,11 +108,12 @@ public class MemberServiceTest {
 				"Content-Type: application/x-www-form-urlencoded\n" +
 				"Accept: */*\n\n");
 
-		httpRequstParser = new HttpRequstParser(new BufferedReader(reader));
-		headers = httpRequstParser.getRequestHeaders();
+		makeHttpRequest(reader);
 	}
-	private Map<String, String> getMemberInfo(HttpRequstParser requstParser, List<HttpRequestHeader> headers) {
-		String requestBody = requstParser.getRequestBody(headers);
-		return requstParser.getRequstParameters(requestBody);
+
+	private void makeHttpRequest(Reader reader) {
+		httpRequstParser = new HttpRequstParser(new BufferedReader(reader));
+		httpRequest = httpRequstParser.requestParse();
+
 	}
 }

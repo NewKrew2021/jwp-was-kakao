@@ -1,7 +1,8 @@
 package utils;
 
-import domain.HttpRequestHeader;
-import org.junit.jupiter.api.BeforeEach;
+import domain.HttpHeader;
+import domain.HttpRequest;
+import domain.MimeType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,24 +17,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HttpRequestParserTest {
 	private HttpRequstParser underTest;
+	private HttpRequest httpRequest;
 
 	@Test
 	@DisplayName("요청헤더를 가져온다.")
 	public void getRequestHeadersTest() {
 		setRequestData();
-		List<HttpRequestHeader> headers = underTest.getRequestHeaders();
+		List<HttpHeader> headers = httpRequest.getHeaders();
 
 		assertThat(headers).hasSize(3);
 		headers.forEach(header -> System.out.println(header.toString()));
-		assertThat(headers.get(0).toString()).isEqualTo(new HttpRequestHeader("Host", "localhost:8080").toString());
+		assertThat(headers.get(0).toString()).isEqualTo(new HttpHeader("Host", "localhost:8080").toString());
 	}
 
 	@Test
 	@DisplayName("요청 requestPath를 얻을 수 있다.")
 	public void getRequestPathTest() {
 		setRequestData();
-		underTest.getRequestHeaders();
-		assertThat(underTest.getRequestPath()).isEqualTo("/index.html");
+		assertThat(httpRequest.getPath()).isEqualTo("/index.html");
 	}
 
 	@Test
@@ -53,7 +54,7 @@ public class HttpRequestParserTest {
 	@DisplayName("Post body 데이터를 가져온다.")
 	public void getRequestBodyTest() {
 		setPostRequestData();
-		String requestBody = underTest.getRequestBody(underTest.getRequestHeaders());
+		String requestBody = httpRequest.getBody();
 		assertThat(requestBody).isEqualTo("userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
 	}
 
@@ -61,7 +62,7 @@ public class HttpRequestParserTest {
 	@DisplayName("응답데이터의 컨텐츠 타입을 요청주소에 따라 변경한다.")
 	public void getContentTypeTest() {
 		setStyleSheetsData();
-		assertThat(underTest.getContentType()).isEqualTo("text/css");
+		assertThat(httpRequest.getMimeType()).isEqualTo(MimeType.CSS);
 	}
 
 	private void setRequestData() {
@@ -71,6 +72,7 @@ public class HttpRequestParserTest {
 				"Accept: */*\n\n");
 
 		underTest = new HttpRequstParser(new BufferedReader(reader));
+		httpRequest =  underTest.requestParse();
 	}
 
 	private void setPostRequestData() {
@@ -83,6 +85,7 @@ public class HttpRequestParserTest {
 				"userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
 
 		underTest = new HttpRequstParser(new BufferedReader(reader));
+		httpRequest = underTest.requestParse();
 	}
 
 	private void setStyleSheetsData() {
@@ -93,6 +96,6 @@ public class HttpRequestParserTest {
 				"Accept: */*\n\n");
 
 		underTest = new HttpRequstParser(new BufferedReader(reader));
-		underTest.getRequestHeaders();
+		httpRequest = underTest.requestParse();
 	}
 }
