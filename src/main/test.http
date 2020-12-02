@@ -1,0 +1,22 @@
+### index.html 페이지
+GET http://localhost:8080/index.html
+
+### 회원가입 페이지
+GET http://localhost:8080/user/form.html
+
+### 회원가입
+GET http://localhost:8080/user/create?userId=nio&password=password&name=최세환&email=sehan.choi@gmail.com
+
+###
+POST http://localhost:8080/user/create
+Content-Type: application/json
+
+### 회원가입 POST
+POST http://localhost:8080/user/create
+Content-Type: application/x-www-form-urlencoded
+
+userId=nio&password=password&name=%EC%B5%9C%EC%84%B8%ED%99%98&email=sehan.choi%40gmail.com
+### 유저 리스트
+GET http://localhost:8080/user/list
+
+###

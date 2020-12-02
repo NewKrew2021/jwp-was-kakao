@@ -7,3 +7,19 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+
+## Todo
+* 인증이 필요한 페이지는 인증정보가 있어야 접근 할 수 있다 
+
+## Done
+* ~~모든 request header 출력~~
+* ~~HttpRequest 에서 Request-Line 추출~~
+* ~~Request URI 를 로딩하여 응답으로 내려주기~~
+* ~~static resource 요청처리~~
+* ~~회원가입요청 처리~~
+* ~~POST 요청처리~~
+* ~~response message 출력~~
+* ~~회원가입 완료 후 index.html 페이지로 자동으로 이동 ( redirect )~~
+* ~~로그인성공시 index.html 로 실패시 user/login_failed.html 페이지로 이동~~
+* ~~로그인성공시 쿠키설정~~
