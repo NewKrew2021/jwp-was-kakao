@@ -1,8 +1,10 @@
-package webserver.http;
+package webserver.http.parser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.IOUtils;
+import webserver.http.HttpMethod;
+import webserver.http.HttpRequest;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -31,11 +33,7 @@ public class HttpRequestParser {
             inputLine = br.readLine();
         }
 
-        if (headers.containsKey(HEADER_CONTENT_LENGTH)) {
-            int contentLength = Integer.parseInt(headers.get(HEADER_CONTENT_LENGTH));
-
-            body = IOUtils.readData(br, contentLength);
-        }
+        readBody(br);
 
         logger.debug("method={}, path={}", method, path);
         logger.debug("parameters : {}", parameters);
@@ -43,12 +41,9 @@ public class HttpRequestParser {
         return new HttpRequest(method, path, parameters, headers, body);
     }
 
-    private void handleLine(String inputLine) throws UnsupportedEncodingException {
+    private void handleLine(String inputLine) {
         if (isFirstLine()) {
-            String urlDecoded = URLDecoder.decode(inputLine, "utf-8");
-            String[] firstLine = urlDecoded.split(" ");
-            method = HttpMethod.valueOf(firstLine[0].trim());
-            parsePathAndParameters(firstLine[1]);
+            handleFirstLine(inputLine);
             return;
         }
         String[] headerLine = inputLine.split(":", 2);
@@ -59,11 +54,30 @@ public class HttpRequestParser {
         return method == null && path == null && parameters.isEmpty();
     }
 
+    private void handleFirstLine(String firstLine) {
+        try {
+            String urlDecoded = URLDecoder.decode(firstLine, "utf-8");
+            String[] token = urlDecoded.split(" ");
+            method = HttpMethod.valueOf(token[0].trim());
+            parsePathAndParameters(token[1]);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UnsupportedEncodingException : " + e.getMessage());
+        }
+    }
+
     private void parsePathAndParameters(String pathAndParams) {
         String[] tokens = pathAndParams.split("[?&]");
         path = tokens[0];
         Stream.of(tokens).skip(1)
                 .map(param -> param.split("="))
                 .forEach(p -> parameters.put(p[0], p[1]));
+    }
+
+    private void readBody(BufferedReader br) throws IOException {
+        if (!headers.containsKey(HEADER_CONTENT_LENGTH)) {
+            return;
+        }
+        int contentLength = Integer.parseInt(headers.get(HEADER_CONTENT_LENGTH));
+        body = IOUtils.readData(br, contentLength);
     }
 }

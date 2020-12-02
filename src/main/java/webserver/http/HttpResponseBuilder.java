@@ -13,14 +13,14 @@ public class HttpResponseBuilder {
         return this;
     }
 
-    public HttpResponseBuilder withBody(byte[] body) {
-        response.setBody(body);
-        return this;
-    }
-
     public HttpResponseBuilder with302Redirect(String location) {
         response.setResponseCode(HttpCode._302);
         response.addHeader(HttpHeaders.LOCATION, location);
+        return this;
+    }
+
+    public HttpResponseBuilder withBody(byte[] body) {
+        response.setBody(body);
         return this;
     }
 

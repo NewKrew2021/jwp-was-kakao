@@ -8,7 +8,6 @@ public enum HttpCode {
     _405("405", "Method Not Allowed"),
     _500("500", "Internal Server Error");
 
-
     private final String statusCode;
     private final String message;
 

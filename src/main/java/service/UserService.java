@@ -4,8 +4,11 @@ import db.DataBase;
 import model.User;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class UserService {
+    public static final String LOGINED_KEY = "logined";
+    public static final String LOGINED_VALUE = "true";
 
     public static void addNewUser(String userId, String password, String name, String email) {
         DataBase.addUser(new User(userId, password, name, email));
@@ -25,4 +28,10 @@ public class UserService {
         return DataBase.findAll();
     }
 
+    public static boolean isLogined(Map<String, String> cookie) {
+        if (!cookie.containsKey(LOGINED_KEY)) {
+            return false;
+        }
+        return LOGINED_VALUE.equals(cookie.get(LOGINED_KEY));
+    }
 }

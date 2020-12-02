@@ -31,7 +31,7 @@ public class UserLoginController extends Controller {
     }
 
     private HttpResponse loginSuccess() {
-        SetCookie setCookie = new SetCookie("logined", "true");
+        SetCookie setCookie = new SetCookie(UserService.LOGINED_KEY, UserService.LOGINED_VALUE);
         setCookie.setPath("/");
 
         return new HttpResponseBuilder()

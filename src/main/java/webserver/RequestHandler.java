@@ -2,18 +2,13 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import context.ApplicationContext;
 import controller.Controller;
-import exceptions.NoSuchResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.HttpRequest;
-import webserver.http.HttpRequestParser;
+import webserver.http.parser.HttpRequestParser;
 import webserver.http.HttpResponse;
 
 public class RequestHandler implements Runnable {
@@ -40,5 +35,4 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
-
 }

@@ -1,4 +1,4 @@
-package webserver.http;
+package webserver.http.parser;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

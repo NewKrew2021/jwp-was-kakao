@@ -1,9 +1,9 @@
 package webserver.http;
 
 import org.junit.jupiter.api.Test;
+import webserver.http.parser.HttpRequestParser;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

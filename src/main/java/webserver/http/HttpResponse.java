@@ -18,10 +18,11 @@ public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
     private HttpCode responseCode = HttpCode._200;
-    private Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> headers;
     private byte[] body;
 
     public HttpResponse() {
+        headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, ContentType.TEXT_HTML_UTF8);
     }
 
@@ -48,44 +49,34 @@ public class HttpResponse {
     }
 
     public void response(OutputStream out) {
-        DataOutputStream dos = new DataOutputStream(out);
-        writeResponseCodeHeader(dos);
-
-        writeHeaders(dos);
-
-        if (body != null) {
+        try (DataOutputStream dos = new DataOutputStream(out)) {
+            writeResponseCodeHeader(dos);
+            writeHeaders(dos);
             writeResponseBody(dos);
-        }
-    }
-
-    private void writeResponseCodeHeader(DataOutputStream dos) {
-        try {
-            String responseCodeHeader = String.format("HTTP/1.1 %s %s \r\n", responseCode.getStatusCode(), responseCode.getMessage());
-            dos.writeBytes(responseCodeHeader);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void writeHeaders(DataOutputStream dos) {
-        headers.forEach((key, value) -> {
-            String header = String.format("%s: %s \r\n", key, value);
-            try {
-                dos.writeBytes(header);
-            } catch (IOException e) {
-                logger.error(e.getMessage());
-            }
-        });
-    }
-
-    private void writeResponseBody(DataOutputStream dos) {
-        try {
-            dos.writeBytes("Content-Length: " +  body.length + "\r\n");
-            dos.writeBytes("\r\n");
-            dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    private void writeResponseCodeHeader(DataOutputStream dos) throws IOException {
+        String responseCodeHeader = String.format("HTTP/1.1 %s %s \r\n", responseCode.getStatusCode(), responseCode.getMessage());
+        dos.writeBytes(responseCodeHeader);
+    }
+
+    private void writeHeaders(DataOutputStream dos) throws IOException {
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            String header = String.format("%s: %s \r\n", entry.getKey(), entry.getValue());
+            dos.writeBytes(header);
+        }
+    }
+
+    private void writeResponseBody(DataOutputStream dos) throws IOException {
+        if (body == null) {
+            return;
+        }
+        dos.writeBytes("Content-Length: " +  body.length + "\r\n");
+        dos.writeBytes("\r\n");
+        dos.write(body, 0, body.length);
     }
 }
