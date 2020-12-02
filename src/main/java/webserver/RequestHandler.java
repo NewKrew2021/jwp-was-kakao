@@ -6,6 +6,7 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import domain.HttpHeader;
 import domain.HttpRequest;
+import domain.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,37 +51,35 @@ public class RequestHandler implements Runnable {
             printRequestHeaders(httpRequest.getHeaders()); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
+            HttpResponse httpResponse = new HttpResponse(dos);
             if (memberService.isMemberJoinRequst(httpRequest)) {
                 memberService.joinMember(httpRequest.getRequestParam());
-                response302Header(dos, "/index.html", "");
+                httpResponse.response302Header("/index.html", "");
                 return;
             }
             if (memberService.memberLoginRequest(httpRequest)) {
                 boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
                 if (!isLogin) {
-                    response302Header(dos, "/user/login_failed.html", "Set-Cookie: logined=false;");
+                    httpResponse.response302Header("/user/login_failed.html", "Set-Cookie: logined=false;");
                     return;
                 }
-                response302Header(dos, "/index.html", "Set-Cookie: logined=true;");
+                httpResponse.response302Header("/index.html", "Set-Cookie: logined=true;");
                 return;
             }
             if (memberService.isMemberListRequest(httpRequest)) {
                 if (requstParser.isLoginCookie(httpRequest.getCookies())) {
-                    System.out.println("isLoginCookie!!!!");
                     List<User> members = memberService.getAllMembers();
                     Template template = handlebars.compile("user/list");
 
                     byte[] body = template.apply(members).getBytes();
-                    response200Header(dos, body.length, httpRequest.getMimeType().getType());
-                    responseBody(dos, body);
+                    httpResponse.response200Header(body, httpRequest.getMimeType());
                     return;
                 }
-                response302Header(dos, "/user/login.html", "Set-Cookie: logined=false;");
+                httpResponse.response302Header("/user/login.html", "Set-Cookie: logined=false;");
                 return;
             }
             byte[] body = getBody(httpRequest.getPath());
-            response200Header(dos, body.length, httpRequest.getMimeType().getType());
-            responseBody(dos, body);
+            httpResponse.response200Header(body, httpRequest.getMimeType());
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -101,40 +100,5 @@ public class RequestHandler implements Runnable {
 
     private void printRequestHeaders(List<HttpHeader> headers) {
         headers.forEach(header -> logger.debug(header.toString()));
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            if (!contentType.isEmpty()) {
-                dos.writeBytes("Content-Type: " + contentType + "\r\n");
-            }
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String location, String cookie) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            if (!cookie.isEmpty()) {
-                dos.writeBytes(cookie + " Path=/" + "\r\n");
-            }
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
     }
 }
