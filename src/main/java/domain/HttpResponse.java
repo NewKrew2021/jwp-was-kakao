@@ -16,7 +16,9 @@ public class HttpResponse {
 	}
 
 	public void response200Header(HttpRequest httpRequest) {
-		byte[] body = getBody(httpRequest.getPath());
+		this.response200Header(getBody(httpRequest.getPath()), httpRequest);
+	}
+	public void response200Header(byte[] body, HttpRequest httpRequest) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
 			if (httpRequest.getMimeType() != null) {
@@ -44,7 +46,7 @@ public class HttpResponse {
 		}
 	}
 
-	private byte[] getBody(String requestPath) {
+	public byte[] getBody(String requestPath) {
 		try {
 			if ("/".equals(requestPath)) {
 				return DEFAULT_RESPONSE.getBytes();

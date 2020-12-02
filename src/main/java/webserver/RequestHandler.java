@@ -71,7 +71,7 @@ public class RequestHandler implements Runnable {
                     Template template = handlebars.compile("user/list");
 
                     byte[] body = template.apply(members).getBytes();
-                    httpResponse.response200Header(httpRequest);
+                    httpResponse.response200Header(body, httpRequest);
                     return;
                 }
                 httpResponse.response302Header("/user/login.html", "Set-Cookie: logined=false;");
