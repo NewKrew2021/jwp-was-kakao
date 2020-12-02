@@ -16,6 +16,8 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
 
     public void dispatch(HttpRequest httpRequest, HttpResponse httpResponse) {
         Controller controller = httpRequestMapper.getTarget(httpRequest);
+        if( controller == null ) throw new NotFoundException(httpRequest.getPath());
+
         try {
             controller.execute(httpRequest, httpResponse);
         } catch (RuntimeException e) {
