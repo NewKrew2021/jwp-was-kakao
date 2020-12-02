@@ -6,6 +6,7 @@ public enum UserAction {
 	LIST("/user/list");
 
 	private final String uri;
+
 	UserAction(String uri) {
 		this.uri = uri;
 	}
