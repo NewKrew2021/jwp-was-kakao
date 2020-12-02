@@ -30,7 +30,7 @@ public class RequiredParamConstraint implements RequestDataObjectValidator {
     }
 
     private void shouldHaveValue(List<HttpRequestParam> params, List<String> notEmptyParams) {
-        params.stream().forEach(it -> {
+        params.forEach(it -> {
             if (notEmptyParams.contains(it.getName()) && StringUtils.isEmpty(it.getValue()))
                 throw new NotEmptyParamException(it.getName());
         });
