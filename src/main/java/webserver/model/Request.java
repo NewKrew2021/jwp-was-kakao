@@ -2,11 +2,9 @@ package webserver.model;
 
 import utils.FileIoUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -56,7 +54,19 @@ public class Request {
         }
         return querySplitPattern.splitAsStream(query)
                 .map(keyValuePattern::split)
-                .collect(Collectors.toMap(s -> s[0], s -> s[1], (l, r) -> l));
+                .collect(Collectors.toMap(s -> s[0], s -> safeDecode(s[1]), (l, r) -> l));
+    }
+
+    private static String safeDecode(String encodedUrl) {
+        try {
+            return URLDecoder.decode(encodedUrl, "utf8");
+        } catch (UnsupportedEncodingException e) {
+            return encodedUrl;
+        }
+    }
+
+    public String getPath() {
+        return path;
     }
 
     public byte[] getRequestedResource() throws IOException, URISyntaxException {

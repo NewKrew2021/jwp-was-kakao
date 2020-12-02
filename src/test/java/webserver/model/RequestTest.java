@@ -2,6 +2,7 @@ package webserver.model;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -59,5 +60,17 @@ public class RequestTest {
     void parameter(String queryKey, String expected, String requestLine) throws IOException {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
         Assertions.assertThat(new Request(in).getParameter(queryKey)).isEqualTo(expected);
+    }
+
+    @Test
+    void createUser() throws IOException {
+        String requestLine =
+                "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
+        InputStream in = new ByteArrayInputStream(requestLine.getBytes());
+        Assertions.assertThat(new Request(in).getParameters())
+                .containsEntry("password", "password")
+                .containsEntry("name", "박재성")
+                .containsEntry("userId", "javajigi")
+                .containsEntry("email", "javajigi@slipp.net");
     }
 }

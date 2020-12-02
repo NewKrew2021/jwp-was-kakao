@@ -1,12 +1,14 @@
 package webserver;
 
+import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.model.HttpStatus;
+import webserver.model.Request;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import webserver.model.Request;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -22,22 +24,36 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            handle(new Request(in),  new DataOutputStream(out));
+            Request request = new Request(in);
+            DataOutputStream dos = new DataOutputStream(out);
+
+            if (request.getPath().equals("/user/create")) {
+                handleUserCreate(request, dos);
+                return;
+            }
+
+            handleStatic(request, dos);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void handle(Request request, DataOutputStream dos) {
+    private void handleUserCreate(Request request, DataOutputStream dos) {
+        User user = new User(
+                request.getParameter("userId"),
+                request.getParameter("password"),
+                request.getParameter("name"),
+                request.getParameter("email")
+        );
+    }
+
+    private void handleStatic(Request request, DataOutputStream dos) throws IOException {
         try {
             byte[] body = request.getRequestedResource();
             response200Header(dos, body.length);
             responseBody(dos, body);
-        } catch (IOException e) {
-            // TODO: response with 5xx
-            e.printStackTrace();
         } catch (URISyntaxException | NullPointerException e) {
-            response404Header(dos);
+            responseHeaderOnly(dos, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -52,9 +68,10 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response404Header(DataOutputStream dos) {
+    private void responseHeaderOnly(DataOutputStream dos, HttpStatus status) {
         ResponseWriter writer = new ResponseWriter(dos);
-        writer.println("HTTP/1.1 404 NOT FOUND");
+        writer.format("HTTP/1.1 %d %s", status.getCode(), status.getMessage());
+        writer.println();
         writer.println();
         writer.flush();
     }
