@@ -1,7 +1,7 @@
 package service;
 
 import db.DataBase;
-import domain.ActionSegment;
+import domain.UserAction;
 import domain.HttpMethod;
 import domain.HttpRequest;
 import model.User;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class MemberService {
 	public boolean isJoinReq(HttpRequest httpRequest) {
-		return httpRequest.getPath().startsWith(ActionSegment.JOIN.getUri())
+		return httpRequest.getPath().startsWith(UserAction.JOIN.getUri())
 				&& HttpMethod.POST == httpRequest.getMethod();
 	}
 
@@ -22,7 +22,7 @@ public class MemberService {
 	}
 
 	public boolean isLoginReq(HttpRequest httpRequest) {
-		return httpRequest.getPath().startsWith(ActionSegment.LOGIN.getUri())
+		return httpRequest.getPath().startsWith(UserAction.LOGIN.getUri())
 				&& HttpMethod.POST == httpRequest.getMethod();
 	}
 
@@ -35,7 +35,7 @@ public class MemberService {
 	}
 
 	public boolean isMembersReq(HttpRequest httpRequest) {
-		return httpRequest.getPath().startsWith(ActionSegment.LIST.getUri())
+		return httpRequest.getPath().startsWith(UserAction.LIST.getUri())
 				&& HttpMethod.GET == httpRequest.getMethod();
 	}
 
