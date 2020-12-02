@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import domain.HttpHeader;
 import domain.HttpMethod;
 import domain.HttpRequest;
-import domain.MimeType;
+import domain.ContentType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class HttpRequstParser {
 			httpRequest.setRequestParam(getQueryMap(requestBody));
 		}
 		httpRequest.setCookies(getCookies(headers));
-		httpRequest.setMimeType(getMimeType(requestPath));
+		httpRequest.setContentType(getMimeType(requestPath));
 		return httpRequest;
 	}
 
@@ -119,11 +119,11 @@ public class HttpRequstParser {
 				.isPresent();
 	}
 
-	private MimeType getMimeType(String path) {
+	private ContentType getMimeType(String path) {
 		if (path.endsWith(".css"))
-			return MimeType.CSS;
+			return ContentType.CSS;
 		if (path.endsWith(".js"))
-			return MimeType.JS;
-		return MimeType.HTML;
+			return ContentType.JS;
+		return ContentType.HTML;
 	}
 }

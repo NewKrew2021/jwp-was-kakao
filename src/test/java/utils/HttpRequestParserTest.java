@@ -2,7 +2,7 @@ package utils;
 
 import domain.HttpHeader;
 import domain.HttpRequest;
-import domain.MimeType;
+import domain.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -62,7 +62,7 @@ public class HttpRequestParserTest {
 	@DisplayName("응답데이터의 컨텐츠 타입을 요청주소에 따라 변경한다.")
 	public void getContentTypeTest() {
 		setStyleSheetsData();
-		assertThat(httpRequest.getMimeType()).isEqualTo(MimeType.CSS);
+		assertThat(httpRequest.getContentType()).isEqualTo(ContentType.CSS);
 	}
 
 	@Test

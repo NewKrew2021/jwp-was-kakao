@@ -9,7 +9,7 @@ public class HttpRequest {
 	private String path;
 	private Map<String, String> requestParam;
 	private Map<String, String> cookies;
-	private MimeType mimeType;
+	private ContentType contentType;
 	private String body;
 
 	public HttpRequest(HttpMethod method, List<HttpHeader> headers, String path) {
@@ -54,11 +54,11 @@ public class HttpRequest {
 		this.body = body;
 	}
 
-	public MimeType getMimeType() {
-		return mimeType;
+	public ContentType getContentType() {
+		return contentType;
 	}
 
-	public void setMimeType(MimeType mimeType) {
-		this.mimeType = mimeType;
+	public void setContentType(ContentType contentType) {
+		this.contentType = contentType;
 	}
 }

@@ -21,8 +21,8 @@ public class HttpResponse {
 	public void response200Header(byte[] body, HttpRequest httpRequest) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			if (httpRequest.getMimeType() != null) {
-				dos.writeBytes("Content-Type: " + httpRequest.getMimeType().getType() + "\r\n");
+			if (httpRequest.getContentType() != null) {
+				dos.writeBytes("Content-Type: " + httpRequest.getContentType().getType() + "\r\n");
 			}
 			dos.writeBytes("Content-Length: " + body.length + "\r\n");
 			dos.writeBytes("\r\n");
