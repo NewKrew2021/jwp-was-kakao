@@ -65,6 +65,15 @@ public class HttpRequestParserTest {
 		assertThat(httpRequest.getMimeType()).isEqualTo(MimeType.CSS);
 	}
 
+	@Test
+	@DisplayName("쿼리파람 디코딩 테스트")
+	public void decodeTest() {
+		setPostRequestData();
+		Map<String, String> requestParam = underTest.getRequstParameters(httpRequest.getBody());
+		assertThat(underTest.decodeQueryParam(requestParam.get("email"))).isEqualTo("adel@daum.net");
+		assertThat(underTest.decodeQueryParam("%EC%95%84%EB%8D%B8%EB%8D%B8")).isEqualTo("아델델");
+
+	}
 	private void setRequestData() {
 		Reader reader = new StringReader("GET /index.html HTTP/1.1\n" +
 				"Host: localhost:8080\n" +

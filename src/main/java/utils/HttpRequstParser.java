@@ -9,6 +9,8 @@ import domain.MimeType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +45,7 @@ public class HttpRequstParser {
 			}
 			return makeHttpRequest(headers, httpMethod, requestPath);
 		} catch (IOException ex) {
-			throw new RuntimeException("");
+			throw new RuntimeException("요청 파싱하는 데이터에 문제가 있습니다.");
 		}
 	}
 
@@ -67,9 +69,8 @@ public class HttpRequstParser {
 					.orElse(new HttpHeader(CONTENT_LENGTH, "0"));
 			return IOUtils.readData(bufferedReader, Integer.valueOf(contentLengthHeader.getValue()));
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException("컨텐츠 데이터를 가져오는데 오류입니다.");
 		}
-		return "";
 	}
 
 	protected Map<String, String> getRequstParameters(String requestBody) {
@@ -87,11 +88,18 @@ public class HttpRequstParser {
 		for (String param : params) {
 			String name = param.split("=")[0];
 			String value = param.split("=")[1];
-			parameters.put(name, value);
+			parameters.put(name, decodeQueryParam(value));
 		}
 		return parameters;
 	}
 
+	protected String decodeQueryParam(String value) {
+		try {
+			return URLDecoder.decode(value, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("문자 디코딩에 실패하였습니다.");
+		}
+	}
 	private Map<String, String> getCookies(List<HttpHeader> headers) {
 		HttpHeader cookieHeader = headers.stream()
 				.filter(header -> "Cookie".equals(header.getKey()))

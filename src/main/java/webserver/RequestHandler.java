@@ -50,34 +50,28 @@ public class RequestHandler implements Runnable {
             printRequestHeaders(httpRequest.getHeaders()); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse httpResponse = new HttpResponse(dos);
+            HttpResponse response = new HttpResponse(dos);
             if (memberService.isJoinReq(httpRequest)) {
                 memberService.joinMember(httpRequest.getRequestParam());
-                httpResponse.response302Header("/index.html", "");
-                return;
+                response.response302Header("/index.html", "");
             }
             if (memberService.isLoginReq(httpRequest)) {
                 boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
                 if (!isLogin) {
-                    httpResponse.response302Header("/user/login_failed.html", "Set-Cookie: logined=false;");
-                    return;
+                    response.response302Header("/user/login_failed.html", "Set-Cookie: logined=false;");
                 }
-                httpResponse.response302Header("/index.html", "Set-Cookie: logined=true;");
-                return;
+                response.response302Header("/index.html", "Set-Cookie: logined=true;");
             }
             if (memberService.isMembersReq(httpRequest)) {
                 if (requstParser.isLoginCookie(httpRequest.getCookies())) {
                     List<User> members = memberService.getAllMembers();
                     Template template = handlebars.compile("user/list");
-
                     byte[] body = template.apply(members).getBytes();
-                    httpResponse.response200Header(body, httpRequest);
-                    return;
+                    response.response200Header(body, httpRequest);
                 }
-                httpResponse.response302Header("/user/login.html", "Set-Cookie: logined=false;");
-                return;
+                response.response302Header("/user/login.html", "Set-Cookie: logined=false;");
             }
-            httpResponse.response200Header(httpRequest);
+            response.response200Header(httpRequest);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

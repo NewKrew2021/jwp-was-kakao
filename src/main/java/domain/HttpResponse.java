@@ -29,7 +29,7 @@ public class HttpResponse {
 			dos.write(body, 0, body.length);
 			dos.flush();
 		} catch (IOException e) {
-			throw new RuntimeException();
+			throw new RuntimeException("응답 메시지 오류입니다.");
 		}
 	}
 
@@ -42,7 +42,7 @@ public class HttpResponse {
 			}
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
-			throw new RuntimeException();
+			throw new RuntimeException("응답 메시지 오류입니다.");
 		}
 	}
 
@@ -53,7 +53,7 @@ public class HttpResponse {
 			}
 			return FileIoUtils.loadFileFromClasspath(RequestPathUtils.getResourcePath(requestPath));
 		} catch (IOException | URISyntaxException ex) {
-			throw new RuntimeException();
+			throw new RuntimeException("응답 메시지 오류입니다.");
 		}
 	}
 }
