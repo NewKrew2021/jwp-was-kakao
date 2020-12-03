@@ -64,8 +64,15 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("Post body 데이터를 가져오는데 실패한다.")
 	public void getRequestBodyFailTest() {
-		createGetRequestData();
-		assertThatThrownBy( () -> underTest.getRequestBody(httpRequest.getHeaders()))
+		Reader reader = new StringReader("POST /user/create HTTP/1.1\n" +
+				"Host: localhost:8080\n" +
+				"Connection: keep-alive\n" +
+				"Content-Type: application/x-www-form-urlencoded\n" +
+				"Accept: */*\n\n" +
+				"userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
+
+		underTest = new HttpRequstParser(new BufferedReader(reader));
+		assertThatThrownBy(() -> underTest.requestParse())
 				.isInstanceOf(InvalidRequestBodyException.class);
 	}
 
@@ -113,7 +120,7 @@ public class HttpRequstParserTest {
 				"Accept: */*\n\n");
 
 		underTest = new HttpRequstParser(new BufferedReader(reader));
-		httpRequest =  underTest.requestParse();
+		httpRequest = underTest.requestParse();
 	}
 
 	private void createPostRequestData() {
