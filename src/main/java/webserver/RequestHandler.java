@@ -1,18 +1,38 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
+import domain.HttpHeader;
+import domain.HttpRequest;
+import domain.HttpResponse;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.MemberService;
+import utils.FileIoUtils;
+import utils.HttpRequstParser;
+import utils.RequestPathUtils;
+
+import java.io.*;
+import java.net.Socket;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
+    private static final MemberService memberService = new MemberService();
+    private static final Handlebars handlebars;
     private Socket connection;
+
+    static {
+        TemplateLoader loader = new ClassPathTemplateLoader();
+        loader.setPrefix("/templates");
+        loader.setSuffix(".html");
+        handlebars = new Handlebars(loader);
+    }
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -24,32 +44,40 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            HttpRequstParser requstParser = new HttpRequstParser(bufferedReader);
+            HttpRequest httpRequest = requstParser.requestParse();
+            printRequestHeaders(httpRequest.getHeaders()); //헤더 출력
+
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            HttpResponse response = new HttpResponse(dos);
+            if (memberService.isJoinReq(httpRequest)) {
+                memberService.joinMember(httpRequest.getRequestParam());
+                response.response302Header("/index.html", "");
+            }
+            if (memberService.isLoginReq(httpRequest)) {
+                boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
+                if (!isLogin) {
+                    response.response302Header("/user/login_failed.html", "Set-Cookie: logined=false;");
+                }
+                response.response302Header("/index.html", "Set-Cookie: logined=true;");
+            }
+            if (memberService.isMembersReq(httpRequest)) {
+                if (requstParser.isLoginCookie(httpRequest.getCookies())) {
+                    List<User> members = memberService.getAllMembers();
+                    Template template = handlebars.compile("user/list");
+                    byte[] body = template.apply(members).getBytes();
+                    response.response200Header(body, httpRequest);
+                }
+                response.response302Header("/user/login.html", "Set-Cookie: logined=false;");
+            }
+            response.response200Header(httpRequest);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private void printRequestHeaders(List<HttpHeader> headers) {
+        headers.forEach(header -> logger.debug(header.toString()));
     }
 }
