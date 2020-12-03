@@ -1,4 +1,4 @@
-package webserver.http.controller;
+package webserver.http;
 
 import webserver.http.InvalidHttpRequestMessageException;
 

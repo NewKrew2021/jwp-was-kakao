@@ -1,4 +1,4 @@
-package webserver.http.controller;
+package apps.slipp.controller;
 
 import com.google.common.base.Charsets;
 import db.DataBase;

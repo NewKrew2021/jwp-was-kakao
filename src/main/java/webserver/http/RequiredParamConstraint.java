@@ -1,13 +1,12 @@
-package webserver.http.controller;
+package webserver.http;
 
-import org.springframework.util.StringUtils;
-import webserver.http.HttpRequestParam;
+import utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RequiredParamConstraint implements RequestDataObjectValidator {
+public class RequiredParamConstraint implements HttpRequestDataObjectValidator {
 
     private List<String> requiredParams;
 

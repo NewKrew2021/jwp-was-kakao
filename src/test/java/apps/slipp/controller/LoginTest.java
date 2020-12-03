@@ -1,8 +1,10 @@
-package webserver.http.controller;
+package apps.slipp.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.http.HttpRequestParam;
+import webserver.http.MissingRequiredParamException;
+import webserver.http.NotEmptyParamException;
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ class LoginTest {
     @DisplayName("password 파라미터가 없으면 exception 이 발생한다")
     @Test
     void requiredParams1(){
-        List<HttpRequestParam> params = HttpRequestParamUtils.params("userId=nio.d");
+        List<HttpRequestParam> params = THttpRequestParams.params("userId=nio.d");
         assertThatThrownBy( () -> new Login(params))
                 .isInstanceOf(MissingRequiredParamException.class);
     }
@@ -21,7 +23,7 @@ class LoginTest {
     @DisplayName("userId 파라미터가 없으면 exception 이 발생한다")
     @Test
     void requiredParams2(){
-        List<HttpRequestParam> params = HttpRequestParamUtils.params("password=password");
+        List<HttpRequestParam> params = THttpRequestParams.params("password=password");
         assertThatThrownBy( () -> new Login(params))
                 .isInstanceOf(MissingRequiredParamException.class);
     }
@@ -29,7 +31,7 @@ class LoginTest {
     @DisplayName("userId 값이 없으면 exception 이 발생한다")
     @Test
     void notEmptyParam1(){
-        List<HttpRequestParam> params = HttpRequestParamUtils.params("userId=", "password=password");
+        List<HttpRequestParam> params = THttpRequestParams.params("userId=", "password=password");
         assertThatThrownBy( () -> new Login(params))
                 .isInstanceOf(NotEmptyParamException.class);
     }
@@ -37,7 +39,7 @@ class LoginTest {
     @DisplayName("password 값이 없으면 exception 이 발생한다")
     @Test
     void notEmptyParam2(){
-        List<HttpRequestParam> params = HttpRequestParamUtils.params("userId=nio", "password=");
+        List<HttpRequestParam> params = THttpRequestParams.params("userId=nio", "password=");
         assertThatThrownBy( () -> new Login(params))
                 .isInstanceOf(NotEmptyParamException.class);
     }

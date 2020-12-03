@@ -1,4 +1,4 @@
-package webserver.http.controller;
+package webserver.http;
 
 import com.google.common.base.Charsets;
 import utils.ClasspathResourceLoader;

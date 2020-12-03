@@ -1,11 +1,14 @@
-package webserver.http.controller;
+package apps.slipp.controller;
 
 import webserver.http.HttpRequestParam;
+import webserver.http.HttpRequestDataObject;
+import webserver.http.HttpRequestDataObjectValidator;
+import webserver.http.RequiredParamConstraint;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class Login implements RequestDataObject {
+public class Login implements HttpRequestDataObject {
 
     private String userId;
     private String password;
@@ -26,7 +29,7 @@ public class Login implements RequestDataObject {
     }
 
     @Override
-    public List<RequestDataObjectValidator> getValidators() {
+    public List<HttpRequestDataObjectValidator> getValidators() {
         return Arrays.asList(new RequiredParamConstraint("userId", "password"));
     }
 }

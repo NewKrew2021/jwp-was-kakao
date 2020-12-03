@@ -1,4 +1,4 @@
-package webserver.http.controller;
+package apps.slipp.service;
 
 import db.DataBase;
 import model.User;

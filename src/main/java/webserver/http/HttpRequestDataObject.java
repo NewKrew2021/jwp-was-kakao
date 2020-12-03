@@ -1,12 +1,10 @@
-package webserver.http.controller;
-
-import webserver.http.HttpRequestParam;
+package webserver.http;
 
 import java.util.List;
 
-public interface RequestDataObject {
+public interface HttpRequestDataObject {
 
-    List<RequestDataObjectValidator> getValidators();
+    List<HttpRequestDataObjectValidator> getValidators();
 
     default void validate(List<HttpRequestParam> params) {
         getValidators().forEach(it -> it.validate(params));

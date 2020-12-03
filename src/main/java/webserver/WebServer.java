@@ -1,12 +1,13 @@
 package webserver;
 
+import apps.slipp.authentication.CookieAuthenticator;
+import apps.slipp.controller.LoginController;
+import apps.slipp.controller.SignUpController;
+import apps.slipp.controller.UserListController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ClasspathResourceLoader;
 import webserver.http.*;
-import webserver.http.authentication.CookieAuthenticator;
-import webserver.http.controller.*;
-import webserver.http.DefaultHttpRequestDispatcher;
 
 import java.io.IOException;
 import java.net.ServerSocket;

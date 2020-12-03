@@ -1,4 +1,4 @@
-package webserver.http.authentication;
+package apps.slipp.authentication;
 
 import webserver.http.*;
 
