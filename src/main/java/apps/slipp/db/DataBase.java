@@ -20,4 +20,11 @@ public class DataBase {
     public static Collection<User> findAll() {
         return users.values();
     }
+
+    /**
+     * for test. test 시 mock 을 사용하면 되지만 mock 은 강의범주를 벗어나는 것이라 추가합니다.
+     */
+    public static void removeAll(){
+        users.clear();
+    }
 }

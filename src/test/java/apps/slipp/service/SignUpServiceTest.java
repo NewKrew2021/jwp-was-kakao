@@ -1,6 +1,8 @@
 package apps.slipp.service;
 
+import apps.slipp.db.DataBase;
 import apps.slipp.model.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,11 @@ class SignUpServiceTest {
         service = new SignUpService();
     }
 
+    @AfterEach()
+    void tearDown(){
+        DataBase.removeAll();
+    }
+
     @DisplayName("이미 가입되어 있다면 exception 을 던진다")
     @Test
     void alreadySignUp(){
@@ -25,5 +32,6 @@ class SignUpServiceTest {
                 .isInstanceOf(UserAlreadySignUpException.class);
 
     }
+
 
 }

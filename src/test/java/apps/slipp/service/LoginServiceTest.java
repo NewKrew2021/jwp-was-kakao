@@ -1,6 +1,8 @@
 package apps.slipp.service;
 
+import apps.slipp.db.DataBase;
 import apps.slipp.model.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,11 @@ class LoginServiceTest {
     @BeforeEach
     void setUp(){
         service = new LoginService();
+    }
+
+    @AfterEach()
+    void tearDown(){
+        DataBase.removeAll();
     }
 
     @DisplayName("아이디가 존재하지 않으면 exception 을 던진다")
