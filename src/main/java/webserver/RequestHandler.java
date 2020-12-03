@@ -32,49 +32,8 @@ public class RequestHandler implements Runnable {
             Request request = Request.of(requestValue);
             Response response = uriFactory.create(request);
 
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = ResponseHandler.getBody(requestValue.getURL());
+            response.output(new DataOutputStream(out));
 
-            responseHeader(dos, response);
-            responseContent(dos, body.length);
-            responseBody(dos, body);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-
-    private void responseHeader(DataOutputStream dos, Response response) {
-        try {
-            String format = String.format("HTTP/1.1 %s \r\n", response.descHttpStatusCode());
-            dos.writeBytes(format);
-
-            response.getAddHttpDesc().forEach(value -> {
-                try {
-                    dos.writeBytes(value);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseContent(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
