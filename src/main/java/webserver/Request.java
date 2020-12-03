@@ -2,38 +2,50 @@ package webserver;
 
 import dto.ParamValue;
 import dto.RequestValue;
-import utils.MessageUtils;
 
 import java.util.Optional;
 
 public class Request {
 
-    private final String urlPath;
+    private static final String REGEX_QUESTION_MARK_AND_PERIOD = "[?.]";
+
+    private final String url;
     private final String method;
     private final Optional<ParamValue> paramMap;
 
-    private Request(String urlPath, String method, Optional<ParamValue> paramMap) {
-        this.urlPath = urlPath;
+    private final Cookie cookie;
+
+    private Request(String url, String method, Optional<ParamValue> paramMap, Cookie cookie) {
+        this.url = url;
         this.method = method;
         this.paramMap = paramMap;
+        this.cookie = cookie;
     }
 
     public static Request of(RequestValue requestValue) {
-        String urlPath = requestValue.getURLPath();
+        String url = requestValue.getURL();
         String method = requestValue.getMethod();
         Optional<ParamValue> param = ParamValue.of(requestValue.getParams());
 
-        return new Request(urlPath, method, param);
+        Cookie cookie = Cookie.of(requestValue.getCookieLine());
+
+        return new Request(url, method, param, cookie);
     }
 
-    public String getURLPath() {
-        return this.urlPath;
+    public String getURL() {
+        return url;
     }
 
-    public ParamValue getParamMap() {
-        if (this.paramMap.isPresent()) {
-            return paramMap.get();
-        }
-        throw new IllegalStateException(MessageUtils.PARAM_VALUE_IS_EMPTY);
+    public String getPathGateway() {
+        return url.split(REGEX_QUESTION_MARK_AND_PERIOD)[0];
+    }
+
+
+    public Optional<ParamValue> getParamMap() {
+        return paramMap;
+    }
+
+    public boolean isLogined() {
+        return cookie.isLogined();
     }
 }

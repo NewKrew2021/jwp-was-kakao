@@ -3,12 +3,13 @@ package webserver;
 import dto.RequestValue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ReqeustTest {
 
@@ -18,18 +19,35 @@ public class ReqeustTest {
         String requestHeader = "GET /index.html HTTP/1.1";
         RequestValue requestValue = parseRequestValue(requestHeader);
 
-        assertThat(Request.of(requestValue)).isEqualToComparingFieldByField(Request.of(requestValue));
+        assertThat(Request.of(requestValue)).isEqualToComparingOnlyGivenFields(Request.of(requestValue));
     }
 
-    @DisplayName("Request 생성 테스트 : param이 빈값인데 get 호출시 에러")
-    @Test
-    void getParamMap() {
-        String requestHeader = "GET /index.html HTTP/1.1";
-        RequestValue requestValue = parseRequestValue(requestHeader);
+    @DisplayName("getURL 테스트")
+    @ParameterizedTest
+    @CsvSource(value = {
+            "GET /index.html HTTP/1.1 | /index.html",
+            "GET /user/list  HTTP/1.1 | /user/list",
+            "GET /user/create?userId=javajigi&password=password  HTTP/1.1 | /user/create?userId=javajigi&password=password"
+    }, delimiter = '|')
+    void getURL(String header, String expectedURL) {
+        RequestValue requestValue = parseRequestValue(header);
         Request request = Request.of(requestValue);
 
-        assertThatThrownBy(request::getParamMap)
-                .isInstanceOf(IllegalStateException.class);
+        assertThat(request.getURL()).isEqualTo(expectedURL);
+    }
+
+    @DisplayName("getPathGateway 테스트")
+    @ParameterizedTest
+    @CsvSource(value = {
+            "GET /index.html HTTP/1.1 | /index",
+            "GET /user/list  HTTP/1.1 | /user/list",
+            "GET /user/create?userId=javajigi&password=password  HTTP/1.1 | /user/create"
+    }, delimiter = '|')
+    void getPathGateway(String header, String expectedPathGateway) {
+        RequestValue requestValue = parseRequestValue(header);
+        Request request = Request.of(requestValue);
+
+        assertThat(request.getPathGateway()).isEqualTo(expectedPathGateway);
     }
 
     private RequestValue parseRequestValue(String header) {

@@ -24,14 +24,15 @@ public class RequestValue {
     private static final String REGEX_COLON = ":";
 
     private static final String CONTENT_LENGTH_FIELD = "Content-Length";
+    private static final String COOKIE_FIELD = "Cookie";
 
     private static final String POST_METHOD = "POST";
     private static final String GET_METHOD = "GET";
 
     private static final Logger logger = LoggerFactory.getLogger(RequestValue.class);
 
-    private List<String> header;
-    private String body;
+    private final List<String> header;
+    private final String body;
 
     public RequestValue(List<String> header, String body) {
         this.header = header;
@@ -65,13 +66,12 @@ public class RequestValue {
     }
 
     public static int getBodySize(List<String> header) {
-        Optional<Integer> any = header.stream()
+        return header.stream()
                 .filter(RequestValue::filterContent)
                 .map(RequestValue::parseContentSize)
                 .map(Integer::parseInt)
-                .findAny();
-
-        return any.orElse(0);
+                .findAny()
+                .orElse(0);
     }
 
     private static boolean filterContent(String header) {
@@ -87,7 +87,7 @@ public class RequestValue {
         header.forEach(logger::info);
     }
 
-    public String getFirstReqeustLine() {
+    private String getFirstReqeustLine() {
         return header.get(0);
     }
 
@@ -102,7 +102,6 @@ public class RequestValue {
     public String getURLPath() {
         return getURL().split(REGEX_QUESTION_MARK_AND_PERIOD)[0];
     }
-
 
     public Optional<String> getParams() {
         switch (getMethod()) {
@@ -127,5 +126,12 @@ public class RequestValue {
             return Optional.of(DecodeUtils.decodeUTF8(body));
         }
         return Optional.empty();
+    }
+
+    public String getCookieLine() {
+        return header.stream()
+                .filter(value -> value.contains(COOKIE_FIELD))
+                .findAny()
+                .orElse(null);
     }
 }
