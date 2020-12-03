@@ -4,6 +4,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import domain.*;
 import exception.InvalidRequestBodyException;
+import exception.InvalidRequestException;
+import exception.InvalidRequestHeaderException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,14 +30,22 @@ public class HttpRequstParser {
 			String line = bufferedReader.readLine();
 			HttpRequestLine requestLine = new HttpRequestLine(line);
 			while (!"".equals(line = bufferedReader.readLine())) {
-				if (line.contains(HEADER_SPLIT_DELIMETER)) {
-					String[] header = line.split(HEADER_SPLIT_DELIMETER);
-					headers.add(new HttpHeader(header[0], header[1]));
-				}
+				validate(line);
+				String[] header = line.split(HEADER_SPLIT_DELIMETER);
+				headers.add(new HttpHeader(header[0].trim(), header[1].trim()));
 			}
 			return makeHttpRequest(headers, requestLine.getHttpMethod(), requestLine.getRequestTarget());
-		} catch (IOException ex) {
-			throw new RuntimeException("요청 파싱하는 데이터에 문제가 있습니다.");
+		} catch (IOException | InvalidRequestHeaderException ex) {
+			throw new InvalidRequestException("요청 파싱하는 데이터에 문제가 있습니다.");
+		}
+	}
+
+	protected void validate(String headerLine) {
+		if (!headerLine.contains(HEADER_SPLIT_DELIMETER)) {
+			throw new InvalidRequestHeaderException("잘못된 헤더정보 입니다.");
+		}
+		if (headerLine.split(HEADER_SPLIT_DELIMETER).length < 2) {
+			throw new InvalidRequestHeaderException("잘못된 헤더정보 입니다.");
 		}
 	}
 

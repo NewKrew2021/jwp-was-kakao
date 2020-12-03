@@ -1,9 +1,10 @@
 package utils;
 
+import domain.ContentType;
 import domain.HttpHeader;
 import domain.HttpRequest;
-import domain.ContentType;
 import exception.InvalidRequestBodyException;
+import exception.InvalidRequestHeaderException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -74,6 +75,14 @@ public class HttpRequstParserTest {
 		underTest = new HttpRequstParser(new BufferedReader(reader));
 		assertThatThrownBy(() -> underTest.requestParse())
 				.isInstanceOf(InvalidRequestBodyException.class);
+	}
+
+	@Test
+	@DisplayName("헤더 정보가 정상인지 확인한다.")
+	public void validateTest() {
+		HttpRequstParser parser = new HttpRequstParser(new BufferedReader(new StringReader("")));
+		assertThatThrownBy(() -> parser.validate("Connection keep-alive"))
+				.isInstanceOf(InvalidRequestHeaderException.class);
 	}
 
 	@Test
