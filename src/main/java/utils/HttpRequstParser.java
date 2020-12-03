@@ -2,19 +2,17 @@ package utils;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
+import domain.ContentType;
 import domain.HttpHeader;
 import domain.HttpMethod;
 import domain.HttpRequest;
-import domain.ContentType;
+import exception.InvalidRequestBodyException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HttpRequstParser {
 	public static final String HEADER_SPLIT_DELIMETER = ": ";
@@ -62,15 +60,15 @@ public class HttpRequstParser {
 		return httpRequest;
 	}
 
-	private String getRequestBody(List<HttpHeader> requestHeaders) {
+	protected String getRequestBody(List<HttpHeader> requestHeaders) {
 		try {
 			HttpHeader contentLengthHeader = requestHeaders.stream()
-					.filter(header -> header.getKey().equals(CONTENT_LENGTH))
+					.filter(header -> header.getKey().equalsIgnoreCase(CONTENT_LENGTH))
 					.findFirst()
-					.orElse(new HttpHeader(CONTENT_LENGTH, "0"));
+					.orElseThrow();
 			return IOUtils.readData(bufferedReader, Integer.valueOf(contentLengthHeader.getValue()));
-		} catch (IOException e) {
-			throw new RuntimeException("컨텐츠 데이터를 가져오는데 오류입니다.");
+		} catch (IOException | NoSuchElementException e) {
+			throw new InvalidRequestBodyException("fom body 데이터를 가져오는데 실패하였습니다.");
 		}
 	}
 

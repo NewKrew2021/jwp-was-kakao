@@ -3,6 +3,7 @@ package utils;
 import domain.HttpHeader;
 import domain.HttpRequest;
 import domain.ContentType;
+import exception.InvalidRequestBodyException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,7 +25,7 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("요청헤더를 가져온다.")
 	public void getRequestHeadersTest() {
-		setRequestData();
+		createGetRequestData();
 		List<HttpHeader> headers = httpRequest.getHeaders();
 
 		assertThat(headers).hasSize(3);
@@ -34,14 +36,14 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("요청 requestPath를 얻을 수 있다.")
 	public void getRequestPathTest() {
-		setRequestData();
+		createGetRequestData();
 		assertThat(httpRequest.getPath()).isEqualTo("/index.html");
 	}
 
 	@Test
 	@DisplayName("요청 url에서 쿼리 파라미터를 파싱한다.")
 	public void getRequestParamters() {
-		setRequestData();
+		createGetRequestData();
 		String input = "userId=adeldel&password=adeldel&name=adeldel&email=adeldel@daum.net";
 		Map<String, String> parameters = underTest.getRequstParameters(input);
 		assertThat(parameters).hasSize(4);
@@ -54,9 +56,17 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("Post body 데이터를 가져온다.")
 	public void getRequestBodyTest() {
-		setPostRequestData();
+		createPostRequestData();
 		String requestBody = httpRequest.getBody();
 		assertThat(requestBody).isEqualTo("userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
+	}
+
+	@Test
+	@DisplayName("Post body 데이터를 가져오는데 실패한다.")
+	public void getRequestBodyFailTest() {
+		createGetRequestData();
+		assertThatThrownBy( () -> underTest.getRequestBody(httpRequest.getHeaders()))
+				.isInstanceOf(InvalidRequestBodyException.class);
 	}
 
 	@Test
@@ -69,7 +79,7 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("쿼리파람 디코딩 테스트")
 	public void decodeTest() {
-		setPostRequestData();
+		createPostRequestData();
 		Map<String, String> requestParam = underTest.getRequstParameters(httpRequest.getBody());
 		assertThat(underTest.decodeQueryParam(requestParam.get("email"))).isEqualTo("adel@daum.net");
 		assertThat(underTest.decodeQueryParam("%EC%95%84%EB%8D%B8%EB%8D%B8")).isEqualTo("아델델");
@@ -79,7 +89,7 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("파일확장자 따라 컨텐츠 타입을 구할수 있다.")
 	public void contentTypeTest() {
-		setPostRequestData();
+		createPostRequestData();
 		assertThat(underTest.getContentType("/index.html")).isEqualTo(ContentType.HTML);
 		assertThat(underTest.getContentType("/styles.css")).isEqualTo(ContentType.CSS);
 		assertThat(underTest.getContentType("/login.js")).isEqualTo(ContentType.JS);
@@ -89,14 +99,14 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("컨텐츠타입으로 form post 요청인지 확인한다.")
 	public void isFormBodyRequestTest() {
-		setPostRequestData();
+		createPostRequestData();
 		assertTrue(underTest.isFormBodyRequest(httpRequest));
 
-		setRequestData();
+		createGetRequestData();
 		assertFalse(underTest.isFormBodyRequest(httpRequest));
 	}
 
-	private void setRequestData() {
+	private void createGetRequestData() {
 		Reader reader = new StringReader("GET /index.html HTTP/1.1\n" +
 				"Host: localhost:8080\n" +
 				"Connection: keep-alive\n" +
@@ -106,7 +116,7 @@ public class HttpRequstParserTest {
 		httpRequest =  underTest.requestParse();
 	}
 
-	private void setPostRequestData() {
+	private void createPostRequestData() {
 		Reader reader = new StringReader("POST /user/create HTTP/1.1\n" +
 				"Host: localhost:8080\n" +
 				"Connection: keep-alive\n" +
