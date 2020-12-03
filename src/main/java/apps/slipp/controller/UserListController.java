@@ -1,8 +1,8 @@
 package apps.slipp.controller;
 
 import com.google.common.base.Charsets;
-import db.DataBase;
-import model.User;
+import apps.slipp.db.DataBase;
+import apps.slipp.model.User;
 import webserver.http.*;
 import webserver.http.template.TemplateEngine;
 

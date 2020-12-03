@@ -1,6 +1,6 @@
 package apps.slipp.service;
 
-import model.User;
+import apps.slipp.model.User;
 
 import java.text.MessageFormat;
 

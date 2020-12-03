@@ -1,7 +1,7 @@
-package db;
+package apps.slipp.db;
 
 import com.google.common.collect.Maps;
-import model.User;
+import apps.slipp.model.User;
 
 import java.util.Collection;
 import java.util.Map;

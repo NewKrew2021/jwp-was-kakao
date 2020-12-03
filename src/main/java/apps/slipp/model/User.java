@@ -1,4 +1,4 @@
-package model;
+package apps.slipp.model;
 
 public class User {
     private String userId;

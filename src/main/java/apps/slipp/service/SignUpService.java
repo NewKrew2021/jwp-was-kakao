@@ -1,7 +1,7 @@
 package apps.slipp.service;
 
-import db.DataBase;
-import model.User;
+import apps.slipp.db.DataBase;
+import apps.slipp.model.User;
 
 public class SignUpService {
 

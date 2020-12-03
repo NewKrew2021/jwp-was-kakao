@@ -1,8 +1,6 @@
 package apps.slipp.controller;
 
 import apps.slipp.service.SignUpService;
-import db.DataBase;
-import model.User;
 import webserver.http.*;
 
 import java.util.List;
