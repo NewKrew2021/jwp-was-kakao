@@ -21,6 +21,7 @@ public class HttpRequstParser {
 	private static final String COOKIE_DELEIMTER = ";";
 	private static final String DELEMITER = " ";
 	private static final String CONTENT_LENGTH = "Content-Length";
+	private static final String CONTENT_TYPE = "Content-Type";
 	private BufferedReader bufferedReader;
 
 	public HttpRequstParser(BufferedReader bufferedReader) {
@@ -51,13 +52,13 @@ public class HttpRequstParser {
 
 	private HttpRequest makeHttpRequest(List<HttpHeader> headers, HttpMethod httpMethod, String requestPath) {
 		HttpRequest httpRequest = new HttpRequest(httpMethod, headers, requestPath);
-		if (httpMethod == HttpMethod.POST) {
+		if (isFormBodyRequest(httpRequest)) {
 			String requestBody = getRequestBody(headers);
 			httpRequest.setBody(requestBody);
 			httpRequest.setRequestParam(getQueryMap(requestBody));
 		}
 		httpRequest.setCookies(getCookies(headers));
-		httpRequest.setContentType(getMimeType(requestPath));
+		httpRequest.setContentType(getContentType(requestPath));
 		return httpRequest;
 	}
 
@@ -102,7 +103,7 @@ public class HttpRequstParser {
 	}
 	private Map<String, String> getCookies(List<HttpHeader> headers) {
 		HttpHeader cookieHeader = headers.stream()
-				.filter(header -> "Cookie".equals(header.getKey()))
+				.filter(header -> "Cookie".equalsIgnoreCase(header.getKey()))
 				.findFirst()
 				.orElse(new HttpHeader("", ""));
 
@@ -119,11 +120,17 @@ public class HttpRequstParser {
 				.isPresent();
 	}
 
-	private ContentType getMimeType(String path) {
-		if (path.endsWith(".css"))
-			return ContentType.CSS;
-		if (path.endsWith(".js"))
-			return ContentType.JS;
-		return ContentType.HTML;
+	protected ContentType getContentType(String path) {
+		return ContentType.of(path);
+	}
+
+	protected boolean isFormBodyRequest(HttpRequest httpRequest) {
+		return httpRequest.getMethod() == HttpMethod.POST
+				&& httpRequest.getHeaders()
+				.stream()
+				.filter(header -> header.getKey().equalsIgnoreCase(CONTENT_TYPE))
+				.filter(header -> header.getValue().equals(ContentType.FORM.getType()))
+				.findFirst()
+				.isPresent();
 	}
 }

@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HttpRequestParserTest {
+public class HttpRequstParserTest {
 	private HttpRequstParser underTest;
 	private HttpRequest httpRequest;
 
@@ -74,6 +75,27 @@ public class HttpRequestParserTest {
 		assertThat(underTest.decodeQueryParam("%EC%95%84%EB%8D%B8%EB%8D%B8")).isEqualTo("아델델");
 
 	}
+
+	@Test
+	@DisplayName("파일확장자 따라 컨텐츠 타입을 구할수 있다.")
+	public void contentTypeTest() {
+		setPostRequestData();
+		assertThat(underTest.getContentType("/index.html")).isEqualTo(ContentType.HTML);
+		assertThat(underTest.getContentType("/styles.css")).isEqualTo(ContentType.CSS);
+		assertThat(underTest.getContentType("/login.js")).isEqualTo(ContentType.JS);
+		assertThat(underTest.getContentType("/")).isEqualTo(ContentType.HTML);
+	}
+
+	@Test
+	@DisplayName("컨텐츠타입으로 form post 요청인지 확인한다.")
+	public void isFormBodyRequestTest() {
+		setPostRequestData();
+		assertTrue(underTest.isFormBodyRequest(httpRequest));
+
+		setRequestData();
+		assertFalse(underTest.isFormBodyRequest(httpRequest));
+	}
+
 	private void setRequestData() {
 		Reader reader = new StringReader("GET /index.html HTTP/1.1\n" +
 				"Host: localhost:8080\n" +
