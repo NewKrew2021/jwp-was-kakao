@@ -1,5 +1,7 @@
 package domain;
 
+import exception.InvalidRequestException;
+
 import java.util.Arrays;
 
 public enum HttpMethod {
@@ -9,6 +11,6 @@ public enum HttpMethod {
 		return Arrays.stream(values())
 				.filter(httpMethod -> httpMethod.name().equalsIgnoreCase(method))
 				.findFirst()
-				.orElse(GET);
+				.orElseThrow(() -> new InvalidRequestException("잘못된 요청 Metohd 입니다."));
 	}
 }

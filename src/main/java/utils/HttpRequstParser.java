@@ -2,10 +2,7 @@ package utils;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
-import domain.ContentType;
-import domain.HttpHeader;
-import domain.HttpMethod;
-import domain.HttpRequest;
+import domain.*;
 import exception.InvalidRequestBodyException;
 
 import java.io.BufferedReader;
@@ -17,7 +14,6 @@ import java.util.*;
 public class HttpRequstParser {
 	public static final String HEADER_SPLIT_DELIMETER = ": ";
 	private static final String COOKIE_DELEIMTER = ";";
-	private static final String DELEMITER = " ";
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String CONTENT_TYPE = "Content-Type";
 	private BufferedReader bufferedReader;
@@ -29,20 +25,15 @@ public class HttpRequstParser {
 	public HttpRequest requestParse() {
 		List<HttpHeader> headers = new ArrayList<>();
 		try {
-			String line = "";
-			HttpMethod httpMethod = null;
-			String requestPath = "";
+			String line = bufferedReader.readLine();
+			HttpRequestLine requestLine = new HttpRequestLine(line);
 			while (!"".equals(line = bufferedReader.readLine())) {
 				if (line.contains(HEADER_SPLIT_DELIMETER)) {
 					String[] header = line.split(HEADER_SPLIT_DELIMETER);
 					headers.add(new HttpHeader(header[0], header[1]));
-				} else {
-					String[] firstLine = line.split(DELEMITER);
-					httpMethod = HttpMethod.of(firstLine[0]);
-					requestPath = firstLine[1];
 				}
 			}
-			return makeHttpRequest(headers, httpMethod, requestPath);
+			return makeHttpRequest(headers, requestLine.getHttpMethod(), requestLine.getRequestTarget());
 		} catch (IOException ex) {
 			throw new RuntimeException("요청 파싱하는 데이터에 문제가 있습니다.");
 		}
