@@ -1,59 +1,86 @@
 package domain;
 
+import exception.InvalidResponseBodyException;
 import utils.FileIoUtils;
 import utils.RequestPathUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 public class HttpResponse {
 	private static final String DEFAULT_RESPONSE = "Hello World";
 	private DataOutputStream dos;
+	private String httpVersion;
+	private ContentType contentType;
+	private String path;
 
-	public HttpResponse(DataOutputStream dos) {
+	public HttpResponse(DataOutputStream dos, HttpRequest httpRequest) {
 		this.dos = dos;
+		this.httpVersion = getHttpVersion(httpRequest.getHttpVersion());
+		this.contentType = httpRequest.getContentType();
+		this.path = httpRequest.getPath();
 	}
 
-	public void response200Header(HttpRequest httpRequest) {
-		this.response200Header(getBody(httpRequest.getPath()), httpRequest);
+	private String getHttpVersion(String httpVersion) {
+		return httpVersion != null && !httpVersion.isEmpty() ? httpVersion : "HTTP/1.1";
 	}
-	public void response200Header(byte[] body, HttpRequest httpRequest) {
+
+	public void response200OK() {
+		this.response200OK(getResponseBody(path));
+	}
+
+	public void response200OK(byte[] body) {
 		try {
-			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			if (httpRequest.getContentType() != null) {
-				dos.writeBytes("Content-Type: " + httpRequest.getContentType().getType() + "\r\n");
+			if (body.length == 0) {
+				body = DEFAULT_RESPONSE.getBytes();
 			}
-			dos.writeBytes("Content-Length: " + body.length + "\r\n");
+			dos.writeBytes(String.format("%s %s \r\n", httpVersion, HttpStatus.OK.toString()));
+			for (HttpHeader header : make200Header(body.length)) {
+				dos.writeBytes(String.format("%s: %s \r\n", header.getKey(), header.getValue()));
+			}
 			dos.writeBytes("\r\n");
 			dos.write(body, 0, body.length);
 			dos.flush();
 		} catch (IOException e) {
-			throw new RuntimeException("응답 메시지 오류입니다.");
+			throw new InvalidResponseBodyException("응답 데이터 오류입니다.");
 		}
 	}
 
-	public void response302Header(String location, String cookie) {
+	public void response302Redirect(String location, boolean loginSuccess) {
 		try {
-			dos.writeBytes("HTTP/1.1 302 Found \r\n");
-			dos.writeBytes("Location: " + location + "\r\n");
-			if (!cookie.isEmpty()) {
-				dos.writeBytes(cookie + " Path=/" + "\r\n");
+			dos.writeBytes(String.format("%s %s \r\n", httpVersion, HttpStatus.FOUND.toString()));
+			for (HttpHeader header : make302Header(location, loginSuccess)) {
+				dos.writeBytes(String.format("%s: %s \r\n", header.getKey(), header.getValue()));
 			}
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
-			throw new RuntimeException("응답 메시지 오류입니다.");
+			throw new InvalidResponseBodyException("응답 데이터 오류입니다.");
 		}
 	}
 
-	public byte[] getBody(String requestPath) {
+	private List<HttpHeader> make200Header(int bodyLength) {
+		HttpHeader contentTypeHeader = new HttpHeader("Content-Type", contentType.getType());
+		HttpHeader contentLength = new HttpHeader("Content-Length", String.valueOf(bodyLength));
+		return Arrays.asList(contentTypeHeader, contentLength);
+	}
+
+	private List<HttpHeader> make302Header(String location, boolean loginSuccess) {
+		HttpHeader locationHeader = new HttpHeader("Location", location);
+		HttpHeader loginCookie = new HttpHeader("Set-Cookie", (loginSuccess ? "logined=true;" : "logined=false;"));
+		return Arrays.asList(locationHeader, loginCookie);
+	}
+
+	private byte[] getResponseBody(String requestPath) {
 		try {
-			if ("/".equals(requestPath)) {
+			if ("/".equals(requestPath) || requestPath == null) {
 				return DEFAULT_RESPONSE.getBytes();
 			}
 			return FileIoUtils.loadFileFromClasspath(RequestPathUtils.getResourcePath(requestPath));
 		} catch (IOException | URISyntaxException ex) {
-			throw new RuntimeException("응답 메시지 오류입니다.");
+			throw new InvalidResponseBodyException("응답 데이터 오류입니다.");
 		}
 	}
 }

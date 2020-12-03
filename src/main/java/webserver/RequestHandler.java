@@ -7,17 +7,15 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import domain.HttpHeader;
 import domain.HttpRequest;
 import domain.HttpResponse;
+import exception.HandlebarTemplateException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.MemberService;
-import utils.FileIoUtils;
 import utils.HttpRequstParser;
-import utils.RequestPathUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -50,34 +48,39 @@ public class RequestHandler implements Runnable {
             printRequestHeaders(httpRequest.getHeaders()); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse response = new HttpResponse(dos);
-            if (memberService.isJoinReq(httpRequest)) {
-                memberService.joinMember(httpRequest.getRequestParam());
-                response.response302Header("/index.html", "");
-            }
-            if (memberService.isLoginReq(httpRequest)) {
-                boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
-                if (!isLogin) {
-                    response.response302Header("/user/login_failed.html", "Set-Cookie: logined=false;");
-                }
-                response.response302Header("/index.html", "Set-Cookie: logined=true;");
-            }
-            if (memberService.isMembersReq(httpRequest)) {
-                if (requstParser.isLoginCookie(httpRequest.getCookies())) {
-                    List<User> members = memberService.getAllMembers();
-                    Template template = handlebars.compile("user/list");
-                    byte[] body = template.apply(members).getBytes();
-                    response.response200Header(body, httpRequest);
-                }
-                response.response302Header("/user/login.html", "Set-Cookie: logined=false;");
-            }
-            response.response200Header(httpRequest);
+            HttpResponse response = new HttpResponse(dos, httpRequest);
+            memberAction(httpRequest, response, requstParser);
+            response.response200OK();
         } catch (IOException e) {
             logger.error(e.getMessage());
+            throw new HandlebarTemplateException("템플릿 지정이 잘못되었습니다.");
         }
     }
 
     private void printRequestHeaders(List<HttpHeader> headers) {
         headers.forEach(header -> logger.debug(header.toString()));
+    }
+
+    private void memberAction(HttpRequest httpRequest, HttpResponse response, HttpRequstParser requstParser) throws IOException {
+        if (memberService.isJoinReq(httpRequest)) {
+            memberService.joinMember(httpRequest.getRequestParam());
+            response.response302Redirect("/index.html", false);
+        }
+        if (memberService.isLoginReq(httpRequest)) {
+            boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
+            if (!isLogin) {
+                response.response302Redirect("/user/login_failed.html", false);
+            }
+            response.response302Redirect("/index.html", true);
+        }
+        if (memberService.isMembersReq(httpRequest)) {
+            if (requstParser.isLoginCookie(httpRequest.getCookies())) {
+                List<User> members = memberService.getAllMembers();
+                Template template = handlebars.compile("user/list");
+                byte[] body = template.apply(members).getBytes();
+                response.response200OK(body);
+            }
+            response.response302Redirect("/user/login.html", false);
+        }
     }
 }

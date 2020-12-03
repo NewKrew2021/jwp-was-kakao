@@ -11,6 +11,7 @@ public class HttpRequest {
 	private Map<String, String> cookies;
 	private ContentType contentType;
 	private String body;
+	private String httpVersion;
 
 	public HttpRequest(HttpMethod method, List<HttpHeader> headers, String path) {
 		this.method = method;
@@ -60,5 +61,13 @@ public class HttpRequest {
 
 	public void setContentType(ContentType contentType) {
 		this.contentType = contentType;
+	}
+
+	public String getHttpVersion() {
+		return httpVersion;
+	}
+
+	public void setHttpVersion(String httpVersion) {
+		this.httpVersion = httpVersion;
 	}
 }

@@ -34,7 +34,7 @@ public class HttpRequstParser {
 				String[] header = line.split(HEADER_SPLIT_DELIMETER);
 				headers.add(new HttpHeader(header[0].trim(), header[1].trim()));
 			}
-			return makeHttpRequest(headers, requestLine.getHttpMethod(), requestLine.getRequestTarget());
+			return makeHttpRequest(headers, requestLine);
 		} catch (IOException | InvalidRequestHeaderException ex) {
 			throw new InvalidRequestException("요청 파싱하는 데이터에 문제가 있습니다.");
 		}
@@ -49,15 +49,16 @@ public class HttpRequstParser {
 		}
 	}
 
-	private HttpRequest makeHttpRequest(List<HttpHeader> headers, HttpMethod httpMethod, String requestPath) {
-		HttpRequest httpRequest = new HttpRequest(httpMethod, headers, requestPath);
+	private HttpRequest makeHttpRequest(List<HttpHeader> headers, HttpRequestLine httpRequestLine) {
+		HttpRequest httpRequest = new HttpRequest(httpRequestLine.getHttpMethod(), headers, httpRequestLine.getRequestTarget());
 		if (isFormBodyRequest(httpRequest)) {
 			String requestBody = getRequestBody(headers);
 			httpRequest.setBody(requestBody);
 			httpRequest.setRequestParam(getQueryMap(requestBody));
+			httpRequest.setHttpVersion(httpRequestLine.getHttpVersion());
 		}
 		httpRequest.setCookies(getCookies(headers));
-		httpRequest.setContentType(getContentType(requestPath));
+		httpRequest.setContentType(getContentType(httpRequestLine.getRequestTarget()));
 		return httpRequest;
 	}
 
