@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import webserver.http.parser.CookieParser;
 import webserver.http.parser.FormUrlencodedBodyParser;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
@@ -40,28 +42,27 @@ public class HttpRequest {
         return headers;
     }
 
-    public void getBodyInMap(Map<String, String> output) {
+    public Map<String, String> getBodyInMap() {
         if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
             throw new UnsupportedOperationException("HttpRequest does not support form body");
         }
         String contentType = headers.get(HttpHeaders.CONTENT_TYPE);
 
         if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
-            FormUrlencodedBodyParser.parse(body, output);
-            return;
+            return FormUrlencodedBodyParser.parse(body);
         }
 
         throw new UnsupportedOperationException("HttpRequest does not support form body, Content-Type=" + contentType);
     }
 
-    public void getCookiesInMap(Map<String, String> output) {
+    public Map<String, String> getCookiesInMap() {
         if (!headers.containsKey(HttpHeaders.COOKIE)) {
             logger.debug("empty cookies");
-            return;
+            return new HashMap<>();
         }
 
         String cookieString = headers.get(HttpHeaders.COOKIE);
-        CookieParser.parse(cookieString, output);
+        return CookieParser.parse(cookieString);
     }
 
 }

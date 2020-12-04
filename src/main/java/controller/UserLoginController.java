@@ -18,8 +18,7 @@ public class UserLoginController extends Controller {
 
     @Override
     protected HttpResponse handlePost(HttpRequest httpRequest) {
-        Map<String, String> body = new HashMap<>();
-        httpRequest.getBodyInMap(body);
+        Map<String, String> body = httpRequest.getBodyInMap();
         String userId = body.get("userId");
         String password = body.get("password");
 

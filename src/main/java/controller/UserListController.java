@@ -18,8 +18,7 @@ public class UserListController extends Controller {
 
     @Override
     protected HttpResponse handleGet(HttpRequest httpRequest) {
-        Map<String, String> cookie = new HashMap<>();
-        httpRequest.getCookiesInMap(cookie);
+        Map<String, String> cookie = httpRequest.getCookiesInMap();
 
         if (!UserService.isLogined(cookie)) {
             return redirectToLoginPage();

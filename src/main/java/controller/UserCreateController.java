@@ -25,8 +25,7 @@ public class UserCreateController extends Controller {
 
     @Override
     protected HttpResponse handlePost(HttpRequest httpRequest) {
-        Map<String, String> body = new HashMap<>();
-        httpRequest.getBodyInMap(body);
+        Map<String, String> body = httpRequest.getBodyInMap();
         addNewUserWithMap(body);
         return new HttpResponseBuilder()
                 .with302Redirect("/index.html")

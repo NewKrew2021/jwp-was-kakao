@@ -70,8 +70,7 @@ public class HttpRequestParserTest {
                             .containsEntry("Content-Length", "93")
                             .containsEntry("Content-Type", "application/x-www-form-urlencoded")
                             .containsEntry("Accept", "*/*");
-                    Map<String, String> body = new HashMap<>();
-                    req.getBodyInMap(body);
+                    Map<String, String> body = req.getBodyInMap();
                     assertThat(body).containsEntry("userId", "javajigi")
                             .containsEntry("password", "password")
                             .containsEntry("name", "박재성")
