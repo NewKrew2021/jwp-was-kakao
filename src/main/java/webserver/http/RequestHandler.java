@@ -40,17 +40,19 @@ public class RequestHandler implements Runnable {
             preProcessor.execute(httpRequest, httpResponse);
             dispatcher.dispatch(httpRequest, httpResponse);
 
-            httpResponse.send();
         } catch (AuthenticationException e) {
             logger.debug(e.getMessage());
             httpResponse.sendRedirect(LOGIN_PAGE);
+        } catch (InvalidHttpRequestParameterException e ){
+            logger.error(e.getMessage(), e);
+            httpResponse.setStatus(HttpStatus.x400_BadRequest);
+            httpResponse.send();
         } catch (HttpStatusCodeException e ){
+            logger.error(e.getMessage(), e);
             httpResponse.setStatus(e.getStatus());
             httpResponse.send();
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-
+            logger.error(e.getMessage(), e);
             httpResponse.setStatus(HttpStatus.x500_InternalServerError);
             httpResponse.setBody(e.getMessage().getBytes());
             httpResponse.send();

@@ -21,5 +21,6 @@ public class TemplateView implements View {
         httpResponse.setStatus(HttpStatus.x200_OK);
         httpResponse.setContentType(MimeType.TEXT_HTML, Charsets.UTF_8);
         httpResponse.setBody(output.getBytes());
+        httpResponse.send();
     }
 }

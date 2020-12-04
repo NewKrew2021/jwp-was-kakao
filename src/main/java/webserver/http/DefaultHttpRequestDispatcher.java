@@ -19,13 +19,8 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
         Controller controller = httpRequestMapper.getTarget(httpRequest);
         if( controller == null ) throw new NotFoundException(httpRequest.getPath());
 
-        try {
-            ModelAndView mav = controller.execute(httpRequest, httpResponse);
-            httpResponseHandler.handle(mav, httpRequest, httpResponse);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            httpResponse.setStatus(HttpStatus.x500_InternalServerError);
-        }
+        ModelAndView mav = controller.execute(httpRequest, httpResponse);
+        httpResponseHandler.handle(mav, httpRequest, httpResponse);
     }
 
 }
