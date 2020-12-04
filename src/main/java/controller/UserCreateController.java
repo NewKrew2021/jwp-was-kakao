@@ -11,9 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserCreateController extends Controller {
-    public static final String PATH = "/user/create";
+    private static final String PATH = "/user/create";
 
-    private static final Logger logger = LoggerFactory.getLogger(UserCreateController.class);
+    @Override
+    public String getPath() {
+        return PATH;
+    }
 
     @Override
     protected HttpResponse handleGet(HttpRequest httpRequest) {

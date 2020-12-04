@@ -2,8 +2,9 @@ package context;
 
 import controller.*;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ApplicationContext {
 
@@ -11,11 +12,11 @@ public class ApplicationContext {
     private static final Controller defaultController;
 
     static {
-        controllerMap = new HashMap<>();
-        // TODO: controller 만들때마다 넣어줘야되네..
-        controllerMap.put(UserCreateController.PATH, new UserCreateController());
-        controllerMap.put(UserLoginController.PATH, new UserLoginController());
-        controllerMap.put(UserListController.PATH, new UserListController());
+        controllerMap = Stream.of(
+                new UserCreateController(),
+                new UserLoginController(),
+                new UserListController())
+                .collect(Collectors.toMap(Controller::getPath, x -> x));
 
         defaultController = new StaticFileController();
     }

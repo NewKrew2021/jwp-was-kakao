@@ -8,13 +8,15 @@ import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.HttpResponseBuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class UserLoginController extends Controller {
-    public static final String PATH = "/user/login";
+    private static final String PATH = "/user/login";
 
-    private static final Logger logger = LoggerFactory.getLogger(UserLoginController.class);
+    @Override
+    public String getPath() {
+        return PATH;
+    }
 
     @Override
     protected HttpResponse handlePost(HttpRequest httpRequest) {
