@@ -8,7 +8,6 @@ import controller.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.HttpRequest;
-import webserver.http.parser.HttpRequestParser;
 import webserver.http.HttpResponse;
 
 public class RequestHandler implements Runnable {
@@ -27,7 +26,7 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = new HttpRequestParser().parse(in);
+            HttpRequest httpRequest = HttpRequest.Parser.parse(in);
             Controller controller = applicationContext.getControllerForPath(httpRequest.getPath());
             HttpResponse httpResponse = controller.handleRequest(httpRequest);
             httpResponse.response(out);

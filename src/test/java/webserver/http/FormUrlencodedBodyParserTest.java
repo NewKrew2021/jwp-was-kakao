@@ -14,8 +14,7 @@ public class FormUrlencodedBodyParserTest {
     public void parse() {
         String sample = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
 
-        Map<String, String> body = new HashMap<>();
-        FormUrlencodedBodyParser.parse(sample, body);
+        Map<String, String> body = FormUrlencodedBodyParser.parse(sample);
         assertThat(body)
                 .containsEntry("userId", "javajigi")
                 .containsEntry("password", "password")

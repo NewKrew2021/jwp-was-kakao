@@ -12,8 +12,7 @@ public class CookieParserTest {
     @Test
     public void parse() {
         String sample = "name=value; name2=value2;name3=value3;  name4=value4";
-        Map<String, String> cookie = new HashMap<>();
-        CookieParser.parse(sample, cookie);
+        Map<String, String> cookie = CookieParser.parse(sample);
         assertThat(cookie)
                 .containsEntry("name", "value")
                 .containsEntry("name2", "value2")

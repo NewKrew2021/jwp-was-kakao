@@ -1,7 +1,6 @@
 package webserver.http;
 
 import org.junit.jupiter.api.Test;
-import webserver.http.parser.HttpRequestParser;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -9,7 +8,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HttpRequestParserTest {
+public class HttpRequestTest {
 
     @Test
     public void parse_normalGet() throws Exception {
@@ -18,7 +17,7 @@ public class HttpRequestParserTest {
                 "Connection: keep-alive\n" +
                 "Accept: */*\n";
 
-        assertThat(new HttpRequestParser().parse(new ByteArrayInputStream(sample.getBytes())))
+        assertThat(HttpRequest.Parser.parse(new ByteArrayInputStream(sample.getBytes())))
                 .satisfies(req -> {
                     assertThat(req.getMethod()).isEqualTo(HttpMethod.GET);
                     assertThat(req.getPath()).isEqualTo("/index.html");
@@ -36,7 +35,7 @@ public class HttpRequestParserTest {
                 "Connection: keep-alive\n" +
                 "Accept: */*\n";
 
-        assertThat(new HttpRequestParser().parse(new ByteArrayInputStream(sample.getBytes())))
+        assertThat(HttpRequest.Parser.parse(new ByteArrayInputStream(sample.getBytes())))
                 .satisfies(req -> {
                     assertThat(req.getMethod()).isEqualTo(HttpMethod.GET);
                     assertThat(req.getPath()).isEqualTo("/user/create");
@@ -61,7 +60,7 @@ public class HttpRequestParserTest {
                 "\n" +
                 "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
 
-        assertThat(new HttpRequestParser().parse(new ByteArrayInputStream(sample.getBytes())))
+        assertThat(HttpRequest.Parser.parse(new ByteArrayInputStream(sample.getBytes())))
                 .satisfies(req -> {
                     assertThat(req.getMethod()).isEqualTo(HttpMethod.POST);
                     assertThat(req.getPath()).isEqualTo("/user/create");
