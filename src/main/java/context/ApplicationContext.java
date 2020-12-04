@@ -7,10 +7,10 @@ import java.util.Map;
 
 public class ApplicationContext {
 
-    private Map<String, Controller> controllerMap;
-    private Controller defaultController;
+    private static final Map<String, Controller> controllerMap;
+    private static final Controller defaultController;
 
-    public ApplicationContext() {
+    static {
         controllerMap = new HashMap<>();
         // TODO: controller 만들때마다 넣어줘야되네..
         controllerMap.put(UserCreateController.PATH, new UserCreateController());
@@ -20,7 +20,7 @@ public class ApplicationContext {
         defaultController = new StaticFileController();
     }
 
-    public Controller getControllerForPath(String path) {
+    public static Controller getControllerForPath(String path) {
         if (controllerMap.containsKey(path)) {
             return controllerMap.get(path);
         }

@@ -14,11 +14,9 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private ApplicationContext applicationContext;
 
-    public RequestHandler(Socket connectionSocket, ApplicationContext applicationContext) {
+    public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        this.applicationContext = applicationContext;
     }
 
     public void run() {
@@ -27,7 +25,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = HttpRequest.Parser.parse(in);
-            Controller controller = applicationContext.getControllerForPath(httpRequest.getPath());
+            Controller controller = ApplicationContext.getControllerForPath(httpRequest.getPath());
             HttpResponse httpResponse = controller.handleRequest(httpRequest);
             httpResponse.response(out);
         } catch (IOException e) {
