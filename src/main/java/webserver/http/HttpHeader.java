@@ -14,6 +14,11 @@ public class HttpHeader {
         this.value = value;
     }
 
+    public HttpHeader(HeaderConstant key, String value) {
+        this.key = key.getHeaderName();
+        this.value = value;
+    }
+
     public HttpHeader(String header) {
         if (StringUtils.isEmpty(header))
             throw new IllegalArgumentException("header 형식이 올바르지 않습니다 ( header 가 null or 빈문자열 )");
