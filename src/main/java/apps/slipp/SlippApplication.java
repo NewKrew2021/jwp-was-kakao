@@ -29,9 +29,27 @@ public class SlippApplication {
                         .port(port)
                         .httpRequestDispatcher(getHttpRequestDispatcher())
                         .httpRequestPreProcessor(getHttpRequestPreProcessor())
+                        .exceptionHandler(getExceptionHandler())
                         .build()
         );
         webServer.start();
+    }
+
+    private ExceptionHandler getExceptionHandler() {
+        ExceptionHandlerResolver exceptionResolver = new ExceptionHandlerResolver();
+        exceptionResolver.addHandler(AuthenticationException.class, (e, httpRequest, httpResponse) -> {
+            httpResponse.sendRedirect("./login.html");
+        });
+        exceptionResolver.addHandler(InvalidHttpRequestMessageException.class, (e, httpRequest, httpResponse) -> {
+            httpResponse.setStatus(HttpStatus.x400_BadRequest);
+            httpResponse.send();
+        });
+        exceptionResolver.addHandler(HttpStatusCodeException.class, (ExceptionHandler<HttpStatusCodeException>) (e, httpRequest, httpResponse) -> {
+            httpResponse.setStatus(e.getStatus());
+            httpResponse.send();
+        });
+
+        return new DefaultExceptionHandler(exceptionResolver);
     }
 
     private HttpRequestPreProcessor getHttpRequestPreProcessor() {

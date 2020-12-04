@@ -7,6 +7,7 @@ public enum HttpStatus {
     x201_Created(201, "Created"),
     x302_Found(302, "Found"),
     x400_BadRequest(400, "Bad Request" ),
+    x401_Unauthorized(401, "Unauthorized"),
     x404_NotFound(404, "Not Found"),
     x500_InternalServerError(500, "Internal Server Error");
 

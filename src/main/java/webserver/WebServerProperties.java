@@ -1,5 +1,6 @@
 package webserver;
 
+import webserver.http.ExceptionHandler;
 import webserver.http.HttpRequestDispatcher;
 import webserver.http.HttpRequestPreProcessor;
 
@@ -8,11 +9,13 @@ public class WebServerProperties {
     private final int port;
     private HttpRequestDispatcher requestDispatcher;
     private HttpRequestPreProcessor requestPreProcessor;
+    private ExceptionHandler exceptionHandler;
 
-    private WebServerProperties(int port, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor requestPreProcessor) {
+    private WebServerProperties(int port, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor requestPreProcessor, ExceptionHandler exceptionHandler) {
         this.port = port;
         this.requestDispatcher = requestDispatcher;
         this.requestPreProcessor = requestPreProcessor;
+        this.exceptionHandler = exceptionHandler;
     }
 
     public HttpRequestDispatcher getRequestDispatcher() {
@@ -31,14 +34,19 @@ public class WebServerProperties {
         return new Builder();
     }
 
+    public ExceptionHandler getExceptionHandler() {
+        return exceptionHandler;
+    }
+
     public static class Builder {
 
         private int port;
         private HttpRequestDispatcher requestDispatcher;
         private HttpRequestPreProcessor preProcessor;
+        private ExceptionHandler exceptionHandler;
 
         public WebServerProperties build(){
-            return new WebServerProperties(port, requestDispatcher, preProcessor);
+            return new WebServerProperties(port, requestDispatcher, preProcessor, exceptionHandler);
         }
 
         public Builder httpRequestDispatcher(HttpRequestDispatcher requestDispatcher){
@@ -51,6 +59,10 @@ public class WebServerProperties {
             return this;
         }
 
+        public Builder exceptionHandler(ExceptionHandler exceptionHandler){
+            this.exceptionHandler = exceptionHandler;
+            return this;
+        }
         public Builder port(int port) {
             this.port = port;
             return this;

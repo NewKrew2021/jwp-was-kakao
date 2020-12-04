@@ -6,6 +6,6 @@ abstract public class HttpStatusCodeException extends RuntimeException{
         super(message);
     }
 
-    abstract HttpStatus getStatus();
+    abstract public HttpStatus getStatus();
 
 }

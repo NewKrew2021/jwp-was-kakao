@@ -9,7 +9,7 @@ public class NotFoundException extends HttpStatusCodeException {
     }
 
     @Override
-    HttpStatus getStatus() {
+    public HttpStatus getStatus() {
         return HttpStatus.x404_NotFound;
     }
 }

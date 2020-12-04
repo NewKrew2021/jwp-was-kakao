@@ -42,7 +42,12 @@ public class WebServer {
     }
 
     private void launchRequestHandler(Socket connection) {
-        new Thread(new RequestHandler(connection, properties.getRequestDispatcher(), properties.getRequestPreProcessor())).start();
+        new Thread(
+                new RequestHandler(
+                        connection,
+                        properties.getRequestDispatcher(),
+                        properties.getRequestPreProcessor(),
+                        properties.getExceptionHandler())).start();
     }
 
 }
