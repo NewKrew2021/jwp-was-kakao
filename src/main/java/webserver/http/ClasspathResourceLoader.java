@@ -1,6 +1,6 @@
-package utils;
+package webserver.http;
 
-import webserver.http.FailToLoadHttpRequestUriException;
+import utils.FileIoUtils;
 
 public class ClasspathResourceLoader implements ResourceLoader {
 

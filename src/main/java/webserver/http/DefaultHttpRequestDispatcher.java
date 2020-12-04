@@ -5,6 +5,7 @@ import java.util.List;
 public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
 
     private HttpRequestMapper<Controller> httpRequestMapper;
+    private HttpResponseHandler httpResponseHandler = new DefaultHttpResponseHandler();
 
     public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings) {
         httpRequestMapper = new DefaultHttpRequestMapper(mappings);
@@ -19,7 +20,8 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
         if( controller == null ) throw new NotFoundException(httpRequest.getPath());
 
         try {
-            controller.execute(httpRequest, httpResponse);
+            ModelAndView mav = controller.execute(httpRequest, httpResponse);
+            httpResponseHandler.handle(mav, httpRequest, httpResponse);
         } catch (RuntimeException e) {
             e.printStackTrace();
             httpResponse.setStatus(HttpStatus.x500_InternalServerError);

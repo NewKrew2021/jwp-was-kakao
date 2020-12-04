@@ -12,9 +12,11 @@
 
 ## Todo
 * WAS 모듈과 Application 모듈 분리
-* HttpResponse 처리책임을 Controller 와 RequestHandler 에서 분리
-* HttpResponse.forward() 매소드 추가. static resource 를 읽어들여 client 에 내려준다
 * HttpResponse 테스트 작성
+
+## InProgress
+* HttpResponse.forward() 매소드 추가. static resource 를 읽어들여 client 에 내려준다
+* WAS 모듈과 Application 모듈 분리
 
 
 ## Done
@@ -29,3 +31,4 @@
 * ~~로그인성공시 index.html 로 실패시 user/login_failed.html 페이지로 이동~~
 * ~~로그인성공시 쿠키설정~~
 * ~~인증이 필요한 페이지는 인증정보가 있어야 접근 할 수 있다~~
+* ~~HttpResponse 처리책임을 Controller 와 RequestHandler 에서 분리~~

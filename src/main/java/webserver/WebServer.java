@@ -6,8 +6,9 @@ import apps.slipp.controller.SignUpController;
 import apps.slipp.controller.UserListController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.ClasspathResourceLoader;
+import webserver.http.ClasspathResourceLoader;
 import webserver.http.*;
+import webserver.http.template.TemplateEngine;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,15 +22,15 @@ public class WebServer {
     private HttpRequestPreProcessor preProcessor;
 
     public WebServer() {
-        Controller staticResourceController = new DefaultController(new ClasspathResourceLoader("./static"));
+        Controller staticResourceController = new ResourceController(new ClasspathResourceLoader("./static"));
         requestDispatcher = new DefaultHttpRequestDispatcher(
                 new PathRegexpMapping("\\/css\\/.+", HttpMethod.GET, staticResourceController),
                 new PathRegexpMapping("\\/js\\/.+", HttpMethod.GET, staticResourceController),
                 new PathRegexpMapping("\\/fonts\\/.+", HttpMethod.GET, staticResourceController),
-                new PathRegexpMapping("\\/.+\\.html", HttpMethod.GET, new DefaultController(new ClasspathResourceLoader("./templates"))),
+                new PathRegexpMapping("\\/.+\\.html", HttpMethod.GET, new ResourceController(new ClasspathResourceLoader("./templates"))),
                 new PathRegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
                 new PathRegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController()),
-                new PathRegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController())
+                new PathRegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController(TemplateEngine.handlebars("/templates", ".html")))
         );
         preProcessor = new CookieAuthenticator("/user/list");
     }
