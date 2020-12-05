@@ -1,14 +1,10 @@
 package controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import service.UserService;
 import webserver.http.SetCookie;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.HttpResponseBuilder;
-
-import java.util.Map;
 
 public class UserLoginController extends Controller {
     private static final String PATH = "/user/login";
@@ -20,9 +16,8 @@ public class UserLoginController extends Controller {
 
     @Override
     protected HttpResponse handlePost(HttpRequest httpRequest) {
-        Map<String, String> body = httpRequest.getBodyInMap();
-        String userId = body.get("userId");
-        String password = body.get("password");
+        String userId = httpRequest.getParameter("userId");
+        String password = httpRequest.getParameter("password");
 
         if (UserService.isLoginSuccessful(userId, password)) {
             return loginSuccess();
