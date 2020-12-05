@@ -1,10 +1,7 @@
 package controller;
 
 import service.UserService;
-import webserver.http.SetCookie;
-import webserver.http.HttpRequest;
-import webserver.http.HttpResponse;
-import webserver.http.HttpResponseBuilder;
+import webserver.http.*;
 
 public class UserLoginController extends Controller {
     private static final String PATH = "/user/login";
@@ -16,6 +13,7 @@ public class UserLoginController extends Controller {
 
     @Override
     protected HttpResponse handlePost(HttpRequest httpRequest) {
+        ParameterValidator.validate(httpRequest, "userId", "password");
         String userId = httpRequest.getParameter("userId");
         String password = httpRequest.getParameter("password");
 
@@ -41,5 +39,4 @@ public class UserLoginController extends Controller {
                 .with302Redirect("/user/login_failed.html")
                 .build();
     }
-
 }

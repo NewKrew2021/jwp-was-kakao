@@ -4,6 +4,7 @@ import service.UserService;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.HttpResponseBuilder;
+import webserver.http.ParameterValidator;
 
 public class UserCreateController extends Controller {
     private static final String PATH = "/user/create";
@@ -28,6 +29,7 @@ public class UserCreateController extends Controller {
     }
 
     private void addNewUser(HttpRequest request) {
+        ParameterValidator.validate(request, "userId", "password", "name", "email");
         String userId = request.getParameter("userId");
         String password = request.getParameter("password");
         String name = request.getParameter("name");
