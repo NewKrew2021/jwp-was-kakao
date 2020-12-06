@@ -10,6 +10,7 @@ import webserver.http.Response;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static webserver.http.HttpMethod.GET;
 import static webserver.http.HttpMethod.POST;
 
@@ -30,12 +31,19 @@ public class RequestMappingTest {
         assertThat(requestMapping.getController(POST, "/index")).isNull();
     }
 
+    @DisplayName("매핑 URI 는 메소드를 포힘해야 한다")
+    @Test
+    void mappingURI() {
+        assertThatThrownBy(() -> new RequestMapping(ImmutableMap.of(
+                "/index", new IndexController()))).isInstanceOf(InvalidMappingURIFormatException.class);
+    }
+
     @DisplayName("여러개의 컨트롤러로 매핑이 가능하다")
     @Test
     void controllerMapping() {
         Map<String, Controller> uriMapping = ImmutableMap.of(
-                "/index", new IndexController(),
-                "/health_check", new HealthCheckController());
+                "GET /index", new IndexController(),
+                "GET /health_check", new HealthCheckController());
 
         RequestMapping requestMapping = new RequestMapping(uriMapping);
 
