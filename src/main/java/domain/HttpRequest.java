@@ -70,11 +70,4 @@ public class HttpRequest {
 	public void setHttpVersion(String httpVersion) {
 		this.httpVersion = httpVersion;
 	}
-
-	public boolean isLoginCookie() {
-		return cookies.keySet().stream()
-				.filter(key -> "logined".equals(key) && "true".equals(cookies.get(key)))
-				.findAny()
-				.isPresent();
-	}
 }

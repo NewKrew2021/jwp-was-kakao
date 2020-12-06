@@ -1,6 +1,5 @@
 package webserver;
 
-import controller.Controller;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import org.slf4j.Logger;
@@ -31,16 +30,9 @@ public class RequestHandler implements Runnable {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             HttpRequest request = new HttpRequstParser(bufferedReader).getHttpRequest();
             HttpResponse response = new HttpResponse(out);
-            route(request, response);
+            new ControllerRouter(request, response).route();
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private void route(HttpRequest request, HttpResponse response) {
-        response.setContentType(request.getContentType());
-        ControllerRouter router = new ControllerRouter(request);
-        Controller controller = router.get();
-        controller.execute(request, response);
     }
 }
