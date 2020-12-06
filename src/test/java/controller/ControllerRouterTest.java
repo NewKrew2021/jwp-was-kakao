@@ -1,6 +1,5 @@
-package webserver;
+package controller;
 
-import controller.*;
 import domain.HttpResponse;
 import exception.NotFoundException;
 import org.junit.jupiter.api.Test;

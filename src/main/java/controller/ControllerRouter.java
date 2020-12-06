@@ -1,6 +1,5 @@
-package webserver;
+package controller;
 
-import controller.*;
 import domain.HttpMethod;
 import domain.HttpRequest;
 import domain.HttpResponse;
