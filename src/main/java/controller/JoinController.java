@@ -2,6 +2,7 @@ package controller;
 
 import domain.HttpRequest;
 import domain.HttpResponse;
+import domain.HttpStatus;
 import service.MemberService;
 
 public class JoinController implements Controller {
@@ -10,6 +11,7 @@ public class JoinController implements Controller {
 	@Override
 	public void execute(HttpRequest request, HttpResponse response) {
 		memberService.joinMember(request.getParameter());
+		response.setHttpStatus(HttpStatus.FOUND);
 		response.sendRedirect("/index.html", false);
 	}
 }

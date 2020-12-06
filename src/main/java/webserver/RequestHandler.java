@@ -1,17 +1,18 @@
 package webserver;
 
 import controller.Controller;
-import domain.HttpHeader;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.HttpRequstParser;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -29,8 +30,7 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             HttpRequest httpRequest = new HttpRequstParser(bufferedReader).getHttpRequest();
-            DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse response = new HttpResponse(dos, httpRequest);
+            HttpResponse response = new HttpResponse(out);
             route(httpRequest, response);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -38,6 +38,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void route(HttpRequest request, HttpResponse response) {
+        response.setContentType(request.getContentType());
         ControllerRouter router = new ControllerRouter(request);
         Controller controller = router.get();
         controller.execute(request, response);

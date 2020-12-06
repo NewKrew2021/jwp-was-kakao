@@ -6,32 +6,35 @@ import utils.RequestPathUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HttpResponse {
 	private static final String DEFAULT_RESPONSE = "Hello World";
+	private static final String DEFAULT_VERSION = "HTTP/1.1";
 	private DataOutputStream dos;
-	private String httpVersion;
+	private HttpStatus httpStatus;
 	private ContentType contentType;
-	private String path;
-	private List<HttpHeader> headers;
 
-	public HttpResponse(DataOutputStream dos, HttpRequest httpRequest) {
-		this.dos = dos;
-		this.httpVersion = getHttpVersion(httpRequest.getHttpVersion());
-		this.contentType = httpRequest.getContentType();
-		this.path = httpRequest.getPath();
-		this.headers = new ArrayList<>();
+	public HttpResponse(OutputStream out) {
+		this.dos = new DataOutputStream(out);
+		this.httpStatus = HttpStatus.OK;
 	}
 
-	private String getHttpVersion(String httpVersion) {
-		return httpVersion != null && !httpVersion.isEmpty() ? httpVersion : "HTTP/1.1";
+	public void setHttpStatus(HttpStatus httpStatus) {
+		this.httpStatus = httpStatus;
 	}
 
-	public void forward() {
-		this.forwardBody(responseBody(path));
+	public void setContentType(ContentType contentType) {
+		this.contentType = contentType;
+	}
+
+	public void forward(HttpRequest request) {
+		setHttpStatus(HttpStatus.OK);
+		setContentType(request.getContentType());
+		this.forwardBody(responseBody(request.getPath()));
 	}
 
 	public void forwardBody(byte[] body) {
@@ -39,8 +42,8 @@ public class HttpResponse {
 			if (body.length == 0) {
 				body = DEFAULT_RESPONSE.getBytes();
 			}
-			dos.writeBytes(String.format("%s %s \r\n", httpVersion, HttpStatus.OK.toString()));
-			for (HttpHeader header : response200Header(body.length)) {
+			dos.writeBytes(String.format("%s %s \r\n", DEFAULT_VERSION, httpStatus.toString()));
+			for (HttpHeader header : response200Header(body.length, contentType)) {
 				dos.writeBytes(String.format("%s: %s \r\n", header.getKey(), header.getValue()));
 			}
 			dos.writeBytes("\r\n");
@@ -53,7 +56,7 @@ public class HttpResponse {
 
 	public void sendRedirect(String location, boolean loginSuccess) {
 		try {
-			dos.writeBytes(String.format("%s %s \r\n", httpVersion, HttpStatus.FOUND.toString()));
+			dos.writeBytes(String.format("%s %s \r\n", DEFAULT_VERSION, httpStatus.toString()));
 			for (HttpHeader header : response302Header(location, loginSuccess)) {
 				dos.writeBytes(String.format("%s: %s \r\n", header.getKey(), header.getValue()));
 			}
@@ -63,16 +66,18 @@ public class HttpResponse {
 		}
 	}
 
-	private List<HttpHeader> response200Header(int bodyLength) {
-		addHeader("Content-Type", contentType.getType());
-		addHeader("Content-Length", String.valueOf(bodyLength));
-		return headers;
+	private List<HttpHeader> response200Header(int bodyLength, ContentType contentType) {
+		return Arrays.asList(
+				new HttpHeader("Content-Type", contentType.getType()),
+				new HttpHeader("Content-Length", String.valueOf(bodyLength))
+		);
 	}
 
 	private List<HttpHeader> response302Header(String location, boolean loginSuccess) {
-		addHeader("Location", location);
-		addHeader("Set-Cookie", (loginSuccess ? "logined=true;" : "logined=false;"));
-		return headers;
+		return Arrays.asList(
+				new HttpHeader("Location", location),
+				new HttpHeader("Set-Cookie", (loginSuccess ? "logined=true;" : "logined=false;"))
+		);
 	}
 
 	private byte[] responseBody(String requestPath) {
@@ -84,9 +89,5 @@ public class HttpResponse {
 		} catch (IOException | URISyntaxException ex) {
 			throw new InvalidResponseBodyException("응답 데이터 오류입니다.");
 		}
-	}
-
-	private void addHeader(String key, String value) {
-		headers.add(new HttpHeader(key, value));
 	}
 }

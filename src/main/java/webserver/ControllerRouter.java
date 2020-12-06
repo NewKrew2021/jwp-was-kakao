@@ -11,6 +11,7 @@ public class ControllerRouter {
 	private static final Map<String, Controller> routeMap = Maps.newHashMap();
 
 	static {
+		routeMap.put("/", new RootController());
 		routeMap.put("/user/create", new JoinController());
 		routeMap.put("/user/login", new LoginController());
 		routeMap.put("/user/list", new MembersController());
@@ -20,7 +21,6 @@ public class ControllerRouter {
 		routeMap.put(".js", new StaticResourceController());
 		routeMap.put(".html", new StaticResourceController());
 		routeMap.put(".ico", new StaticResourceController());
-		routeMap.put("/", new StaticResourceController());
 	}
 
 	private HttpRequest request;
@@ -32,7 +32,7 @@ public class ControllerRouter {
 	public Controller get() {
 		String routeKey = routeMap.keySet()
 				.stream()
-				.filter(key -> request.getPath().contains(key))
+				.filter(key -> request.getPath().endsWith(key))
 				.findFirst()
 				.orElseThrow(() -> new NotFoundException("지원하지 않는 기능입니다."));
 		return routeMap.get(routeKey);

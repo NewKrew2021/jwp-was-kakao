@@ -1,11 +1,7 @@
 package controller;
 
-import exception.InvalidRequestBodyException;
-import exception.InvalidRequestException;
-import exception.InvalidResourceException;
 import exception.NotFoundException;
 import org.junit.jupiter.api.Test;
-import utils.HttpRequstParser;
 import webserver.ControllerRouter;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +26,9 @@ public class ControllerRouterTest {
 
 		router = new ControllerRouter(getHttpRequest("GET_Request3"));
 		assertThat(router.get()).isInstanceOf(MembersController.class);
+
+		router = new ControllerRouter(getHttpRequest("GET_Request2"));
+		assertThat(router.get()).isInstanceOf(RootController.class);
 	}
 
 	@Test

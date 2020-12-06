@@ -8,7 +8,6 @@ import exception.InvalidRequestException;
 import exception.InvalidRequestHeaderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.RequestHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
