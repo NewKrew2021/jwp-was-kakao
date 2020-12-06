@@ -29,7 +29,7 @@ public class HttpRequstParser {
 		try {
 			String line = bufferedReader.readLine();
 			HttpRequestLine requestLine = new HttpRequestLine(line);
-			while (!"".equals(line = bufferedReader.readLine())) {
+			while (!"".equals(line = bufferedReader.readLine()) && null != line) {
 				validate(line);
 				String[] header = line.split(HEADER_SPLIT_DELIMETER);
 				headers.add(new HttpHeader(header[0].trim(), header[1].trim()));

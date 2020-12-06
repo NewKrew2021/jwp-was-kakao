@@ -9,8 +9,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
-import java.io.Reader;
+import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +45,9 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("요청 url에서 쿼리 파라미터를 파싱한다.")
 	public void getRequestParamters() {
-		createGetRequestData();
-		String input = "userId=adeldel&password=adeldel&name=adeldel&email=adeldel@daum.net";
-		Map<String, String> parameters = underTest.getRequstParameters(input);
+		createPostRequestData("POST_Request1");
+//		String input = "userId=adeldel&password=adeldel&name=adeldel&email=adeldel@daum.net";
+		Map<String, String> parameters = underTest.getRequstParameters(httpRequest.getBody());
 		assertThat(parameters).hasSize(4);
 		assertTrue(parameters.containsKey("userId"));
 		assertTrue(parameters.containsKey("password"));
@@ -57,7 +58,7 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("Post body 데이터를 가져온다.")
 	public void getRequestBodyTest() {
-		createPostRequestData();
+		createPostRequestData("POST_Request1");
 		String requestBody = httpRequest.getBody();
 		assertThat(requestBody).isEqualTo("userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
 	}
@@ -65,14 +66,8 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("Post body 데이터를 가져오는데 실패한다.")
 	public void getRequestBodyFailTest() {
-		Reader reader = new StringReader("POST /user/create HTTP/1.1\n" +
-				"Host: localhost:8080\n" +
-				"Connection: keep-alive\n" +
-				"Content-Type: application/x-www-form-urlencoded\n" +
-				"Accept: */*\n\n" +
-				"userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
-
-		underTest = new HttpRequstParser(new BufferedReader(reader));
+		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("POST_Request2")));
+		underTest = new HttpRequstParser(reader);
 		assertThatThrownBy(() -> underTest.requestParse())
 				.isInstanceOf(InvalidRequestBodyException.class);
 	}
@@ -88,14 +83,16 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("응답데이터의 컨텐츠 타입을 요청주소에 따라 변경한다.")
 	public void getContentTypeTest() {
-		setStyleSheetsData();
+		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("GET_Request2")));
+		underTest = new HttpRequstParser(new BufferedReader(reader));
+		httpRequest = underTest.requestParse();
 		assertThat(httpRequest.getContentType()).isEqualTo(ContentType.CSS);
 	}
 
 	@Test
 	@DisplayName("쿼리파람 디코딩 테스트")
 	public void decodeTest() {
-		createPostRequestData();
+		createPostRequestData("POST_Request1");
 		Map<String, String> requestParam = underTest.getRequstParameters(httpRequest.getBody());
 		assertThat(underTest.decodeQueryParam(requestParam.get("email"))).isEqualTo("adel@daum.net");
 		assertThat(underTest.decodeQueryParam("%EC%95%84%EB%8D%B8%EB%8D%B8")).isEqualTo("아델델");
@@ -105,7 +102,7 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("파일확장자 따라 컨텐츠 타입을 구할수 있다.")
 	public void contentTypeTest() {
-		createPostRequestData();
+		createPostRequestData("POST_Request1");
 		assertThat(underTest.getContentType("/index.html")).isEqualTo(ContentType.HTML);
 		assertThat(underTest.getContentType("/styles.css")).isEqualTo(ContentType.CSS);
 		assertThat(underTest.getContentType("/login.js")).isEqualTo(ContentType.JS);
@@ -115,7 +112,7 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("컨텐츠타입으로 form post 요청인지 확인한다.")
 	public void isFormBodyRequestTest() {
-		createPostRequestData();
+		createPostRequestData("POST_Request1");
 		assertTrue(underTest.isFormBodyRequest(httpRequest));
 
 		createGetRequestData();
@@ -123,36 +120,23 @@ public class HttpRequstParserTest {
 	}
 
 	private void createGetRequestData() {
-		Reader reader = new StringReader("GET /index.html HTTP/1.1\n" +
-				"Host: localhost:8080\n" +
-				"Connection: keep-alive\n" +
-				"Accept: */*\n\n");
-
-		underTest = new HttpRequstParser(new BufferedReader(reader));
+		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("GET_Request1")));
+		underTest = new HttpRequstParser(reader);
 		httpRequest = underTest.requestParse();
 	}
 
-	private void createPostRequestData() {
-		Reader reader = new StringReader("POST /user/create HTTP/1.1\n" +
-				"Host: localhost:8080\n" +
-				"Connection: keep-alive\n" +
-				"Content-Length: 67\n" +
-				"Content-Type: application/x-www-form-urlencoded\n" +
-				"Accept: */*\n\n" +
-				"userId=adeldel&password=password&name=adeldel&email=adel%40daum.net");
-
-		underTest = new HttpRequstParser(new BufferedReader(reader));
+	private void createPostRequestData(String filename) {
+		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody(filename)));
+		underTest = new HttpRequstParser(reader);
 		httpRequest = underTest.requestParse();
 	}
 
-	private void setStyleSheetsData() {
-		Reader reader = new StringReader("GET /css/styles.css HTTP/1.1\n" +
-				"Host: localhost:8080\n" +
-				"Connection: keep-alive\n" +
-				"Content-Type: application/x-www-form-urlencoded\n" +
-				"Accept: */*\n\n");
-
-		underTest = new HttpRequstParser(new BufferedReader(reader));
-		httpRequest = underTest.requestParse();
+	private String getRequestBody(String path) {
+		try {
+			return new String(FileIoUtils.loadFileFromClasspath(path));
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 }
