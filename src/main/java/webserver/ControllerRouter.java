@@ -11,14 +11,13 @@ public class ControllerRouter {
 	private static final Map<String, Controller> routeMap = Maps.newHashMap();
 
 	static {
-		routeMap.put("/", new RootController());
 		routeMap.put("/user/create", new JoinController());
 		routeMap.put("/user/login", new LoginController());
 		routeMap.put("/user/list", new MembersController());
-		routeMap.put(".css", new StaticResourceController());
-		routeMap.put(".fonts", new StaticResourceController());
-		routeMap.put(".images", new StaticResourceController());
-		routeMap.put(".js", new StaticResourceController());
+		routeMap.put("/images/", new StaticResourceController());
+		routeMap.put("/fonts/", new StaticResourceController());
+		routeMap.put("/js/", new StaticResourceController());
+		routeMap.put("/css/", new StaticResourceController());
 		routeMap.put(".html", new StaticResourceController());
 		routeMap.put(".ico", new StaticResourceController());
 	}
@@ -30,9 +29,13 @@ public class ControllerRouter {
 	}
 
 	public Controller get() {
+		if ("/".equals(request.getPath()))
+			return new RootController();
+
 		String routeKey = routeMap.keySet()
 				.stream()
-				.filter(key -> request.getPath().endsWith(key))
+				.filter(key -> (request.getPath().contains(key)
+						|| request.getPath().endsWith(key)))
 				.findFirst()
 				.orElseThrow(() -> new NotFoundException("지원하지 않는 기능입니다."));
 		return routeMap.get(routeKey);

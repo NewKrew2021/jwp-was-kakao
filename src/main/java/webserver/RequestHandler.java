@@ -43,5 +43,4 @@ public class RequestHandler implements Runnable {
         Controller controller = router.get();
         controller.execute(request, response);
     }
-
 }
