@@ -15,6 +15,10 @@ public interface TemplateEngine {
         return new HandlebarsTemplateEngine();
     }
 
+    static TemplateEngine handlebars(String prefix, String suffix) {
+        return new HandlebarsTemplateEngine(prefix, suffix);
+    }
+
     class HandlebarsTemplateEngine implements TemplateEngine {
 
         public static final String DEFAULT_PREFIX = "/templates";

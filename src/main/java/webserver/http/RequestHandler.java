@@ -10,17 +10,19 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class RequestHandler implements Runnable {
+
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final String LOGIN_PAGE = "./login.html";
 
     private final Socket connection;
-    private final HttpRequestDispatcher dispatcher;
-    private final HttpRequestPreProcessor preProcessor;
+    private final HttpRequestDispatcher requestDispatcher;
+    private final HttpRequestPreProcessor requestPreProcessor;
+    private final ExceptionHandler exceptionHandler;
 
-    public RequestHandler(Socket connectionSocket, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor preProcessor) {
+    public RequestHandler(Socket connectionSocket, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor requestPreProcessor, ExceptionHandler exceptionHandler) {
         this.connection = connectionSocket;
-        this.preProcessor = preProcessor;
-        this.dispatcher = requestDispatcher;
+        this.requestPreProcessor = requestPreProcessor;
+        this.requestDispatcher = requestDispatcher;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        HttpRequest httpRequest;
+        HttpRequest httpRequest = null;
         HttpResponse httpResponse = null;
         try {
             InputStream in = connection.getInputStream();
@@ -37,23 +39,11 @@ public class RequestHandler implements Runnable {
             httpRequest = new HttpRequestFactory().create(new InputStreamReader(in));
             httpResponse = new HttpResponse(out);
 
-            preProcessor.execute(httpRequest, httpResponse);
-            dispatcher.dispatch(httpRequest, httpResponse);
+            requestPreProcessor.execute(httpRequest, httpResponse);
+            requestDispatcher.dispatch(httpRequest, httpResponse);
 
-            httpResponse.send();
-        } catch (AuthenticationException e) {
-            logger.debug(e.getMessage());
-            httpResponse.sendRedirect(LOGIN_PAGE);
-        } catch (HttpStatusCodeException e ){
-            httpResponse.setStatus(e.getStatus());
-            httpResponse.send();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-
-            httpResponse.setStatus(HttpStatus.x500_InternalServerError);
-            httpResponse.setBody(e.getMessage().getBytes());
-            httpResponse.send();
+        } catch ( Exception e ){
+            exceptionHandler.handle(e, httpRequest, httpResponse);
         } finally {
             closeConnection();
         }

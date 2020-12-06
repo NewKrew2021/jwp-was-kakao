@@ -50,7 +50,6 @@ class HttpRequestFactoryTest {
                 body
         ));
 
-        System.out.print(requestMessage);
         StringReader reader = new StringReader(requestMessage);
 
         HttpRequestFactory factory = new HttpRequestFactory();

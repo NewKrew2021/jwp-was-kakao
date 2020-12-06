@@ -1,5 +1,5 @@
 package webserver.http;
 
 public interface Controller {
-    void execute(HttpRequest httpRequest, HttpResponse httpResponse);
+    ModelAndView execute(HttpRequest httpRequest, HttpResponse httpResponse);
 }

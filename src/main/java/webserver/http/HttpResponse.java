@@ -18,6 +18,7 @@ public class HttpResponse {
 
     private final DataOutputStream dos;
 
+    private String httpVersion = "HTTP/1.1";
     private List<HttpHeader> headers;
     private String cookie;
     private byte[] body;
@@ -30,47 +31,47 @@ public class HttpResponse {
 
     public void setBody(byte[] body) {
         this.body = body;
-        addHeader("Content-Length", String.valueOf(body.length));
+        addHeader(EntityHeader.ContentLength, String.valueOf(body.length));
     }
 
     public void setStatus(HttpStatus status) {
         this.status = status;
     }
 
-    public HttpStatus getStatus() {
+    HttpStatus getStatus() {
         return status == null ? HttpStatus.x200_OK : status;
     }
 
-    public String getStatusLine() {
-        return "HTTP/1.1 " + getStatus();
+    String getStatusLine() {
+        return MessageFormat.format("{0} {1}",httpVersion, getStatus());
     }
 
-    public List<HttpHeader> getHeaders() {
+    List<HttpHeader> getHeaders() {
         List<HttpHeader> allHeaders = new ArrayList<>();
         allHeaders.addAll(Collections.unmodifiableList(headers));
-        if( cookie != null ) allHeaders.add(new HttpHeader("Set-Cookie", cookie));
+        if( cookie != null ) allHeaders.add(new HttpHeader(ResponseHeader.SetCookie, cookie));
 
         return allHeaders;
+    }
+
+    public void addHeader(HeaderConstant headerConstant, String value){
+        addHeader(headerConstant.getHeaderName(), value);
+    }
+
+    public void addHeader(String key, String value) {
+        addHeader(new HttpHeader(key, value));
     }
 
     public void addHeader(HttpHeader header){
         headers.add(header);
     }
 
-    public void addHeader(String key, String value) {
-        headers.add(new HttpHeader(key, value));
-    }
-
     public void setCookie(String setCookieHeaderValue) {
         cookie = setCookieHeaderValue;
     }
 
-    public void setContentType(String contentType) {
-        headers.add(new HttpHeader("Content-Type", contentType));
-    }
-
     public void setContentType(MimeType mimeType, Charset charset) {
-        headers.add(new HttpHeader("Content-Type", MessageFormat.format("{0}; {1}", mimeType, charset)));
+        headers.add(new HttpHeader(EntityHeader.ContentType, MessageFormat.format("{0}; {1}", mimeType, charset)));
     }
 
     private void writeStatusLine() throws IOException {
@@ -93,16 +94,15 @@ public class HttpResponse {
         dos.flush();
     }
 
-    public void sendRedirect(String location, String contentType, List<HttpHeader> headers){
+    public void sendRedirect(String location, List<HttpHeader> headers){
         setStatus(HttpStatus.x302_Found);
-        setContentType(contentType);
-        addHeader("Location", location);
+        addHeader(ResponseHeader.Location, location);
         headers.stream().forEach(this::addHeader);
         send();
     }
 
     public void sendRedirect(String location) {
-        sendRedirect(location, "text/html", new ArrayList<>());
+        sendRedirect(location, new ArrayList<>());
     }
 
     public void send() {
@@ -120,4 +120,5 @@ public class HttpResponse {
             getHeaders().forEach(it -> logger.debug(it.toString()));
         }
     }
+
 }
