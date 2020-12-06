@@ -10,7 +10,7 @@ import static java.util.AbstractMap.SimpleEntry;
 import static java.util.stream.Collectors.*;
 
 public class HttpRequest {
-    private final String method;
+    private final HttpMethod method;
     private final String requestURI;
     private final String protocol;
     private Map<String, String> queryParams;
@@ -18,12 +18,12 @@ public class HttpRequest {
     private Map<String, String> entity;
 
     public HttpRequest(String method, String requestURI, String protocol) {
-        this.method = method;
+        this.method = HttpMethod.valueOf(method);
         this.requestURI = requestURI;
         this.protocol = protocol;
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 

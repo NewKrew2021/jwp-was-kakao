@@ -13,6 +13,7 @@ import java.io.StringReader;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static webserver.http.HttpMethod.GET;
 
 public class RequestParserTest {
 
@@ -42,7 +43,7 @@ public class RequestParserTest {
         @Test
         void parseMethod() throws IOException {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
-            assertThat(httpRequest.getMethod()).isEqualTo("GET");
+            assertThat(httpRequest.getMethod()).isEqualTo(GET);
         }
 
         @DisplayName("RequestURI 를 파싱한다")
