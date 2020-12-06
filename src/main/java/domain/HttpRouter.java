@@ -1,6 +1,6 @@
-package controller;
+package domain;
 
-import domain.HttpMethod;
+import controller.AbstractController;
 
 public class HttpRouter {
 	private AbstractController controller;
