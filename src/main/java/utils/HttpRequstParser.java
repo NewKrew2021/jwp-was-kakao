@@ -21,6 +21,7 @@ public class HttpRequstParser {
 	private static final String COOKIE_DELEIMTER = ";";
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String CONTENT_TYPE = "Content-Type";
+	private Map<String, String> parameters = new HashMap<>();
 	private BufferedReader bufferedReader;
 	private HttpRequest httpRequest;
 
@@ -60,7 +61,7 @@ public class HttpRequstParser {
 	}
 
 	private HttpRequest makeHttpRequest(List<HttpHeader> headers, HttpRequestLine httpRequestLine) {
-		HttpRequest httpRequest = new HttpRequest(httpRequestLine.getHttpMethod(), headers, httpRequestLine.getRequestTarget());
+		HttpRequest httpRequest = new HttpRequest(httpRequestLine.getHttpMethod(), headers, httpRequestLine.getUri().getPath());
 		if (isFormBodyRequest(httpRequest)) {
 			String requestBody = getRequestBody(headers);
 			httpRequest.setBody(requestBody);
@@ -68,7 +69,11 @@ public class HttpRequstParser {
 			httpRequest.setHttpVersion(httpRequestLine.getHttpVersion());
 		}
 		httpRequest.setCookies(getCookies(headers));
-		httpRequest.setContentType(getContentType(httpRequestLine.getRequestTarget()));
+		httpRequest.setContentType(getContentType(httpRequestLine.getUri().getPath()));
+		String queryParameter = httpRequestLine.getUri().getQuery();
+		if (queryParameter != null && !queryParameter.isEmpty()) {
+			httpRequest.setParameter(getQueryMap(queryParameter));
+		}
 		return httpRequest;
 	}
 
@@ -95,7 +100,6 @@ public class HttpRequstParser {
 		if (query == null)
 			return null;
 		String[] params = query.split("&");
-		Map<String, String> parameters = new HashMap<>();
 		for (String param : params) {
 			String name = param.split("=")[0];
 			String value = param.split("=")[1];

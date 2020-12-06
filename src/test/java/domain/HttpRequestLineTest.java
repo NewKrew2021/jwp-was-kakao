@@ -11,7 +11,7 @@ public class HttpRequestLineTest {
 	public void 첫번째_라인을_파싱해서_requestLine을_생성한다() {
 		HttpRequestLine httpRequestLine = new HttpRequestLine("GET /index.html HTTP/1.1\n");
 		assertThat(httpRequestLine.getHttpMethod()).isEqualTo(HttpMethod.GET);
-		assertThat(httpRequestLine.getRequestTarget()).isEqualTo("/index.html");
+		assertThat(httpRequestLine.getUri().getPath()).isEqualTo("/index.html");
 		assertThat(httpRequestLine.getHttpVersion()).isEqualTo("HTTP/1.1");
 	}
 

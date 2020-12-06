@@ -1,18 +1,19 @@
 package domain;
 
 import exception.InvalidRequestException;
+import java.net.URI;
 
 public class HttpRequestLine {
 	private static final String DELEMITER = " ";
 	private HttpMethod httpMethod;
-	private String requestTarget;
 	private String httpVersion;
+	private URI uri;
 
 	public HttpRequestLine(String requestLine) {
 		String[] splitLine = requestLine.split(DELEMITER);
 		validate(splitLine);
 		setHttpMethod(splitLine[0].trim());
-		setRequestTarget(splitLine[1].trim());
+		setUri(splitLine[1].trim());
 		setHttpVersion(splitLine[2].trim());
 	}
 
@@ -29,12 +30,12 @@ public class HttpRequestLine {
 		this.httpMethod = HttpMethod.of(method);
 	}
 
-	public String getRequestTarget() {
-		return requestTarget;
+	public URI getUri() {
+		return uri;
 	}
 
-	public void setRequestTarget(String requestTarget) {
-		this.requestTarget = requestTarget;
+	public void setUri(String requestTarget) {
+		this.uri = URI.create(requestTarget);
 	}
 
 	public String getHttpVersion() {
