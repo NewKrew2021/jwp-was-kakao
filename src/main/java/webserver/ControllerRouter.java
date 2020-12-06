@@ -3,7 +3,6 @@ package webserver;
 import com.google.common.collect.Maps;
 import controller.*;
 import domain.HttpRequest;
-import domain.UserAction;
 import exception.NotFoundException;
 
 import java.util.Map;
@@ -12,15 +11,16 @@ public class ControllerRouter {
 	private static final Map<String, Controller> routeMap = Maps.newHashMap();
 
 	static {
-		routeMap.put(UserAction.JOIN.getUri(), new JoinController());
-		routeMap.put(UserAction.LOGIN.getUri(), new LoginController());
-		routeMap.put(UserAction.LIST.getUri(), new MembersController());
+		routeMap.put("/user/create", new JoinController());
+		routeMap.put("/user/login", new LoginController());
+		routeMap.put("/user/list", new MembersController());
 		routeMap.put(".css", new StaticResourceController());
 		routeMap.put(".fonts", new StaticResourceController());
 		routeMap.put(".images", new StaticResourceController());
 		routeMap.put(".js", new StaticResourceController());
 		routeMap.put(".html", new StaticResourceController());
 		routeMap.put(".ico", new StaticResourceController());
+		routeMap.put("/", new StaticResourceController());
 	}
 
 	private HttpRequest request;
