@@ -11,14 +11,23 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static webserver.http.HttpMethod.GET;
+import static webserver.http.HttpMethod.POST;
 
 public class RequestMappingTest {
     @DisplayName("매핑된 컨트롤러르 리턴한다")
     @Test
-    void create() {
+    void getController() {
         IndexController indexController = new IndexController();
-        RequestMapping requestMapping = new RequestMapping("/index", indexController);
-        assertThat(requestMapping.getController("/index")).isEqualTo(indexController);
+        RequestMapping requestMapping = new RequestMapping(GET, "/index", indexController);
+        assertThat(requestMapping.getController(GET, "/index")).isEqualTo(indexController);
+    }
+
+    @DisplayName("메소드로 매핑을 구분할 수 있다")
+    @Test
+    void shouldReturnNullWhenDifferentMethod() {
+        IndexController indexController = new IndexController();
+        RequestMapping requestMapping = new RequestMapping(GET, "/index", indexController);
+        assertThat(requestMapping.getController(POST, "/index")).isNull();
     }
 
     @DisplayName("여러개의 컨트롤러로 매핑이 가능하다")
