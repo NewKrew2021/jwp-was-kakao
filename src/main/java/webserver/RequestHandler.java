@@ -34,7 +34,7 @@ public class RequestHandler implements Runnable {
 
             Response response = handleRequest(httpRequest);
 
-            RESPONSE_HANDLER.response(new DataOutputStream(out), response);
+            RESPONSE_HANDLER.handleResponse(new DataOutputStream(out), response);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

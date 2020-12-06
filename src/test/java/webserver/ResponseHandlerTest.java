@@ -34,7 +34,7 @@ class ResponseHandlerTest {
         Response response = new Response();
         response.setStatus(ResponseStatus.SEE_OTHER);
         response.setHeaders("Location: /index.html");
-        responseHandler.response(new DataOutputStream(out), response);
+        responseHandler.handleResponse(new DataOutputStream(out), response);
 
         assertThat(out.toString()).isEqualTo("HTTP/1.1 302 Found \r\n" +
                                              "Location: /index.html\r\n\r\n");
@@ -45,7 +45,7 @@ class ResponseHandlerTest {
         Response response = new Response();
         String body = "Hello World!";
         response.setBody(body.getBytes());
-        responseHandler.response(new DataOutputStream(out), response);
+        responseHandler.handleResponse(new DataOutputStream(out), response);
 
         assertThat(out.toString()).isEqualTo("HTTP/1.1 200 OK \r\n" +
                                              "Content-Length: " + body.length() + "\r\n\r\n" +
@@ -58,7 +58,7 @@ class ResponseHandlerTest {
         String message = "Hello World!";
         response.setModel(message);
         response.setViewName("/hello.html");
-        responseHandler.response(new DataOutputStream(out), response);
+        responseHandler.handleResponse(new DataOutputStream(out), response);
 
         assertThat(out.toString()).isEqualTo("HTTP/1.1 200 OK \r\n" +
                                              "Content-Length: " + message.length() + "\r\n\r\n" +

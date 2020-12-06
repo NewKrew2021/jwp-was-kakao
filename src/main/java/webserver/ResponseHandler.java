@@ -15,7 +15,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    public void response(DataOutputStream dos, Response response) throws IOException {
+    public void handleResponse(DataOutputStream dos, Response response) throws IOException {
         if (StringUtils.hasText(response.getViewName())) {
             setBody(response);
         }
