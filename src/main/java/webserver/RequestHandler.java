@@ -50,7 +50,7 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = new HttpResponse(dos, httpRequest);
             memberAction(httpRequest, response, requstParser);
-            response.response200OK();
+            response.forward();
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw new HandlebarTemplateException("템플릿 지정이 잘못되었습니다.");
@@ -64,23 +64,23 @@ public class RequestHandler implements Runnable {
     private void memberAction(HttpRequest httpRequest, HttpResponse response, HttpRequstParser requstParser) throws IOException {
         if (memberService.isJoinReq(httpRequest)) {
             memberService.joinMember(httpRequest.getParameter());
-            response.response302Redirect("/index.html", false);
+            response.sendRedirect("/index.html", false);
         }
         if (memberService.isLoginReq(httpRequest)) {
             boolean isLogin = memberService.memberLogin(httpRequest.getParameter());
             if (!isLogin) {
-                response.response302Redirect("/user/login_failed.html", false);
+                response.sendRedirect("/user/login_failed.html", false);
             }
-            response.response302Redirect("/index.html", true);
+            response.sendRedirect("/index.html", true);
         }
         if (memberService.isMembersReq(httpRequest)) {
             if (requstParser.isLoginCookie(httpRequest.getCookies())) {
                 List<User> members = memberService.getAllMembers();
                 Template template = handlebars.compile("user/list");
                 byte[] body = template.apply(members).getBytes();
-                response.response200OK(body);
+                response.forwardBody(body);
             }
-            response.response302Redirect("/user/login.html", false);
+            response.sendRedirect("/user/login.html", false);
         }
     }
 }
