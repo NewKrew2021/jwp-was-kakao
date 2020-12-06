@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import webserver.http.HttpRequest;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.Map;
 
@@ -35,27 +34,27 @@ public class RequestParserTest {
 
         @DisplayName("HttpRequest 를 생성한다")
         @Test
-        void createHttpRequest() throws IOException {
+        void createHttpRequest() {
             assertThat(new RequestParser(bufferedReader).parse()).isNotNull();
         }
 
         @DisplayName("메소드를 파싱한다")
         @Test
-        void parseMethod() throws IOException {
+        void parseMethod() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getMethod()).isEqualTo(GET);
         }
 
         @DisplayName("RequestURI 를 파싱한다")
         @Test
-        void parseRequestURI() throws IOException {
+        void parseRequestURI() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getRequestURI()).isEqualTo("/index.html");
         }
 
         @DisplayName("프로토콜을 를 파싱한다")
         @Test
-        void parseProtocol() throws IOException {
+        void parseProtocol() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getProtocol()).isEqualTo("HTTP/1.1");
         }
@@ -76,7 +75,7 @@ public class RequestParserTest {
         }
 
         @Test
-        void parse() throws IOException {
+        void parse() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(getUser(httpRequest)).isEqualTo(new User(
                     "javajigi",
@@ -117,7 +116,7 @@ public class RequestParserTest {
         }
 
         @Test
-        void parse() throws IOException {
+        void parse() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(httpRequest.getHeaders())
                     .containsEntry("Host", "localhost:8080")
@@ -146,7 +145,7 @@ public class RequestParserTest {
         }
 
         @Test
-        void parse() throws IOException {
+        void parse() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
             assertThat(getUser(httpRequest)).isEqualTo(new User(
                     "javajigi",
@@ -169,7 +168,7 @@ public class RequestParserTest {
         }
 
         @Test
-        void parse() throws IOException {
+        void parse() {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
 
             Map<String, String> cookiesMap = httpRequest.getCookies().asMap();
@@ -180,7 +179,7 @@ public class RequestParserTest {
         }
 
         @Test
-        void cookieHeaderNotExists() throws IOException {
+        void cookieHeaderNotExists() {
             bufferedReader = new BufferedReader(new StringReader(
                     "GET /user/list HTTP/1.1\n" +
                     "Host: localhost:8080\n" +

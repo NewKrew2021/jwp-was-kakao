@@ -40,7 +40,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private HttpRequest parseRequest(InputStream in) throws IOException {
+    private HttpRequest parseRequest(InputStream in) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, UTF_8));
         RequestParser requestParser = new RequestParser(bufferedReader);
         return requestParser.parse();
