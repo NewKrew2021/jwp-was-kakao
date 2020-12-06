@@ -43,13 +43,12 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            HttpRequstParser requstParser = new HttpRequstParser(bufferedReader);
-            HttpRequest httpRequest = requstParser.requestParse();
+            HttpRequest httpRequest = new HttpRequstParser(bufferedReader).getHttpRequest();
             printRequestHeaders(httpRequest.getHeaders()); //헤더 출력
 
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = new HttpResponse(dos, httpRequest);
-            memberAction(httpRequest, response, requstParser);
+            memberAction(httpRequest, response);
             response.forward();
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -61,7 +60,7 @@ public class RequestHandler implements Runnable {
         headers.forEach(header -> logger.debug(header.toString()));
     }
 
-    private void memberAction(HttpRequest httpRequest, HttpResponse response, HttpRequstParser requstParser) throws IOException {
+    private void memberAction(HttpRequest httpRequest, HttpResponse response) throws IOException {
         if (memberService.isJoinReq(httpRequest)) {
             memberService.joinMember(httpRequest.getParameter());
             response.sendRedirect("/index.html", false);
@@ -74,7 +73,7 @@ public class RequestHandler implements Runnable {
             response.sendRedirect("/index.html", true);
         }
         if (memberService.isMembersReq(httpRequest)) {
-            if (requstParser.isLoginCookie(httpRequest.getCookies())) {
+            if (httpRequest.isLoginCookie()) {
                 List<User> members = memberService.getAllMembers();
                 Template template = handlebars.compile("user/list");
                 byte[] body = template.apply(members).getBytes();

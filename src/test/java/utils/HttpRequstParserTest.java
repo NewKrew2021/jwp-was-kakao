@@ -4,7 +4,7 @@ import domain.ContentType;
 import domain.HttpHeader;
 import domain.HttpRequest;
 import exception.InvalidRequestBodyException;
-import exception.InvalidRequestHeaderException;
+import exception.InvalidRequestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,6 @@ public class HttpRequstParserTest {
 		List<HttpHeader> headers = httpRequest.getHeaders();
 
 		assertThat(headers).hasSize(3);
-		headers.forEach(header -> System.out.println(header.toString()));
 		assertThat(headers.get(0).toString()).isEqualTo(new HttpHeader("Host", "localhost:8080").toString());
 	}
 
@@ -46,7 +45,6 @@ public class HttpRequstParserTest {
 	@DisplayName("요청 url에서 쿼리 파라미터를 파싱한다.")
 	public void getRequestParamters() {
 		createPostRequestData("POST_Request1");
-//		String input = "userId=adeldel&password=adeldel&name=adeldel&email=adeldel@daum.net";
 		Map<String, String> parameters = underTest.getRequstParameters(httpRequest.getBody());
 		assertThat(parameters).hasSize(4);
 		assertTrue(parameters.containsKey("userId"));
@@ -66,18 +64,17 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("Post body 데이터를 가져오는데 실패한다.")
 	public void getRequestBodyFailTest() {
-		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("POST_Request2")));
-		underTest = new HttpRequstParser(reader);
-		assertThatThrownBy(() -> underTest.requestParse())
+		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("POST_Invalid_Header")));
+		assertThatThrownBy(() -> new HttpRequstParser(reader))
 				.isInstanceOf(InvalidRequestBodyException.class);
 	}
 
 	@Test
 	@DisplayName("헤더 정보가 정상인지 확인한다.")
 	public void validateTest() {
-		HttpRequstParser parser = new HttpRequstParser(new BufferedReader(new StringReader("")));
-		assertThatThrownBy(() -> parser.validate("Connection keep-alive"))
-				.isInstanceOf(InvalidRequestHeaderException.class);
+		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("GET_Invalid_Header")));
+		assertThatThrownBy(() -> new HttpRequstParser(reader))
+				.isInstanceOf(InvalidRequestException.class);
 	}
 
 	@Test
@@ -85,7 +82,7 @@ public class HttpRequstParserTest {
 	public void getContentTypeTest() {
 		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("GET_Request2")));
 		underTest = new HttpRequstParser(new BufferedReader(reader));
-		httpRequest = underTest.requestParse();
+		httpRequest = underTest.getHttpRequest();
 		assertThat(httpRequest.getContentType()).isEqualTo(ContentType.CSS);
 	}
 
@@ -122,13 +119,13 @@ public class HttpRequstParserTest {
 	private void createGetRequestData() {
 		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("GET_Request1")));
 		underTest = new HttpRequstParser(reader);
-		httpRequest = underTest.requestParse();
+		httpRequest = underTest.getHttpRequest();
 	}
 
 	private void createPostRequestData(String filename) {
 		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody(filename)));
 		underTest = new HttpRequstParser(reader);
-		httpRequest = underTest.requestParse();
+		httpRequest = underTest.getHttpRequest();
 	}
 
 	private String getRequestBody(String path) {

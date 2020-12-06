@@ -113,6 +113,6 @@ public class MemberServiceTest {
 
 	private void makeHttpRequest(Reader reader) {
 		httpRequstParser = new HttpRequstParser(new BufferedReader(reader));
-		httpRequest = httpRequstParser.requestParse();
+		httpRequest = httpRequstParser.getHttpRequest();
 	}
 }

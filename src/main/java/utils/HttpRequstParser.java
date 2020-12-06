@@ -19,12 +19,18 @@ public class HttpRequstParser {
 	private static final String CONTENT_LENGTH = "Content-Length";
 	private static final String CONTENT_TYPE = "Content-Type";
 	private BufferedReader bufferedReader;
+	private HttpRequest httpRequest;
 
 	public HttpRequstParser(BufferedReader bufferedReader) {
 		this.bufferedReader = bufferedReader;
+		this.httpRequest = requestParse();
 	}
 
-	public HttpRequest requestParse() {
+	public HttpRequest getHttpRequest() {
+		return httpRequest;
+	}
+
+	private HttpRequest requestParse() {
 		List<HttpHeader> headers = new ArrayList<>();
 		try {
 			String line = bufferedReader.readLine();
@@ -113,12 +119,7 @@ public class HttpRequstParser {
 		return Splitter.on(COOKIE_DELEIMTER).withKeyValueSeparator("=").split(cookieHeader.getValue());
 	}
 
-	public boolean isLoginCookie(Map<String, String> cookies) {
-		return cookies.keySet().stream()
-				.filter(key -> "logined".equals(key) && "true".equals(cookies.get(key)))
-				.findAny()
-				.isPresent();
-	}
+
 
 	protected ContentType getContentType(String path) {
 		return ContentType.of(path);
