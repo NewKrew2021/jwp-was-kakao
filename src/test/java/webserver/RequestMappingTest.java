@@ -10,6 +10,7 @@ import webserver.http.Response;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static webserver.http.HttpMethod.GET;
 
 public class RequestMappingTest {
     @DisplayName("매핑된 컨트롤러르 리턴한다")
@@ -31,6 +32,11 @@ public class RequestMappingTest {
 
         uriMapping.forEach((uri, controller) ->
                                    assertThat(requestMapping.getController(uri)).isEqualTo(controller));
+    }
+
+    @Test
+    void toMappingURI() {
+        assertThat(RequestMapping.toMappingURI(GET, "/index")).isEqualTo("GET /index");
     }
 
     private static class IndexController implements Controller {
