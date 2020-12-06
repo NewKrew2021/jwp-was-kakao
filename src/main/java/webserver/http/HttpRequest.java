@@ -13,9 +13,9 @@ public class HttpRequest {
     private final HttpMethod method;
     private final String requestURI;
     private final String protocol;
-    private Map<String, String> queryParams;
+    private Map<String, String> queryParams = Collections.emptyMap();
     private final Map<String, String> headers = new HashMap<>();
-    private Map<String, String> entity;
+    private Map<String, String> entity = Collections.emptyMap();
 
     public HttpRequest(String method, String requestURI, String protocol) {
         this.method = HttpMethod.valueOf(method);
@@ -63,6 +63,10 @@ public class HttpRequest {
         return Optional.ofNullable(getHeaders().get("Cookie"))
                 .map(Cookies::new)
                 .orElse(null);
+    }
+
+    public String getParameter(String name) {
+        return queryParams.getOrDefault(name, entity.get(name));
     }
 
     public static class Cookies {

@@ -65,7 +65,6 @@ public class RequestParserTest {
     class QueryString {
         @BeforeEach
         void setUp() {
-
             bufferedReader = new BufferedReader(new StringReader(
                     "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n" +
                             "Host: localhost:8080\n" +
@@ -84,7 +83,7 @@ public class RequestParserTest {
                     "javajigi@slipp.net"));
         }
 
-        @DisplayName("query stirng 문자열을 Map 으로 변환한다.")
+        @DisplayName("query string 문자열을 Map 으로 변환한다.")
         @Test
         void queryStringLineToMap() {
             RequestParser.UrlEncodedStringParser urlEncodedStringParser = new RequestParser.UrlEncodedStringParser(
@@ -94,6 +93,12 @@ public class RequestParserTest {
                     .containsEntry("password", "password")
                     .containsEntry("name", "박재성")
                     .containsEntry("email", "javajigi@slipp.net");
+        }
+
+        @Test
+        void getParameter() {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+            assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
         }
     }
 
@@ -152,6 +157,12 @@ public class RequestParserTest {
                     "password",
                     "박재성",
                     "javajigi@slipp.net"));
+        }
+
+        @Test
+        void getParameter() {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+            assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
         }
     }
     @Nested
