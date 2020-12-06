@@ -41,6 +41,18 @@ public class HttpRequestTest {
 		assertEquals("1", request.getParameter().get("id"));
 	}
 
+	@Test
+	public void request_GET() throws Exception {
+		InputStream in = new FileInputStream(new File(testDirectory + "Http_GET.txt"));
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+		HttpRequest request = new HttpRequstParser(bufferedReader).getHttpRequest();
+
+		assertEquals(HttpMethod.GET, request.getMethod());
+		assertEquals("/user/create", request.getPath());
+		assertEquals("keep-alive", getHttpHeader(request,"Connection").getValue());
+		assertEquals("javajigi", request.getParameter().get("userId"));
+	}
+
 	private HttpHeader getHttpHeader(HttpRequest request, String key) {
 		return request.getHeaders()
 				.stream()
