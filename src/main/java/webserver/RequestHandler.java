@@ -51,7 +51,7 @@ public class RequestHandler implements Runnable {
     }
 
     private Response handleRequest(HttpRequest httpRequest) throws Exception {
-        return Optional.ofNullable(requestMapping.getController(httpRequest.getRequestURI()))
+        return Optional.ofNullable(requestMapping.getController(httpRequest.getMethod(), httpRequest.getRequestURI()))
                 .orElseGet(StaticContentController::new)
                 .execute(httpRequest);
     }

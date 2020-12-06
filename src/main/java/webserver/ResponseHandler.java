@@ -1,6 +1,8 @@
 package webserver;
 
 import com.github.jknack.handlebars.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import utils.TemplateUtils;
 import webserver.http.Response;
@@ -12,6 +14,7 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ResponseHandler {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     public void response(DataOutputStream dos, Response response) throws IOException {
         if (StringUtils.hasText(response.getViewName())) {
             setBody(response);
@@ -32,6 +35,7 @@ public class ResponseHandler {
 
     private void responseHeader(DataOutputStream dos, List<String> headers) throws IOException {
         for (String header : headers) {
+            logger.debug("responseHeader: {}", header);
             dos.writeBytes(header + "\r\n");
         }
         dos.writeBytes("\r\n");

@@ -26,10 +26,6 @@ class RequestMapping {
         return uriMapping.keySet().stream().anyMatch(uri -> Arrays.stream(HttpMethod.values()).anyMatch(method -> uri.startsWith(method.name())));
     }
 
-    public Controller getController(String uri) {
-        return uriMapping.get(uri);
-    }
-
     public Controller getController(HttpMethod method, String uri) {
         return uriMapping.get(toMappingURI(method, uri));
     }
