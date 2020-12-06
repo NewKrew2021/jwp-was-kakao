@@ -54,7 +54,7 @@ public class HttpRequstParser {
 		if (isFormBodyRequest(httpRequest)) {
 			String requestBody = getRequestBody(headers);
 			httpRequest.setBody(requestBody);
-			httpRequest.setRequestParam(getQueryMap(requestBody));
+			httpRequest.setParameter(getQueryMap(requestBody));
 			httpRequest.setHttpVersion(httpRequestLine.getHttpVersion());
 		}
 		httpRequest.setCookies(getCookies(headers));

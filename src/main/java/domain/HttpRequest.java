@@ -7,7 +7,7 @@ public class HttpRequest {
 	private HttpMethod method;
 	private List<HttpHeader> headers;
 	private String path;
-	private Map<String, String> requestParam;
+	private Map<String, String> parameter;
 	private Map<String, String> cookies;
 	private ContentType contentType;
 	private String body;
@@ -31,12 +31,12 @@ public class HttpRequest {
 		return path;
 	}
 
-	public Map<String, String> getRequestParam() {
-		return requestParam;
+	public Map<String, String> getParameter() {
+		return parameter;
 	}
 
-	public void setRequestParam(Map<String, String> requestParam) {
-		this.requestParam = requestParam;
+	public void setParameter(Map<String, String> parameter) {
+		this.parameter = parameter;
 	}
 
 	public Map<String, String> getCookies() {

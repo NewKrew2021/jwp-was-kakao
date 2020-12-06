@@ -32,7 +32,7 @@ public class MemberServiceTest {
 	@DisplayName("회원가입시 유저 정보를 저장한다")
 	public void joinMemberTest() {
 		joinMemberRequestData();
-		underTest.joinMember(httpRequest.getRequestParam());
+		underTest.joinMember(httpRequest.getParameter());
 		User user = DataBase.findUserById("adeldel");
 		assertThat(user.getName()).isEqualTo("adeldel");
 		assertThat(user.getPassword()).isEqualTo("password");
@@ -49,13 +49,13 @@ public class MemberServiceTest {
 	@DisplayName("로그인시 유저정보를 확인한다.")
 	public void loginRequestTest() {
 		joinMemberRequestData();
-		underTest.joinMember(httpRequest.getRequestParam());
+		underTest.joinMember(httpRequest.getParameter());
 
 		loginRequstData("password");
-		assertTrue(underTest.memberLogin(httpRequest.getRequestParam()));
+		assertTrue(underTest.memberLogin(httpRequest.getParameter()));
 
 		loginRequstData("wrong_password");
-		assertFalse(underTest.memberLogin(httpRequest.getRequestParam()));
+		assertFalse(underTest.memberLogin(httpRequest.getParameter()));
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class MemberServiceTest {
 	public void getAllMembersTest() {
 		//회원가입
 		joinMemberRequestData();
-		underTest.joinMember(httpRequest.getRequestParam());
+		underTest.joinMember(httpRequest.getParameter());
 		//모든회원 조회
 		List<User> members = underTest.getAllMembers();
 		assertThat(members).hasSize(1);

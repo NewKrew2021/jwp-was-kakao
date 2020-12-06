@@ -63,11 +63,11 @@ public class RequestHandler implements Runnable {
 
     private void memberAction(HttpRequest httpRequest, HttpResponse response, HttpRequstParser requstParser) throws IOException {
         if (memberService.isJoinReq(httpRequest)) {
-            memberService.joinMember(httpRequest.getRequestParam());
+            memberService.joinMember(httpRequest.getParameter());
             response.response302Redirect("/index.html", false);
         }
         if (memberService.isLoginReq(httpRequest)) {
-            boolean isLogin = memberService.memberLogin(httpRequest.getRequestParam());
+            boolean isLogin = memberService.memberLogin(httpRequest.getParameter());
             if (!isLogin) {
                 response.response302Redirect("/user/login_failed.html", false);
             }
