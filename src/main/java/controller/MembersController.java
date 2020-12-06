@@ -20,10 +20,12 @@ public class MembersController implements Controller {
 			if (request.isLoginCookie()) {
 				List<User> members = memberService.getAllMembers();
 				response.setHttpStatus(HttpStatus.OK);
+				response.setContentType(request.getContentType());
 				response.forwardBody(handlebars.apply("/user/list", members).getBytes());
 			}
 			response.setHttpStatus(HttpStatus.FOUND);
-			response.sendRedirect("/user/login.html", false);
+			response.addHeader("Set-Cookie", "logined=false");
+			response.sendRedirect("/user/login.html");
 		} catch (InvalidTemplateException e) {
 			throw e;
 		}

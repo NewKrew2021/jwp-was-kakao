@@ -17,6 +17,7 @@ public class StaticResourceController implements Controller {
 		try {
 			String resourcePath = RequestPathUtils.getResourcePath(request.getPath());
 			response.setHttpStatus(HttpStatus.OK);
+			request.setContentType(request.getContentType());
 			response.forwardBody(FileIoUtils.loadFileFromClasspath(resourcePath));
 		} catch (IOException | URISyntaxException e) {
 			throw new InvalidResourceException(e.getMessage());

@@ -12,6 +12,7 @@ public class JoinController implements Controller {
 	public void execute(HttpRequest request, HttpResponse response) {
 		memberService.joinMember(request.getParameter());
 		response.setHttpStatus(HttpStatus.FOUND);
-		response.sendRedirect("/index.html", false);
+		response.addHeader("Set-Cookie", "logined=false");
+		response.sendRedirect("/index.html");
 	}
 }

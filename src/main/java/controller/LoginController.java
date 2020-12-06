@@ -13,8 +13,10 @@ public class LoginController implements Controller {
 		response.setHttpStatus(HttpStatus.FOUND);
 		boolean loginSuccess = memberService.memberLogin(request.getParameter());
 		if (!loginSuccess) {
-			response.sendRedirect("/user/login_failed.html", false);
+			response.addHeader("Set-Cookie", "logined=false");
+			response.sendRedirect("/user/login_failed.html");
 		}
-		response.sendRedirect("/index.html", true);
+		response.addHeader("Set-Cookie", "logined=true");
+		response.sendRedirect("/index.html");
 	}
 }

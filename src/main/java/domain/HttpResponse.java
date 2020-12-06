@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,10 +18,12 @@ public class HttpResponse {
 	private DataOutputStream dos;
 	private HttpStatus httpStatus;
 	private ContentType contentType;
+	private List<HttpHeader> headers;
 
 	public HttpResponse(OutputStream out) {
 		this.dos = new DataOutputStream(out);
 		this.httpStatus = HttpStatus.OK;
+		this.headers = new ArrayList<>();
 	}
 
 	public void setHttpStatus(HttpStatus httpStatus) {
@@ -31,10 +34,9 @@ public class HttpResponse {
 		this.contentType = contentType;
 	}
 
-	public void forward(HttpRequest request) {
+	public void forward(String path) {
 		setHttpStatus(HttpStatus.OK);
-		setContentType(request.getContentType());
-		this.forwardBody(responseBody(request.getPath()));
+		this.forwardBody(responseBody(path));
 	}
 
 	public void forwardBody(byte[] body) {
@@ -42,8 +44,10 @@ public class HttpResponse {
 			if (body.length == 0) {
 				body = DEFAULT_RESPONSE.getBytes();
 			}
+			addHeader("Content-Type", contentType != null ? contentType.getType() : "");
+			addHeader("Content-Length", String.valueOf(body.length));
 			dos.writeBytes(String.format("%s %s \r\n", DEFAULT_VERSION, httpStatus.toString()));
-			for (HttpHeader header : response200Header(body.length, contentType)) {
+			for (HttpHeader header : headers) {
 				dos.writeBytes(String.format("%s: %s \r\n", header.getKey(), header.getValue()));
 			}
 			dos.writeBytes("\r\n");
@@ -54,30 +58,17 @@ public class HttpResponse {
 		}
 	}
 
-	public void sendRedirect(String location, boolean loginSuccess) {
+	public void sendRedirect(String location) {
 		try {
+			addHeader("Location", location);
 			dos.writeBytes(String.format("%s %s \r\n", DEFAULT_VERSION, httpStatus.toString()));
-			for (HttpHeader header : response302Header(location, loginSuccess)) {
+			for (HttpHeader header : headers) {
 				dos.writeBytes(String.format("%s: %s \r\n", header.getKey(), header.getValue()));
 			}
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			throw new InvalidResponseBodyException("응답 데이터 오류입니다.");
 		}
-	}
-
-	private List<HttpHeader> response200Header(int bodyLength, ContentType contentType) {
-		return Arrays.asList(
-				new HttpHeader("Content-Type", contentType.getType()),
-				new HttpHeader("Content-Length", String.valueOf(bodyLength))
-		);
-	}
-
-	private List<HttpHeader> response302Header(String location, boolean loginSuccess) {
-		return Arrays.asList(
-				new HttpHeader("Location", location),
-				new HttpHeader("Set-Cookie", (loginSuccess ? "logined=true;" : "logined=false;"))
-		);
 	}
 
 	private byte[] responseBody(String requestPath) {
@@ -89,5 +80,9 @@ public class HttpResponse {
 		} catch (IOException | URISyntaxException ex) {
 			throw new InvalidResponseBodyException("응답 데이터 오류입니다.");
 		}
+	}
+
+	public void addHeader(String key, String value) {
+		headers.add(new HttpHeader(key, value));
 	}
 }
