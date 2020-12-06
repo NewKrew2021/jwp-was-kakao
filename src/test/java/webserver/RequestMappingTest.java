@@ -48,7 +48,11 @@ public class RequestMappingTest {
         RequestMapping requestMapping = new RequestMapping(uriMapping);
 
         uriMapping.forEach((uri, controller) ->
-                                   assertThat(requestMapping.getController(uri)).isEqualTo(controller));
+                                   assertThat(requestMapping.getController(GET, justUri(uri))).isEqualTo(controller));
+    }
+
+    private String justUri(String uri) {
+        return uri.substring(uri.indexOf(" ") + 1);
     }
 
     @Test
