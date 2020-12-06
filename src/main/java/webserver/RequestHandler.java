@@ -17,15 +17,11 @@ public class RequestHandler implements Runnable {
 
     private final Socket connection;
     private final RequestMapping requestMapping;
-    private final ResponseHandler responseHandler;
+    private static final ResponseHandler RESPONSE_HANDLER = new ResponseHandler();
 
     public RequestHandler(Socket connectionSocket, RequestMapping requestMapping) {
-        this(connectionSocket, requestMapping, new ResponseHandler());
-    }
-    public RequestHandler(Socket connectionSocket, RequestMapping requestMapping, ResponseHandler responseHandler) {
         this.connection = connectionSocket;
         this.requestMapping = requestMapping;
-        this.responseHandler = responseHandler;
     }
 
     public void run() {
@@ -38,7 +34,7 @@ public class RequestHandler implements Runnable {
 
             Response response = handleRequest(httpRequest);
 
-            responseHandler.response(new DataOutputStream(out), response);
+            RESPONSE_HANDLER.response(new DataOutputStream(out), response);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
