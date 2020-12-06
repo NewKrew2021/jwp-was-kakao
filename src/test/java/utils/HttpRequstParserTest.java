@@ -80,7 +80,7 @@ public class HttpRequstParserTest {
 	@Test
 	@DisplayName("응답데이터의 컨텐츠 타입을 요청주소에 따라 변경한다.")
 	public void getContentTypeTest() {
-		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("GET_Request2")));
+		BufferedReader reader = new BufferedReader(new StringReader(getRequestBody("GET_Resource2")));
 		underTest = new HttpRequstParser(new BufferedReader(reader));
 		httpRequest = underTest.getHttpRequest();
 		assertThat(httpRequest.getContentType()).isEqualTo(ContentType.CSS);

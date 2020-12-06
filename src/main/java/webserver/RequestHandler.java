@@ -1,17 +1,11 @@
 package webserver;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
+import controller.Controller;
 import domain.HttpHeader;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import exception.HandlebarTemplateException;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.MemberService;
 import utils.HttpRequstParser;
 
 import java.io.*;
@@ -21,16 +15,7 @@ import java.util.List;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final MemberService memberService = new MemberService();
-    private static final Handlebars handlebars;
     private Socket connection;
-
-    static {
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-        handlebars = new Handlebars(loader);
-    }
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -44,42 +29,18 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             HttpRequest httpRequest = new HttpRequstParser(bufferedReader).getHttpRequest();
-            printRequestHeaders(httpRequest.getHeaders()); //헤더 출력
-
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = new HttpResponse(dos, httpRequest);
-            memberAction(httpRequest, response);
-            response.forward();
-        } catch (IOException e) {
+            route(httpRequest, response);
+        } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new HandlebarTemplateException("템플릿 지정이 잘못되었습니다.");
         }
     }
 
-    private void printRequestHeaders(List<HttpHeader> headers) {
-        headers.forEach(header -> logger.debug(header.toString()));
+    private void route(HttpRequest request, HttpResponse response) {
+        ControllerRouter router = new ControllerRouter(request);
+        Controller controller = router.get();
+        controller.execute(request, response);
     }
 
-    private void memberAction(HttpRequest httpRequest, HttpResponse response) throws IOException {
-        if (memberService.isJoinReq(httpRequest)) {
-            memberService.joinMember(httpRequest.getParameter());
-            response.sendRedirect("/index.html", false);
-        }
-        if (memberService.isLoginReq(httpRequest)) {
-            boolean isLogin = memberService.memberLogin(httpRequest.getParameter());
-            if (!isLogin) {
-                response.sendRedirect("/user/login_failed.html", false);
-            }
-            response.sendRedirect("/index.html", true);
-        }
-        if (memberService.isMembersReq(httpRequest)) {
-            if (httpRequest.isLoginCookie()) {
-                List<User> members = memberService.getAllMembers();
-                Template template = handlebars.compile("user/list");
-                byte[] body = template.apply(members).getBytes();
-                response.forwardBody(body);
-            }
-            response.sendRedirect("/user/login.html", false);
-        }
-    }
 }

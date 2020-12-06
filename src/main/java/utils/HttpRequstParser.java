@@ -6,6 +6,9 @@ import domain.*;
 import exception.InvalidRequestBodyException;
 import exception.InvalidRequestException;
 import exception.InvalidRequestHeaderException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.RequestHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +17,7 @@ import java.net.URLDecoder;
 import java.util.*;
 
 public class HttpRequstParser {
+	private static final Logger logger = LoggerFactory.getLogger(HttpRequstParser.class);
 	public static final String HEADER_SPLIT_DELIMETER = ": ";
 	private static final String COOKIE_DELEIMTER = ";";
 	private static final String CONTENT_LENGTH = "Content-Length";
@@ -39,6 +43,7 @@ public class HttpRequstParser {
 				validate(line);
 				String[] header = line.split(HEADER_SPLIT_DELIMETER);
 				headers.add(new HttpHeader(header[0].trim(), header[1].trim()));
+				logger.debug(header[0].trim() + ": " + header[1].trim());
 			}
 			return makeHttpRequest(headers, requestLine);
 		} catch (IOException | InvalidRequestHeaderException ex) {
