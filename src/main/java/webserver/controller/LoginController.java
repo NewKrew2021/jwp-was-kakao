@@ -13,7 +13,7 @@ public class LoginController implements Controller {
     public Response execute(HttpRequest httpRequest) {
         Map<String, String> entity = httpRequest.getEntity();
         User user = DataBase.findUserById(entity.get("userId"));
-        if (user.getPassword().equals(entity.get("password"))) {
+        if (user != null && user.getPassword().equals(entity.get("password"))) {
             Response response = new Response();
             response.setStatus(ResponseStatus.SEE_OTHER);
             response.setHeaders("Set-Cookie: logined=true; Path=/");

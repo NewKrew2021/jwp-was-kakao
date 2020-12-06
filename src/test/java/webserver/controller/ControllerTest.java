@@ -41,6 +41,18 @@ class ControllerTest {
                         "Location: /user/login_failed.html");
     }
 
+
+    @Test
+    void loginControllerWhenUserNotFound() {
+        HttpRequest httpRequest = createRequest("/user/login");
+        httpRequest.setEntity(ImmutableMap.of("userId", "notFound", "password", "0000"));
+        assertThat(new LoginController().execute(httpRequest).getHeaders())
+                .containsExactly(
+                        "HTTP/1.1 302 Found ",
+                        "Set-Cookie: logined=false; Path=/",
+                        "Location: /user/login_failed.html");
+    }
+
     @Test
     void userListControllerWhenLoggedIn() {
         HttpRequest httpRequest = createRequest("/user/list");
