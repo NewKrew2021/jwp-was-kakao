@@ -10,8 +10,8 @@ public class UserService {
     public static final String LOGINED_KEY = "logined";
     public static final String LOGINED_VALUE = "true";
 
-    public static void addNewUser(String userId, String password, String name, String email) {
-        DataBase.addUser(new User(userId, password, name, email));
+    public static void addNewUser(User user) {
+        DataBase.addUser(user);
     }
 
     public static boolean isLoginSuccessful(String userId, String password) {
