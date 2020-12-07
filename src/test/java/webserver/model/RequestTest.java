@@ -35,6 +35,7 @@ public class RequestTest {
             "GET index.htm HTTP/1.0", // path does not started with /
             "GET ?k1=v1 HTTP/1.1", // query without path
             "POST #anchor", // hash without path
+            "RUN #anchor", // unknown method
     })
     void invalid(String requestLine) {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());

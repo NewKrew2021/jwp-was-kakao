@@ -26,7 +26,7 @@ public class Request {
     private static final Pattern querySplitPattern = Pattern.compile("&");
     private static final Pattern keyValuePattern = Pattern.compile("=");
 
-    private final String method;
+    private final HttpMethod method;
     private final String path;
     private final String query;
     private final String hash;
@@ -34,7 +34,7 @@ public class Request {
     private final Map<String, String> headers;
     private final Map<String, String> parameters;
 
-    private Request(String method, String path, String version, String query, String hash, Map<String, String> headers, Map<String, String> parameters) {
+    private Request(HttpMethod method, String path, String version, String query, String hash, Map<String, String> headers, Map<String, String> parameters) {
         this.method = method;
         this.path = path;
         this.version = version;
@@ -50,10 +50,10 @@ public class Request {
         Matcher matcher = parseRequestLine(reader.readLine());
         Map<String, String> headers = parseHeaders(reader);
 
-        String method = matcher.group("method");
+        HttpMethod method = HttpMethod.valueOf(matcher.group("method"));
         String query = matcher.group("query");
 
-        if ("POST".equals(method) || "PUT".equals(method)) {
+        if (method == HttpMethod.POST || method == HttpMethod.PUT) {
             query = IOUtils.readData(reader, Integer.parseInt(headers.getOrDefault("content-length", "0")));
         }
 
