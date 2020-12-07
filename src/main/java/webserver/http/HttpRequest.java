@@ -1,30 +1,29 @@
-package webserver;
+package webserver.http;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
-import model.User;
 
 import java.util.*;
 
-import static java.util.AbstractMap.*;
+import static java.util.AbstractMap.SimpleEntry;
 import static java.util.stream.Collectors.*;
 
-class HttpRequest {
-    private final String method;
+public class HttpRequest {
+    private final HttpMethod method;
     private final String requestURI;
     private final String protocol;
-    private Map<String, String> queryParams;
+    private Map<String, String> queryParams = Collections.emptyMap();
     private final Map<String, String> headers = new HashMap<>();
-    private Map<String, String> entity;
+    private Map<String, String> entity = Collections.emptyMap();
 
     public HttpRequest(String method, String requestURI, String protocol) {
-        this.method = method;
+        this.method = HttpMethod.valueOf(method);
         this.requestURI = requestURI;
         this.protocol = protocol;
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
@@ -34,18 +33,6 @@ class HttpRequest {
 
     public String getProtocol() {
         return protocol;
-    }
-
-    public User getUser() {
-        Map<String, String> queryParams = getQueryParams();
-        if (queryParams != null) {
-            return User.createUser(queryParams);
-        }
-        Map<String, String> entity = getEntity();
-        if (entity != null) {
-            return User.createUser(entity);
-        }
-        throw new IllegalStateException();
     }
 
     public void setQueryParams(Map<String, String> queryParams) {
@@ -73,7 +60,13 @@ class HttpRequest {
     }
 
     public Cookies getCookies() {
-        return new Cookies(getHeaders().get("Cookie"));
+        return Optional.ofNullable(getHeaders().get("Cookie"))
+                .map(Cookies::new)
+                .orElse(null);
+    }
+
+    public String getParameter(String name) {
+        return queryParams.getOrDefault(name, entity.get(name));
     }
 
     public static class Cookies {

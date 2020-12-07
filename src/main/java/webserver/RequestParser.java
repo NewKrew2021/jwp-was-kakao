@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.IOUtils;
+import webserver.http.HttpRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
@@ -31,7 +33,7 @@ class RequestParser {
         this.bufferedReader = bufferedReader;
     }
 
-    public HttpRequest parse() throws IOException {
+    public HttpRequest parse() {
         HttpRequest httpRequest = parseRequestLine();
 
         httpRequest.addHeaders(getHeaders());
@@ -40,23 +42,29 @@ class RequestParser {
         return httpRequest;
     }
 
-    private Map<String, String> getEntity(String contentLengthHeader) throws IOException {
-        if (!hasEntity(contentLengthHeader)) {
-            return emptyMap();
-        }
-
-        String entityString = IOUtils.readData(bufferedReader, Integer.parseInt(contentLengthHeader));
-
-        UrlEncodedStringParser urlEncodedStringParser = new UrlEncodedStringParser(entityString);
-        return urlEncodedStringParser.parse();
+    private Map<String, String> getEntity(String contentLengthHeader) {
+        return getContentLengthFromHeader(contentLengthHeader)
+                .map(contentLength -> readEntity(contentLengthHeader))
+                .orElse(emptyMap());
     }
 
-    private boolean hasEntity(String contentLengthHeader) {
-        if (Objects.isNull(contentLengthHeader)) {
-            return false;
+    private Map<String, String> readEntity(String contentLengthHeader) {
+        String entityString;
+        try {
+            entityString = IOUtils.readData(bufferedReader, Integer.parseInt(contentLengthHeader));
+        } catch (IOException e) {
+            throw new RequestReadException(e);
         }
 
-        return Integer.parseInt(contentLengthHeader) > 0;
+        return new UrlEncodedStringParser(entityString).parse();
+    }
+
+    private Optional<Integer> getContentLengthFromHeader(String contentLengthHeader) {
+        if (Objects.isNull(contentLengthHeader)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Integer.parseInt(contentLengthHeader));
     }
 
     private HttpRequest parseRequestLine() {
