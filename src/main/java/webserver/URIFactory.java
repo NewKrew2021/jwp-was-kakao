@@ -60,14 +60,16 @@ public class URIFactory {
             String password = UserFactory.parserUserPassword(paramMap);
 
             boolean isLogin = userService.isLogin(userId, password);
-            return Response.ofDirect(request, parseLoginParamValue(isLogin));
+            if (isLogin) {
+                return Response.ofDirect(request, parseLoginParamValue(true, "/index.html"));
+            }
         }
-        return Response.ofDirect(request, ParamValue.of(LOCATION_FILED, "/user/login.html"));
+        return Response.ofDirect(request, parseLoginParamValue(false, "/user/login_failed.html"));
     }
 
-    private ParamValue parseLoginParamValue(boolean setCookie) {
+    private ParamValue parseLoginParamValue(boolean setCookie, String location) {
         Map<String, String> map = new HashMap<>();
-        map.put(LOCATION_FILED, "/index.html");
+        map.put(LOCATION_FILED, location);
         map.put("Set-Cookie", "logined=" + setCookie + "; Path=/");
         return new ParamValue(map);
     }
@@ -80,7 +82,7 @@ public class URIFactory {
             String view = ResponseHandler.createTemplatesView(USER_LIST_URL, usersDTO);
             return Response.of(request, HttpStatus.HTTP_OK, view);
         }
-        return Response.ofDirect(request, ParamValue.of(LOCATION_FILED, "/index.html"));
+        return Response.ofDirect(request, ParamValue.of(LOCATION_FILED, "/user/login.html"));
     }
 
     public UsersDTO getUsersDTO(List<User> users) {
