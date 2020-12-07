@@ -1,42 +1,39 @@
 package controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import service.UserService;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.HttpResponseBuilder;
-
-import java.util.HashMap;
-import java.util.Map;
+import webserver.http.ParameterValidator;
 
 public class UserCreateController extends Controller {
-    public static final String PATH = "/user/create";
+    private static final String PATH = "/user/create";
 
-    private static final Logger logger = LoggerFactory.getLogger(UserCreateController.class);
+    @Override
+    public String getPath() {
+        return PATH;
+    }
 
     @Override
     protected HttpResponse handleGet(HttpRequest httpRequest) {
-        Map<String, String> parameters = httpRequest.getParameters();
-        addNewUserWithMap(parameters);
-
+        addNewUser(httpRequest);
         return HttpResponse._200_OK;
     }
 
     @Override
     protected HttpResponse handlePost(HttpRequest httpRequest) {
-        Map<String, String> body = httpRequest.getBodyInMap();
-        addNewUserWithMap(body);
+        addNewUser(httpRequest);
         return new HttpResponseBuilder()
                 .with302Redirect("/index.html")
                 .build();
     }
 
-    private void addNewUserWithMap(Map<String, String> parameters) {
-        String userId = parameters.get("userId");
-        String password = parameters.get("password");
-        String name = parameters.get("name");
-        String email = parameters.get("email");
+    private void addNewUser(HttpRequest request) {
+        ParameterValidator.validate(request, "userId", "password", "name", "email");
+        String userId = request.getParameter("userId");
+        String password = request.getParameter("password");
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
         UserService.addNewUser(userId, password, name, email);
     }
 }

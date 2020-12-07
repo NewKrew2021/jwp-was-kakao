@@ -12,9 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserListController extends Controller {
-    public static final String PATH = "/user/list.html";
+    private static final String PATH = "/user/list.html";
 
-    private static final Logger logger = LoggerFactory.getLogger(UserListController.class);
+    @Override
+    public String getPath() {
+        return PATH;
+    }
 
     @Override
     protected HttpResponse handleGet(HttpRequest httpRequest) {

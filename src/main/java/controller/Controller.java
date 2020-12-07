@@ -15,6 +15,8 @@ public abstract class Controller {
         }
     }
 
+    public abstract String getPath();
+
     private HttpResponse handleMethod(HttpRequest httpRequest) {
         if (HttpMethod.GET.equals(httpRequest.getMethod())) {
             return handleGet(httpRequest);

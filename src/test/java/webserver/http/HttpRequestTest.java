@@ -3,8 +3,6 @@ package webserver.http;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,10 +19,10 @@ public class HttpRequestTest {
                 .satisfies(req -> {
                     assertThat(req.getMethod()).isEqualTo(HttpMethod.GET);
                     assertThat(req.getPath()).isEqualTo("/index.html");
-                    assertThat(req.getParameters()).containsEntry("test", "123");
-                    assertThat(req.getHeaders()).containsEntry("Host", "localhost:8080")
-                            .containsEntry("Connection", "keep-alive")
-                            .containsEntry("Accept", "*/*");
+                    assertThat(req.getParameter("test")).isEqualTo("123");
+                    assertThat(req.getHeader("Host")).isEqualTo("localhost:8080");
+                    assertThat(req.getHeader("Connection")).isEqualTo("keep-alive");
+                    assertThat(req.getHeader("Accept")).isEqualTo("*/*");
                 });
     }
 
@@ -39,13 +37,14 @@ public class HttpRequestTest {
                 .satisfies(req -> {
                     assertThat(req.getMethod()).isEqualTo(HttpMethod.GET);
                     assertThat(req.getPath()).isEqualTo("/user/create");
-                    assertThat(req.getParameters()).containsEntry("userId", "javajigi")
-                            .containsEntry("password", "password")
-                            .containsEntry("name", "박재성")
-                            .containsEntry("email", "javajigi@slipp.net");
-                    assertThat(req.getHeaders()).containsEntry("Host", "localhost:8080")
-                            .containsEntry("Connection", "keep-alive")
-                            .containsEntry("Accept", "*/*");
+
+                    assertThat(req.getParameter("userId")).isEqualTo("javajigi");
+                    assertThat(req.getParameter("password")).isEqualTo("password");
+                    assertThat(req.getParameter("name")).isEqualTo("박재성");
+                    assertThat(req.getParameter("email")).isEqualTo("javajigi@slipp.net");
+                    assertThat(req.getHeader("Host")).isEqualTo("localhost:8080");
+                    assertThat(req.getHeader("Connection")).isEqualTo("keep-alive");
+                    assertThat(req.getHeader("Accept")).isEqualTo("*/*");
                 });
     }
 
@@ -64,16 +63,17 @@ public class HttpRequestTest {
                 .satisfies(req -> {
                     assertThat(req.getMethod()).isEqualTo(HttpMethod.POST);
                     assertThat(req.getPath()).isEqualTo("/user/create");
-                    assertThat(req.getHeaders()).containsEntry("Host", "localhost:8080")
-                            .containsEntry("Connection", "keep-alive")
-                            .containsEntry("Content-Length", "93")
-                            .containsEntry("Content-Type", "application/x-www-form-urlencoded")
-                            .containsEntry("Accept", "*/*");
-                    Map<String, String> body = req.getBodyInMap();
-                    assertThat(body).containsEntry("userId", "javajigi")
-                            .containsEntry("password", "password")
-                            .containsEntry("name", "박재성")
-                            .containsEntry("email", "javajigi@slipp.net");
+
+                    assertThat(req.getHeader("Host")).isEqualTo("localhost:8080");
+                    assertThat(req.getHeader("Connection")).isEqualTo("keep-alive");
+                    assertThat(req.getHeader("Content-Length")).isEqualTo("93");
+                    assertThat(req.getHeader("Content-Type")).isEqualTo("application/x-www-form-urlencoded");
+                    assertThat(req.getHeader("Accept")).isEqualTo("*/*");
+
+                    assertThat(req.getParameter("userId")).isEqualTo("javajigi");
+                    assertThat(req.getParameter("password")).isEqualTo("password");
+                    assertThat(req.getParameter("name")).isEqualTo("박재성");
+                    assertThat(req.getParameter("email")).isEqualTo("javajigi@slipp.net");
                 });
     }
 }

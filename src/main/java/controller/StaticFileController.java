@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 public class StaticFileController extends Controller {
 
+    private static final String PATH = "/*";
     private static final String EXTENSION_CSS = "css";
     private static final String EXTENSION_JS = "js";
     private static final Map<String, String> contentTypeResolver = new HashMap<>();
@@ -21,6 +22,11 @@ public class StaticFileController extends Controller {
     static {
         contentTypeResolver.put(EXTENSION_CSS, ContentType.TEXT_CSS_UTF8);
         contentTypeResolver.put(EXTENSION_JS, ContentType.APPLICATION_JAVASCRIPT);
+    }
+
+    @Override
+    public String getPath() {
+        return PATH;
     }
 
     @Override

@@ -1,26 +1,21 @@
 package controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import service.UserService;
-import webserver.http.SetCookie;
-import webserver.http.HttpRequest;
-import webserver.http.HttpResponse;
-import webserver.http.HttpResponseBuilder;
-
-import java.util.HashMap;
-import java.util.Map;
+import webserver.http.*;
 
 public class UserLoginController extends Controller {
-    public static final String PATH = "/user/login";
+    private static final String PATH = "/user/login";
 
-    private static final Logger logger = LoggerFactory.getLogger(UserLoginController.class);
+    @Override
+    public String getPath() {
+        return PATH;
+    }
 
     @Override
     protected HttpResponse handlePost(HttpRequest httpRequest) {
-        Map<String, String> body = httpRequest.getBodyInMap();
-        String userId = body.get("userId");
-        String password = body.get("password");
+        ParameterValidator.validate(httpRequest, "userId", "password");
+        String userId = httpRequest.getParameter("userId");
+        String password = httpRequest.getParameter("password");
 
         if (UserService.isLoginSuccessful(userId, password)) {
             return loginSuccess();
@@ -44,5 +39,4 @@ public class UserLoginController extends Controller {
                 .with302Redirect("/user/login_failed.html")
                 .build();
     }
-
 }

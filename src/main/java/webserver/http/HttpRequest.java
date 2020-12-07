@@ -34,25 +34,12 @@ public class HttpRequest {
         return path;
     }
 
-    public Map<String, String> getParameters() {
-        return parameters;
+    public String getParameter(String name) {
+        return parameters.get(name);
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
-    public Map<String, String> getBodyInMap() {
-        if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            throw new UnsupportedOperationException("HttpRequest does not support form body");
-        }
-        String contentType = headers.get(HttpHeaders.CONTENT_TYPE);
-
-        if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
-            return FormUrlencodedBodyParser.parse(body);
-        }
-
-        throw new UnsupportedOperationException("HttpRequest does not support form body, Content-Type=" + contentType);
+    public String getHeader(String name) {
+        return headers.get(name);
     }
 
     public Map<String, String> getCookiesInMap() {
@@ -77,6 +64,7 @@ public class HttpRequest {
                 handleLine(inputLine, httpRequest);
             }
             readBody(br, httpRequest);
+            handleFormBody(httpRequest);
 
             logger.debug("method={}, path={}", httpRequest.method, httpRequest.path);
             logger.debug("parameters : {}", httpRequest.parameters);
@@ -95,10 +83,10 @@ public class HttpRequest {
 
         private static void handleFirstLine(String firstLine, HttpRequest httpRequest) {
             try {
-                String urlDecoded = URLDecoder.decode(firstLine, "utf-8");
-                String[] token = urlDecoded.split(" ");
+                String[] token = firstLine.split(" ");
                 httpRequest.method = HttpMethod.valueOf(token[0].trim());
-                parsePathAndParameters(token[1], httpRequest);
+                String urlDecoded = URLDecoder.decode(token[1], "utf-8");
+                parsePathAndParameters(urlDecoded, httpRequest);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("UnsupportedEncodingException : " + e.getMessage());
             }
@@ -118,6 +106,17 @@ public class HttpRequest {
             }
             int contentLength = Integer.parseInt(httpRequest.headers.get(HttpHeaders.CONTENT_LENGTH));
             httpRequest.body = IOUtils.readData(br, contentLength);
+        }
+
+        private static void handleFormBody(HttpRequest httpRequest) {
+            if (!httpRequest.headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                return;
+            }
+            String contentType = httpRequest.headers.get(HttpHeaders.CONTENT_TYPE);
+            if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
+                Map<String, String> body = FormUrlencodedBodyParser.parse(httpRequest.body);
+                body.forEach((key, value) -> httpRequest.parameters.put(key, value));
+            }
         }
     }
 }
