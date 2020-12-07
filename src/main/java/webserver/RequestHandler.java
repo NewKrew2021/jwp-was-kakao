@@ -9,6 +9,8 @@ import webserver.model.Request;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -45,6 +47,7 @@ public class RequestHandler implements Runnable {
                 request.getParameter("name"),
                 request.getParameter("email")
         );
+        responseHeaderOnly(dos, HttpStatus.FOUND, Collections.singletonMap("Location", "/index.html"));
     }
 
     private void handleStatic(Request request, DataOutputStream dos) throws IOException {
@@ -69,9 +72,14 @@ public class RequestHandler implements Runnable {
     }
 
     private void responseHeaderOnly(DataOutputStream dos, HttpStatus status) {
+        responseHeaderOnly(dos, status, Collections.emptyMap());
+    }
+
+    private void responseHeaderOnly(DataOutputStream dos, HttpStatus status, Map<String, String> headers) {
         ResponseWriter writer = new ResponseWriter(dos);
         writer.format("HTTP/1.1 %d %s", status.getCode(), status.getMessage());
         writer.println();
+        headers.forEach((k, v) -> writer.println(String.join(": ", k, v)));
         writer.println();
         writer.flush();
     }
