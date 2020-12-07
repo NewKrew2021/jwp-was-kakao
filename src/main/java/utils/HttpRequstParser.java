@@ -2,74 +2,90 @@ package utils;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
-import domain.HttpHeader;
-import domain.HttpMethod;
-import domain.HttpRequest;
-import domain.ContentType;
+import domain.*;
+import exception.InvalidRequestBodyException;
+import exception.InvalidRequestException;
+import exception.InvalidRequestHeaderException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HttpRequstParser {
+	private static final Logger logger = LoggerFactory.getLogger(HttpRequstParser.class);
 	public static final String HEADER_SPLIT_DELIMETER = ": ";
 	private static final String COOKIE_DELEIMTER = ";";
-	private static final String DELEMITER = " ";
 	private static final String CONTENT_LENGTH = "Content-Length";
+	private static final String CONTENT_TYPE = "Content-Type";
+	private Map<String, String> parameters = new HashMap<>();
 	private BufferedReader bufferedReader;
+	private HttpRequest httpRequest;
 
 	public HttpRequstParser(BufferedReader bufferedReader) {
 		this.bufferedReader = bufferedReader;
+		this.httpRequest = requestParse();
 	}
 
-	public HttpRequest requestParse() {
-		List<HttpHeader> headers = new ArrayList<>();
-		try {
-			String line = "";
-			HttpMethod httpMethod = null;
-			String requestPath = "";
-			while (!"".equals(line = bufferedReader.readLine())) {
-				if (line.contains(HEADER_SPLIT_DELIMETER)) {
-					String[] header = line.split(HEADER_SPLIT_DELIMETER);
-					headers.add(new HttpHeader(header[0], header[1]));
-				} else {
-					String[] firstLine = line.split(DELEMITER);
-					httpMethod = HttpMethod.of(firstLine[0]);
-					requestPath = firstLine[1];
-				}
-			}
-			return makeHttpRequest(headers, httpMethod, requestPath);
-		} catch (IOException ex) {
-			throw new RuntimeException("요청 파싱하는 데이터에 문제가 있습니다.");
-		}
-	}
-
-	private HttpRequest makeHttpRequest(List<HttpHeader> headers, HttpMethod httpMethod, String requestPath) {
-		HttpRequest httpRequest = new HttpRequest(httpMethod, headers, requestPath);
-		if (httpMethod == HttpMethod.POST) {
-			String requestBody = getRequestBody(headers);
-			httpRequest.setBody(requestBody);
-			httpRequest.setRequestParam(getQueryMap(requestBody));
-		}
-		httpRequest.setCookies(getCookies(headers));
-		httpRequest.setContentType(getMimeType(requestPath));
+	public HttpRequest getHttpRequest() {
 		return httpRequest;
 	}
 
-	private String getRequestBody(List<HttpHeader> requestHeaders) {
+	private HttpRequest requestParse() {
+		List<HttpHeader> headers = new ArrayList<>();
+		try {
+			String line = bufferedReader.readLine();
+			HttpRequestLine requestLine = new HttpRequestLine(line);
+			while (!"".equals(line = bufferedReader.readLine()) && null != line) {
+				validate(line);
+				String[] header = line.split(HEADER_SPLIT_DELIMETER);
+				headers.add(new HttpHeader(header[0].trim(), header[1].trim()));
+				logger.debug(header[0].trim() + ": " + header[1].trim());
+			}
+			return makeHttpRequest(headers, requestLine);
+		} catch (IOException | InvalidRequestHeaderException ex) {
+			throw new InvalidRequestException("요청 파싱하는 데이터에 문제가 있습니다.");
+		}
+	}
+
+	protected void validate(String headerLine) {
+		if (!headerLine.contains(HEADER_SPLIT_DELIMETER)) {
+			throw new InvalidRequestHeaderException("잘못된 헤더정보 입니다.");
+		}
+		if (headerLine.split(HEADER_SPLIT_DELIMETER).length < 2) {
+			throw new InvalidRequestHeaderException("잘못된 헤더정보 입니다.");
+		}
+	}
+
+	private HttpRequest makeHttpRequest(List<HttpHeader> headers, HttpRequestLine httpRequestLine) {
+		HttpRequest httpRequest = new HttpRequest(httpRequestLine.getHttpMethod(), headers, httpRequestLine.getUri().getPath());
+		if (isFormBodyRequest(httpRequest)) {
+			String requestBody = getRequestBody(headers);
+			httpRequest.setBody(requestBody);
+			httpRequest.setParameter(getQueryMap(requestBody));
+			httpRequest.setHttpVersion(httpRequestLine.getHttpVersion());
+		}
+		httpRequest.setCookies(getCookies(headers));
+		httpRequest.setContentType(getContentType(httpRequestLine.getUri().getPath()));
+		String queryParameter = httpRequestLine.getUri().getQuery();
+		if (queryParameter != null && !queryParameter.isEmpty()) {
+			httpRequest.setParameter(getQueryMap(queryParameter));
+		}
+		return httpRequest;
+	}
+
+	protected String getRequestBody(List<HttpHeader> requestHeaders) {
 		try {
 			HttpHeader contentLengthHeader = requestHeaders.stream()
-					.filter(header -> header.getKey().equals(CONTENT_LENGTH))
+					.filter(header -> header.getKey().equalsIgnoreCase(CONTENT_LENGTH))
 					.findFirst()
-					.orElse(new HttpHeader(CONTENT_LENGTH, "0"));
+					.orElseThrow();
 			return IOUtils.readData(bufferedReader, Integer.valueOf(contentLengthHeader.getValue()));
-		} catch (IOException e) {
-			throw new RuntimeException("컨텐츠 데이터를 가져오는데 오류입니다.");
+		} catch (IOException | NoSuchElementException e) {
+			throw new InvalidRequestBodyException("fom body 데이터를 가져오는데 실패하였습니다.");
 		}
 	}
 
@@ -84,7 +100,6 @@ public class HttpRequstParser {
 		if (query == null)
 			return null;
 		String[] params = query.split("&");
-		Map<String, String> parameters = new HashMap<>();
 		for (String param : params) {
 			String name = param.split("=")[0];
 			String value = param.split("=")[1];
@@ -102,7 +117,7 @@ public class HttpRequstParser {
 	}
 	private Map<String, String> getCookies(List<HttpHeader> headers) {
 		HttpHeader cookieHeader = headers.stream()
-				.filter(header -> "Cookie".equals(header.getKey()))
+				.filter(header -> "Cookie".equalsIgnoreCase(header.getKey()))
 				.findFirst()
 				.orElse(new HttpHeader("", ""));
 
@@ -112,18 +127,19 @@ public class HttpRequstParser {
 		return Splitter.on(COOKIE_DELEIMTER).withKeyValueSeparator("=").split(cookieHeader.getValue());
 	}
 
-	public boolean isLoginCookie(Map<String, String> cookies) {
-		return cookies.keySet().stream()
-				.filter(key -> "logined".equals(key) && "true".equals(cookies.get(key)))
-				.findAny()
-				.isPresent();
+
+
+	protected ContentType getContentType(String path) {
+		return ContentType.of(path);
 	}
 
-	private ContentType getMimeType(String path) {
-		if (path.endsWith(".css"))
-			return ContentType.CSS;
-		if (path.endsWith(".js"))
-			return ContentType.JS;
-		return ContentType.HTML;
+	protected boolean isFormBodyRequest(HttpRequest httpRequest) {
+		return httpRequest.getMethod() == HttpMethod.POST
+				&& httpRequest.getHeaders()
+				.stream()
+				.filter(header -> header.getKey().equalsIgnoreCase(CONTENT_TYPE))
+				.filter(header -> header.getValue().equals(ContentType.FORM.getType()))
+				.findFirst()
+				.isPresent();
 	}
 }
