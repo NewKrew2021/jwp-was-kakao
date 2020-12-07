@@ -13,10 +13,10 @@ public class User {
     private final String email;
 
     public User(String userId, String password, String name, String email) {
-        validate(userId);
-        validate(password);
-        validate(name);
-        validate(email);
+        validateEmpty(userId);
+        validateEmpty(password);
+        validateEmpty(name);
+        validateEmpty(email);
         validateEmail(email);
 
         this.userId = userId;
@@ -62,7 +62,7 @@ public class User {
         return Objects.hash(userId, password, name, email);
     }
 
-    private static void validate(String value) {
+    private static void validateEmpty(String value) {
         if (!InputValidator.isValidEmpty(value)) {
             throw new IllegalArgumentException(MessageUtils.INVALID_USER_PARAM);
         }
