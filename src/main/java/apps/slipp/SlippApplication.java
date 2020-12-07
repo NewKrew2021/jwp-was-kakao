@@ -5,7 +5,7 @@ import apps.slipp.controller.LoginController;
 import apps.slipp.controller.SignUpController;
 import apps.slipp.controller.UserListController;
 import webserver.WebServer;
-import webserver.WebServerProperties;
+import webserver.WebServerConfig;
 import webserver.http.*;
 import webserver.http.template.TemplateEngine;
 
@@ -25,7 +25,7 @@ public class SlippApplication {
 
     void start(int port) throws IOException {
         webServer = new WebServer(
-                WebServerProperties.builder()
+                WebServerConfig.builder()
                         .port(port)
                         .httpRequestDispatcher(getHttpRequestDispatcher())
                         .httpRequestPreProcessor(getHttpRequestPreProcessor())

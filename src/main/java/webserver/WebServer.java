@@ -14,14 +14,14 @@ public class WebServer {
 
     private static final int DEFAULT_PORT = 8080;
 
-    private WebServerProperties properties;
+    private WebServerConfig config;
 
-    public WebServer(WebServerProperties properties) {
-        this.properties = properties;
+    public WebServer(WebServerConfig config) {
+        this.config = config;
     }
 
     public void start() throws IOException{
-        start(properties.getPortOrDefault(DEFAULT_PORT));
+        start(config.getPortOrDefault(DEFAULT_PORT));
     }
 
     public void start(int port) throws IOException {
@@ -45,9 +45,9 @@ public class WebServer {
         new Thread(
                 new RequestHandler(
                         connection,
-                        properties.getRequestDispatcher(),
-                        properties.getRequestPreProcessor(),
-                        properties.getExceptionHandler())).start();
+                        config.getRequestDispatcher(),
+                        config.getRequestPreProcessor(),
+                        config.getExceptionHandler())).start();
     }
 
 }

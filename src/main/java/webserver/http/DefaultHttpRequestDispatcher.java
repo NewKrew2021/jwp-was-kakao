@@ -7,8 +7,13 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
     private HttpRequestMapper<Controller> httpRequestMapper;
     private HttpResponseHandler httpResponseHandler = new DefaultHttpResponseHandler();
 
+    public DefaultHttpRequestDispatcher(HttpResponseHandler httpResponseHandler, HttpRequestMapping... mappings){
+        this.httpRequestMapper = new DefaultHttpRequestMapper(mappings);
+        this.httpResponseHandler = new DefaultHttpResponseHandler();
+    }
+
     public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings) {
-        httpRequestMapper = new DefaultHttpRequestMapper(mappings);
+        this(new DefaultHttpResponseHandler(), mappings);
     }
 
     public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings) {

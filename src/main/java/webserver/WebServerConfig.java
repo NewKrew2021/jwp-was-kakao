@@ -4,14 +4,14 @@ import webserver.http.ExceptionHandler;
 import webserver.http.HttpRequestDispatcher;
 import webserver.http.HttpRequestPreProcessor;
 
-public class WebServerProperties {
+public class WebServerConfig {
 
     private final int port;
     private HttpRequestDispatcher requestDispatcher;
     private HttpRequestPreProcessor requestPreProcessor;
     private ExceptionHandler exceptionHandler;
 
-    private WebServerProperties(int port, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor requestPreProcessor, ExceptionHandler exceptionHandler) {
+    private WebServerConfig(int port, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor requestPreProcessor, ExceptionHandler exceptionHandler) {
         this.port = port;
         this.requestDispatcher = requestDispatcher;
         this.requestPreProcessor = requestPreProcessor;
@@ -45,8 +45,8 @@ public class WebServerProperties {
         private HttpRequestPreProcessor preProcessor;
         private ExceptionHandler exceptionHandler;
 
-        public WebServerProperties build(){
-            return new WebServerProperties(port, requestDispatcher, preProcessor, exceptionHandler);
+        public WebServerConfig build(){
+            return new WebServerConfig(port, requestDispatcher, preProcessor, exceptionHandler);
         }
 
         public Builder httpRequestDispatcher(HttpRequestDispatcher requestDispatcher){
