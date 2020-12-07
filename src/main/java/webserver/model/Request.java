@@ -1,14 +1,15 @@
 package webserver.model;
 
 import utils.FileIoUtils;
+import utils.IOUtils;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,26 +22,53 @@ public class Request {
             "(?:#(?<hash>[^ ]+))?" +      // hash (optional)
             "(?: +(?<version>.*))?"       // version (optional)
     );
+    private static final Pattern headerSplitPattern = Pattern.compile(" *: *");
     private static final Pattern querySplitPattern = Pattern.compile("&");
     private static final Pattern keyValuePattern = Pattern.compile("=");
 
     private final String method;
     private final String path;
     private final String query;
+    private final String hash;
     private final String version;
+    private final Map<String, String> headers;
     private final Map<String, String> parameters;
 
-    public Request(InputStream in) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        Matcher matcher = parseRequestLine(reader.readLine());
-        method = matcher.group("method");
-        path = matcher.group("path");
-        query = matcher.group("query");
-        version = matcher.group("version");
-        parameters = parseQuery(query);
+    private Request(String method, String path, String version, String query, String hash, Map<String, String> headers, Map<String, String> parameters) {
+        this.method = method;
+        this.path = path;
+        this.version = version;
+        this.query = query;
+        this.hash = hash;
+        this.headers = headers;
+        this.parameters = parameters;
     }
 
-    private Matcher parseRequestLine(String requestLine) {
+    public static Request from(InputStream in) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+        Matcher matcher = parseRequestLine(reader.readLine());
+        Map<String, String> headers = parseHeaders(reader);
+
+        String method = matcher.group("method");
+        String query = matcher.group("query");
+
+        if ("POST".equals(method) || "PUT".equals(method)) {
+            query = IOUtils.readData(reader, Integer.parseInt(headers.getOrDefault("content-length", "0")));
+        }
+
+        return new Request(
+                method,
+                matcher.group("path"),
+                matcher.group("version"),
+                matcher.group("query"),
+                matcher.group("hash"),
+                headers,
+                parseQuery(query)
+        );
+    }
+
+    private static Matcher parseRequestLine(String requestLine) {
         Matcher matcher;
         if (Objects.isNull(requestLine) || !(matcher = requestLinePattern.matcher(requestLine)).find()) {
             throw new IllegalArgumentException("Unexpected Request-Line message");
@@ -48,7 +76,21 @@ public class Request {
         return matcher;
     }
 
-    private Map<String, String> parseQuery(String query) {
+    private static Map<String, String> parseHeaders(BufferedReader reader) throws IOException {
+        Map<String, String> headers = new HashMap<>();
+        String line;
+        while (isNotEmpty(line = reader.readLine())) {
+            String[] keyValue = headerSplitPattern.split(line, 2);
+            headers.put(keyValue[0].trim().toLowerCase(), keyValue[1].trim());
+        }
+        return headers;
+    }
+
+    private static boolean isNotEmpty(String string) {
+        return !Objects.isNull(string) && !string.isEmpty();
+    }
+
+    private static Map<String, String> parseQuery(String query) {
         if (Objects.isNull(query) || query.trim().isEmpty()) {
             return Collections.emptyMap();
         }

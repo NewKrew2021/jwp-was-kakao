@@ -26,7 +26,7 @@ public class RequestTest {
     })
     void valid(String requestLine) {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThatCode(() -> new Request(in)).doesNotThrowAnyException();
+        Assertions.assertThatCode(() -> Request.from(in)).doesNotThrowAnyException();
     }
 
     @DisplayName("Invalid request lines")
@@ -39,7 +39,7 @@ public class RequestTest {
     void invalid(String requestLine) {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
         Assertions.assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Request(in));
+                .isThrownBy(() -> Request.from(in));
     }
 
     @ParameterizedTest
@@ -49,7 +49,7 @@ public class RequestTest {
     })
     void parameters(int expected, String requestLine) throws IOException {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThat(new Request(in).getParameters().size()).isEqualTo(expected);
+        Assertions.assertThat(Request.from(in).getParameters().size()).isEqualTo(expected);
     }
 
     @ParameterizedTest
@@ -59,7 +59,7 @@ public class RequestTest {
     })
     void parameter(String queryKey, String expected, String requestLine) throws IOException {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThat(new Request(in).getParameter(queryKey)).isEqualTo(expected);
+        Assertions.assertThat(Request.from(in).getParameter(queryKey)).isEqualTo(expected);
     }
 
     @Test
@@ -67,7 +67,27 @@ public class RequestTest {
         String requestLine =
                 "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThat(new Request(in).getParameters())
+        Assertions.assertThat(Request.from(in).getParameters())
+                .containsEntry("password", "password")
+                .containsEntry("name", "박재성")
+                .containsEntry("userId", "javajigi")
+                .containsEntry("email", "javajigi@slipp.net");
+    }
+
+    @Test
+    void createUserWithPost() throws IOException {
+        String[] requestLines = {
+                "POST /user/create HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Content-Length: 93",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Accept: */*",
+                "",
+                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"
+        };
+        InputStream in = new ByteArrayInputStream(String.join("\r\n", requestLines).getBytes());
+        Assertions.assertThat(Request.from(in).getParameters())
                 .containsEntry("password", "password")
                 .containsEntry("name", "박재성")
                 .containsEntry("userId", "javajigi")

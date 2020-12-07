@@ -24,7 +24,7 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            Request request = new Request(in);
+            Request request = Request.from(in);
             DataOutputStream dos = new DataOutputStream(out);
 
             if (request.getPath().equals("/user/create")) {
