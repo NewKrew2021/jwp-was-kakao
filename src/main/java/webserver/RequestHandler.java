@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,10 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -34,6 +38,11 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
+            if (request.getPath().equals("/user/login")) {
+                handleUserLogin(request, dos);
+                return;
+            }
+
             handleStatic(request, dos);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -47,7 +56,22 @@ public class RequestHandler implements Runnable {
                 request.getParameter("name"),
                 request.getParameter("email")
         );
+        DataBase.addUser(user);
         responseHeaderOnly(dos, HttpStatus.FOUND, Collections.singletonMap("Location", "/index.html"));
+    }
+
+    private void handleUserLogin(Request request, DataOutputStream dos) {
+        String userId = request.getParameter("userId");
+        String password = request.getParameter("password");
+        boolean logined = Optional.ofNullable(DataBase.findUserById(userId))
+                .map(User::getPassword)
+                .filter(p -> p.equals(password))
+                .isPresent();
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Set-Cookie", String.format("logined=%s; Path=/", logined));
+        headers.put("Location", logined ? "/index.html" : "/user/login_failed.html");
+        responseHeaderOnly(dos, HttpStatus.FOUND, headers);
     }
 
     private void handleStatic(Request request, DataOutputStream dos) throws IOException {

@@ -115,6 +115,14 @@ public class Request {
         return FileIoUtils.loadFileFromClasspath("./templates" + path);
     }
 
+    public String getHeader(String key) {
+        return headers.get(key);
+    }
+
+    public Map<String, String> getHeaders() {
+        return Collections.unmodifiableMap(headers);
+    }
+
     public String getParameter(String key) {
         return parameters.get(key);
     }
