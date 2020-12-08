@@ -1,5 +1,8 @@
 package webserver;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -14,10 +17,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final Handlebars handlebars = new Handlebars(new ClassPathTemplateLoader("/templates", ".html"));
 
     private Socket connection;
 
@@ -40,6 +43,11 @@ public class RequestHandler implements Runnable {
 
             if (request.getPath().equals("/user/login")) {
                 handleUserLogin(request, dos);
+                return;
+            }
+
+            if (request.getPath().equals("/user/list")) {
+                handleUserList(request, dos);
                 return;
             }
 
@@ -72,6 +80,24 @@ public class RequestHandler implements Runnable {
         headers.put("Set-Cookie", String.format("logined=%s; Path=/", logined));
         headers.put("Location", logined ? "/index.html" : "/user/login_failed.html");
         responseHeaderOnly(dos, HttpStatus.FOUND, headers);
+    }
+
+    private void handleUserList(Request request, DataOutputStream dos) {
+        if (!Boolean.TRUE.toString().equals(request.getCookie("logined"))) {
+            responseHeaderOnly(dos, HttpStatus.FOUND, Collections.singletonMap("Location", "/user/login.html"));
+            return;
+        }
+
+        try {
+            Template template = handlebars.compile("user/list");
+            String listPage = template.apply(Collections.singletonMap("userList", DataBase.findAll()));
+            byte[] body = listPage.getBytes();
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+        } catch (IOException e) {
+            e.printStackTrace();
+            responseHeaderOnly(dos, HttpStatus.NOT_FOUND);
+        }
     }
 
     private void handleStatic(Request request, DataOutputStream dos) throws IOException {

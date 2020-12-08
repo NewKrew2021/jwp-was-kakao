@@ -25,6 +25,7 @@ public class Request {
     private static final Pattern headerSplitPattern = Pattern.compile(" *: *");
     private static final Pattern querySplitPattern = Pattern.compile("&");
     private static final Pattern keyValuePattern = Pattern.compile("=");
+    private static final Pattern cookieSplitPattern = Pattern.compile(" *; *");
 
     private final HttpMethod method;
     private final String path;
@@ -33,6 +34,7 @@ public class Request {
     private final String version;
     private final Map<String, String> headers;
     private final Map<String, String> parameters;
+    private final Map<String, String> cookies;
 
     private Request(HttpMethod method, String path, String version, String query, String hash, Map<String, String> headers, Map<String, String> parameters) {
         this.method = method;
@@ -42,6 +44,7 @@ public class Request {
         this.hash = hash;
         this.headers = headers;
         this.parameters = parameters;
+        this.cookies = parseCookie(headers.getOrDefault("cookie", ""));
     }
 
     public static Request from(InputStream in) throws IOException {
@@ -96,7 +99,15 @@ public class Request {
         }
         return querySplitPattern.splitAsStream(query)
                 .map(keyValuePattern::split)
+                .filter(s -> s.length == 2)
                 .collect(Collectors.toMap(s -> s[0], s -> safeDecode(s[1]), (l, r) -> l));
+    }
+
+    private static Map<String, String> parseCookie(String cookieHeader) {
+        return cookieSplitPattern.splitAsStream(cookieHeader)
+                .map(keyValuePattern::split)
+                .filter(s -> s.length == 2)
+                .collect(Collectors.toMap(s -> s[0], s -> safeDecode(s[1]), (l, r) -> r));
     }
 
     private static String safeDecode(String encodedUrl) {
@@ -129,5 +140,13 @@ public class Request {
 
     public Map<String, String> getParameters() {
         return Collections.unmodifiableMap(parameters);
+    }
+
+    public String getCookie(String key) {
+        return cookies.get(key);
+    }
+
+    public Map<String, String> getCookies() {
+        return Collections.unmodifiableMap(cookies);
     }
 }

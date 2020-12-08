@@ -42,7 +42,7 @@ public class HttpRequestTest {
         parameters.add("userId", "javajigi");
         parameters.add("password", "password");
         parameters.add("name", "박재성");
-        parameters.add("email", "javajigi%40slipp.net");
+        parameters.add("email", "javajigi@slipp.net");
 
         ResponseEntity<String> response = restTemplate.postForEntity(
                 "http://localhost:8080/user/create",
@@ -93,5 +93,19 @@ public class HttpRequestTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         assertThat(response.getHeaders().getLocation().getPath()).isEqualTo("/user/login_failed.html");
+    }
+
+    @Test
+    void user_list() {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Cookie", "logined=true");
+        ResponseEntity<String> response = restTemplate.exchange(
+                "http://localhost:8080/user/list",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("<th>#</th> <th>사용자 아이디</th> <th>이름</th> <th>이메일</th><th></th>");
     }
 }
