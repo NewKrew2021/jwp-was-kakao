@@ -2,6 +2,7 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.session.HttpSessionManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +17,19 @@ public class RequestHandler implements Runnable {
     private final Socket connection;
     private final HttpRequestDispatcher requestDispatcher;
     private final HttpRequestPreProcessor requestPreProcessor;
+    private final HttpSessionManager sessionManager;
     private final ExceptionHandler exceptionHandler;
 
-    public RequestHandler(Socket connectionSocket, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor requestPreProcessor, ExceptionHandler exceptionHandler) {
+    public RequestHandler(Socket connectionSocket,
+                          HttpRequestDispatcher requestDispatcher,
+                          HttpRequestPreProcessor requestPreProcessor,
+                          ExceptionHandler exceptionHandler,
+                          HttpSessionManager sessionManager) {
         this.connection = connectionSocket;
         this.requestPreProcessor = requestPreProcessor;
         this.requestDispatcher = requestDispatcher;
         this.exceptionHandler = exceptionHandler;
+        this.sessionManager = sessionManager;
     }
 
     @Override
@@ -36,7 +43,7 @@ public class RequestHandler implements Runnable {
             InputStream in = connection.getInputStream();
             OutputStream out = connection.getOutputStream();
 
-            httpRequest = new HttpRequestFactory().create(new InputStreamReader(in));
+            httpRequest = new HttpRequestFactory().create(new InputStreamReader(in), sessionManager);
             httpResponse = new HttpResponse(out);
 
             requestPreProcessor.execute(httpRequest, httpResponse);

@@ -2,27 +2,32 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.session.*;
 import webserver.http.utils.CookieParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class HttpRequest {
-    private HttpRequestLine requestLine;
-    private List<HttpHeader> headers;
-    private List<Cookie> cookies;
-    private String body;
+
+    private final HttpSessionManager sessionManager;
+    private final HttpRequestLine requestLine;
+    private final List<HttpHeader> headers;
+    private final List<Cookie> cookies;
+    private final String body;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    private HttpRequest(HttpRequestLine requestLine, List<HttpHeader> headers, String body) {
+    private HttpRequest(HttpRequestLine requestLine, List<HttpHeader> headers, String body, HttpSessionManager sessionManager) {
         this.requestLine = requestLine;
         this.headers = headers;
         this.cookies = setCookies(headers);
         this.body = body;
+        this.sessionManager = sessionManager;
     }
 
     private List<Cookie> setCookies(List<HttpHeader> headers) {
@@ -35,6 +40,15 @@ public class HttpRequest {
 
         CookieParser parser = new CookieParser();
         return parser.parse(cookieHeader.getValue());
+    }
+
+    public HttpSession getSession(boolean createIfAbsent){
+        if( sessionManager == null ) throw new HttpSessionException("WebServer 구동시 session 사용설정이 필요합니다");
+
+        String sessionId = getCookie(HttpSessions.SESSION_ID_COOKIE_HEADER);
+        HttpSession session = sessionManager.getSession(SessionId.of(sessionId)).orElse(null);
+        if( session == null && createIfAbsent ) return sessionManager.createSession();
+        return session;
     }
 
     public List<HttpHeader> getHeaders() {
@@ -90,6 +104,7 @@ public class HttpRequest {
         private HttpRequestLine requestLine;
         private List<HttpHeader> headers = new ArrayList<>();
         private String body;
+        private HttpSessionManager sessionManager;
 
         public Builder requestLine(HttpRequestLine requestLine) {
             this.requestLine = requestLine;
@@ -113,7 +128,7 @@ public class HttpRequest {
 
         public HttpRequest build() {
             if (requestLine == null) throw new IllegalArgumentException("request line 이 비어 있습니다");
-            HttpRequest httpRequest = new HttpRequest(requestLine, headers, body == null ? "" : body);
+            HttpRequest httpRequest = new HttpRequest(requestLine, headers, body == null ? "" : body, sessionManager);
 
             logger.debug("---- request-line ----");
             logger.debug(httpRequest.getRequestLine());
@@ -124,6 +139,12 @@ public class HttpRequest {
 
             return httpRequest;
         }
+
+        public Builder sessionManager(HttpSessionManager sessionManager) {
+            this.sessionManager = sessionManager;
+            return this;
+        }
     }
+
 }
 

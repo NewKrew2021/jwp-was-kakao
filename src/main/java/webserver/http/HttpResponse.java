@@ -20,7 +20,7 @@ public class HttpResponse {
 
     private String httpVersion = "HTTP/1.1";
     private List<HttpHeader> headers;
-    private String cookie;
+    private List<String> setCookies = new ArrayList<>();
     private byte[] body;
     private HttpStatus status;
 
@@ -49,8 +49,7 @@ public class HttpResponse {
     List<HttpHeader> getHeaders() {
         List<HttpHeader> allHeaders = new ArrayList<>();
         allHeaders.addAll(Collections.unmodifiableList(headers));
-        if( cookie != null ) allHeaders.add(new HttpHeader(ResponseHeader.SetCookie, cookie));
-
+        setCookies.forEach( setCookie -> allHeaders.add(new HttpHeader(ResponseHeader.SetCookie, setCookie)));
         return allHeaders;
     }
 
@@ -66,8 +65,8 @@ public class HttpResponse {
         headers.add(header);
     }
 
-    public void setCookie(String setCookieHeaderValue) {
-        cookie = setCookieHeaderValue;
+    public void setSetCookie(String setCookie) {
+        this.setCookies.add(setCookie);
     }
 
     public void setContentType(MimeType mimeType, Charset charset) {

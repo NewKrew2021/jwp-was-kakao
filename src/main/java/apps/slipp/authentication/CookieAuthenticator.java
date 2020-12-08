@@ -22,14 +22,14 @@ public class CookieAuthenticator implements HttpRequestPreProcessor, Authenticat
     }
 
     @Override
-    public boolean matches(HttpRequest httpRequest) {
-        return matchedPaths.contains(httpRequest.getPath());
+    public boolean matches(HttpRequest request, HttpResponse response) {
+        return matchedPaths.contains(request.getPath());
     }
 
     @Override
-    public void apply(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public void apply(HttpRequest request) {
         try {
-            authenticate(httpRequest);
+            authenticate(request);
         } catch (AuthenticationException e) {
             throw new CookieAuthenticationException("Cookie 인증정보가 유효하지 않습니다.", e);
         }

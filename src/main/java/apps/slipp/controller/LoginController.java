@@ -18,10 +18,10 @@ public class LoginController implements Controller {
 
         try {
             loginService.login(login.getUserId(), login.getPassword());
-            httpResponse.setCookie("logined=true; Path=/");
+            httpResponse.setSetCookie("logined=true; Path=/");
             return ModelAndView.of(new RedirectView("/index.html"));
         } catch (LoginException e) {
-            httpResponse.setCookie("logined=false; Path=/");
+            httpResponse.setSetCookie("logined=false; Path=/");
             return ModelAndView.of(new RedirectView("/user/login_failed.html"));
         }
     }

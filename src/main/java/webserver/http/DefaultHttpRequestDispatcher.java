@@ -1,15 +1,20 @@
 package webserver.http;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
 
-    private HttpRequestMapper<Controller> httpRequestMapper;
-    private HttpResponseHandler httpResponseHandler = new DefaultHttpResponseHandler();
+    private HttpRequestMapper<Controller> requestMapper;
+    private HttpResponseHandler responseHandler = new DefaultHttpResponseHandler();
 
-    public DefaultHttpRequestDispatcher(HttpResponseHandler httpResponseHandler, HttpRequestMapping... mappings){
-        this.httpRequestMapper = new DefaultHttpRequestMapper(mappings);
-        this.httpResponseHandler = new DefaultHttpResponseHandler();
+    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, List<HttpRequestMapping> mappings){
+        this.requestMapper = new DefaultHttpRequestMapper(mappings);
+        this.responseHandler = responseHandler;
+    }
+
+    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, HttpRequestMapping... mappings){
+        this(responseHandler, Arrays.asList(mappings));
     }
 
     public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings) {
@@ -17,15 +22,15 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
     }
 
     public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings) {
-        httpRequestMapper = new DefaultHttpRequestMapper(mappings);
+        requestMapper = new DefaultHttpRequestMapper(mappings);
     }
 
-    public void dispatch(HttpRequest httpRequest, HttpResponse httpResponse) {
-        Controller controller = httpRequestMapper.getTarget(httpRequest);
-        if( controller == null ) throw new NotFoundException(httpRequest.getPath());
+    public void dispatch(HttpRequest request, HttpResponse response) {
+        Controller controller = requestMapper.getTarget(request);
+        if( controller == null ) throw new NotFoundException(request.getPath());
 
-        ModelAndView mav = controller.execute(httpRequest, httpResponse);
-        httpResponseHandler.handle(mav, httpRequest, httpResponse);
+        ModelAndView mav = controller.execute(request, response);
+        responseHandler.handle(mav, request, response);
     }
 
 }

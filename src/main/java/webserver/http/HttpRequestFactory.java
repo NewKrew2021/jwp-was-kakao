@@ -2,6 +2,7 @@ package webserver.http;
 
 import org.springframework.util.StringUtils;
 import utils.IOUtils;
+import webserver.http.session.HttpSessionManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +16,10 @@ import java.util.stream.StreamSupport;
 public class HttpRequestFactory {
 
     public HttpRequest create(Reader reader) {
+        return create(reader, null);
+    }
+
+    public HttpRequest create(Reader reader, final HttpSessionManager sessionManager) {
         try {
             HttpRequestMessageReader messageReader = new HttpRequestMessageReader(reader);
 
@@ -27,6 +32,8 @@ public class HttpRequestFactory {
 
             if (isSupportBody(requestLine.getMethod()))
                 builder.body(readBody(messageReader, contentLength(headers)));
+
+            builder.sessionManager(sessionManager);
 
             return builder.build();
         } catch (IOException e) {

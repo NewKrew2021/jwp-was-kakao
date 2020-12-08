@@ -1,25 +1,53 @@
 package webserver;
 
 import webserver.http.ExceptionHandler;
-import webserver.http.HttpRequestDispatcher;
+import webserver.http.HttpRequestMapping;
 import webserver.http.HttpRequestPreProcessor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WebServerConfig {
 
-    private final int port;
-    private HttpRequestDispatcher requestDispatcher;
+    private int port;
     private HttpRequestPreProcessor requestPreProcessor;
-    private ExceptionHandler exceptionHandler;
+    private boolean enableSession = false;
+    private List<HttpRequestMapping> requestMappings = new ArrayList<>();
+    private Map<Class, ExceptionHandler> exceptionHandlers = new HashMap<>();
 
-    private WebServerConfig(int port, HttpRequestDispatcher requestDispatcher, HttpRequestPreProcessor requestPreProcessor, ExceptionHandler exceptionHandler) {
+    private WebServerConfig() { }
+
+    @Deprecated
+    private WebServerConfig(int port,
+                            HttpRequestPreProcessor requestPreProcessor) {
         this.port = port;
-        this.requestDispatcher = requestDispatcher;
         this.requestPreProcessor = requestPreProcessor;
-        this.exceptionHandler = exceptionHandler;
     }
 
-    public HttpRequestDispatcher getRequestDispatcher() {
-        return requestDispatcher;
+    public static WebServerConfig configurer( WebServerConfigurer configurer ){
+        return configurer.apply(new WebServerConfig());
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setRequestPreProcessor(HttpRequestPreProcessor requestPreProcessor) {
+        this.requestPreProcessor = requestPreProcessor;
+    }
+
+    public Map<Class, ExceptionHandler> getExceptionHandlers() {
+        return exceptionHandlers;
+    }
+
+    public List<HttpRequestMapping> getRequestMappings() {
+        return requestMappings;
+    }
+
+    public void setEnableSession(boolean enableSession) {
+        this.enableSession = enableSession;
     }
 
     public HttpRequestPreProcessor getRequestPreProcessor() {
@@ -30,42 +58,15 @@ public class WebServerConfig {
         return port < 0 ? defaultPort : port;
     }
 
-    public static Builder builder(){
-        return new Builder();
+    public boolean isEnableSession() {
+        return enableSession;
     }
 
-    public ExceptionHandler getExceptionHandler() {
-        return exceptionHandler;
+    public void setRequestMappings(List<HttpRequestMapping> requestMappings) {
+        this.requestMappings = requestMappings;
     }
 
-    public static class Builder {
-
-        private int port;
-        private HttpRequestDispatcher requestDispatcher;
-        private HttpRequestPreProcessor preProcessor;
-        private ExceptionHandler exceptionHandler;
-
-        public WebServerConfig build(){
-            return new WebServerConfig(port, requestDispatcher, preProcessor, exceptionHandler);
-        }
-
-        public Builder httpRequestDispatcher(HttpRequestDispatcher requestDispatcher){
-            this.requestDispatcher = requestDispatcher;
-            return this;
-        }
-
-        public Builder httpRequestPreProcessor(HttpRequestPreProcessor preProcessor){
-            this.preProcessor = preProcessor;
-            return this;
-        }
-
-        public Builder exceptionHandler(ExceptionHandler exceptionHandler){
-            this.exceptionHandler = exceptionHandler;
-            return this;
-        }
-        public Builder port(int port) {
-            this.port = port;
-            return this;
-        }
+    public void setExceptionHandlers(Map<Class, ExceptionHandler> exceptionHandlers) {
+        this.exceptionHandlers = exceptionHandlers;
     }
 }
