@@ -7,6 +7,8 @@ import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
+import webserver.model.ContentType;
 import webserver.model.HttpStatus;
 import webserver.model.Request;
 
@@ -29,8 +31,7 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
+        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             Request request = Request.from(in);
@@ -92,7 +93,7 @@ public class RequestHandler implements Runnable {
             Template template = handlebars.compile("user/list");
             String listPage = template.apply(Collections.singletonMap("userList", DataBase.findAll()));
             byte[] body = listPage.getBytes();
-            response200Header(dos, body.length);
+            response200Header(dos, body.length, ContentType.HTML);
             responseBody(dos, body);
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,24 +102,29 @@ public class RequestHandler implements Runnable {
     }
 
     private void handleStatic(Request request, DataOutputStream dos) throws IOException {
+        ContentType contentType = ContentType.fromUrlPath(request.getPath());
         try {
-            byte[] body = request.getRequestedResource();
-            response200Header(dos, body.length);
+            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getPath());
+            response200Header(dos, body.length, contentType);
+            responseBody(dos, body);
+            return;
+        } catch (URISyntaxException | NullPointerException ignored) {
+        }
+
+        try {
+            byte[] body = FileIoUtils.loadFileFromClasspath("./static" + request.getPath());
+            response200Header(dos, body.length, contentType);
             responseBody(dos, body);
         } catch (URISyntaxException | NullPointerException e) {
             responseHeaderOnly(dos, HttpStatus.NOT_FOUND);
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, ContentType contentType) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", contentType.getMimeType());
+        headers.put("Content-Length", String.valueOf(lengthOfBodyContent));
+        responseHeaderOnly(dos, HttpStatus.OK, headers);
     }
 
     private void responseHeaderOnly(DataOutputStream dos, HttpStatus status) {

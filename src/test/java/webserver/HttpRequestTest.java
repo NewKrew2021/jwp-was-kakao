@@ -4,6 +4,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -107,5 +109,20 @@ public class HttpRequestTest {
                 String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("<th>#</th> <th>사용자 아이디</th> <th>이름</th> <th>이메일</th><th></th>");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "/css/styles.css, text/css",
+            "/images/80-text.png, image/png",
+            "/js/scripts.js, text/javascript"
+    })
+    void content_type(String path, String contentType) {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(
+                "http://localhost:8080" + path,
+                String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.valueOf(contentType));
     }
 }

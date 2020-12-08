@@ -122,10 +122,6 @@ public class Request {
         return path;
     }
 
-    public byte[] getRequestedResource() throws IOException, URISyntaxException {
-        return FileIoUtils.loadFileFromClasspath("./templates" + path);
-    }
-
     public String getHeader(String key) {
         return headers.get(key);
     }
