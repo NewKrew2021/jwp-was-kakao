@@ -18,13 +18,15 @@ public class HttpRequest {
 
     private HttpMethod method;
     private String path;
-    private Map<String, String> parameters;
-    private Map<String, String> headers;
+    private final Map<String, String> parameters;
+    private final Map<String, String> headers;
+    private final Map<String, String> cookies;
     private String body;
 
     private HttpRequest() {
         parameters = new HashMap<>();
         headers = new HashMap<>();
+        cookies = new HashMap<>();
     }
 
     public HttpMethod getMethod() {
@@ -44,10 +46,9 @@ public class HttpRequest {
     }
 
     public UUID getSessionId() {
-        // TODO: cookie 처리 그냥 parser 에서 다 해놓자
-        Map<String, String> cookie = getCookiesInMap();
-        if (cookie.containsKey(HttpSession.COOKIE_HTTP_SESSION_KEY)) {
-            return UUID.fromString(cookie.get(HttpSession.COOKIE_HTTP_SESSION_KEY));
+        String sessionId = getCookie(HttpSession.COOKIE_HTTP_SESSION_KEY);
+        if (sessionId != null) {
+            return UUID.fromString(sessionId);
         }
         return null;
     }
@@ -61,14 +62,8 @@ public class HttpRequest {
         return HttpSessionStorage.getSession(getSessionId());
     }
 
-    public Map<String, String> getCookiesInMap() {
-        if (!headers.containsKey(HttpHeaders.COOKIE)) {
-            logger.debug("empty cookies");
-            return new HashMap<>();
-        }
-
-        String cookieString = headers.get(HttpHeaders.COOKIE);
-        return CookieParser.parse(cookieString);
+    public String getCookie(String name) {
+        return cookies.get(name);
     }
 
     public static class Parser {
@@ -84,6 +79,7 @@ public class HttpRequest {
             }
             readBody(br, httpRequest);
             handleFormBody(httpRequest);
+            handleCookies(httpRequest);
 
             logger.debug("method={}, path={}", httpRequest.method, httpRequest.path);
             logger.debug("parameters : {}", httpRequest.parameters);
@@ -134,8 +130,19 @@ public class HttpRequest {
             String contentType = httpRequest.headers.get(HttpHeaders.CONTENT_TYPE);
             if (ContentType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
                 Map<String, String> body = FormUrlencodedBodyParser.parse(httpRequest.body);
-                body.forEach((key, value) -> httpRequest.parameters.put(key, value));
+                body.forEach(httpRequest.parameters::put);
             }
+        }
+
+        private static void handleCookies(HttpRequest httpRequest) {
+            if (!httpRequest.headers.containsKey(HttpHeaders.COOKIE)) {
+                logger.debug("empty cookies");
+                return;
+            }
+
+            String cookieString = httpRequest.headers.get(HttpHeaders.COOKIE);
+            Map<String, String> cookies = CookieParser.parse(cookieString);
+            cookies.forEach(httpRequest.cookies::put);
         }
     }
 }
