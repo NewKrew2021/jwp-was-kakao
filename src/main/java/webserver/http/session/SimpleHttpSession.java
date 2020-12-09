@@ -1,10 +1,13 @@
 package webserver.http.session;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class SimpleHttpSession implements HttpSession{
 
     private final SessionId id;
+    private Map<String, Object> attributes = new HashMap<>();
 
     SimpleHttpSession(){
         this.id = SessionId.of(UUID.randomUUID().toString());
@@ -17,22 +20,22 @@ public class SimpleHttpSession implements HttpSession{
 
     @Override
     public void setAttribute(String name, Object value) {
-
+        attributes.put(name, value);
     }
 
     @Override
     public Object getAttribute(String name) {
-        return null;
+        return attributes.get(name);
     }
 
     @Override
     public void removeAttribute(String name) {
-
+        attributes.remove(name);
     }
 
     @Override
     public void invalidate() {
-
+        attributes.clear();
     }
 
     @Override

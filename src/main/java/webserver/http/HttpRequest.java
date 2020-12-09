@@ -42,6 +42,10 @@ public class HttpRequest {
         return parser.parse(cookieHeader.getValue());
     }
 
+    public HttpSession getSession() {
+        return getSession(true);
+    }
+
     public HttpSession getSession(boolean createIfAbsent){
         if( sessionManager == null ) throw new HttpSessionException("WebServer 구동시 session 사용설정이 필요합니다");
 
@@ -96,7 +100,6 @@ public class HttpRequest {
     public String getBody() {
         return body;
     }
-
 
     static class Builder {
         private Logger logger = LoggerFactory.getLogger(Builder.class);
