@@ -6,7 +6,7 @@ public interface SessionId {
 
     String getId();
 
-    static SessionId of(String id){
+    static SessionId of(String id) {
         return new SessionId() {
             @Override
             public String getId() {
@@ -14,7 +14,7 @@ public interface SessionId {
             }
 
             @Override
-            public String toString(){
+            public String toString() {
                 return id;
             }
 

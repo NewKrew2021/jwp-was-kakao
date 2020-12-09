@@ -29,7 +29,7 @@ public class SlippApplication {
 
     void start(int port) throws IOException {
         webServer = new WebServer(
-                WebServerConfig.configurer( it -> {
+                WebServerConfig.configurer(it -> {
                     it.setPort(port);
                     it.setRequestMappings(getRequestMappings());
                     it.setEnableSession(true);
@@ -47,7 +47,7 @@ public class SlippApplication {
         handlers.put(AuthenticationException.class, (e, httpRequest, httpResponse) -> {
             httpResponse.sendRedirect("./login.html");
         });
-        handlers.put(InvalidHttpRequestMessageException.class,  (e, httpRequest, httpResponse) -> {
+        handlers.put(InvalidHttpRequestMessageException.class, (e, httpRequest, httpResponse) -> {
             httpResponse.setStatus(HttpStatus.x400_BadRequest);
             httpResponse.send();
         });

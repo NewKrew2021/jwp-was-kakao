@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SimpleHttpSession implements HttpSession{
+public class SimpleHttpSession implements HttpSession {
 
     private final SessionId id;
     private Map<String, Object> attributes = new HashMap<>();
 
-    SimpleHttpSession(){
+    SimpleHttpSession() {
         this.id = SessionId.of(UUID.randomUUID().toString());
     }
 

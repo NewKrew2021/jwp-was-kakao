@@ -11,7 +11,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     @Override
     public void handle(Exception e, HttpRequest httpRequest, HttpResponse httpResponse) {
         ExceptionHandler handler = exceptionHandlerResolver.resolve(e);
-        handler.handle(e, httpRequest,httpResponse);
+        handler.handle(e, httpRequest, httpResponse);
     }
 
 }

@@ -16,18 +16,18 @@ public interface HttpRequestPreProcessor {
 
     /**
      * matches 가 true 요청에 대해서 apply 가 실행된다.
-     *  @param request
      *
+     * @param request
      */
     void apply(HttpRequest request);
 
     /**
      * 일치하는 ( match() 가 true ) 요청일때 apply() 가 실행됩니다.
-     *  @param request
      *
+     * @param request
      */
     default void execute(HttpRequest request, HttpResponse response) {
-        if (matches(request, response )) {
+        if (matches(request, response)) {
             apply(request);
         }
     }

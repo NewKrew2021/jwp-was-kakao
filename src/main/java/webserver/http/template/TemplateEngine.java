@@ -26,11 +26,11 @@ public interface TemplateEngine {
 
         private TemplateLoader templateLoader;
 
-        public HandlebarsTemplateEngine(){
+        public HandlebarsTemplateEngine() {
             this(DEFAULT_PREFIX, DEFAULT_SUFFIX);
         }
 
-        public HandlebarsTemplateEngine(String prefix, String suffix){
+        public HandlebarsTemplateEngine(String prefix, String suffix) {
             templateLoader = new ClassPathTemplateLoader();
             templateLoader.setPrefix(prefix);
             templateLoader.setSuffix(suffix);

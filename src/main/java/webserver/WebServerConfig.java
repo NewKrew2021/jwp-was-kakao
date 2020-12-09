@@ -17,7 +17,8 @@ public class WebServerConfig {
     private List<HttpRequestMapping> requestMappings = new ArrayList<>();
     private Map<Class, ExceptionHandler> exceptionHandlers = new HashMap<>();
 
-    private WebServerConfig() { }
+    private WebServerConfig() {
+    }
 
     @Deprecated
     private WebServerConfig(int port,
@@ -26,7 +27,7 @@ public class WebServerConfig {
         this.requestPreProcessor = requestPreProcessor;
     }
 
-    public static WebServerConfig configurer( WebServerConfigurer configurer ){
+    public static WebServerConfig configurer(WebServerConfigurer configurer) {
         return configurer.apply(new WebServerConfig());
     }
 

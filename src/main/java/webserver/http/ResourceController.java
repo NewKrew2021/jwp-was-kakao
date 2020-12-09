@@ -4,7 +4,7 @@ public class ResourceController implements Controller {
 
     private ResourceLoader resourceLoader;
 
-    public ResourceController(ResourceLoader resourceLoader){
+    public ResourceController(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 

@@ -8,12 +8,12 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
     private HttpRequestMapper<Controller> requestMapper;
     private HttpResponseHandler responseHandler = new DefaultHttpResponseHandler();
 
-    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, List<HttpRequestMapping> mappings){
+    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, List<HttpRequestMapping> mappings) {
         this.requestMapper = new DefaultHttpRequestMapper(mappings);
         this.responseHandler = responseHandler;
     }
 
-    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, HttpRequestMapping... mappings){
+    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, HttpRequestMapping... mappings) {
         this(responseHandler, Arrays.asList(mappings));
     }
 
@@ -27,7 +27,7 @@ public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
 
     public void dispatch(HttpRequest request, HttpResponse response) {
         Controller controller = requestMapper.getTarget(request);
-        if( controller == null ) throw new NotFoundException(request.getPath());
+        if (controller == null) throw new NotFoundException(request.getPath());
 
         ModelAndView mav = controller.execute(request, response);
         responseHandler.handle(mav, request, response);

@@ -11,7 +11,7 @@ public abstract class TemplateController implements Controller {
 
     protected TemplateEngine templateEngine;
 
-    public TemplateController(TemplateEngine templateEngine){
+    public TemplateController(TemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
     }
 

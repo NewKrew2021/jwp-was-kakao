@@ -49,7 +49,7 @@ public class RequestHandler implements Runnable {
             requestPreProcessor.execute(httpRequest, httpResponse);
             requestDispatcher.dispatch(httpRequest, httpResponse);
 
-        } catch ( Exception e ){
+        } catch (Exception e) {
             exceptionHandler.handle(e, httpRequest, httpResponse);
         } finally {
             closeConnection();

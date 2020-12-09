@@ -5,7 +5,7 @@ import apps.slipp.model.User;
 
 public class UserService {
 
-    public User get(String userId){
+    public User get(String userId) {
         return DataBase.findUserById(userId);
     }
 

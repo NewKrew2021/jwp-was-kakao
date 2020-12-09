@@ -24,7 +24,7 @@ public class UserListController extends TemplateController {
 
         HttpSession session = request.getSession();
         Object profile = session.getAttribute("profile");
-        if( profile != null )
+        if (profile != null)
             data.put("profile", (Profile) profile);
         data.put("users", users);
         return data;

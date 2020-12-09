@@ -24,7 +24,7 @@ public class WebServer {
     private int port;
 
     public WebServer(WebServerConfig config) {
-        if( config == null ) throw new IllegalArgumentException("WebServerConfig 는 필수 입력값입니다");
+        if (config == null) throw new IllegalArgumentException("WebServerConfig 는 필수 입력값입니다");
 
         this.port = config.getPortOrDefault(DEFAULT_PORT);
         this.sessionManager = createSessionManager(config);
@@ -34,12 +34,12 @@ public class WebServer {
     }
 
     private HttpSessionManager createSessionManager(WebServerConfig config) {
-        if( config.isEnableSession() )
+        if (config.isEnableSession())
             return new SimpleHttpSessionManager();
         return null;
     }
 
-    public void start() throws IOException{
+    public void start() throws IOException {
         start(port);
     }
 
@@ -57,7 +57,7 @@ public class WebServer {
     }
 
     private void shouldUsable(int port) {
-        if( port <= 80 ) throw new RuntimeException("80 이하의 port 는 사용할 수 없습니다");
+        if (port <= 80) throw new RuntimeException("80 이하의 port 는 사용할 수 없습니다");
     }
 
     private void launchRequestHandler(Socket connection) {

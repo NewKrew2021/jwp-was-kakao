@@ -8,7 +8,6 @@ import webserver.http.utils.CookieParser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class HttpRequest {
 
@@ -46,12 +45,12 @@ public class HttpRequest {
         return getSession(true);
     }
 
-    public HttpSession getSession(boolean createIfAbsent){
-        if( sessionManager == null ) throw new HttpSessionException("WebServer 구동시 session 사용설정이 필요합니다");
+    public HttpSession getSession(boolean createIfAbsent) {
+        if (sessionManager == null) throw new HttpSessionException("WebServer 구동시 session 사용설정이 필요합니다");
 
         String sessionId = getCookie(HttpSessions.SESSION_ID_COOKIE_HEADER);
         HttpSession session = sessionManager.getSession(SessionId.of(sessionId)).orElse(null);
-        if( session == null && createIfAbsent ) return sessionManager.createSession();
+        if (session == null && createIfAbsent) return sessionManager.createSession();
         return session;
     }
 

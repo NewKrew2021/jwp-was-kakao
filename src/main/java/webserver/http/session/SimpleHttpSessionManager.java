@@ -2,30 +2,30 @@ package webserver.http.session;
 
 import java.util.Optional;
 
-public class SimpleHttpSessionManager implements HttpSessionManager{
+public class SimpleHttpSessionManager implements HttpSessionManager {
 
-    private HttpSessionStore httpSessionStore;
+    private HttpSessionStore sessionStore;
 
     public SimpleHttpSessionManager() {
         this(new SimpleHttpSessionStore());
     }
 
-    public SimpleHttpSessionManager(HttpSessionStore httpSessionStore) {
-        this.httpSessionStore = httpSessionStore;
+    public SimpleHttpSessionManager(HttpSessionStore sessionStore) {
+        this.sessionStore = sessionStore;
     }
 
     @Override
     public HttpSession createSession() {
-        return httpSessionStore.saveSession(new SimpleHttpSession());
+        return sessionStore.saveSession(new SimpleHttpSession());
     }
 
     @Override
     public Optional<HttpSession> getSession(SessionId sessionId) {
-        return Optional.ofNullable(httpSessionStore.getSession(sessionId));
+        return Optional.ofNullable(sessionStore.getSession(sessionId));
     }
 
     @Override
     public boolean exist(SessionId sessionId) {
-        return httpSessionStore.contains(sessionId);
+        return sessionStore.contains(sessionId);
     }
 }

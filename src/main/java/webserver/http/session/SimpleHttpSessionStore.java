@@ -3,11 +3,11 @@ package webserver.http.session;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleHttpSessionStore implements HttpSessionStore{
+public class SimpleHttpSessionStore implements HttpSessionStore {
 
     private Map<SessionId, HttpSession> store;
 
-    public SimpleHttpSessionStore(){
+    public SimpleHttpSessionStore() {
         store = new HashMap<>();
     }
 
@@ -21,7 +21,7 @@ public class SimpleHttpSessionStore implements HttpSessionStore{
         try {
             store.put(session.getId(), session);
             return session;
-        } catch ( RuntimeException e ){
+        } catch (RuntimeException e) {
             throw new HttpSessionStoreException("session 저장에 실패했습니다", e);
         }
     }
@@ -30,7 +30,7 @@ public class SimpleHttpSessionStore implements HttpSessionStore{
     public HttpSession removeSession(SessionId sessionId) {
         try {
             return store.remove(sessionId);
-        } catch ( RuntimeException e ){
+        } catch (RuntimeException e) {
             throw new HttpSessionStoreException("session 삭제에 실패했습니다", e);
         }
     }
