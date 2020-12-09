@@ -1,5 +1,8 @@
 package webserver.http;
 
+/**
+ * HttpResponseHandler 가 실행되기 전에 실행되어 HttpResponse 에 전처리를 수행합니다.
+ */
 public interface HttpResponsePreProcessor {
     /**
      * PostProcessor 가 처리할 response 인지 판단합니다.

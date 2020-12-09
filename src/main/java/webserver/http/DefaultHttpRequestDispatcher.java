@@ -5,25 +5,26 @@ import java.util.List;
 
 public class DefaultHttpRequestDispatcher implements HttpRequestDispatcher {
 
-    private HttpRequestMapper<Controller> requestMapper;
-    private HttpResponseHandler responseHandler = new DefaultHttpResponseHandler();
+    private final HttpRequestMapper<Controller> requestMapper;
+    private final HttpResponseHandler responseHandler;
 
-    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, List<HttpRequestMapping> mappings) {
-        this.requestMapper = new DefaultHttpRequestMapper(mappings);
-        this.responseHandler = responseHandler;
+    public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings) {
+        this(Arrays.asList(mappings));
+    }
+
+    public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings) {
+        this(new DefaultHttpResponseHandler(), mappings);
     }
 
     public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, HttpRequestMapping... mappings) {
         this(responseHandler, Arrays.asList(mappings));
     }
 
-    public DefaultHttpRequestDispatcher(HttpRequestMapping... mappings) {
-        this(new DefaultHttpResponseHandler(), mappings);
+    public DefaultHttpRequestDispatcher(HttpResponseHandler responseHandler, List<HttpRequestMapping> mappings) {
+        this.requestMapper = new DefaultHttpRequestMapper(mappings);
+        this.responseHandler = responseHandler;
     }
 
-    public DefaultHttpRequestDispatcher(List<HttpRequestMapping> mappings) {
-        requestMapper = new DefaultHttpRequestMapper(mappings);
-    }
 
     public void dispatch(HttpRequest request, HttpResponse response) {
         Controller controller = requestMapper.getTarget(request);

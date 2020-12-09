@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 public class SessionIdSetter implements HttpResponsePreProcessor {
 
     private final HttpSessionManager sessionManager;
-    private int expiredHours = 1;
 
     public SessionIdSetter(HttpSessionManager sessionManager) {
         this.sessionManager = sessionManager;
