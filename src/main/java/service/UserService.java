@@ -2,9 +2,11 @@ package service;
 
 import db.DataBase;
 import model.User;
+import webserver.http.HttpSession;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 public class UserService {
     public static final String LOGINED_KEY = "logined";
@@ -33,5 +35,13 @@ public class UserService {
             return false;
         }
         return LOGINED_VALUE.equals(cookie.get(LOGINED_KEY));
+    }
+
+    public static boolean isLoginedWithSession(HttpSession httpSession) {
+        Object value = httpSession.getAttribute(LOGINED_KEY);
+        if (Objects.isNull(value)) {
+            return false;
+        }
+        return LOGINED_VALUE.equals(value);
     }
 }

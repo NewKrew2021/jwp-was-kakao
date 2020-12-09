@@ -1,5 +1,7 @@
 package webserver.http;
 
+import java.util.UUID;
+
 public class HttpResponseBuilder {
 
     private HttpResponse response;
@@ -25,6 +27,13 @@ public class HttpResponseBuilder {
     }
 
     public HttpResponseBuilder withSetCookie(SetCookie setCookie) {
+        response.addHeader(HttpHeaders.SET_COOKIE, setCookie.toString());
+        return this;
+    }
+
+    public HttpResponseBuilder withSessionId(UUID id) {
+        SetCookie setCookie = new SetCookie(HttpSession.COOKIE_HTTP_SESSION_KEY, id.toString());
+        setCookie.setPath("/");
         response.addHeader(HttpHeaders.SET_COOKIE, setCookie.toString());
         return this;
     }

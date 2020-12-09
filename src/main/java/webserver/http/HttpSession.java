@@ -6,16 +6,26 @@ import java.util.UUID;
 
 public class HttpSession {
 
+    public static final String COOKIE_HTTP_SESSION_KEY = "session_key";
+
     private final UUID id;
     private final Map<String, Object> attributes;
 
-    public HttpSession() {
-        id = UUID.randomUUID();
-        attributes = new HashMap<>();
+    private HttpSession(UUID id, Map<String, Object> attributes) {
+       this.id = id;
+       this.attributes = attributes;
     }
 
-    public String getId() {
-        return id.toString();
+    public HttpSession() {
+        this(UUID.randomUUID(), new HashMap<>());
+    }
+
+    public static HttpSession of(UUID id, Map<String, Object> attributes) {
+        return new HttpSession(id, attributes);
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public void setAttribute(String name, Object value) {

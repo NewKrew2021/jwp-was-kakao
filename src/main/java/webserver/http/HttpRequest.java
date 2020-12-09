@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class HttpRequest {
@@ -40,6 +41,24 @@ public class HttpRequest {
 
     public String getHeader(String name) {
         return headers.get(name);
+    }
+
+    public UUID getSessionId() {
+        // TODO: cookie 처리 그냥 parser 에서 다 해놓자
+        Map<String, String> cookie = getCookiesInMap();
+        if (cookie.containsKey(HttpSession.COOKIE_HTTP_SESSION_KEY)) {
+            return UUID.fromString(cookie.get(HttpSession.COOKIE_HTTP_SESSION_KEY));
+        }
+        return null;
+    }
+
+    public HttpSession getSession() {
+        if (getSessionId() == null) {
+            HttpSession session = new HttpSession();
+            HttpSessionStorage.putSession(session);
+            return session;
+        }
+        return HttpSessionStorage.getSession(getSessionId());
     }
 
     public Map<String, String> getCookiesInMap() {
