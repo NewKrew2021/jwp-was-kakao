@@ -10,6 +10,7 @@ import webserver.http.session.SimpleHttpSessionManager;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 public class WebServer {
 
@@ -28,9 +29,15 @@ public class WebServer {
 
         this.port = config.getPortOrDefault(DEFAULT_PORT);
         this.sessionManager = createSessionManager(config);
-        this.requestDispatcher = new DefaultHttpRequestDispatcher(new DefaultHttpResponseHandler(new SessionIdSetter(this.sessionManager)), config.getRequestMappings());
+        this.requestDispatcher = createRequestDispatcher(config.getRequestMappings(), this.sessionManager);
         this.requestPreProcessor = config.getRequestPreProcessor();
         this.exceptionHandler = new DefaultExceptionHandler(new ExceptionHandlerResolver(config.getExceptionHandlers()));
+    }
+
+    private HttpRequestDispatcher createRequestDispatcher(List<HttpRequestMapping> requestMappings, HttpSessionManager sessionManager) {
+        if(sessionManager != null)
+            return new DefaultHttpRequestDispatcher(new DefaultHttpResponseHandler(new SessionIdSetter(this.sessionManager)), requestMappings);
+        return new DefaultHttpRequestDispatcher(new DefaultHttpResponseHandler(), requestMappings);
     }
 
     private HttpSessionManager createSessionManager(WebServerConfig config) {
