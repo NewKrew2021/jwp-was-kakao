@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 public class RequestBody {
 
     private final String body;
-    public QueryString queryString;
+    private final QueryString queryString;
 
     public RequestBody(String body) throws UnsupportedEncodingException {
         this.body = body;

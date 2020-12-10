@@ -21,11 +21,11 @@ public class ResponseHeaderTest {
 
     @Test
     public void loginCookieTest(){
-        ResponseHeader responseHeader = new ResponseHeader();
+        ResponseHeader responseHeader = ResponseHeader.create();
         responseHeader.setLoginCookie(request, true);
-        assertThat(responseHeader.getHeader().get("Set-Cookie")).isEqualTo("logined=true;Path=/");
+        assertThat(responseHeader.getHeader().get(HttpHeader.SET_COOKIE)).isEqualTo("logined=true;Path=/");
         responseHeader.setLoginCookie(request, false);
-        assertThat(responseHeader.getHeader().get("Set-Cookie")).isEqualTo("logined=false;Path=/");
+        assertThat(responseHeader.getHeader().get(HttpHeader.SET_COOKIE)).isEqualTo("logined=false;Path=/");
     }
 
 

@@ -11,7 +11,7 @@ public class UserService {
         DataBase.addUser(user);
     }
 
-    public boolean loginProcess(String userId, String password) {
+    public boolean isValidUserByLogin(String userId, String password) {
         User user = DataBase.findUserById(userId);
         return user != null && user.getPassword().equals(password);
     }

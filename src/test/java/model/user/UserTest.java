@@ -1,15 +1,25 @@
-package webserver.user;
+package model.user;
 
+import model.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.http.HttpRequest;
 
 import java.io.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class UserTest {
 
     private final String testDirectory = "src/test/resources-test/";
+
+
+    @DisplayName("User객체 유효성검증")
+    @Test
+    void userInitTest(){
+        assertThatThrownBy(() -> new User("name", null, "123", "test@test")).isInstanceOf(IllegalArgumentException.class);
+    }
 
     @Test
     void GET_CREATE_USER_PARAMETER_TEST() throws Exception {

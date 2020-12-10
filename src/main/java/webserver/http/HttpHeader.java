@@ -11,7 +11,19 @@ import java.util.Map;
 
 public class HttpHeader {
 
+    public static final String HOST = "Host";
+    public static final String CONNECTION = "Connection";
+    public static final String ACCEPT = "Accept";
+    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String PATH = "Path";
+    public static final String METHOD = "Method";
+    public static final String SET_COOKIE = "Set-Cookie";
+    public static final String SEPERATOR = "=";
+    public static final String COOKIE_PATH = ";Path=/";
+    public static final String CONTENT_TYPE = "Content-Type";
     private static final String COLON_SEPARATOR = ": ";
+    public static final String PROTOCOL = "Protocol";
+    public static final String COOKIE = "Cookie";
     private final List<String> headerLines;
     private final Map<String, String> httpHeaders = new HashMap<>();
     private final Cookies cookies;
@@ -22,16 +34,16 @@ public class HttpHeader {
         headerLines.add(line);
         String[] values = line.split(" ");
         HttpMethod httpMethod = HttpMethod.getHttpMethod(values[0]);
-        httpHeaders.put("Method", httpMethod.name());
+        httpHeaders.put(METHOD, httpMethod.name());
         HttpPath httpPath = new HttpPath(values[1]);
-        httpHeaders.put("Path", httpPath.toString());
+        httpHeaders.put(PATH, httpPath.toString());
         HttpProtocol httpProtocol = new HttpProtocol(values[2]);
-        httpHeaders.put("Protocol", httpProtocol.toString());
+        httpHeaders.put(PROTOCOL, httpProtocol.toString());
         while (StringUtils.isNotBlank(line = bufferedReader.readLine())) {
             addHeader(line);
             headerLines.add(line);
         }
-        this.cookies = Cookies.parse(httpHeaders.getOrDefault("Cookie", ""));
+        this.cookies = Cookies.parse(httpHeaders.getOrDefault(COOKIE, ""));
     }
 
     private void addHeader(String line){
@@ -47,8 +59,15 @@ public class HttpHeader {
         return cookies;
     }
 
+    public String getProtocol() {
+        return httpHeaders.get(PROTOCOL);
+    }
+
+
     public void print() {
         System.out.println(String.join("\n", headerLines));
         System.out.println("\n");
     }
+
+
 }

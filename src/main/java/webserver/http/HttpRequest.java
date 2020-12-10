@@ -1,6 +1,7 @@
 package webserver.http;
 
 import utils.IOUtils;
+import webserver.config.ServerConfigConstants;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,15 +29,15 @@ public class HttpRequest {
     }
 
     public HttpMethod getMethod() {
-        return HttpMethod.valueOf(httpHeader.getHttpHeader("Method"));
+        return HttpMethod.valueOf(httpHeader.getHttpHeader(HttpHeader.METHOD));
     }
 
     public String getPath() {
-        return httpHeader.getHttpHeader("Path");
+        return httpHeader.getHttpHeader(HttpHeader.PATH);
     }
 
     public String getQueryString() {
-        String[] paths = httpHeader.getHttpHeader("Path").split("\\?");
+        String[] paths = httpHeader.getHttpHeader(HttpHeader.PATH).split("\\?");
         if(paths.length > 1){
             return paths[1];
         }else{
@@ -44,24 +45,20 @@ public class HttpRequest {
         }
     }
 
-    public String getProtocol() {
-        return httpHeader.getHttpHeader("Protocol");
-    }
-
     public String getHost() {
-        return httpHeader.getHttpHeader("Host");
+        return httpHeader.getHttpHeader(HttpHeader.HOST);
     }
 
     public String getConnection() {
-        return httpHeader.getHttpHeader("Connection");
+        return httpHeader.getHttpHeader(HttpHeader.CONNECTION);
     }
 
     public String getAccept() {
-        return httpHeader.getHttpHeader("Accept");
+        return httpHeader.getHttpHeader(HttpHeader.ACCEPT);
     }
 
     public String getContentLength() {
-        return httpHeader.getHttpHeader("Content-Length");
+        return httpHeader.getHttpHeader(HttpHeader.CONTENT_LENGTH);
     }
 
     public RequestBody getBody() {
@@ -69,8 +66,8 @@ public class HttpRequest {
     }
 
     public boolean isLogin(){
-        return httpHeader.getCookies().get("logined") != null
-                && httpHeader.getCookies().get("logined").equals("true");
+        return httpHeader.getCookies().get(ServerConfigConstants.LOGIN_COOKIE_KEY) != null
+                && httpHeader.getCookies().get(ServerConfigConstants.LOGIN_COOKIE_KEY).equals("true");
     }
 
 }

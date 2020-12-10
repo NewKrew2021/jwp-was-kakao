@@ -1,5 +1,7 @@
 package webserver.http;
 
+import webserver.config.ServerConfigConstants;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,12 +11,25 @@ public class ResponseHeader {
 
     public static final String HTML = ".html";
     public static final String CSS = ".css";
-    public static final String SET_COOKIE = "Set-Cookie";
-    public static final String LOGIN_COOKIE_KEY = "logined";
-    private final Map<String, String> header = new HashMap<>();
+    private final Map<String, String> header;
+
+    private ResponseHeader(Map<String, String> header) {
+        this.header = header;
+    }
+
+    public static ResponseHeader create(){
+        Map<String, String> header = new HashMap<>();
+        return new ResponseHeader(header);
+    }
+
+    public static ResponseHeader of(HttpRequest httpRequest){
+        Map<String, String> header = new HashMap<>();
+        setContentType(httpRequest, header);
+        return new ResponseHeader(header);
+    }
 
     public void addHeader(String key, String value) {
-        this.header.put(key, value);
+        header.put(key, value);
     }
 
     public Map<String, String> getHeader() {
@@ -23,8 +38,8 @@ public class ResponseHeader {
 
     public void setLoginCookie(HttpRequest httpRequest, boolean isLogin){
         Cookies cookies = httpRequest.getHeader().getCookies();
-        cookies.add(LOGIN_COOKIE_KEY, String.valueOf(isLogin));
-        addHeader(SET_COOKIE, cookies.toString());
+        cookies.add(ServerConfigConstants.LOGIN_COOKIE_KEY, String.valueOf(isLogin));
+        addHeader(HttpHeader.SET_COOKIE, ServerConfigConstants.LOGIN_COOKIE_KEY+ HttpHeader.SEPERATOR +String.valueOf(isLogin)+ HttpHeader.COOKIE_PATH);
     }
 
     public List<String> makeHeader() {
@@ -35,11 +50,11 @@ public class ResponseHeader {
         return response;
     }
 
-    public void setContentType(HttpRequest httpRequest){
+    public static void setContentType(HttpRequest httpRequest, Map<String, String> header){
         if(httpRequest.getPath().endsWith(HTML)){
-            this.addHeader("Content-Type", ContentType.HTML.toString());
+            header.put(HttpHeader.CONTENT_TYPE, ContentType.HTML.toString());
         }else if(httpRequest.getPath().endsWith(CSS)){
-            this.addHeader("Content-Type", ContentType.CSS.toString());
+            header.put(HttpHeader.CONTENT_TYPE, ContentType.CSS.toString());
         }
     }
 }

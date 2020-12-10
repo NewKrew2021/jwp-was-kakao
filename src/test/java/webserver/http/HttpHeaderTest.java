@@ -17,7 +17,7 @@ public class HttpHeaderTest {
         HttpRequest request = new HttpRequest(bufferedReader);
         assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(request.getPath()).isEqualTo("/index.html");
-        assertThat(request.getProtocol()).isEqualTo("HTTP/1.1");
+        assertThat(request.getHeader().getProtocol()).isEqualTo("HTTP/1.1");
         assertThat(request.getHost()).isEqualTo("localhost:8080");
         assertThat(request.getConnection()).isEqualTo("keep-alive");
         assertThat(request.getAccept()).isEqualTo("*/*");

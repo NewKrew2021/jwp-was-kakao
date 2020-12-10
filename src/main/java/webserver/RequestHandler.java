@@ -31,8 +31,6 @@ public class RequestHandler implements Runnable {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             HttpRequest httpRequest = new HttpRequest(bufferedReader);
 
-            RequestMappingHandler requestMappingHandler = new RequestMappingHandler();
-
             HttpController httpController = RequestMappingHandler.getController(httpRequest);
 
             HttpResponse httpResponse = httpController.response(httpRequest);

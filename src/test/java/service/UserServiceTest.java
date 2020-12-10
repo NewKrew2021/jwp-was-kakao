@@ -1,4 +1,4 @@
-package webserver.user;
+package service;
 
 import db.DataBase;
 import model.User;
@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import service.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,13 +31,13 @@ public class UserServiceTest {
     @ParameterizedTest
     @CsvSource(value = {"1,passwd"}, delimiter = ',')
     public void loginProcess_성공(String userId, String password) {
-        assertThat(userService.loginProcess(userId, password)).isTrue();
+        assertThat(userService.isValidUserByLogin(userId, password)).isTrue();
     }
 
     @ParameterizedTest
     @CsvSource(value = {"1,passwd2"}, delimiter = ',')
     public void loginProcess_실패(String userId, String password) {
-        assertThat(userService.loginProcess(userId, password)).isFalse();
+        assertThat(userService.isValidUserByLogin(userId, password)).isFalse();
     }
 
     @Test
