@@ -211,7 +211,7 @@ public class RequestParserTest {
                     "Host: localhost:8080\n" +
                     "Connection: keep-alive\n" +
                     "Accept: */*\n" +
-                    "Cookie: session_id:session1\n\n"));
+                    "Cookie: session_id=session1\n\n"));
         }
 
         @Test
@@ -232,6 +232,19 @@ public class RequestParserTest {
             HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
 
             assertThat(httpRequest.getSession()).isNotNull();
+        }
+
+        @DisplayName("세션 객체를 두번 가져오면 동일한 객체여야 한다")
+        @Test
+        void getSessionTwice() {
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /user/list HTTP/1.1\n" +
+                    "Host: localhost:8080\n" +
+                    "Connection: keep-alive\n" +
+                    "Accept: */*\n\n"));
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+
+            assertThat(httpRequest.getSession().getId()).isEqualTo(httpRequest.getSession().getId());
         }
     }
 

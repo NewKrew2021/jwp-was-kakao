@@ -70,6 +70,7 @@ public class HttpRequest {
     }
 
     public HttpSession getSession() {
+
         return new HttpSession("session1");
     }
 
