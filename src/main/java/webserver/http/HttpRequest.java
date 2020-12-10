@@ -10,6 +10,9 @@ import static java.util.AbstractMap.SimpleEntry;
 import static java.util.stream.Collectors.*;
 
 public class HttpRequest {
+    public static final HttpSessionFactory HTTP_SESSION_FACTORY = new HttpSessionFactory();
+    public static final String SESSION_ID = "session_id";
+    public static final String COOKIE_HEADER = "Cookie";
     private final HttpMethod method;
     private final String requestURI;
     private final String protocol;
@@ -17,6 +20,7 @@ public class HttpRequest {
     private final Map<String, String> headers = new HashMap<>();
     private Map<String, String> entity = Collections.emptyMap();
     private String sessionId;
+    private Cookies cookies;
 
     public HttpRequest(String method, String requestURI, String protocol) {
         this.method = HttpMethod.valueOf(method);
@@ -61,9 +65,12 @@ public class HttpRequest {
     }
 
     public Cookies getCookies() {
-        return Optional.ofNullable(getHeaders().get("Cookie"))
-                .map(Cookies::new)
-                .orElse(null);
+        if (cookies == null) {
+            cookies = Optional.ofNullable(getHeaders().get(COOKIE_HEADER))
+                    .map(Cookies::new)
+                    .orElse(null);
+        }
+        return cookies;
     }
 
     public String getParameter(String name) {
@@ -71,15 +78,21 @@ public class HttpRequest {
     }
 
     public HttpSession getSession() {
-        HttpSessionFactory httpSessionFactory = new HttpSessionFactory();
-        Cookies cookies = getCookies();
-        if (cookies != null && sessionId == null) {
-            sessionId = cookies.asMap().get("session_id");
-        }
+        parseSessionId();
 
-        HttpSession httpSession = httpSessionFactory.getOrCreate(sessionId);
+        return getHttpSession();
+    }
+
+    private HttpSession getHttpSession() {
+        HttpSession httpSession = HTTP_SESSION_FACTORY.getOrCreate(sessionId);
         sessionId = httpSession.getId();
         return httpSession;
+    }
+
+    private void parseSessionId() {
+        if (getCookies() != null && sessionId == null) {
+            sessionId = getCookies().findCookieByName(SESSION_ID);
+        }
     }
 
     public static class Cookies {
@@ -101,6 +114,14 @@ public class HttpRequest {
                     }).collect(collectingAndThen(
                             toMap(SimpleEntry::getKey, SimpleEntry::getValue),
                             ImmutableMap::copyOf));
+        }
+
+        public String findCookieByName(String name) {
+            return cookies.stream()
+                    .filter(cookie -> cookie.startsWith(name))
+                    .map(cookie -> cookie.split(KEY_VALUE_SPLIT)[1])
+                    .findFirst()
+                    .orElse(null);
         }
 
         public boolean contains(String cookie) {
