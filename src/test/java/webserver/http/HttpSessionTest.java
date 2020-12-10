@@ -1,8 +1,10 @@
 package webserver.http;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * * String getId(): 현재 세션에 할당되어 있는 고유한 세션 아이디를 반환
@@ -15,8 +17,14 @@ public class HttpSessionTest {
     @DisplayName("세션 생성시 반드시 세션아이디가 존재한다")
     @Test
     void createNullSessionId() {
-        Assertions.assertThatThrownBy(() -> new HttpSession(null))
+        assertThatThrownBy(() -> new HttpSession(null))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void getId() {
+        String sessionId = "session id";
+        assertThat(new HttpSession(sessionId).getId()).isEqualTo(sessionId);
     }
 
     private static class HttpSession {
