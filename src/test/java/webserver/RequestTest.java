@@ -7,13 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ReqeustTest {
+public class RequestTest {
+
+    private String testDirectory = "./src/test/resources/";
 
     @DisplayName("Request 생성 테스트")
     @Test
@@ -71,6 +76,42 @@ public class ReqeustTest {
         assertThat(params).isNotEmpty();
         assertThat(params.get().getValue("userId")).isEqualTo("javajigi");
         assertThat(params.get().getValue("password")).isEqualTo("password");
+    }
+
+    @DisplayName("InputStream GET Request 생성 테스트")
+    @Test
+    public void request_GET() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "Http_GET.txt"));
+        RequestValue requestValue = RequestValue.of(in);
+        Request request = Request.of(requestValue);
+
+        assertThat(request.getMethod()).isEqualTo("GET");
+        assertThat(request.getPathGateway()).isEqualTo("/user/create");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+
+        Optional<ParamValue> paramMap = request.getParamMap();
+        assertThat(paramMap).isNotEmpty();
+        assertThat(paramMap.get().getValue("userId")).isEqualTo("javajigi");
+        assertThat(paramMap.get().getValue("password")).isEqualTo("password");
+        assertThat(paramMap.get().getValue("name")).isEqualTo("JaeSung");
+    }
+
+    @DisplayName("InputStream POST Request 생성 테스트")
+    @Test
+    public void request_POST() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "Http_POST.txt"));
+        RequestValue requestValue = RequestValue.of(in);
+        Request request = Request.of(requestValue);
+
+        assertThat(request.getMethod()).isEqualTo("POST");
+        assertThat(request.getPathGateway()).isEqualTo("/user/create");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+
+        Optional<ParamValue> paramMap = request.getParamMap();
+        assertThat(paramMap).isNotEmpty();
+        assertThat(paramMap.get().getValue("userId")).isEqualTo("javajigi");
+        assertThat(paramMap.get().getValue("password")).isEqualTo("password");
+        assertThat(paramMap.get().getValue("name")).isEqualTo("JaeSung");
     }
 
     private RequestValue parseRequestValue(String header) {

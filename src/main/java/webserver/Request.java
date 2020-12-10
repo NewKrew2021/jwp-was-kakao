@@ -59,12 +59,20 @@ public class Request {
         return Optional.empty();
     }
 
+    public String getMethod() {
+        return requestHeader.getMethod();
+    }
+
     public String getURL() {
         return requestHeader.getURL();
     }
 
     public String getPathGateway() {
         return requestHeader.getPathGateway();
+    }
+
+    public String getHeader(String key){
+        return requestHeader.getHeader(key);
     }
 
 
