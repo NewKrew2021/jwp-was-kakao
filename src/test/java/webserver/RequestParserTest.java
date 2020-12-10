@@ -220,6 +220,19 @@ public class RequestParserTest {
 
             assertThat(httpRequest.getSession().getId()).isEqualTo("session1");
         }
+
+        @DisplayName("세션아이디 쿠키가 없어도 생성할 수 있다")
+        @Test
+        void getSessionWhenSessionEmptyCookie() {
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /user/list HTTP/1.1\n" +
+                    "Host: localhost:8080\n" +
+                    "Connection: keep-alive\n" +
+                    "Accept: */*\n\n"));
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+
+            assertThat(httpRequest.getSession()).isNotNull();
+        }
     }
 
     public static User getUser(HttpRequest httpRequest) {
