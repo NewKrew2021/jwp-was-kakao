@@ -7,9 +7,13 @@ public class RequestBody {
     private final String body;
     private final QueryString queryString;
 
-    public RequestBody(String body) throws UnsupportedEncodingException {
+    private RequestBody(String body) throws UnsupportedEncodingException {
         this.body = body;
         this.queryString = new QueryString(body);
+    }
+
+    public static RequestBody from(String body) throws UnsupportedEncodingException {
+        return new RequestBody(body);
     }
 
     public String getBody() {

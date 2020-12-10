@@ -17,6 +17,6 @@ public class UserService {
     }
 
     public Users findAll(){
-        return new Users(new ArrayList<>(DataBase.findAll()));
+        return Users.from(new ArrayList<>(DataBase.findAll()));
     }
 }

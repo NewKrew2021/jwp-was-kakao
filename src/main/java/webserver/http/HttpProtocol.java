@@ -4,8 +4,12 @@ public class HttpProtocol {
 
     String protocol;
 
-    public HttpProtocol(String protocol) {
+    private HttpProtocol(String protocol) {
         this.protocol = protocol;
+    }
+
+    public static HttpProtocol from(String protocol){
+        return new HttpProtocol(protocol);
     }
 
     @Override

@@ -28,22 +28,26 @@ public class HttpHeader {
     private final Map<String, String> httpHeaders = new HashMap<>();
     private final Cookies cookies;
 
-    public HttpHeader(BufferedReader bufferedReader) throws IOException {
+    private HttpHeader(BufferedReader bufferedReader) throws IOException {
         headerLines = new ArrayList<>();
         String line = bufferedReader.readLine();
         headerLines.add(line);
         String[] values = line.split(" ");
         HttpMethod httpMethod = HttpMethod.getHttpMethod(values[0]);
         httpHeaders.put(METHOD, httpMethod.name());
-        HttpPath httpPath = new HttpPath(values[1]);
+        HttpPath httpPath = HttpPath.from(values[1]);
         httpHeaders.put(PATH, httpPath.toString());
-        HttpProtocol httpProtocol = new HttpProtocol(values[2]);
+        HttpProtocol httpProtocol = HttpProtocol.from(values[2]);
         httpHeaders.put(PROTOCOL, httpProtocol.toString());
         while (StringUtils.isNotBlank(line = bufferedReader.readLine())) {
             addHeader(line);
             headerLines.add(line);
         }
         this.cookies = Cookies.parse(httpHeaders.getOrDefault(COOKIE, ""));
+    }
+
+    public static HttpHeader from(BufferedReader bufferedReader) throws IOException {
+        return new HttpHeader(bufferedReader);
     }
 
     private void addHeader(String line){

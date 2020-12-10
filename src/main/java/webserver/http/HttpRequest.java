@@ -12,15 +12,15 @@ public class HttpRequest {
     private final RequestBody body;
 
     public HttpRequest(BufferedReader bufferedReader) throws IOException {
-        httpHeader = new HttpHeader(bufferedReader);
+        httpHeader = HttpHeader.from(bufferedReader);
         // 요구사항 1
         httpHeader.print();
         if (getMethod().equals(HttpMethod.POST) || getMethod().equals(HttpMethod.DELETE) || getMethod().equals(HttpMethod.PUT)) {
-            body = new RequestBody(IOUtils.readData(bufferedReader, Integer.parseInt(getContentLength())));
+            body = RequestBody.from(IOUtils.readData(bufferedReader, Integer.parseInt(getContentLength())));
         } else if(getMethod().equals(HttpMethod.GET)) {
-            body = new RequestBody(getQueryString());
+            body = RequestBody.from(getQueryString());
         } else{
-            body = new RequestBody("");
+            body = RequestBody.from("");
         }
     }
 

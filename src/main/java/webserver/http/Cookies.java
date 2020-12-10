@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 public class Cookies {
 
-    private static final String COOKIE_PREFIX = "Set-Cookie: ";
     private static final String NEW_LINE = "\r\n";
     private static final String KEY_VALUE_SEPARATOR = "=";
     private static final String COOKIE_SEPARATOR = ";";
@@ -20,7 +19,7 @@ public class Cookies {
         this.cookies = cookies;
     }
 
-    public Cookies() {
+    private Cookies() {
         this.cookies = new HashMap<>();
     }
 
