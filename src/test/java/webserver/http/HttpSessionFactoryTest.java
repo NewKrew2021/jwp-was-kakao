@@ -4,6 +4,10 @@ package webserver.http;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -35,8 +39,15 @@ public class HttpSessionFactoryTest {
     }
 
     private static class HttpSessionFactory {
+        private final Map<String, HttpSession> sessions = new HashMap<>();
         public HttpSession create(String sessionId) {
-            return new HttpSession("");
+            if (sessionId == null) {
+                String newSessionId = UUID.randomUUID().toString();
+                HttpSession httpSession = new HttpSession("");
+                sessions.put(newSessionId, httpSession);
+                return httpSession;
+            }
+            return sessions.get(sessionId);
         }
     }
 }
