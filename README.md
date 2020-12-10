@@ -128,10 +128,10 @@ HttpSession API 중 구현할 메소드는 getId(), setAttribute(String name, Ob
 여기서 힌트를 얻어 세션을 구현해 보자.
 
 ### 구현목록
-* HttpRequest 는 쿠키로부터 세션아이디를 파생하여 가진다
+* HttpRequest 는 쿠키로부터 세션아이디를 파싱하여 가진다
 * HttpRequest 는 세션아이디에 해당하는 HttpSession 객체를 제공한다  
 * 세션이 없으면 새로 생성한다
   * 세션아이디는 랜덤한 UUID 문자열이다
-  * 세션은 SessionStore 에 저장한다. 세션아이디와 세션 객체를 가진다
+  * 세션은 SessionStore -> (SessionFactory) 에 저장한다. 세션아이디와 세션 객체를 가진다
   * 세션이 만들어지면 `Set-Cookie` 헤더로 세션아이디를 응답한다
 * 세션객체는 위 요구사항을 제공한다
