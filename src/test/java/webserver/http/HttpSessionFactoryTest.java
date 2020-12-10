@@ -26,6 +26,14 @@ public class HttpSessionFactoryTest {
         assertThat(httpSessionFactory.create(null)).isNotEqualTo(httpSessionFactory.create(null));
     }
 
+    @DisplayName("세션 아이디가 같으면 같은 객체를 반환한다")
+    @Test
+    void createSessionWithExistingId() {
+        HttpSessionFactory httpSessionFactory = new HttpSessionFactory();
+        String id = "session id";
+        assertThat(httpSessionFactory.create(id)).isEqualTo(httpSessionFactory.create(id));
+    }
+
     private static class HttpSessionFactory {
         public HttpSession create(String sessionId) {
             return new HttpSession("");
