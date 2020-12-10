@@ -2,15 +2,16 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.controller.StaticContentController;
 import webserver.http.HttpRequest;
 import webserver.http.Response;
-import webserver.controller.StaticContentController;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static webserver.http.HttpRequest.SESSION_ID;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -34,9 +35,17 @@ public class RequestHandler implements Runnable {
 
             Response response = handleRequest(httpRequest);
 
+            addSessionHeader(httpRequest, response);
+
             RESPONSE_HANDLER.handleResponse(new DataOutputStream(out), response);
         } catch (Exception e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private void addSessionHeader(HttpRequest httpRequest, Response response) {
+        if (!httpRequest.getCookies().findCookieByName(SESSION_ID).isPresent()) {
+            response.setHeaders("Set-Cookie: session_id=" + httpRequest.getSession().getId() + "; Path=/");
         }
     }
 

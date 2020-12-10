@@ -90,8 +90,10 @@ public class HttpRequest {
     }
 
     private void parseSessionId() {
-        if (getCookies() != null && sessionId == null) {
-            sessionId = getCookies().findCookieByName(SESSION_ID);
+        Optional<Cookies> cookies = Optional.ofNullable(getCookies());
+        if (sessionId == null) {
+            sessionId = cookies.flatMap(cookie -> cookie.findCookieByName(SESSION_ID))
+                    .orElse(null);
         }
     }
 
@@ -116,12 +118,11 @@ public class HttpRequest {
                             ImmutableMap::copyOf));
         }
 
-        public String findCookieByName(String name) {
+        public Optional<String> findCookieByName(String name) {
             return cookies.stream()
                     .filter(cookie -> cookie.startsWith(name))
                     .map(cookie -> cookie.split(KEY_VALUE_SPLIT)[1])
-                    .findFirst()
-                    .orElse(null);
+                    .findFirst();
         }
 
         public boolean contains(String cookie) {
