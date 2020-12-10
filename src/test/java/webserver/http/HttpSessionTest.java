@@ -40,6 +40,16 @@ public class HttpSessionTest {
         assertThat(session.getAttribute(name)).isEqualTo(value);
     }
 
+    @Test
+    void removeAttribute() {
+        HttpSession session = new HttpSession("session id");
+
+        String name = "key1";
+        session.setAttribute(name, new Object());
+        session.removeAttribute(name);
+        assertThat(session.getAttribute(name)).isNull();
+    }
+
     private static class HttpSession {
 
         private final String id;
