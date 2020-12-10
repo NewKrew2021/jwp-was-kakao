@@ -38,6 +38,14 @@ public class HttpSessionFactoryTest {
         assertThat(httpSessionFactory.create(id)).isEqualTo(httpSessionFactory.create(id));
     }
 
+    @DisplayName("주어진 세션아이디를 가진 세션객체를 생성한다")
+    @Test
+    void createSessionWithGivenId() {
+        HttpSessionFactory httpSessionFactory = new HttpSessionFactory();
+        String id = "session id";
+        assertThat(httpSessionFactory.create(id).getId()).isEqualTo(id);
+    }
+
     private static class HttpSessionFactory {
         private final Map<String, HttpSession> sessions = new HashMap<>();
         public HttpSession create(String sessionId) {
