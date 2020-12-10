@@ -201,6 +201,26 @@ public class RequestParserTest {
             assertThat(httpRequest.getCookies()).isNull();
         }
     }
+    @Nested
+    @DisplayName("세션 쿠키를 파싱한다")
+    class Session {
+        @BeforeEach
+        void setUp() {
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /index.html HTTP/1.1\n" +
+                    "Host: localhost:8080\n" +
+                    "Connection: keep-alive\n" +
+                    "Accept: */*\n" +
+                    "Cookie: session_id:session1\n\n"));
+        }
+
+        @Test
+        void parse() {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+
+            assertThat(httpRequest.getSession().getId()).isEqualTo("session1");
+        }
+    }
 
     public static User getUser(HttpRequest httpRequest) {
         Map<String, String> queryParams = httpRequest.getQueryParams();
