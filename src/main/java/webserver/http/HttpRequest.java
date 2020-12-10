@@ -69,6 +69,10 @@ public class HttpRequest {
         return queryParams.getOrDefault(name, entity.get(name));
     }
 
+    public HttpSession getSession() {
+        return new HttpSession("session1");
+    }
+
     public static class Cookies {
         public static final Splitter COOKIE_SPLITTER = Splitter.on("; ");
         public static final String KEY_VALUE_SPLIT = "=";
