@@ -95,5 +95,9 @@ public class HttpSessionTest {
         public void removeAttribute(String name) {
             map.remove(name);
         }
+
+        public void invalidate() {
+            map.clear();
+        }
     }
 }
