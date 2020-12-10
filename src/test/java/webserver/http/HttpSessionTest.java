@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 /**
  * v String getId(): 현재 세션에 할당되어 있는 고유한 세션 아이디를 반환
@@ -53,6 +54,18 @@ public class HttpSessionTest {
         session.setAttribute(name, new Object());
         session.removeAttribute(name);
         assertThat(session.getAttribute(name)).isNull();
+    }
+
+    @Test
+    void invalidate() {
+        session.setAttribute("key1", new Object());
+        session.setAttribute("key2", new Object());
+        session.invalidate();
+
+        assertAll(
+                () -> assertThat(session.getAttribute("key1")).isNull(),
+                () -> assertThat(session.getAttribute("key2")).isNull()
+        );
     }
 
     private static class HttpSession {
