@@ -41,13 +41,11 @@ public class HttpSessionFactoryTest {
     private static class HttpSessionFactory {
         private final Map<String, HttpSession> sessions = new HashMap<>();
         public HttpSession create(String sessionId) {
-            if (sessionId == null) {
-                String newSessionId = UUID.randomUUID().toString();
-                HttpSession httpSession = new HttpSession("");
-                sessions.put(newSessionId, httpSession);
-                return httpSession;
+            String actualSessionId = sessionId;
+            if (actualSessionId == null) {
+                actualSessionId = UUID.randomUUID().toString();
             }
-            return sessions.get(sessionId);
+            return sessions.computeIfAbsent(actualSessionId, HttpSession::new);
         }
     }
 }
