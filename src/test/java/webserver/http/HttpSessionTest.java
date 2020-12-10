@@ -1,5 +1,6 @@
 package webserver.http;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * * void invalidate(): 현재 세션에 저장되어 있는 모든 값을 삭제
  */
 public class HttpSessionTest {
+
+    private HttpSession session;
+
+    @BeforeEach
+    void setUp() {
+        session = new HttpSession("session id");
+    }
+
     @DisplayName("세션 생성시 반드시 세션아이디가 존재한다")
     @Test
     void createNullSessionId() {
@@ -32,8 +41,6 @@ public class HttpSessionTest {
 
     @Test
     void setAndGet() {
-        HttpSession session = new HttpSession("session id");
-
         Object value = new Object();
         String name = "key1";
         session.setAttribute(name, value);
@@ -42,8 +49,6 @@ public class HttpSessionTest {
 
     @Test
     void removeAttribute() {
-        HttpSession session = new HttpSession("session id");
-
         String name = "key1";
         session.setAttribute(name, new Object());
         session.removeAttribute(name);
