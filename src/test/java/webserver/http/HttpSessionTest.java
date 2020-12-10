@@ -18,4 +18,13 @@ public class HttpSessionTest {
         Assertions.assertThatThrownBy(() -> new HttpSession(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    private static class HttpSession {
+
+        public HttpSession(String id) {
+            if (id == null) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
 }
