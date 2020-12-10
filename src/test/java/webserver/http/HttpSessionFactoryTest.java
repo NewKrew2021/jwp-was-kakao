@@ -5,10 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -46,14 +42,4 @@ public class HttpSessionFactoryTest {
         assertThat(httpSessionFactory.getOrCreate(id).getId()).isEqualTo(id);
     }
 
-    private static class HttpSessionFactory {
-        private final Map<String, HttpSession> sessions = new HashMap<>();
-        public HttpSession getOrCreate(String sessionId) {
-            String actualSessionId = sessionId;
-            if (actualSessionId == null) {
-                actualSessionId = UUID.randomUUID().toString();
-            }
-            return sessions.computeIfAbsent(actualSessionId, HttpSession::new);
-        }
-    }
 }
