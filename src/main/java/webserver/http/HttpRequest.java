@@ -16,6 +16,7 @@ public class HttpRequest {
     private Map<String, String> queryParams = Collections.emptyMap();
     private final Map<String, String> headers = new HashMap<>();
     private Map<String, String> entity = Collections.emptyMap();
+    private String sessionId;
 
     public HttpRequest(String method, String requestURI, String protocol) {
         this.method = HttpMethod.valueOf(method);
@@ -70,8 +71,15 @@ public class HttpRequest {
     }
 
     public HttpSession getSession() {
+        HttpSessionFactory httpSessionFactory = new HttpSessionFactory();
+        Cookies cookies = getCookies();
+        if (cookies != null && sessionId == null) {
+            sessionId = cookies.asMap().get("session_id");
+        }
 
-        return new HttpSession("session1");
+        HttpSession httpSession = httpSessionFactory.getOrCreate(sessionId);
+        sessionId = httpSession.getId();
+        return httpSession;
     }
 
     public static class Cookies {
