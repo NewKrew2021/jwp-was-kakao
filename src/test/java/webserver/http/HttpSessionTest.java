@@ -27,6 +27,16 @@ public class HttpSessionTest {
         assertThat(new HttpSession(sessionId).getId()).isEqualTo(sessionId);
     }
 
+    @Test
+    void setAndGet() {
+        HttpSession session = new HttpSession("session id");
+
+        Object value = new Object();
+        String key = "key1";
+        session.setAttribute(key, value);
+        assertThat(session.getAtrribute(key)).isEqualTo(key);
+    }
+
     private static class HttpSession {
 
         private final String id;
