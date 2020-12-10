@@ -250,11 +250,11 @@ public class RequestParserTest {
 
     public static User getUser(HttpRequest httpRequest) {
         Map<String, String> queryParams = httpRequest.getQueryParams();
-        if (queryParams != null) {
+        if (!queryParams.isEmpty()) {
             return User.createUser(queryParams);
         }
         Map<String, String> entity = httpRequest.getEntity();
-        if (entity != null) {
+        if (!entity.isEmpty()) {
             return User.createUser(entity);
         }
         throw new IllegalStateException();
