@@ -2,50 +2,73 @@ package webserver;
 
 import dto.ParamValue;
 import dto.RequestValue;
+import utils.DecodeUtils;
+import validator.InputValidator;
 
 import java.util.Optional;
 
 public class Request {
 
-    private static final String REGEX_QUESTION_MARK_AND_PERIOD = "[?.]";
+    private static final String QUESTION_MARK = "?";
+    private static final String REGEX_QUESTION_MARK = "\\?";
 
-    private final String url;
-    private final String method;
-    private final Optional<ParamValue> paramMap;
+    private static final String POST_METHOD = "POST";
+    private static final String GET_METHOD = "GET";
 
-    private final Cookie cookie;
+    private final RequestHeader requestHeader;
+    private final RequestBody requestBody;
 
-    private Request(String url, String method, Optional<ParamValue> paramMap, Cookie cookie) {
-        this.url = url;
-        this.method = method;
-        this.paramMap = paramMap;
-        this.cookie = cookie;
+    private Request(RequestHeader requestHeader, RequestBody requestBody) {
+        this.requestHeader = requestHeader;
+        this.requestBody = requestBody;
     }
 
     public static Request of(RequestValue requestValue) {
-        String url = requestValue.getURL();
-        String method = requestValue.getMethod();
-        Optional<ParamValue> param = ParamValue.of(requestValue.getParams());
+        RequestHeader requestHeader = RequestHeader.of(requestValue);
+        RequestBody requestBody = RequestBody.of(requestValue);
 
-        Cookie cookie = Cookie.of(requestValue.getCookieLine());
+        return new Request(requestHeader, requestBody);
+    }
 
-        return new Request(url, method, param, cookie);
+    public Optional<ParamValue> getParamMap() {
+        return ParamValue.of(getParams());
+    }
+
+    private Optional<String> getParams() {
+        switch (requestHeader.getMethod()) {
+            case POST_METHOD:
+                return getPostParams();
+            case GET_METHOD:
+                return getGetParams();
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> getGetParams() {
+        if (!requestHeader.getURL().contains(QUESTION_MARK)) {
+            return Optional.empty();
+        }
+        String paramString = requestHeader.getURL().split(REGEX_QUESTION_MARK)[1];
+        return Optional.of(DecodeUtils.decodeUTF8(paramString));
+    }
+
+    private Optional<String> getPostParams() {
+        if (InputValidator.isValidEmpty(requestBody.getBody())) {
+            return Optional.of(DecodeUtils.decodeUTF8(requestBody.getBody()));
+        }
+        return Optional.empty();
     }
 
     public String getURL() {
-        return url;
+        return requestHeader.getURL();
     }
 
     public String getPathGateway() {
-        return url.split(REGEX_QUESTION_MARK_AND_PERIOD)[0];
+        return requestHeader.getPathGateway();
     }
 
-
-    public Optional<ParamValue> getParamMap() {
-        return paramMap;
-    }
 
     public boolean isLogined() {
-        return cookie.isLogined();
+        return requestHeader.isLogined();
     }
 }

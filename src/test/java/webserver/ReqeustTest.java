@@ -1,5 +1,6 @@
 package webserver;
 
+import dto.ParamValue;
 import dto.RequestValue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,32 +24,53 @@ public class ReqeustTest {
         assertThat(Request.of(requestValue)).isEqualToComparingOnlyGivenFields(Request.of(requestValue));
     }
 
-    @DisplayName("getURL 테스트")
+    @DisplayName("Get Param 파싱 테스트 : Param 존재 여부 확인")
     @ParameterizedTest
     @CsvSource(value = {
-            "GET /index.html HTTP/1.1 | /index.html",
-            "GET /user/list  HTTP/1.1 | /user/list",
-            "GET /user/create?userId=javajigi&password=password  HTTP/1.1 | /user/create?userId=javajigi&password=password"
+            "GET /index.html HTTP/1.1 | false",
+            "GET /user/create?userId=javajigi&password=password  HTTP/1.1 | true"
     }, delimiter = '|')
-    void getURL(String header, String expectedURL) {
-        RequestValue requestValue = parseRequestValue(header);
-        Request request = Request.of(requestValue);
+    void getGetParams1(String header, boolean existParam) {
+        Request request = Request.of(parseRequestValue(header));
 
-        assertThat(request.getURL()).isEqualTo(expectedURL);
+        assertThat(request.getParamMap().isPresent()).isEqualTo(existParam);
     }
 
-    @DisplayName("getPathGateway 테스트")
-    @ParameterizedTest
-    @CsvSource(value = {
-            "GET /index.html HTTP/1.1 | /index",
-            "GET /user/list  HTTP/1.1 | /user/list",
-            "GET /user/create?userId=javajigi&password=password  HTTP/1.1 | /user/create"
-    }, delimiter = '|')
-    void getPathGateway(String header, String expectedPathGateway) {
-        RequestValue requestValue = parseRequestValue(header);
+    @DisplayName("Get Param 파싱 테스트 : 데이터 존재 시 정상적으로 파싱하는지 확인")
+    @Test
+    void getGetParams2() {
+        String header = "GET /user/create?userId=javajigi&password=password  HTTP/1.1";
+        Request request = Request.of(parseRequestValue(header));
+        Optional<ParamValue> params = request.getParamMap();
+
+        assertThat(params).isNotEmpty();
+        assertThat(params.get().getValue("userId")).isEqualTo("javajigi");
+        assertThat(params.get().getValue("password")).isEqualTo("password");
+    }
+
+    @DisplayName("Post Param 파싱 테스트")
+    @Test
+    void getPostParams() {
+        List<String> requestHeader = Arrays.asList(
+                "POST /user/create HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Content-Length: 59",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Accept: */*",
+                "",
+                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"
+        );
+        String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+
+        RequestValue requestValue = new RequestValue(requestHeader, body);
         Request request = Request.of(requestValue);
 
-        assertThat(request.getPathGateway()).isEqualTo(expectedPathGateway);
+        Optional<ParamValue> params = request.getParamMap();
+
+        assertThat(params).isNotEmpty();
+        assertThat(params.get().getValue("userId")).isEqualTo("javajigi");
+        assertThat(params.get().getValue("password")).isEqualTo("password");
     }
 
     private RequestValue parseRequestValue(String header) {
