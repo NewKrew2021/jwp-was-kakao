@@ -1,7 +1,5 @@
 package webserver.http;
 
-import webserver.http.InvalidHttpRequestMessageException;
-
 import java.text.MessageFormat;
 
 public class NotEmptyParamException extends InvalidHttpRequestMessageException {

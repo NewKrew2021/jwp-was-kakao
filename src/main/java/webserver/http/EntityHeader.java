@@ -3,7 +3,7 @@ package webserver.http;
 /**
  * https://tools.ietf.org/html/rfc2616#section-7.1
  */
-public enum EntityHeader implements HeaderConstant{
+public enum EntityHeader implements HeaderConstant {
     ContentLength("Content-Length"),
     ContentType("Content-Type");
 

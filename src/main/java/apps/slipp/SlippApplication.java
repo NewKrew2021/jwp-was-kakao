@@ -5,11 +5,15 @@ import apps.slipp.controller.LoginController;
 import apps.slipp.controller.SignUpController;
 import apps.slipp.controller.UserListController;
 import webserver.WebServer;
-import webserver.WebServerProperties;
+import webserver.WebServerConfig;
 import webserver.http.*;
 import webserver.http.template.TemplateEngine;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SlippApplication {
 
@@ -25,47 +29,48 @@ public class SlippApplication {
 
     void start(int port) throws IOException {
         webServer = new WebServer(
-                WebServerProperties.builder()
-                        .port(port)
-                        .httpRequestDispatcher(getHttpRequestDispatcher())
-                        .httpRequestPreProcessor(getHttpRequestPreProcessor())
-                        .exceptionHandler(getExceptionHandler())
-                        .build()
+                WebServerConfig.configurer(it -> {
+                    it.setPort(port);
+                    it.setRequestMappings(getRequestMappings());
+                    it.setEnableSession(true);
+                    it.setRequestPreProcessor(getHttpRequestPreProcessor());
+                    it.setExceptionHandlers(getExceptionHandlers());
+                    return it;
+                })
         );
         webServer.start();
     }
 
-    private ExceptionHandler getExceptionHandler() {
-        ExceptionHandlerResolver exceptionResolver = new ExceptionHandlerResolver();
-        exceptionResolver.addHandler(AuthenticationException.class, (e, httpRequest, httpResponse) -> {
+    private Map<Class, ExceptionHandler> getExceptionHandlers() {
+        Map<Class, ExceptionHandler> handlers = new HashMap<>();
+
+        handlers.put(AuthenticationException.class, (e, httpRequest, httpResponse) -> {
             httpResponse.sendRedirect("./login.html");
         });
-        exceptionResolver.addHandler(InvalidHttpRequestMessageException.class, (e, httpRequest, httpResponse) -> {
+        handlers.put(InvalidHttpRequestMessageException.class, (e, httpRequest, httpResponse) -> {
             httpResponse.setStatus(HttpStatus.x400_BadRequest);
             httpResponse.send();
         });
-        exceptionResolver.addHandler(HttpStatusCodeException.class, (ExceptionHandler<HttpStatusCodeException>) (e, httpRequest, httpResponse) -> {
+        handlers.put(HttpStatusCodeException.class, (ExceptionHandler<HttpStatusCodeException>) (e, httpRequest, httpResponse) -> {
             httpResponse.setStatus(e.getStatus());
             httpResponse.send();
         });
-
-        return new DefaultExceptionHandler(exceptionResolver);
+        return handlers;
     }
 
-    private HttpRequestPreProcessor getHttpRequestPreProcessor() {
-        return new CookieAuthenticator("/user/list");
-    }
-
-    private HttpRequestDispatcher getHttpRequestDispatcher() {
+    private List<HttpRequestMapping> getRequestMappings() {
         Controller staticResourceController = new ResourceController(new ClasspathResourceLoader("./static"));
-        return new DefaultHttpRequestDispatcher(
+        return Arrays.asList(
                 new PathRegexpMapping("\\/css\\/.+", HttpMethod.GET, staticResourceController),
                 new PathRegexpMapping("\\/js\\/.+", HttpMethod.GET, staticResourceController),
                 new PathRegexpMapping("\\/fonts\\/.+", HttpMethod.GET, staticResourceController),
                 new PathRegexpMapping("\\/.+\\.html", HttpMethod.GET, new ResourceController(new ClasspathResourceLoader("./templates"))),
                 new PathRegexpMapping("\\/user\\/create", HttpMethod.POST, new SignUpController()),
                 new PathRegexpMapping("\\/user\\/login", HttpMethod.POST, new LoginController()),
-                new PathRegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController(TemplateEngine.handlebars("/templates", ".html")))
-        );
+                new PathRegexpMapping("\\/user\\/list", HttpMethod.GET, new UserListController(TemplateEngine.handlebars("/templates", ".html"))));
+    }
+
+    private HttpRequestPreProcessor getHttpRequestPreProcessor() {
+        return new CookieAuthenticator("/user/list");
     }
 }

@@ -16,14 +16,14 @@ public class HttpRequestParam {
         if (StringUtils.isEmpty(paramString))
             throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
         String[] parts = paramString.split("=");
-        if (parts.length > 2 ) throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
+        if (parts.length > 2) throw new IllegalArgumentException("parameter 형식이 잘못되었습니다. paramString : " + paramString);
 
-        if (parts.length == 1 ) {
+        if (parts.length == 1) {
             this.name = parts[0];
             this.value = "";
         }
 
-        if ( parts.length == 2 ){
+        if (parts.length == 2) {
             this.name = parts[0];
             this.value = parts[1];
         }

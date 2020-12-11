@@ -20,7 +20,7 @@ public class HttpResponse {
 
     private String httpVersion = "HTTP/1.1";
     private List<HttpHeader> headers;
-    private String cookie;
+    private List<String> setCookies = new ArrayList<>();
     private byte[] body;
     private HttpStatus status;
 
@@ -43,18 +43,17 @@ public class HttpResponse {
     }
 
     String getStatusLine() {
-        return MessageFormat.format("{0} {1}",httpVersion, getStatus());
+        return MessageFormat.format("{0} {1}", httpVersion, getStatus());
     }
 
     List<HttpHeader> getHeaders() {
         List<HttpHeader> allHeaders = new ArrayList<>();
         allHeaders.addAll(Collections.unmodifiableList(headers));
-        if( cookie != null ) allHeaders.add(new HttpHeader(ResponseHeader.SetCookie, cookie));
-
+        setCookies.forEach(setCookie -> allHeaders.add(new HttpHeader(ResponseHeader.SetCookie, setCookie)));
         return allHeaders;
     }
 
-    public void addHeader(HeaderConstant headerConstant, String value){
+    public void addHeader(HeaderConstant headerConstant, String value) {
         addHeader(headerConstant.getHeaderName(), value);
     }
 
@@ -62,12 +61,12 @@ public class HttpResponse {
         addHeader(new HttpHeader(key, value));
     }
 
-    public void addHeader(HttpHeader header){
+    public void addHeader(HttpHeader header) {
         headers.add(header);
     }
 
-    public void setCookie(String setCookieHeaderValue) {
-        cookie = setCookieHeaderValue;
+    public void setSetCookie(String setCookie) {
+        this.setCookies.add(setCookie);
     }
 
     public void setContentType(MimeType mimeType, Charset charset) {
@@ -94,7 +93,7 @@ public class HttpResponse {
         dos.flush();
     }
 
-    public void sendRedirect(String location, List<HttpHeader> headers){
+    public void sendRedirect(String location, List<HttpHeader> headers) {
         setStatus(HttpStatus.x302_Found);
         addHeader(ResponseHeader.Location, location);
         headers.stream().forEach(this::addHeader);

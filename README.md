@@ -11,6 +11,7 @@
 
 
 ## Todo
+* Servlet HttpSession 매소드 중 getId(), setAttribute(String name, Object value), getAttribute(String name), removeAttribute(String name), invalidate() 구현 
 
 ## InProgress
 * Post 요청에 queryString 지원
