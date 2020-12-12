@@ -1,4 +1,4 @@
-package model;
+package model.user;
 
 import java.util.Objects;
 
@@ -13,6 +13,10 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public static User nobody() {
+        return new User("", "", "", "");
     }
 
     public String getUserId() {
