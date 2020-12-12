@@ -18,7 +18,7 @@ public class UserLoginController extends Controller {
         String password = httpRequest.getParameter("password");
 
         if (UserService.isLoginSuccessful(userId, password)) {
-            return loginSuccess();
+            return loginSuccessWithSession(httpRequest.getSession());
         }
 
         return loginFailed();
@@ -31,6 +31,15 @@ public class UserLoginController extends Controller {
         return new HttpResponseBuilder()
                 .with302Redirect("/index.html")
                 .withSetCookie(setCookie)
+                .build();
+    }
+
+    private HttpResponse loginSuccessWithSession(HttpSession httpSession) {
+        httpSession.setAttribute(UserService.LOGINED_KEY, UserService.LOGINED_VALUE);
+
+        return new HttpResponseBuilder()
+                .with302Redirect("/index.html")
+                .withSessionId(httpSession.getId())
                 .build();
     }
 

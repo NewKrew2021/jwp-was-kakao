@@ -1,5 +1,6 @@
 package controller;
 
+import model.User;
 import service.UserService;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
@@ -34,6 +35,7 @@ public class UserCreateController extends Controller {
         String password = request.getParameter("password");
         String name = request.getParameter("name");
         String email = request.getParameter("email");
-        UserService.addNewUser(userId, password, name, email);
+        User user = new User(userId, password, name, email);
+        UserService.addNewUser(user);
     }
 }

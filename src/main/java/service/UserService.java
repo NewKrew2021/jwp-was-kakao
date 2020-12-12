@@ -2,16 +2,18 @@ package service;
 
 import db.DataBase;
 import model.User;
+import webserver.http.HttpSession;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 public class UserService {
     public static final String LOGINED_KEY = "logined";
     public static final String LOGINED_VALUE = "true";
 
-    public static void addNewUser(String userId, String password, String name, String email) {
-        DataBase.addUser(new User(userId, password, name, email));
+    public static void addNewUser(User user) {
+        DataBase.addUser(user);
     }
 
     public static boolean isLoginSuccessful(String userId, String password) {
@@ -33,5 +35,13 @@ public class UserService {
             return false;
         }
         return LOGINED_VALUE.equals(cookie.get(LOGINED_KEY));
+    }
+
+    public static boolean isLoginedWithSession(HttpSession httpSession) {
+        Object value = httpSession.getAttribute(LOGINED_KEY);
+        if (Objects.isNull(value)) {
+            return false;
+        }
+        return LOGINED_VALUE.equals(value);
     }
 }
