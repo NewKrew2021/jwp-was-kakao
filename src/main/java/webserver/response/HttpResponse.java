@@ -1,78 +1,70 @@
 package webserver.response;
 
+import org.springframework.http.HttpStatus;
+import view.View;
 import webserver.Cookie;
-import webserver.request.ContentType;
 import webserver.request.HttpRequest;
-import webserver.request.Protocol;
-import webserver.request.Status;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class HttpResponse {
-
-    private final ResponseHeader header;
-    private final byte[] body;
-
-    public HttpResponse(ResponseHeader header) {
-        this.header = header;
-        this.body = "".getBytes();
-    }
+    private ResponseHeader header;
+    private byte[] body;
 
     public HttpResponse(ResponseHeader header, byte[] body) {
         this.header = header;
         this.body = body;
     }
 
-    public static HttpResponse error() {
-        return new HttpResponse(ResponseHeader.builder()
-                .protocol(Protocol.HTTP)
-                .status(Status.INTERNAL_SERVER_ERROR)
-                .build());
+    public static HttpResponse ok(HttpRequest request) {
+        return new HttpResponse(ResponseHeader.ok(request), "".getBytes());
     }
 
-    public String getHeader() {
-        return header.toString();
+    public static HttpResponse error() {
+        return new HttpResponse(ResponseHeader.error(), "".getBytes());
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
+        this.header.setContentLength(body.length);
+    }
+
+    public ResponseHeader getHeader() {
+        return header;
     }
 
     public byte[] getBody() {
         return body;
     }
 
-    public static HttpResponse notFound() {
-        return new HttpResponse(ResponseHeader.builder()
-                .protocol(Protocol.HTTP)
-                .status(Status.NOT_FOUND)
-                .build());
+    public void setView(View view) {
+        if (view != null) {
+            this.header.setContentType(view.getContentType());
+            setBody(view.getContent());
+        } else {
+            this.header.setStatus(HttpStatus.NOT_FOUND);
+        }
     }
 
-    public static HttpResponse file(byte[] bodyFromFile, ContentType contentType) {
-        return new HttpResponse(
-                ResponseHeader.builder()
-                        .protocol(Protocol.HTTP)
-                        .status(Status.OK)
-                        .contentType(contentType)
-                        .contentLength(bodyFromFile.length)
-                        .build(),
-                bodyFromFile
-        );
+    public void setRedirect(HttpRequest request, String path) {
+        this.header.setStatus(HttpStatus.FOUND);
+        this.header.setLocation("http://" + request.getHeader().getHost() + path);
     }
 
-    public static HttpResponse redirect(HttpRequest request, String path) {
-        return new HttpResponse(
-                ResponseHeader.builder()
-                        .protocol(Protocol.HTTP)
-                        .status(Status.REDIRECT)
-                        .location("http://" + request.getHeader().getHost() + path)
-                        .build()
-        );
+    public void setRedirectWithCookie(HttpRequest request, Cookie cookie, String path) {
+        setRedirect(request, path);
+        this.header.setCookie(cookie);
     }
 
-    public static HttpResponse redirectWithCookie(HttpRequest request, Cookie cookie, String path) {
-        return new HttpResponse(
-                ResponseHeader.builder()
-                        .protocol(Protocol.HTTP)
-                        .status(Status.REDIRECT)
-                        .cookie(cookie)
-                        .location("http://" + request.getHeader().getHost() + path)
-                        .build()
-        );
+    public void write(DataOutputStream out) {
+        System.out.println(getHeader().toString());
+        try {
+            out.writeBytes(getHeader().toString());
+            out.write(getBody(), 0, getBody().length);
+            out.flush();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 }
