@@ -1,7 +1,7 @@
 package webserver.request;
 
 import org.springframework.util.ObjectUtils;
-import utils.IOUtils;
+import utils.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,40 +10,37 @@ import java.util.List;
 import java.util.Optional;
 
 public class RequestReader {
-    public static HttpRequest read(BufferedReader bufferedReader) throws IOException {
-        RequestHeader requestHeader = RequestHeader.of(readRequestHeader(bufferedReader));
-        print(requestHeader);
-        return new HttpRequest(requestHeader, getRequestBody(bufferedReader, requestHeader));
+    public static HttpRequest read(BufferedReader bufferedReader) {
+        HttpRequest request = HttpRequest.of(readRequestHeader(bufferedReader));
+        request.setBodyParams(readRequestBody(bufferedReader, request.getHeader().getContentLength()));
+        return request;
     }
 
-    private static String getRequestBody(BufferedReader bufferedReader, RequestHeader requestHeader) {
-        return Optional.ofNullable(requestHeader.getContentLength())
-                .map(contentLength -> readRequestBody(bufferedReader, contentLength))
-                .orElse("");
+    private static List<String> readRequestHeader(BufferedReader bufferedReader) {
+        List<String> lines = new ArrayList<>();
+        String line = readLine(bufferedReader);
+        while (!ObjectUtils.isEmpty(line)) {
+            lines.add(line);
+            line = readLine(bufferedReader);
+        }
+        lines.forEach(System.out::println);
+        System.out.println();
+        return lines;
     }
 
-    private static String readRequestBody(BufferedReader bufferedReader, Integer contentLength) {
+    private static String readLine(BufferedReader bufferedReader) {
         try {
-            return IOUtils.readData(bufferedReader, contentLength);
+            return bufferedReader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private static void print(RequestHeader requestHeader) {
-        System.out.println(requestHeader);
-        System.out.println();
-    }
-
-    private static List<String> readRequestHeader(BufferedReader bufferedReader) throws IOException {
-        List<String> lines = new ArrayList<>();
-        String line = bufferedReader.readLine();
-        while (!ObjectUtils.isEmpty(line)) {
-            lines.add(line);
-            line = bufferedReader.readLine();
-        }
-        return lines;
+    private static String readRequestBody(BufferedReader bufferedReader, Integer contentLength) {
+        return Optional.ofNullable(contentLength)
+                .map(length -> IOUtils.readData(bufferedReader, length))
+                .orElse("");
     }
 
 }
