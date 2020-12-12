@@ -1,6 +1,6 @@
-package webserver.request;
+package resource;
 
-public class RequestPath {
+public class ResourceResolver {
     private static final String STATIC_PATH_PREFIX = "./static";
     private static final String TEMPLATE_PATH_PREFIX = "./templates";
     private static final String CSS_PREFIX = "/css";
@@ -10,46 +10,24 @@ public class RequestPath {
     private static final String FAVICON_SUFFIX = ".ico";
     private static final String HTML_SUFFIX = ".html";
 
-    private final String path;
-
-    public RequestPath(String path) {
-        this.path = path;
-    }
-
-    public boolean requiresFile() {
-        return requiresStaticResource() || requiresTemplate();
-    }
-
-    public boolean startsWith(String prefix) {
-        return path.startsWith(prefix);
-    }
-
-    public boolean requiresCss() {
-        return startsWith(CSS_PREFIX);
-    }
-
-    public String asFilePath() {
-        if (requiresStaticResource()) {
+    public static String resolve(String path) {
+        if (requiresStaticResource(path)) {
             return STATIC_PATH_PREFIX + path;
         }
-        if (requiresTemplate()) {
+        if (requiresTemplate(path)) {
             return TEMPLATE_PATH_PREFIX + path;
         }
         return path;
     }
 
-    public String asUrl() {
-        return path;
-    }
-
-    private boolean requiresTemplate() {
+    private static boolean requiresTemplate(String path) {
         return path.endsWith(FAVICON_SUFFIX) ||
                 path.endsWith(HTML_SUFFIX);
     }
 
-    private boolean requiresStaticResource() {
+    private static boolean requiresStaticResource(String path) {
         return path.startsWith(JS_PREFIX) ||
-                requiresCss() ||
+                path.startsWith(CSS_PREFIX) ||
                 path.startsWith(FONT_PREFIX) ||
                 path.startsWith(IMAGE_PREFIX);
     }
