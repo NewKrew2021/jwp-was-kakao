@@ -4,25 +4,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.request.HttpRequest;
 import webserver.request.RequestReader;
-import webserver.response.HttpResponse;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import static context.ApplicationContext.dispatcher;
+import static context.ApplicationContext.exceptionHandler;
+
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final Socket connection;
-    private final Router router;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        this.router = new Router();
     }
 
     public void run() {
@@ -30,30 +29,15 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            HttpRequest request = RequestReader.read(bufferedReader);
-            renderResponse(new DataOutputStream(out), router.getResponse(request));
+            dispatcher.dispatch(readRequest(in), new DataOutputStream(out));
         } catch (Exception ex) {
             logger.error(ex.getMessage());
-            renderError();
+            ex.printStackTrace();
+            exceptionHandler.handleException(connection);
         }
     }
 
-    private void renderError() {
-        try (OutputStream out = connection.getOutputStream()) {
-            renderResponse(new DataOutputStream(out), HttpResponse.error());
-        } catch (IOException exception) {
-            logger.error(exception.getMessage());
-        }
-    }
-
-    private void renderResponse(DataOutputStream dos, HttpResponse response) {
-        try {
-            dos.writeBytes(response.getHeader());
-            dos.write(response.getBody(), 0, response.getBody().length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private HttpRequest readRequest(InputStream in) {
+        return RequestReader.read(new BufferedReader(new InputStreamReader(in)));
     }
 }
