@@ -56,7 +56,7 @@ class ControllerTest {
     @Test
     void userListControllerWhenLoggedIn() {
         HttpRequest httpRequest = createRequest("/user/list");
-        httpRequest.addHeaders(ImmutableMap.of("Cookie", "logined=true"));
+        httpRequest.setHeaderAndCookies(ImmutableMap.of("Cookie", "logined=true"));
         Response response = new UserListController().execute(httpRequest);
         assertAll(() -> assertThat(response.getViewName()).isEqualTo("user/list"),
                   () -> assertThat(response.getModel()).isNotNull());

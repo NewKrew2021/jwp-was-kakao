@@ -52,8 +52,11 @@ public class HttpRequest {
         return Collections.unmodifiableMap(headers);
     }
 
-    public void addHeaders(Map<String, String> added) {
+    public void setHeaderAndCookies(Map<String, String> added) {
         headers.putAll(added);
+        cookies = Optional.ofNullable(getHeaders().get(COOKIE_HEADER))
+                                       .map(HttpRequest.Cookies::new)
+                                       .orElse(null);
     }
 
     public void setEntity(Map<String, String> entity) {
@@ -65,11 +68,6 @@ public class HttpRequest {
     }
 
     public Cookies getCookies() {
-        if (cookies == null) {
-            cookies = Optional.ofNullable(getHeaders().get(COOKIE_HEADER))
-                    .map(Cookies::new)
-                    .orElse(null);
-        }
         return cookies;
     }
 
