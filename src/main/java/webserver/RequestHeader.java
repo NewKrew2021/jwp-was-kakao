@@ -70,6 +70,10 @@ public class RequestHeader {
         return url.split(REGEX_QUESTION_MARK_AND_PERIOD)[0];
     }
 
+    public Map<String, String> getHeader() {
+        return this.header;
+    }
+
     public String getHeader(String key) {
         return this.header.get(key);
     }

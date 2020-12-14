@@ -5,6 +5,7 @@ import dto.RequestValue;
 import utils.DecodeUtils;
 import validator.InputValidator;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class Request {
@@ -40,8 +41,9 @@ public class Request {
                 return getPostParams();
             case GET_METHOD:
                 return getGetParams();
+            default:
+                return Optional.empty();
         }
-        return Optional.empty();
     }
 
     private Optional<String> getGetParams() {
@@ -63,6 +65,14 @@ public class Request {
         return requestHeader.getMethod();
     }
 
+    public boolean isGetMethod() {
+        return requestHeader.getMethod().equals(GET_METHOD);
+    }
+
+    public boolean isPostMethod() {
+        return requestHeader.getMethod().equals(POST_METHOD);
+    }
+
     public String getURL() {
         return requestHeader.getURL();
     }
@@ -71,7 +81,11 @@ public class Request {
         return requestHeader.getPathGateway();
     }
 
-    public String getHeader(String key){
+    public Map<String, String> getHeader() {
+        return requestHeader.getHeader();
+    }
+
+    public String getHeader(String key) {
         return requestHeader.getHeader(key);
     }
 
