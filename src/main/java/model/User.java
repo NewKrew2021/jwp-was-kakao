@@ -1,12 +1,20 @@
 package model;
 
+import org.springframework.util.StringUtils;
+
 public class User {
-    private String userId;
-    private String password;
-    private String name;
-    private String email;
+    private final String userId;
+    private final String password;
+    private final String name;
+    private final String email;
 
     public User(String userId, String password, String name, String email) {
+        if(StringUtils.isEmpty(userId)
+        || StringUtils.isEmpty(password)
+        || StringUtils.isEmpty(name)
+        || StringUtils.isEmpty(email)){
+            throw new IllegalArgumentException("회원정보 유효성 오류");
+        }
         this.userId = userId;
         this.password = password;
         this.name = name;
