@@ -25,10 +25,11 @@ public class URIFactoryTest {
     @DisplayName("URIPath 테스트 : /user/create")
     @Test
     void compose1() {
-        String header = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
-        Request request = build(header, "");
+        String header = "POST /user/create HTTP/1.1";
+        Request request = build(header, "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+        Response response = Response.of(request);
 
-        Response response = uriFactory.create(request);
+        uriFactory.create(request, response);
 
         assertThat(response.getHttpStatus()).isEqualTo(HttpStatus.HTTP_FOUND);
     }
@@ -39,8 +40,9 @@ public class URIFactoryTest {
         String header = "POST /user/login HTTP/1.1";
         String body = "userId=javajigi&password=password";
         Request request = build(header, body);
+        Response response = Response.of(request);
 
-        Response response = uriFactory.create(request);
+        uriFactory.create(request, response);
 
         assertThat(response.getHttpStatus()).isEqualTo(HttpStatus.HTTP_FOUND);
     }
@@ -51,8 +53,9 @@ public class URIFactoryTest {
         List<String> headerList = Arrays.asList("GET /user/list HTTP/1.1",
                                                 "Cookie: JSESSIONID=DFCD469C; logined=true");
         Request request = build(headerList, "");
+        Response response = Response.of(request);
 
-        Response response = uriFactory.create(request);
+        uriFactory.create(request, response);
 
         assertThat(response.getHttpStatus()).isEqualTo(HttpStatus.HTTP_OK);
     }
@@ -63,8 +66,9 @@ public class URIFactoryTest {
         List<String> headerList = Arrays.asList("GET /user/list HTTP/1.1",
                                                 "Cookie: JSESSIONID=DFCD469C; logined=false");
         Request request = build(headerList, "");
+        Response response = Response.of(request);
 
-        Response response = uriFactory.create(request);
+        uriFactory.create(request, response);
 
         assertThat(response.getHttpStatus()).isEqualTo(HttpStatus.HTTP_FOUND);
     }
@@ -76,8 +80,9 @@ public class URIFactoryTest {
             "GET bootstrap.css HTTP/1.1"})
     void compose5(String header) {
         Request request = build(header, "");
+        Response response = Response.of(request);
 
-        Response response = uriFactory.create(request);
+        uriFactory.create(request, response);
 
         assertThat(response.getHttpStatus()).isEqualTo(HttpStatus.HTTP_OK);
     }

@@ -5,12 +5,17 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import utils.FileIoUtils;
+import utils.MessageUtils;
 
 import java.io.IOException;
 
 public class ResponseHandler {
 
     private static final String DEFAULT_VIEW = "Hello World";
+
+    private ResponseHandler() {
+        throw new IllegalStateException(MessageUtils.UTILITY_CLASS);
+    }
 
     public static byte[] getBody(String urlPath) {
         try {
