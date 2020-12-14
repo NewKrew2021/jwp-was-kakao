@@ -2,11 +2,13 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.http.HttpRequest;
-import webserver.http.parser.HttpRequestParser;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
+
+import webserver.http.HttpRequest;
+import webserver.http.parser.HttpRequestParser;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -25,12 +27,12 @@ public class RequestHandler implements Runnable {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 
             HttpRequest request = HttpRequestParser.fromReader(bufferedReader);
+            byte[] bodyContent = FileResponseManager.getFileContent(request.getPath());
 
-            byte[] bodyContent = "Hello World".getBytes();
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, bodyContent.length);
             responseBody(dos, bodyContent);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
