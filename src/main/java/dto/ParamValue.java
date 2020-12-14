@@ -2,10 +2,9 @@ package dto;
 
 import utils.DecodeUtils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ParamValue {
 
@@ -41,8 +40,13 @@ public class ParamValue {
         return Optional.empty();
     }
 
-    public Map<String, String> getParamMap() {
-        return paramMap;
+    public List<String> parseParam(Class<? extends Object> objectClass) {
+        Field[] fields = objectClass.getDeclaredFields();
+
+        return Arrays.stream(fields)
+                .map(Field::getName)
+                .map(this::getValue)
+                .collect(Collectors.toList());
     }
 
     public String getValue(String key) {
