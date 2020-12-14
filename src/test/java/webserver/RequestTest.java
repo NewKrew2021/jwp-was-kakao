@@ -114,6 +114,23 @@ public class RequestTest {
         assertThat(paramMap.get().getValue("name")).isEqualTo("JaeSung");
     }
 
+    @DisplayName("HttpMethod 관계없이 모든 Param 파싱")
+    @Test
+    public void request_POST2() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "Http_POST2.txt"));
+        RequestValue requestValue = RequestValue.of(in);
+        Request request = Request.of(requestValue);
+
+        assertThat(request.getMethod()).isEqualTo("POST");
+        assertThat(request.getPathGateway()).isEqualTo("/user/create");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+
+        Optional<ParamValue> paramMap = request.getParamMap();
+        assertThat(paramMap).isNotEmpty();
+        assertThat(paramMap.get().getValue("userId")).isEqualTo("javajigi");
+        assertThat(paramMap.get().getValue("id")).isEqualTo("1");
+    }
+
     private RequestValue parseRequestValue(String header) {
         List<String> requestHeader = Arrays.asList(header);
         return new RequestValue(requestHeader, "");

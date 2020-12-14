@@ -12,6 +12,7 @@ public class Request {
 
     private static final String QUESTION_MARK = "?";
     private static final String REGEX_QUESTION_MARK = "\\?";
+    private static final String REGEX_AMPERSAND = "&";
 
     private static final String POST_METHOD = "POST";
     private static final String GET_METHOD = "GET";
@@ -36,14 +37,21 @@ public class Request {
     }
 
     private Optional<String> getParams() {
-        switch (requestHeader.getMethod()) {
-            case POST_METHOD:
-                return getPostParams();
-            case GET_METHOD:
-                return getGetParams();
-            default:
-                return Optional.empty();
+        Optional<String> getParams = getGetParams();
+        Optional<String> postParams = getPostParams();
+
+        if (getParams.isPresent() && postParams.isPresent()) {
+            String params = getParams.get() + REGEX_AMPERSAND + postParams.get();
+            return Optional.of(params);
+
+        } else if (postParams.isPresent()) {
+            return postParams;
+
+        } else if (getParams.isPresent()) {
+            return getParams;
         }
+
+        return Optional.empty();
     }
 
     private Optional<String> getGetParams() {
