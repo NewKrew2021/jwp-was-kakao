@@ -27,20 +27,21 @@ public class RequestHandler implements Runnable {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 
             HttpRequest request = HttpRequestParser.fromReader(bufferedReader);
-            byte[] bodyContent = FileResponseManager.getFileContent(request.getPath());
+            String contentType = request.getContentType();
+            byte[] bodyContent = ResponseManager.getContent(request.getPath());
 
             DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, bodyContent.length);
+            response200Header(dos, bodyContent.length, contentType);
             responseBody(dos, bodyContent);
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {

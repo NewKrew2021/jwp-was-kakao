@@ -26,11 +26,34 @@ public class HttpRequest {
 
     public String getParam(String key) {
 
-        if((line.getMethod() == HttpMethod.GET) && line.hasQueryString()) {
+        if ((line.getMethod() == HttpMethod.GET) && line.hasQueryString()) {
             return line.getQueryString().getParameter(key);
         }
 
         return params.getParameter(key);
 
+    }
+
+    public String getContentType() {
+
+        String uri = line.getPath();
+        String extension = uri.substring(uri.lastIndexOf(".") + 1);
+
+        if (extension.equals("woff")) {
+            return "application/octet-stream";
+        }
+
+        if (extension.equals("js")) {
+            return "application/js";
+        }
+
+        if (extension.equals("css")) {
+            return "text/css";
+        }
+
+        if (extension.equals("png")) {
+            return "image/png";
+        }
+        return "text/html";
     }
 }
