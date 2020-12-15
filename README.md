@@ -110,3 +110,28 @@ HTTP 웹 서버를 구현하고 보니 소스 코드의 복잡도가 많이 증�
 Bad Smell을 찾는 것은 쉽지 않은 작업이다.
 리팩토링할 부분을 찾기 힘든 사람은 다음으로 제시하는 1단계 힌트를 참고해 리팩토링을 진행해 볼 것을 추천한다.
 만약 혼자 힘으로 리팩토링할 부분을 찾은 사람은 먼저 도움 없이 리팩토링을 진행한다.
+
+## 🚀 3단계 - 세션 구현하기
+### 요구사항
+서블릿에서 지원하는 HttpSession API의 일부를 지원해야 한다.
+HttpSession API 중 구현할 메소드는 getId(), setAttribute(String name, Object value), getAttribute(String name), removeAttribute(String name), invalidate() 5개이다. HttpSession의 가장 중요하고 핵심이 되는 메소드이다.
+
+각 메소드의 역할은 다음과 같다.
+
+* String getId(): 현재 세션에 할당되어 있는 고유한 세션 아이디를 반환
+* void setAttribute(String name, Object value): 현재 세션에 value 인자로 전달되는 객체를 name 인자 이름으로 저장
+* Object getAttribute(String name): 현재 세션에 name 인자로 저장되어 있는 객체 값을 찾아 반환
+* void removeAttribute(String name): 현재 세션에 name 인자로 저장되어 있는 객체 값을 삭제
+* void invalidate(): 현재 세션에 저장되어 있는 모든 값을 삭제
+
+세션은 클라이언트와 서버 간에 상태 값을 공유하기 위해 고유한 아이디를 활용하고, 이 고유한 아이디는 쿠키를 활용해 공유한다.
+여기서 힌트를 얻어 세션을 구현해 보자.
+
+### 구현목록
+* HttpRequest 는 쿠키로부터 세션아이디를 파싱하여 가진다
+* HttpRequest 는 세션아이디에 해당하는 HttpSession 객체를 제공한다  
+* 세션이 없으면 새로 생성한다
+  * 세션아이디는 랜덤한 UUID 문자열이다
+  * 세션은 SessionStore -> (SessionFactory) 에 저장한다. 세션아이디와 세션 객체를 가진다
+  * 세션이 만들어지면 `Set-Cookie` 헤더로 세션아이디를 응답한다
+* 세션객체는 위 요구사항을 제공한다

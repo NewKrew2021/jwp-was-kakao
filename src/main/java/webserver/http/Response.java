@@ -42,7 +42,7 @@ public class Response {
     }
 
     public boolean isRedirect() {
-        return status == ResponseStatus.SEE_OTHER || headers.stream()
+        return status == ResponseStatus.FOUND || headers.stream()
                 .anyMatch(header -> header.startsWith("Location: "));
     }
 

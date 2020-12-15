@@ -15,14 +15,14 @@ public class LoginController implements Controller {
         User user = DataBase.findUserById(entity.get("userId"));
         if (user != null && user.getPassword().equals(entity.get("password"))) {
             Response response = new Response();
-            response.setStatus(ResponseStatus.SEE_OTHER);
+            response.setStatus(ResponseStatus.FOUND);
             response.setHeaders("Set-Cookie: logined=true; Path=/");
             response.setHeaders("Location: /index.html");
             return response;
         }
 
         Response response = new Response();
-        response.setStatus(ResponseStatus.SEE_OTHER);
+        response.setStatus(ResponseStatus.FOUND);
         response.setHeaders("Set-Cookie: logined=false; Path=/");
         response.setHeaders("Location: /user/login_failed.html");
         return response;

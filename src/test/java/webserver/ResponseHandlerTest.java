@@ -32,7 +32,7 @@ class ResponseHandlerTest {
     @Test
     void seeOther() throws IOException {
         Response response = new Response();
-        response.setStatus(ResponseStatus.SEE_OTHER);
+        response.setStatus(ResponseStatus.FOUND);
         response.setHeaders("Location: /index.html");
         responseHandler.handleResponse(new DataOutputStream(out), response);
 

@@ -36,7 +36,7 @@ class RequestParser {
     public HttpRequest parse() {
         HttpRequest httpRequest = parseRequestLine();
 
-        httpRequest.addHeaders(getHeaders());
+        httpRequest.setHeaderAndCookies(getHeaders());
         httpRequest.setEntity(getEntity(httpRequest.getHeaders().get("Content-Length")));
 
         return httpRequest;

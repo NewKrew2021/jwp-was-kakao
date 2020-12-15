@@ -10,12 +10,17 @@ import static java.util.AbstractMap.SimpleEntry;
 import static java.util.stream.Collectors.*;
 
 public class HttpRequest {
+    public static final HttpSessionFactory HTTP_SESSION_FACTORY = new HttpSessionFactory();
+    public static final String SESSION_ID = "session_id";
+    public static final String COOKIE_HEADER = "Cookie";
     private final HttpMethod method;
     private final String requestURI;
     private final String protocol;
     private Map<String, String> queryParams = Collections.emptyMap();
     private final Map<String, String> headers = new HashMap<>();
     private Map<String, String> entity = Collections.emptyMap();
+    private String sessionId;
+    private Cookies cookies;
 
     public HttpRequest(String method, String requestURI, String protocol) {
         this.method = HttpMethod.valueOf(method);
@@ -47,8 +52,11 @@ public class HttpRequest {
         return Collections.unmodifiableMap(headers);
     }
 
-    public void addHeaders(Map<String, String> added) {
+    public void setHeaderAndCookies(Map<String, String> added) {
         headers.putAll(added);
+        cookies = Optional.ofNullable(getHeaders().get(COOKIE_HEADER))
+                                       .map(HttpRequest.Cookies::new)
+                                       .orElse(null);
     }
 
     public void setEntity(Map<String, String> entity) {
@@ -60,13 +68,31 @@ public class HttpRequest {
     }
 
     public Cookies getCookies() {
-        return Optional.ofNullable(getHeaders().get("Cookie"))
-                .map(Cookies::new)
-                .orElse(null);
+        return cookies;
     }
 
     public String getParameter(String name) {
         return queryParams.getOrDefault(name, entity.get(name));
+    }
+
+    public HttpSession getSession() {
+        parseSessionId();
+
+        return getHttpSession();
+    }
+
+    private HttpSession getHttpSession() {
+        HttpSession httpSession = HTTP_SESSION_FACTORY.getOrCreate(sessionId);
+        sessionId = httpSession.getId();
+        return httpSession;
+    }
+
+    private void parseSessionId() {
+        Optional<Cookies> cookies = Optional.ofNullable(getCookies());
+        if (sessionId == null) {
+            sessionId = cookies.flatMap(cookie -> cookie.findCookieByName(SESSION_ID))
+                    .orElse(null);
+        }
     }
 
     public static class Cookies {
@@ -88,6 +114,13 @@ public class HttpRequest {
                     }).collect(collectingAndThen(
                             toMap(SimpleEntry::getKey, SimpleEntry::getValue),
                             ImmutableMap::copyOf));
+        }
+
+        public Optional<String> findCookieByName(String name) {
+            return cookies.stream()
+                    .filter(cookie -> cookie.startsWith(name))
+                    .map(cookie -> cookie.split(KEY_VALUE_SPLIT)[1])
+                    .findFirst();
         }
 
         public boolean contains(String cookie) {

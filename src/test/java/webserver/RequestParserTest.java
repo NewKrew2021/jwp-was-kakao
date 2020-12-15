@@ -201,14 +201,60 @@ public class RequestParserTest {
             assertThat(httpRequest.getCookies()).isNull();
         }
     }
+    @Nested
+    @DisplayName("세션 쿠키를 파싱한다")
+    class Session {
+        @BeforeEach
+        void setUp() {
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /index.html HTTP/1.1\n" +
+                    "Host: localhost:8080\n" +
+                    "Connection: keep-alive\n" +
+                    "Accept: */*\n" +
+                    "Cookie: session_id=session1\n\n"));
+        }
+
+        @Test
+        void parse() {
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+
+            assertThat(httpRequest.getSession().getId()).isEqualTo("session1");
+        }
+
+        @DisplayName("세션아이디 쿠키가 없어도 생성할 수 있다")
+        @Test
+        void getSessionWhenSessionEmptyCookie() {
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /user/list HTTP/1.1\n" +
+                    "Host: localhost:8080\n" +
+                    "Connection: keep-alive\n" +
+                    "Accept: */*\n\n"));
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+
+            assertThat(httpRequest.getSession()).isNotNull();
+        }
+
+        @DisplayName("세션 객체를 두번 가져오면 동일한 객체여야 한다")
+        @Test
+        void getSessionTwice() {
+            bufferedReader = new BufferedReader(new StringReader(
+                    "GET /user/list HTTP/1.1\n" +
+                    "Host: localhost:8080\n" +
+                    "Connection: keep-alive\n" +
+                    "Accept: */*\n\n"));
+            HttpRequest httpRequest = new RequestParser(bufferedReader).parse();
+
+            assertThat(httpRequest.getSession().getId()).isEqualTo(httpRequest.getSession().getId());
+        }
+    }
 
     public static User getUser(HttpRequest httpRequest) {
         Map<String, String> queryParams = httpRequest.getQueryParams();
-        if (queryParams != null) {
+        if (!queryParams.isEmpty()) {
             return User.createUser(queryParams);
         }
         Map<String, String> entity = httpRequest.getEntity();
-        if (entity != null) {
+        if (!entity.isEmpty()) {
             return User.createUser(entity);
         }
         throw new IllegalStateException();
