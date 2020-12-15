@@ -15,10 +15,11 @@ import webserver.response.HttpResponse;
 
 import java.util.Collections;
 
-import static controller.LoginController.LOGIN_COOKIE_KEY;
+import static controller.UserController.LOGIN_COOKIE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static utils.template.TemplateUtils.TEMPLATE_PREFIX;
 
 class UserControllerTest {
     @Mock
@@ -50,22 +51,48 @@ class UserControllerTest {
     @Test
     void showAll() {
         when(userService.findAll()).thenReturn(Collections.singletonList(User.nobody()));
-        request.getHeader().addHeader(RequestHeader.COOKIE, Collections.singletonList(new Cookie(LOGIN_COOKIE_KEY, "true", null)));
+        request.getHeader().addHeader(RequestHeader.COOKIE, Collections.singletonList(new Cookie(LOGIN_COOKIE_NAME, "true", null)));
 
         String viewPath = userController.showUsers(request, response, model);
 
-        assertThat(viewPath).isEqualTo("templates/user/list.html");
+        assertThat(viewPath).isEqualTo(TEMPLATE_PREFIX + "/user/list.html");
         assertThat(((UsersDto) model.getData().get("usersDto")).getUsers().size()).isEqualTo(1);
     }
 
     @Test
     void cannotShowAllBeforeLogin() {
-        request.getHeader().addHeader(RequestHeader.COOKIE, Collections.singletonList(new Cookie(LOGIN_COOKIE_KEY, "false", null)));
+        request.getHeader().addHeader(RequestHeader.COOKIE, Collections.singletonList(new Cookie(LOGIN_COOKIE_NAME, "false", null)));
 
         String viewPath = userController.showUsers(request, response, model);
 
         assertThat(viewPath).isNull();
         assertThat(String.join("", response.getHeader().getHeaders())).contains("/user/login.html");
 
+    }
+
+
+    @Test
+    void successLogin() {
+        when(userService.login("user", "password")).thenReturn(true);
+
+        request.getHeader().addParameter("userId", "user");
+        request.getHeader().addParameter("password", "password");
+        userController.login(request, response);
+
+        assertThat(String.join("", response.getHeader().getHeaders())).contains("logined=true");
+        assertThat(String.join("", response.getHeader().getHeaders())).contains("index.html");
+    }
+
+    @Test
+    void failLogin() {
+        when(userService.login("user", "password2")).thenReturn(false);
+
+        request.getHeader().addParameter("userId", "user");
+        request.getHeader().addParameter("password", "password2");
+
+        userController.login(request, response);
+
+        assertThat(String.join("", response.getHeader().getHeaders())).contains("logined=false");
+        assertThat(String.join("", response.getHeader().getHeaders())).contains("/user/login_failed.html");
     }
 }

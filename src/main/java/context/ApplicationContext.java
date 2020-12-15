@@ -1,7 +1,6 @@
 package context;
 
 import com.github.jknack.handlebars.Handlebars;
-import controller.LoginController;
 import controller.UserController;
 import exception.ExceptionHandler;
 import service.UserService;
@@ -13,7 +12,6 @@ public class ApplicationContext {
     public static UserService userService = new UserService();
     public static Handlebars handlebars = TemplateUtils.getHandleBars();
     public static UserController userController = new UserController(userService);
-    public static LoginController loginController = new LoginController(userService);
     public static ViewResolver viewResolver = new ViewResolver();
     public static Dispatcher dispatcher = new Dispatcher();
     public static ExceptionHandler exceptionHandler = new ExceptionHandler();

@@ -1,8 +1,10 @@
 package resource;
 
+import static utils.template.TemplateUtils.TEMPLATE_PREFIX;
+
 public class ResourceResolver {
-    private static final String STATIC_PATH_PREFIX = "./static";
-    private static final String TEMPLATE_PATH_PREFIX = "./templates";
+    public static final String STATIC_PATH_PREFIX = "./static";
+    public static final String TEMPLATE_PATH_PREFIX = "./" + TEMPLATE_PREFIX;
     private static final String CSS_PREFIX = "/css";
     private static final String JS_PREFIX = "/js";
     private static final String FONT_PREFIX = "/fonts";

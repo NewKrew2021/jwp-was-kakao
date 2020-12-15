@@ -30,10 +30,10 @@ class HttpResponseTest {
         HttpRequest request = HttpRequest.empty();
         request.getHeader().addHeader("Host", "localhost:8080");
 
-        response.setRedirect(request, "/index.html");
+        response.setRedirect("/index.html");
 
         assertThat(response.getHeader().toString()).startsWith("HTTP/1.1 302 Found");
-        assertThat(response.getHeader().toString()).contains("Location: http://localhost:8080/index.html");
+        assertThat(response.getHeader().toString()).contains("Location: /index.html");
     }
 
     @Test
@@ -41,10 +41,10 @@ class HttpResponseTest {
         HttpRequest request = HttpRequest.empty();
         request.getHeader().addHeader("Host", "localhost:8080");
 
-        response.setRedirectWithCookie(request, new Cookie("logined", "true", "/"), "/index.html");
+        response.setRedirectWithCookie(new Cookie("logined", "true", "/"), "/index.html");
 
         assertThat(response.getHeader().toString()).startsWith("HTTP/1.1 302 Found");
-        assertThat(response.getHeader().toString()).contains("Location: http://localhost:8080/index.html");
+        assertThat(response.getHeader().toString()).contains("Location: /index.html");
         assertThat(response.getHeader().toString()).contains("Set-Cookie: logined=true; Path=/");
     }
 

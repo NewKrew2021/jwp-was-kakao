@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static resource.ResourceResolver.TEMPLATE_PATH_PREFIX;
 
 class ResourceResolverTest {
     @ParameterizedTest
@@ -24,7 +25,7 @@ class ResourceResolverTest {
     void templatePath(String inputPath) {
         String path = ResourceResolver.resolve(inputPath);
 
-        assertThat(path).isEqualTo("./templates" + inputPath);
+        assertThat(path).isEqualTo(TEMPLATE_PATH_PREFIX + inputPath);
     }
 
     @Test

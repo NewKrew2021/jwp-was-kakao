@@ -25,9 +25,9 @@ class RequestBuilderTest {
         assertThat(request.getHeader().getHost()).isEqualTo("localhost:8080");
         assertThat(request.getHeader().getHeader("Connection")).isEqualTo("keep-alive");
         assertThat(request.getHeader().getHeader("Accept")).isEqualTo("*/*");
-        assertThat(request.getParam("userId")).isEqualTo("javajigi");
-        assertThat(request.getParam("password")).isEqualTo("password");
-        assertThat(request.getParam("name")).isEqualTo("JaeSung");
+        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
+        assertThat(request.getParameter("password")).isEqualTo("password");
+        assertThat(request.getParameter("name")).isEqualTo("JaeSung");
     }
 
     private List<String> getLines(String input) {
@@ -56,10 +56,10 @@ class RequestBuilderTest {
         assertThat(request.getHeader().getHeader("Content-Type")).isEqualTo("application/x-www-form-urlencoded");
         assertThat(request.getHeader().getHeader("Connection")).isEqualTo("keep-alive");
         assertThat(request.getHeader().getHeader("Accept")).isEqualTo("*/*");
-        assertThat(request.getParam("id")).isEqualTo("1");
-        assertThat(request.getParam("userId")).isEqualTo("javajigi");
-        assertThat(request.getParam("password")).isEqualTo("password");
-        assertThat(request.getParam("name")).isEqualTo("JaeSung");
+        assertThat(request.getParameter("id")).isEqualTo("1");
+        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
+        assertThat(request.getParameter("password")).isEqualTo("password");
+        assertThat(request.getParameter("name")).isEqualTo("JaeSung");
     }
 
     @Test

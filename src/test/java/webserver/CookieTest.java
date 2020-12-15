@@ -7,10 +7,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CookieTest {
     @Test
     public void login() {
-        Cookie cookie = Cookie.fromRequest("logined=true");
+        Cookie cookie = Cookie.from("logined=true");
 
         assertThat(cookie.getContent()).isEqualTo("logined=true");
-        assertThat(cookie.getKey()).isEqualTo("logined");
+        assertThat(cookie.getName()).isEqualTo("logined");
         assertThat(cookie.getValue()).isEqualTo("true");
     }
 }

@@ -29,7 +29,7 @@ public class RequestBuilder {
         String[] pathTokens = token.split("\\?");
         request.setPath(pathTokens[0]);
         if (pathTokens.length == 2) {
-            request.getHeader().setParams(RequestParamParser.parseRequestParams(pathTokens[1]));
+            request.getHeader().setParameters(RequestParamParser.parseRequestParams(pathTokens[1]));
         }
     }
 
@@ -44,7 +44,7 @@ public class RequestBuilder {
     private static Object getValue(String key, String value) {
         if (isCookie(key)) {
             return Arrays.stream(value.split(";"))
-                    .map(Cookie::fromRequest)
+                    .map(Cookie::from)
                     .collect(Collectors.toList());
         }
         return value;

@@ -61,12 +61,12 @@ public class HttpRequest {
         return protocol;
     }
 
-    public String getParam(String key) {
-        return Optional.ofNullable(header.getParam(key))
-                .orElse(getParamFromBody(key));
+    public String getParameter(String key) {
+        return Optional.ofNullable(header.getParameter(key))
+                .orElse(getParameterFromBody(key));
     }
 
-    private String getParamFromBody(String key) {
+    private String getParameterFromBody(String key) {
         if (bodyParams.containsKey(key)) {
             return bodyParams.get(key);
         }

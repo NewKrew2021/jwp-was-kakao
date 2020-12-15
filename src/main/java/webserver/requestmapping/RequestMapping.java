@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static context.ApplicationContext.loginController;
 import static context.ApplicationContext.userController;
 
 public class RequestMapping {
@@ -24,7 +23,7 @@ public class RequestMapping {
         map.put("/user/create", getMethodMap(userController,
                 Arrays.asList(HttpMethod.POST, HttpMethod.GET),
                 Arrays.asList("addUser", "addUser")));
-        map.put("/user/login", getMethodMap(loginController,
+        map.put("/user/login", getMethodMap(userController,
                 Collections.singletonList(HttpMethod.POST),
                 Collections.singletonList("login")));
         map.put("/user/list", getMethodMap(userController,

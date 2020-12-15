@@ -4,27 +4,27 @@ import java.util.Objects;
 
 public class Cookie {
 
-    private final String key;
+    private final String name;
     private final String value;
     private final String path;
 
-    public Cookie(String key, String value, String path) {
-        this.key = key;
+    public Cookie(String name, String value, String path) {
+        this.name = name;
         this.value = value;
         this.path = path;
     }
 
-    public static Cookie fromRequest(String line) {
+    public static Cookie from(String line) {
         String[] tokens = line.split("=");
         return new Cookie(tokens[0].trim(), tokens[1].trim(), null);
     }
 
     public String getContent() {
-        return String.format("%s=%s", key, value);
+        return String.format("%s=%s", name, value);
     }
 
-    public String getKey() {
-        return key;
+    public String getName() {
+        return name;
     }
 
     public String getPath() {
@@ -42,14 +42,14 @@ public class Cookie {
 
         Cookie cookie = (Cookie) o;
 
-        if (!Objects.equals(key, cookie.key)) return false;
+        if (!Objects.equals(name, cookie.name)) return false;
         if (!Objects.equals(value, cookie.value)) return false;
         return Objects.equals(path, cookie.path);
     }
 
     @Override
     public int hashCode() {
-        int result = key != null ? key.hashCode() : 0;
+        int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (path != null ? path.hashCode() : 0);
         return result;

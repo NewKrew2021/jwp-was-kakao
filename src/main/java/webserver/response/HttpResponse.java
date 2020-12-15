@@ -47,13 +47,13 @@ public class HttpResponse {
         }
     }
 
-    public void setRedirect(HttpRequest request, String path) {
+    public void setRedirect(String path) {
         this.header.setStatus(HttpStatus.FOUND);
-        this.header.setLocation("http://" + request.getHeader().getHost() + path);
+        this.header.setLocation(path);
     }
 
-    public void setRedirectWithCookie(HttpRequest request, Cookie cookie, String path) {
-        setRedirect(request, path);
+    public void setRedirectWithCookie(Cookie cookie, String path) {
+        setRedirect(path);
         this.header.setCookie(cookie);
     }
 

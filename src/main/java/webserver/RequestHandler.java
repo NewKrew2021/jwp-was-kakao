@@ -29,11 +29,18 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            dispatcher.dispatch(readRequest(in), new DataOutputStream(out));
+            dispathWithException(in, out);
         } catch (Exception ex) {
             logger.error(ex.getMessage());
             ex.printStackTrace();
-            exceptionHandler.handleException(connection);
+        }
+    }
+
+    private void dispathWithException(InputStream in, OutputStream out) {
+        try {
+            dispatcher.dispatch(readRequest(in), new DataOutputStream(out));
+        } catch (Exception ex) {
+            exceptionHandler.handleException(out);
         }
     }
 

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static resource.ResourceResolver.TEMPLATE_PATH_PREFIX;
 
 public class TemplateUtilsTest {
     private static final Logger log = LoggerFactory.getLogger(TemplateUtilsTest.class);
@@ -20,7 +21,7 @@ public class TemplateUtilsTest {
     void name() throws Exception {
         Handlebars handlebars = TemplateUtils.getHandleBars();
 
-        Template template = handlebars.compile("templates/user/profile.html");
+        Template template = handlebars.compile(TEMPLATE_PATH_PREFIX + "/user/profile.html");
 
         User user = new User("javajigi", "password", "자바지기", "javajigi@gmail.com");
         String profilePage = template.apply(user);
@@ -31,7 +32,7 @@ public class TemplateUtilsTest {
     void list() throws Exception {
         Handlebars handlebars = TemplateUtils.getHandleBars();
 
-        Template template = handlebars.compile("templates/user/list.html");
+        Template template = handlebars.compile(TEMPLATE_PATH_PREFIX + "/user/list.html");
 
         UsersDto users = new UsersDto(Collections.singletonList(new User("javajigi", "password", "자바지기", "javajigi@gmail.com")));
         Model model = Model.empty();
