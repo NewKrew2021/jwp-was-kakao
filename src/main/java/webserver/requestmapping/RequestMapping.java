@@ -6,61 +6,49 @@ import org.springframework.http.HttpMethod;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static context.ApplicationContext.userController;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
-public class RequestMapping {
-    private static final Map<String, ControllerMethodMap> map;
+public enum RequestMapping {
+    USER_CREATE_BY_GET(GET, "/user/create", userController, "addUser"),
+    USER_CREATE_BY_POST(POST, "/user/create", userController, "addUser"),
+    USER_LOGIN(POST, "/user/login", userController, "login"),
+    USER_LIST(GET, "/user/list", userController, "showUsers");;
 
-    static {
-        map = new HashMap<>();
-        map.put("/user/create", getMethodMap(userController,
-                Arrays.asList(HttpMethod.POST, HttpMethod.GET),
-                Arrays.asList("addUser", "addUser")));
-        map.put("/user/login", getMethodMap(userController,
-                Collections.singletonList(HttpMethod.POST),
-                Collections.singletonList("login")));
-        map.put("/user/list", getMethodMap(userController,
-                Collections.singletonList(HttpMethod.GET),
-                Collections.singletonList("showUsers")));
+    private final HttpMethod httpMethod;
+    private final String requestPath;
+    private final Controller controller;
+    private final Method method;
+
+    RequestMapping(HttpMethod httpMethod, String requestPath, Controller controller, String methodName) {
+        this.httpMethod = httpMethod;
+        this.requestPath = requestPath;
+        this.controller = controller;
+        this.method = getMethodFromController(controller.getClass(), methodName);
     }
 
-    private static ControllerMethodMap getMethodMap(Controller controller, List<HttpMethod> httpMethods, List<String> methodNames) {
-        return new ControllerMethodMap(controller, httpMethods, getMethods(controller.getClass(), methodNames));
-    }
-
-    private static List<Method> getMethods(Class<?> clazz, List<String> methodNames) {
-        return methodNames.stream()
-                .map(name -> getMethod(clazz, name))
-                .collect(Collectors.toList());
-    }
-
-    private static Method getMethod(Class<?> clazz, String name) {
+    private static Method getMethodFromController(Class<?> clazz, String name) {
         return Arrays.stream(clazz.getMethods())
                 .filter(method -> method.getName().equals(name))
+                .findFirst()
+                .orElseThrow(RequestMappingMethodNotFoundException::new);
+    }
+
+    public static Controller findController(String path) {
+        return Arrays.stream(values())
+                .filter(requestMapping -> requestMapping.requestPath.equals(path))
+                .map(requestMapping -> requestMapping.controller)
                 .findFirst()
                 .orElse(null);
     }
 
-    public static Controller findController(String path) {
-        ControllerMethodMap controllerMethodMap = map.get(path);
-        if (Optional.ofNullable(controllerMethodMap).isPresent()) {
-            return controllerMethodMap.getController();
-        }
-        return null;
-    }
-
     public static Method findMethod(String path, HttpMethod httpMethod) {
-        ControllerMethodMap controllerMethodMap = map.get(path);
-        if (Optional.ofNullable(controllerMethodMap).isPresent()) {
-            return controllerMethodMap.find(httpMethod);
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(requestMapping -> requestMapping.requestPath.equals(path) && requestMapping.httpMethod.equals(httpMethod))
+                .map(requestMapping -> requestMapping.method)
+                .findFirst()
+                .orElse(null);
     }
 }

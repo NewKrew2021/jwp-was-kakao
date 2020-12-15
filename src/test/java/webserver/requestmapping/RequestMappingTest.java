@@ -12,4 +12,14 @@ public class RequestMappingTest {
     public void getAddUser() {
         assertThat(RequestMapping.findMethod("/user/create", HttpMethod.GET).getName()).isEqualTo("addUser");
     }
+
+    @Test
+    void getNotFoundController() {
+        assertThat(RequestMapping.findController("/user/create1")).isNull();
+    }
+
+    @Test
+    void getNotFoundMethod() {
+        assertThat(RequestMapping.findMethod("/user/create1", HttpMethod.GET)).isNull();
+    }
 }

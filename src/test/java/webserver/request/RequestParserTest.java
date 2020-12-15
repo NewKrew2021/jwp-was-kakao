@@ -4,6 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import webserver.Cookie;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,13 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestParserTest {
     @Test
-    void getRequest() {
-        String input = "GET /user/create?userId=javajigi&password=password&name=JaeSung HTTP/1.1 \n" +
-                "Host: localhost:8080 \n" +
-                "Connection: keep-alive \n" +
-                "Accept: */*\n";
+    void getRequest() throws FileNotFoundException {
+        InputStream in = new FileInputStream(new File("src/test/resources/http_get.txt"));
 
-        HttpRequest request = RequestParser.fromLines(getLines(input));
+        HttpRequest request = RequestReader.read(new BufferedReader(new InputStreamReader(in)));
 
         assertThat(request.getProtocol()).isEqualTo(Protocol.HTTP);
         assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
@@ -35,18 +38,10 @@ class RequestParserTest {
     }
 
     @Test
-    void postRequest() {
-        String input = "POST /user/create?id=1 HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 46\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Accept: */*\n";
+    void postRequest() throws FileNotFoundException {
+        InputStream in = new FileInputStream(new File("src/test/resources/http_post.txt"));
 
-        String body = "userId=javajigi&password=password&name=JaeSung";
-
-        HttpRequest request = RequestParser.fromLines(getLines(input));
-        request.setBodyParams(body);
+        HttpRequest request = RequestReader.read(new BufferedReader(new InputStreamReader(in)));
 
         assertThat(request.getProtocol()).isEqualTo(Protocol.HTTP);
         assertThat(request.getMethod()).isEqualTo(HttpMethod.POST);
@@ -63,14 +58,10 @@ class RequestParserTest {
     }
 
     @Test
-    void cookieRequest() {
-        String input = "GET /index.html HTTP/1.1 \n" +
-                "Host: localhost:8080 \n" +
-                "Connection: keep-alive \n" +
-                "Accept: */*\n" +
-                "Cookie: logined=true\n";
+    void cookieRequest() throws FileNotFoundException {
+        InputStream in = new FileInputStream(new File("src/test/resources/cookie.txt"));
 
-        HttpRequest request = RequestParser.fromLines(getLines(input));
+        HttpRequest request = RequestReader.read(new BufferedReader(new InputStreamReader(in)));
 
         assertThat(request.getProtocol()).isEqualTo(Protocol.HTTP);
         assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
