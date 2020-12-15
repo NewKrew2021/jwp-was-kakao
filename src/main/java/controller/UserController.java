@@ -8,14 +8,12 @@ import webserver.Cookie;
 import webserver.request.HttpRequest;
 import webserver.response.HttpResponse;
 
-import static utils.template.TemplateUtils.TEMPLATE_PREFIX;
-
 public class UserController implements Controller {
     public static final String LOGIN_COOKIE_NAME = "logined";
     private static final String HOME_PATH = "/index.html";
     private static final String LOGIN_FAILED_PATH = "/user/login_failed.html";
     private static final String LOGIN_PATH = "/user/login.html";
-    private static final String USER_LIST_PATH = TEMPLATE_PREFIX + "/user/list.html";
+    private static final String USER_LIST_PATH = "/user/list.html";
 
     private final UserService userService;
 

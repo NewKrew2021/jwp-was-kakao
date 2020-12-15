@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RequestBuilderTest {
+class RequestParserTest {
     @Test
     void getRequest() {
         String input = "GET /user/create?userId=javajigi&password=password&name=JaeSung HTTP/1.1 \n" +
@@ -17,7 +17,7 @@ class RequestBuilderTest {
                 "Connection: keep-alive \n" +
                 "Accept: */*\n";
 
-        HttpRequest request = RequestBuilder.fromLines(getLines(input));
+        HttpRequest request = RequestParser.fromLines(getLines(input));
 
         assertThat(request.getProtocol()).isEqualTo(Protocol.HTTP);
         assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
@@ -45,7 +45,7 @@ class RequestBuilderTest {
 
         String body = "userId=javajigi&password=password&name=JaeSung";
 
-        HttpRequest request = RequestBuilder.fromLines(getLines(input));
+        HttpRequest request = RequestParser.fromLines(getLines(input));
         request.setBodyParams(body);
 
         assertThat(request.getProtocol()).isEqualTo(Protocol.HTTP);
@@ -70,7 +70,7 @@ class RequestBuilderTest {
                 "Accept: */*\n" +
                 "Cookie: logined=true\n";
 
-        HttpRequest request = RequestBuilder.fromLines(getLines(input));
+        HttpRequest request = RequestParser.fromLines(getLines(input));
 
         assertThat(request.getProtocol()).isEqualTo(Protocol.HTTP);
         assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);

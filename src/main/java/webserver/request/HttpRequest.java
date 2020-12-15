@@ -22,7 +22,7 @@ public class HttpRequest {
     }
 
     public static HttpRequest of(List<String> lines) {
-        return RequestBuilder.fromLines(lines);
+        return RequestParser.fromLines(lines);
     }
 
     public static HttpRequest empty() {

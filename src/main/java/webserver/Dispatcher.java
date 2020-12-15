@@ -57,13 +57,40 @@ public class Dispatcher {
     }
 
     private void dispatchWithHandler(HttpRequest request, HttpResponse response, Method method, Model model) {
-        if (method.getParameterCount() == 2) {
+        if (requireRequestAndResponse(method)) {
             invokeMethod(request, response, method);
         }
-        if (method.getParameterCount() == 3) {
+        if (requireRequestAndResponseAndModel(method)) {
             String viewPath = invokeMethod(request, method, response, model);
             dispatchModelAndView(response, model, viewPath);
         }
+    }
+
+    private boolean requireRequestAndResponseAndModel(Method method) {
+        if (method.getParameterCount() != 3) {
+            return false;
+        }
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (!parameterTypes[0].equals(HttpRequest.class) ||
+                !parameterTypes[1].equals(HttpResponse.class) ||
+                !parameterTypes[2].equals(Model.class)
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean requireRequestAndResponse(Method method) {
+        if (method.getParameterCount() != 2) {
+            return false;
+        }
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (!parameterTypes[0].equals(HttpRequest.class) ||
+                !parameterTypes[1].equals(HttpResponse.class)
+        ) {
+            return false;
+        }
+        return true;
     }
 
     private void invokeMethod(HttpRequest request, HttpResponse response, Method method) {

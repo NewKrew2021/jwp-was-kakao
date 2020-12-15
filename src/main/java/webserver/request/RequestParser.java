@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import static webserver.request.RequestHeader.COOKIE;
 
-public class RequestBuilder {
+public class RequestParser {
     public static HttpRequest fromLines(List<String> lines) {
         HttpRequest request = new HttpRequest();
         applyFirstLine(request, lines.get(0));

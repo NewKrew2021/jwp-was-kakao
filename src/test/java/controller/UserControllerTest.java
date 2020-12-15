@@ -14,12 +14,12 @@ import webserver.request.RequestHeader;
 import webserver.response.HttpResponse;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import static controller.UserController.LOGIN_COOKIE_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static utils.template.TemplateUtils.TEMPLATE_PREFIX;
 
 class UserControllerTest {
     @Mock
@@ -42,6 +42,12 @@ class UserControllerTest {
     @Test
     void addUser() {
         when(userService.addUser(any())).thenReturn(User.nobody());
+        request.getHeader().setParameters(new HashMap<String, String>() {{
+            put("userId", "1");
+            put("password", "1");
+            put("name", "1");
+            put("email", "a@a.com");
+        }});
 
         userController.addUser(request, response);
 
@@ -55,7 +61,7 @@ class UserControllerTest {
 
         String viewPath = userController.showUsers(request, response, model);
 
-        assertThat(viewPath).isEqualTo(TEMPLATE_PREFIX + "/user/list.html");
+        assertThat(viewPath).isEqualTo("/user/list.html");
         assertThat(((UsersDto) model.getData().get("usersDto")).getUsers().size()).isEqualTo(1);
     }
 
