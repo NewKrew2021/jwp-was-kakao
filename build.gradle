@@ -1,9 +1,9 @@
 plugins {
-    id 'org.springframework.boot' version '2.3.0.RELEASE'
+//    id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'java'
 }
 
-apply plugin: 'io.spring.dependency-management'
+//apply plugin: 'io.spring.dependency-management'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -15,15 +15,19 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    springVersion = '5.2.6.RELEASE'
-}
+//ext {
+//    springVersion = '5.2.6.RELEASE'
+//}
 
 dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'com.github.jknack:handlebars:4.2.0'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
+//    implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
     testImplementation 'org.assertj:assertj-core:3.16.1'
 }
