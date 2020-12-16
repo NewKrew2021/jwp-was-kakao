@@ -1,124 +1,65 @@
 package webserver.response;
 
+import org.springframework.http.HttpStatus;
 import webserver.Cookie;
-import webserver.request.ContentType;
+import webserver.request.HttpRequest;
 import webserver.request.Protocol;
-import webserver.request.Status;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ResponseHeader {
 
     private Protocol protocol;
-    private Status status;
-    private String cookie;
-    private String cookiePath;
-    private String location;
-    private ContentType contentType;
-    private Integer contentLength;
 
-    private ResponseHeader() {
-    }
+    private List<String> headers;
 
-    public static Builder builder() {
-        return new Builder();
-    }
+    private HttpStatus status;
 
-    public static class Builder {
-        private ResponseHeader header;
-
-        public Builder() {
-            this.header = new ResponseHeader();
-        }
-
-        public Builder protocol(Protocol protocol) {
-            header.setProtocol(protocol);
-            return this;
-        }
-
-        public Builder status(Status status) {
-            header.setStatus(status);
-            return this;
-        }
-
-        public ResponseHeader build() {
-            return header;
-        }
-
-        public Builder cookie(String cookie, String cookiePath) {
-            header.setCookie(cookie);
-            header.setCookiePath(cookiePath);
-            return this;
-        }
-
-        public Builder cookie(Cookie cookie) {
-            header.setCookie(cookie.getContent());
-            header.setCookiePath(cookie.getPath());
-            return this;
-        }
-
-        public Builder location(String location) {
-            header.setLocation(location);
-            return this;
-        }
-
-        public Builder contentType(ContentType contentType) {
-            header.setContentType(contentType);
-            return this;
-        }
-
-        public Builder contentLength(int contentLength) {
-            header.setContentLength(contentLength);
-            return this;
-        }
-    }
-
-    private void setContentLength(int contentLength) {
-        this.contentLength = contentLength;
-    }
-
-    private void setContentType(ContentType contentType) {
-        this.contentType = contentType;
-    }
-
-    private void setLocation(String location) {
-        this.location = location;
-    }
-
-    private void setCookiePath(String cookiePath) {
-        this.cookiePath = cookiePath;
-    }
-
-    private void setCookie(String cookie) {
-        this.cookie = cookie;
-    }
-
-    private void setProtocol(Protocol protocol) {
+    private ResponseHeader(Protocol protocol, HttpStatus status, List<String> headers) {
         this.protocol = protocol;
+        this.status = status;
+        this.headers = headers;
     }
 
-    private void setStatus(Status status) {
+    public static ResponseHeader ok(HttpRequest request) {
+        return new ResponseHeader(request.getProtocol(), HttpStatus.OK, new ArrayList<>());
+    }
+
+    public static ResponseHeader error() {
+        return new ResponseHeader(Protocol.HTTP, HttpStatus.INTERNAL_SERVER_ERROR, Collections.emptyList());
+    }
+
+    public void setContentLength(int contentLength) {
+        headers.add(String.format("Content-Length: %d\r\n", contentLength));
+    }
+
+    public void setContentType(String contentType) {
+        headers.add(String.format("Content-Type: %s\r\n", contentType));
+    }
+
+    public void setLocation(String location) {
+        headers.add(String.format("Location: %s\r\n", location));
+    }
+
+    public void setCookie(Cookie cookie) {
+        headers.add(String.format("Set-Cookie: %s; Path=%s\r\n", cookie.getContent(), cookie.getPath()));
+    }
+
+    public void setStatus(HttpStatus status) {
         this.status = status;
+    }
+
+    public List<String> getHeaders() {
+        return headers;
     }
 
     @Override
     public String toString() {
         return String.join("",
-                Optional.ofNullable(protocol)
-                        .map(protocol -> String.format("%s %s \r\n", protocol.getMessage(), status.getMessage()))
-                        .orElseThrow(RuntimeException::new),
-                Optional.ofNullable(cookie)
-                        .map(cookie -> String.format("Set-Cookie: %s; Path=%s\r\n", cookie, cookiePath))
-                        .orElse(""),
-                Optional.ofNullable(location)
-                        .map(location -> String.format("Location: %s\r\n", location))
-                        .orElse(""),
-                Optional.ofNullable(contentType)
-                        .map(contentType -> String.format("Content-Type: %s\r\n", contentType.getMessage()))
-                        .orElse(""),
-                Optional.ofNullable(contentLength)
-                        .map(contentLength -> String.format("Content-Length: %d\r\n", contentLength))
-                        .orElse(""),
+                String.format("%s %d %s \r\n", protocol.getMessage(), status.value(), status.getReasonPhrase()),
+                String.join("", headers),
                 "\r\n"
         );
     }

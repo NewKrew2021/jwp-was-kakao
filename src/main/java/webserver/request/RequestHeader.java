@@ -1,119 +1,78 @@
 package webserver.request;
 
-import utils.RequestParser;
 import webserver.Cookie;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class RequestHeader {
+    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String HOST = "Host";
+    public static final String COOKIE = "Cookie";
 
-    private static final String CONTENT_LENGTH_KEY = "Content-Length";
-    private static final String HOST_KEY = "Host";
-    private static final String METHOD_KEY = "method";
-    private static final String PATH_KEY = "path";
+    private Map<String, Object> header;
+    private Map<String, String> parameters;
 
-
-    private final List<String> lines;
-    private Map<String, String> header;
-    private Map<String, String> params;
-    private Cookie cookie;
-
-    private RequestHeader(List<String> lines, Map<String, String> header, Map<String, String> params, Cookie cookie) {
-        this.lines = lines;
+    private RequestHeader(Map<String, Object> header, Map<String, String> parameters) {
         this.header = header;
-        this.params = params;
-        this.cookie = cookie;
+        this.parameters = parameters;
     }
 
-    public static RequestHeader of(List<String> lines) {
-        return new RequestHeader(lines, getHeader(lines), getParams(lines.get(0)), getCookie(lines));
+    public static RequestHeader of(Map<String, Object> header, Map<String, String> params) {
+        return new RequestHeader(header, params);
     }
 
-    private static Cookie getCookie(List<String> lines) {
-        return lines.stream()
-                .filter(line -> line.contains("Cookie"))
-                .findFirst()
-                .map(Cookie::of)
-                .orElse(null);
+    public static RequestHeader empty() {
+        return new RequestHeader(new HashMap<>(), new HashMap<>());
     }
 
-    private static Map<String, String> getParams(String line) {
-        return RequestParser.getRequestParams(line);
-    }
-
-    private static Map<String, String> getHeader(List<String> lines) {
-        Map<String, String> header = new HashMap<>();
-        if (lines.size() < 1) {
-            return header;
-        }
-        header.put(METHOD_KEY, RequestParser.getMethod(lines.get(0)));
-        header.put(PATH_KEY, RequestParser.getRequestPath(lines.get(0)));
-        for (String line : lines) {
-            header = putContentLength(header, line);
-            header = putHost(header, line);
-        }
-        return header;
-    }
-
-    private static Map<String, String> putContentLength(Map<String, String> header, String line) {
-        return putHeader(header, line, CONTENT_LENGTH_KEY, RequestParser::getContentLength);
-    }
-
-    private static Map<String, String> putHeader(Map<String, String> header, String line, String key, Function<String, String> getValue) {
-        if (line.startsWith(key)) {
-            Map<String, String> newHeader = new HashMap<>(header);
-            newHeader.put(key, getValue.apply(line));
-            return newHeader;
-        }
-        return header;
-    }
-
-    private static Map<String, String> putHost(Map<String, String> header, String line) {
-        return putHeader(header, line, HOST_KEY, RequestParser::getHost);
-    }
-
-    @Override
-    public String toString() {
-        return String.join("\n", lines);
-    }
-
-    public RequestPath getPath() {
-        return new RequestPath(findInHeader(PATH_KEY));
-    }
-
-    public Map<String, String> getParams() {
-        return params;
-    }
-
-    public String getMethod() {
-        return findInHeader(METHOD_KEY);
+    public void addHeader(String key, Object value) {
+        header.put(key, value);
     }
 
     public Integer getContentLength() {
-        return Optional.ofNullable(findInHeader(CONTENT_LENGTH_KEY))
+        return Optional.ofNullable(findInHeader(CONTENT_LENGTH))
                 .map(Integer::parseInt)
                 .orElse(null);
     }
 
     private String findInHeader(String key) {
         if (header.containsKey(key)) {
-            return header.get(key);
+            return (String) header.get(key);
         }
         return null;
     }
 
     public String getHost() {
-        return findInHeader(HOST_KEY);
+        return findInHeader(HOST);
     }
 
-    public boolean cookieContains(Cookie cookie) {
-        if (this.cookie == null || cookie == null) {
-            return false;
+    public String getParameter(String key) {
+        if (parameters.containsKey(key)) {
+            return parameters.get(key);
         }
-        return this.cookie.contains(cookie.getContent());
+        return null;
+    }
+
+    public void setParameters(Map<String, String> params) {
+        this.parameters = params;
+    }
+
+    public void addParameter(String key, String value) {
+        this.parameters.put(key, value);
+    }
+
+    public List<Cookie> getCookies() {
+        if (header.containsKey(COOKIE)) {
+            return (List<Cookie>) header.get(COOKIE);
+        }
+        return Collections.emptyList();
+    }
+
+    public String getHeader(String key) {
+        return findInHeader(key);
     }
 }

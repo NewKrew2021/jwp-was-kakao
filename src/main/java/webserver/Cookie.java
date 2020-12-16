@@ -1,36 +1,57 @@
 package webserver;
 
+import java.util.Objects;
+
 public class Cookie {
 
-    private String content;
-    private String path;
+    private final String name;
+    private final String value;
+    private final String path;
 
-    public Cookie(String content, String path) {
-        this.content = content;
+    public Cookie(String name, String value, String path) {
+        this.name = name;
+        this.value = value;
         this.path = path;
     }
 
-    public static Cookie login() {
-        return new Cookie("logined=true", "/");
-    }
-
-    public static Cookie logout() {
-        return new Cookie("logined=false", "/");
+    public static Cookie from(String line) {
+        String[] tokens = line.split("=");
+        return new Cookie(tokens[0].trim(), tokens[1].trim(), null);
     }
 
     public String getContent() {
-        return content;
+        return String.format("%s=%s", name, value);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getPath() {
         return path;
     }
 
-    public boolean contains(String content) {
-        return this.content.contains(content);
+    public String getValue() {
+        return value;
     }
 
-    public static Cookie of(String line) {
-        return new Cookie(line, null);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Cookie cookie = (Cookie) o;
+
+        if (!Objects.equals(name, cookie.name)) return false;
+        if (!Objects.equals(value, cookie.value)) return false;
+        return Objects.equals(path, cookie.path);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        return result;
     }
 }
