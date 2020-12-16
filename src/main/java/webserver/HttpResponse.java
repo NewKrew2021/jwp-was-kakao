@@ -1,10 +1,13 @@
 package webserver;
 
+import utils.FileUtils;
 import utils.Utils;
 import webserver.constant.HttpHeader;
 import webserver.constant.HttpMessage;
 import webserver.constant.HttpStatus;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,14 +41,24 @@ public class HttpResponse {
             return this;
         }
 
+        public Builder header(String k, String v) {
+            loweredKeyHeaders.put(k.toLowerCase(), v);
+            return this;
+        }
+
         public Builder body(byte[] body) {
             this.body = body;
             return this;
         }
 
-        public Builder header(String k, String v) {
-            loweredKeyHeaders.put(k.toLowerCase(), v);
-            return this;
+        public Builder file(String resourcePath, boolean guessContentType) throws IOException, URISyntaxException {
+            byte[] bytes = FileUtils.loadFileFromClasspath(resourcePath);
+
+            if (guessContentType) {
+                header(HttpHeader.CONTENT_TYPE, FileUtils.guessContentType(resourcePath));
+            }
+
+            return body(bytes);
         }
 
         public HttpResponse build() {

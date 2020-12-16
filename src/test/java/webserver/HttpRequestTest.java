@@ -10,9 +10,14 @@ import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import utils.FileUtils;
+import webserver.constant.HttpHeader;
 
 import java.io.IOException;
-import java.util.concurrent.*;
+import java.net.URISyntaxException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,8 +64,27 @@ public class HttpRequestTest {
         CloseableHttpResponse resp = httpClient.execute(httpGet);
 
         assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-        assertThat(EntityUtils.toString(resp.getEntity())).isEqualTo("Hello World!");
         assertThat(resp.getFirstHeader("x-hello").getValue()).isEqualTo("World!");
+
+        assertThat(EntityUtils.toString(resp.getEntity())).isEqualTo("Hello World!");
+    }
+
+    @Test
+    public void helloStaticFile() throws IOException, URISyntaxException {
+        String file = "/css/styles.css";
+
+        HttpGet httpGet = new HttpGet(DEFAULT_HOST_URL + file);
+        CloseableHttpResponse resp = httpClient.execute(httpGet);
+
+        assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(resp.getFirstHeader(HttpHeader.CONTENT_TYPE).getValue()).isEqualTo("text/css; charset=utf-8");
+
+        String indexFilePath = "./static" + file;
+
+        String actual = EntityUtils.toString(resp.getEntity());
+        String expected = new String(FileUtils.loadFileFromClasspath(indexFilePath));
+
+        assertThat(actual).isEqualTo(expected);
     }
 
 }

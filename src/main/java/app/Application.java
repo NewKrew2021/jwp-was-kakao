@@ -1,9 +1,10 @@
 package app;
 
 import app.controllers.HelloController;
-import webserver.constant.HttpMethod;
+import app.controllers.MainController;
 import webserver.Router;
 import webserver.WebServer;
+import webserver.constant.HttpMethod;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -33,6 +34,10 @@ public class Application {
         Router router = webServer.getRouter();
 
         router.addRoute(HttpMethod.GET, "/hello", HelloController.getHelloHandler);
+
+        router.addRoute(HttpMethod.GET, "/(css|fonts|images|js)/.+", MainController.getStaticFileHandler);
+        router.addRoute(HttpMethod.GET, "/favicon.ico", MainController.getStaticFileHandler);
+        router.addRoute(HttpMethod.GET, "/.+\\.html", MainController.getTemplateFileHandler);
 
         webServer.start(port);
     }

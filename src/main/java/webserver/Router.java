@@ -1,55 +1,60 @@
 package webserver;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import webserver.constant.HttpStatus;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Router {
 
-    private class RoutePair {
+    private class RouteInfo {
         public String method;
 
-        // TODO support regex?
         public String path;
 
-        public RoutePair(String method, String path) {
+        public HttpHandler handler;
+
+        public RouteInfo(String method, String path, HttpHandler handler) {
             this.method = method;
             this.path = path;
+            this.handler = handler;
         }
 
-        @Override
-        public int hashCode() {
-            return method.hashCode() + path.hashCode();
-        }
+        public boolean isMatched(String method, String target) {
+            if (this.method.equals(method)) {
+                // TODO optimize
+                Pattern p = Pattern.compile(path);
+                Matcher matcher = p.matcher(target);
 
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof RoutePair)) {
-                return false;
+                if (matcher.matches()) {
+                    return true;
+                }
             }
 
-            RoutePair rhs = (RoutePair)obj;
-
-            return rhs.method.equals(rhs.method) &&
-                    rhs.path.equals(rhs.path);
+            return false;
         }
     }
 
-    public Map<RoutePair, HttpHandler> routePairHttpHandlerMap = new HashMap<>();
+    public List<RouteInfo> routeInfoList = new ArrayList<>();
 
     public void addRoute(String method, String path, HttpHandler handler) {
-        routePairHttpHandlerMap.put(new RoutePair(method, path), handler);
+        routeInfoList.add(new RouteInfo(method, path, handler));
     }
 
-    public Optional<HttpResponse> route(String method, String target, HttpRequest req) {
-        HttpHandler httpHandler = routePairHttpHandlerMap.get(new RoutePair(method, target));
+    public HttpResponse route(String method, String target, HttpRequest req) throws Exception {
+        HttpHandler matchedHandler = routeInfoList.stream()
+                .filter(routePair -> routePair.isMatched(method, target))
+                .map(routePair -> routePair.handler)
+                .findFirst()
+                .orElse(defaultNotFoundHandler);
 
-        if (httpHandler != null) {
-            HttpResponse resp = httpHandler.handle(method, target, req);
-            return Optional.of(resp);
-        }
-
-        return Optional.empty();
+        return matchedHandler.handle(method, target, req);
     }
+
+    private final static HttpHandler defaultNotFoundHandler = (method, target, req) -> HttpResponse.Builder.prepare()
+            .status(HttpStatus.NOT_FOUND)
+            .build();
 
 }
