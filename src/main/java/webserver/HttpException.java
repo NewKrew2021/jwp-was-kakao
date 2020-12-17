@@ -13,6 +13,10 @@ public class HttpException extends Exception {
         this.message = Utils.defaultIfNull(message);
     }
 
+    public HttpException(HttpStatus httpStatus) {
+        this(httpStatus, null);
+    }
+
     public static HttpException notImplemented(String message) {
         return new HttpException(HttpStatus.NOT_IMPLEMENTED, message);
     }
@@ -26,10 +30,7 @@ public class HttpException extends Exception {
     }
 
     public HttpResponse toHttpResponse() {
-        return HttpResponse.Builder.prepare()
-                .status(httpStatus)
-                .body(message.getBytes())
-                .build();
+        return new HttpResponse(httpStatus).setBody(message.getBytes(), true);
     }
 
 }

@@ -1,5 +1,9 @@
 package utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 public class Utils {
 
     // FIXME ???
@@ -19,8 +23,16 @@ public class Utils {
         }
     }
 
-    public static byte[] defaultIfNull(byte[] b) {
-        return b == null ? new byte[0] : b;
+    public static String decodeUrl(String s) {
+        if (s == null || s.length() == 0) {
+            return s;
+        }
+
+        try {
+            return URLDecoder.decode(s, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getCause());
+        }
     }
 
 }

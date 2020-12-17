@@ -1,90 +1,43 @@
 package webserver;
 
-import app.Application;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import utils.FileUtils;
-import webserver.constant.HttpHeader;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.io.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// FIXME rename to app test
 public class HttpRequestTest {
 
-    private static final int DEFAULT_PORT = 8888;
-    private static final String DEFAULT_HOST_URL = "http://localhost:" + DEFAULT_PORT;
-
-    private static ExecutorService executorService;
-    private static CloseableHttpClient httpClient;
-
-    @BeforeAll
-    public static void init() throws InterruptedException {
-        startApplication();
-
-        httpClient = HttpClients.createDefault();
-    }
-
-    private static void startApplication() throws InterruptedException {
-        Application application = new Application();
-
-        CountDownLatch startSignal = application.getStartSignal();
-
-        executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(() -> {
-            application.run(DEFAULT_PORT);
-            return null;
-        });
-
-        startSignal.await();
-    }
-
-    @AfterAll
-    public static void tearDown() throws IOException {
-        httpClient.close();
-
-        executorService.shutdown();
+    private InputStream buildInputStream(String s) {
+        return new ByteArrayInputStream(s.getBytes());
     }
 
     @Test
-    public void helloWebServer() throws IOException {
-        HttpGet httpGet = new HttpGet(DEFAULT_HOST_URL + "/hello");
-        CloseableHttpResponse resp = httpClient.execute(httpGet);
+    public void testPostFormUrlEncodedRequest() throws IOException, HttpException {
+        String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
 
-        assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-        assertThat(resp.getFirstHeader("x-hello").getValue()).isEqualTo("World!");
+        String requestString = "POST /user/create HTTP/1.1\n" +
+                "Host: localhost:8080\n" +
+                "Connection: keep-alive\n" +
+                "Content-Length: " + body.length() + "\n" +
+                "Content-Type: application/x-www-form-urlencoded\n" +
+                "Accept: */*\n" +
+                "\n" +
+                body;
 
-        assertThat(EntityUtils.toString(resp.getEntity())).isEqualTo("Hello World!");
-    }
+        InputStream is = buildInputStream(requestString);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-    @Test
-    public void helloStaticFile() throws IOException, URISyntaxException {
-        String file = "/css/styles.css";
+        HttpRequest req = new HttpRequest(br.readLine(), br);
 
-        HttpGet httpGet = new HttpGet(DEFAULT_HOST_URL + file);
-        CloseableHttpResponse resp = httpClient.execute(httpGet);
+        assertThat(req.getMethod()).isEqualTo("POST");
+        assertThat(req.getTarget()).isEqualTo("/user/create");
+        assertThat(req.getHeaderValue("Host")).isEqualTo("localhost:8080");
+        assertThat(req.getHeaderValueInt("Content-Length")).isEqualTo(body.length());
 
-        assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-        assertThat(resp.getFirstHeader(HttpHeader.CONTENT_TYPE).getValue()).isEqualTo("text/css; charset=utf-8");
-
-        String indexFilePath = "./static" + file;
-
-        String actual = EntityUtils.toString(resp.getEntity());
-        String expected = new String(FileUtils.loadFileFromClasspath(indexFilePath));
-
-        assertThat(actual).isEqualTo(expected);
+        assertThat(req.getRequestParam("userId")).isEqualTo("javajigi");
+        assertThat(req.getRequestParam("password")).isEqualTo("password");
+        assertThat(req.getRequestParam("name")).isEqualTo("박재성");
     }
 
 }

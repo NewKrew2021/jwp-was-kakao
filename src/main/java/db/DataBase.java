@@ -18,6 +18,19 @@ public class DataBase {
         return users.get(userId);
     }
 
+    public static User findUserByIdAndPassword(String userId, String password) {
+        User u = findUserById(userId);
+        if (u == null) {
+            return null;
+        }
+
+        if (u.getPassword().equals(password)) {
+            return u;
+        }
+
+        return null;
+    }
+
     public static Collection<User> findAll() {
         return users.values();
     }

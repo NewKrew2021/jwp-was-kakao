@@ -29,9 +29,10 @@ public class FileUtils {
         FILE_SUFFIX_CONTENT_TYPE_MAP.put(".svg", "image/svg+xml");
         FILE_SUFFIX_CONTENT_TYPE_MAP.put(".png", "image/png");
 
-        FILE_SUFFIX_CONTENT_TYPE_MAP.put(".woff", "application/x-font-woff");
+        FILE_SUFFIX_CONTENT_TYPE_MAP.put(".woff", "font/woff");
+        FILE_SUFFIX_CONTENT_TYPE_MAP.put(".woff2", "font/woff2");
         FILE_SUFFIX_CONTENT_TYPE_MAP.put(".eot", "application/vnd.ms-fontobject");
-        FILE_SUFFIX_CONTENT_TYPE_MAP.put(".ttf", "application/x-font-ttf");
+        FILE_SUFFIX_CONTENT_TYPE_MAP.put(".ttf", "font/ttf");
 
         FILE_SUFFIX_CONTENT_TYPE_MAP.put(".js", "application/js");
     }

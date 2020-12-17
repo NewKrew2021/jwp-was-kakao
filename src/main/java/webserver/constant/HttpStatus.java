@@ -4,7 +4,11 @@ public enum HttpStatus {
 
     OK(200, "OK"),
 
+    FOUND(302, "Found"),
+
     NOT_FOUND(404, "Not Found"),
+    PAYLOAD_TOO_LARGE(413, "Payload Too Large"),
+    UNSUPPORTED_MEDIA_TYPE(415,"Unsupported Media Type"),
 
     INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
     NOT_IMPLEMENTED(501, "Not Implemented")

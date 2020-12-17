@@ -11,16 +11,14 @@ import java.net.URISyntaxException;
 public class MainController {
 
     public static HttpHandler getStaticFileHandler = (method, target, req) ->
-            buildFileHttpResponse("./static" + target);
+            file("./static" + target);
 
     public static HttpHandler getTemplateFileHandler = (method, target, req) ->
-            buildFileHttpResponse("./templates" + target);
+            file("./templates" + target);
 
-    private static HttpResponse buildFileHttpResponse(String resourcePath) throws IOException, URISyntaxException {
-        return HttpResponse.Builder.prepare()
-                .status(HttpStatus.OK)
-                .file(resourcePath, true)
-                .build();
+    // TODO move to super
+    private static HttpResponse file(String resourcePath) throws IOException, URISyntaxException {
+        return new HttpResponse(HttpStatus.OK).setFileAsBody(resourcePath, true, true);
     }
 
 }

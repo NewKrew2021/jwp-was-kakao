@@ -2,6 +2,7 @@ package app;
 
 import app.controllers.HelloController;
 import app.controllers.MainController;
+import app.controllers.UserController;
 import webserver.Router;
 import webserver.WebServer;
 import webserver.constant.HttpMethod;
@@ -38,6 +39,9 @@ public class Application {
         router.addRoute(HttpMethod.GET, "/(css|fonts|images|js)/.+", MainController.getStaticFileHandler);
         router.addRoute(HttpMethod.GET, "/favicon.ico", MainController.getStaticFileHandler);
         router.addRoute(HttpMethod.GET, "/.+\\.html", MainController.getTemplateFileHandler);
+
+        router.addRoute(HttpMethod.POST, "/user/create", UserController.postSignUpHandler);
+        router.addRoute(HttpMethod.POST, "/user/login", UserController.postLoginHandler);
 
         webServer.start(port);
     }

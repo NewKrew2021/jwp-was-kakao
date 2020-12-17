@@ -53,8 +53,6 @@ public class Router {
         return matchedHandler.handle(method, target, req);
     }
 
-    private final static HttpHandler defaultNotFoundHandler = (method, target, req) -> HttpResponse.Builder.prepare()
-            .status(HttpStatus.NOT_FOUND)
-            .build();
+    private final static HttpHandler defaultNotFoundHandler = (method, target, req) -> new HttpResponse(HttpStatus.NOT_FOUND);
 
 }
