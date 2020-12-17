@@ -66,25 +66,7 @@ public class ApplicationTest {
     }
 
     @Test
-    public void helloWebServer() throws IOException {
-        HttpGet httpGet = new HttpGet(DEFAULT_HOST_URL + "/hello");
-        CloseableHttpResponse resp = httpClient.execute(httpGet);
-
-        try {
-            assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-            assertThat(resp.getFirstHeader("x-hello").getValue()).isEqualTo("World!");
-
-            assertThat(EntityUtils.toString(resp.getEntity())).isEqualTo("Hello World!");
-
-        } finally {
-            resp.close();
-        }
-    }
-
-    // TODO not found test
-
-    @Test
-    public void helloStaticFile() throws IOException, URISyntaxException {
+    public void testStaticFile() throws IOException, URISyntaxException {
         String file = "/css/styles.css";
 
         HttpGet httpGet = new HttpGet(DEFAULT_HOST_URL + file);
@@ -106,21 +88,26 @@ public class ApplicationTest {
     }
 
     @Test
-    public void testSignUpAndLogin() throws IOException {
+    public void testSignUpLoginAndList() throws IOException {
+        String userId = "myuserid";
+        String password = "mypassword";
+        String email = "myemail@email.com";
+
         // signup
         HttpPost postSignUp = new HttpPost(DEFAULT_HOST_URL + "/user/create");
 
         postSignUp.setEntity(buildUrlEncodedFormEntity(
-                new BasicNameValuePair("userId", "myuserid"),
-                new BasicNameValuePair("password", "mypassword")));
+                new BasicNameValuePair("userId", userId),
+                new BasicNameValuePair("password", password),
+                new BasicNameValuePair("email", email)));
 
-        CloseableHttpResponse resp = httpClient.execute(postSignUp);
+        CloseableHttpResponse signUpResp = httpClient.execute(postSignUp);
 
         try {
-            assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
-            assertThat(resp.getFirstHeader(HttpHeader.LOCATION).getValue()).isEqualTo("/index.html");
+            assertThat(signUpResp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
+            assertThat(signUpResp.getFirstHeader(HttpHeader.LOCATION).getValue()).isEqualTo("/index.html");
         } finally {
-            resp.close();
+            signUpResp.close();
         }
 
         // login fail
@@ -141,12 +128,11 @@ public class ApplicationTest {
         }
 
         // login
-
         HttpPost postLogin = new HttpPost(DEFAULT_HOST_URL + "/user/login");
 
         postLogin.setEntity(buildUrlEncodedFormEntity(
-                new BasicNameValuePair("userId", "myuserid"),
-                new BasicNameValuePair("password", "mypassword")));
+                new BasicNameValuePair("userId", userId),
+                new BasicNameValuePair("password", password)));
 
         CloseableHttpResponse loginResp = httpClient.execute(postLogin);
 
@@ -156,6 +142,21 @@ public class ApplicationTest {
             assertThat(loginResp.getFirstHeader(HttpHeader.SET_COOKIE).getValue()).contains("logined=true");
         } finally {
             loginResp.close();
+        }
+
+        // list
+        HttpGet getList = new HttpGet(DEFAULT_HOST_URL + "/user/list");
+        CloseableHttpResponse listResp = httpClient.execute(getList);
+
+        try {
+            assertThat(listResp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+
+            String body = EntityUtils.toString(listResp.getEntity());
+
+            assertThat(body).contains(userId);
+            assertThat(body).contains(email);
+        } finally {
+            listResp.close();
         }
     }
 

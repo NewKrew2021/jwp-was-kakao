@@ -5,9 +5,11 @@ import model.User;
 import webserver.HttpHandler;
 import webserver.HttpResponse;
 import webserver.constant.HttpHeader;
-import webserver.constant.HttpStatus;
 
-public class UserController {
+import java.util.HashMap;
+import java.util.Map;
+
+public class UserController extends BaseController {
 
     public static HttpHandler postSignUpHandler = (method, target, req) -> {
         String userId = req.getRequestParam("userId");
@@ -36,17 +38,18 @@ public class UserController {
         return logined();
     };
 
+    public static HttpHandler getListHandler = (method, target, req) -> {
+        Map<String, Object> params = new HashMap<>();
+        params.put("users", DataBase.findAll());
+
+        return template("user/list", params);
+    };
+
     private static HttpResponse logined() {
         String cookieValue = "logined=true; Path=/";
 
         return found("/index.html")
                 .putHeader(HttpHeader.SET_COOKIE, cookieValue);
-    }
-
-    // TODO move to super
-    public static HttpResponse found(String location) {
-        return new HttpResponse(HttpStatus.FOUND)
-                .putHeader(HttpHeader.LOCATION, location);
     }
 
 }

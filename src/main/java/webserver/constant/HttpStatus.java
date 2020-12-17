@@ -6,6 +6,7 @@ public enum HttpStatus {
 
     FOUND(302, "Found"),
 
+    BAD_REQUEST(400, "Bad Request"),
     NOT_FOUND(404, "Not Found"),
     PAYLOAD_TOO_LARGE(413, "Payload Too Large"),
     UNSUPPORTED_MEDIA_TYPE(415,"Unsupported Media Type"),

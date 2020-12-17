@@ -1,7 +1,6 @@
 package app;
 
-import app.controllers.HelloController;
-import app.controllers.MainController;
+import app.controllers.StaticFileController;
 import app.controllers.UserController;
 import webserver.Router;
 import webserver.WebServer;
@@ -34,14 +33,14 @@ public class Application {
     public void run(int port) throws IOException {
         Router router = webServer.getRouter();
 
-        router.addRoute(HttpMethod.GET, "/hello", HelloController.getHelloHandler);
-
-        router.addRoute(HttpMethod.GET, "/(css|fonts|images|js)/.+", MainController.getStaticFileHandler);
-        router.addRoute(HttpMethod.GET, "/favicon.ico", MainController.getStaticFileHandler);
-        router.addRoute(HttpMethod.GET, "/.+\\.html", MainController.getTemplateFileHandler);
-
         router.addRoute(HttpMethod.POST, "/user/create", UserController.postSignUpHandler);
         router.addRoute(HttpMethod.POST, "/user/login", UserController.postLoginHandler);
+        router.addRoute(HttpMethod.GET, "/user/list", UserController.getListHandler);
+        router.addRoute(HttpMethod.GET, "/user/list.html", UserController.getListHandler);
+
+        router.addRoute(HttpMethod.GET, "/(css|fonts|images|js)/.+", StaticFileController.getStaticFileHandler);
+        router.addRoute(HttpMethod.GET, "/favicon.ico", StaticFileController.getStaticFileHandler);
+        router.addRoute(HttpMethod.GET, "/.+\\.html", StaticFileController.getStaticTemplateFileHandler);
 
         webServer.start(port);
     }

@@ -29,8 +29,12 @@ public class HttpException extends Exception {
         return new HttpException(HttpStatus.NOT_FOUND, null);
     }
 
+    public static HttpException badRequest() {
+        return new HttpException(HttpStatus.BAD_REQUEST, null);
+    }
+
     public HttpResponse toHttpResponse() {
-        return new HttpResponse(httpStatus).setBody(message.getBytes(), true);
+        return new HttpResponse(httpStatus).setBody(message.getBytes());
     }
 
 }

@@ -32,9 +32,17 @@ public class HttpResponse {
         this(httpStatus.getStatusCode(), httpStatus.getReasonPhrase());
     }
 
+    public HttpResponse() {
+        this(HttpStatus.OK);
+    }
+
     public HttpResponse putHeader(String k, String v) {
         loweredKeyHeaders.put(k.toLowerCase(), v);
         return this;
+    }
+
+    public HttpResponse setBody(byte[] body) {
+        return setBody(body, true);
     }
 
     public HttpResponse setBody(byte[] body, boolean setContentLength) {
@@ -45,6 +53,10 @@ public class HttpResponse {
         }
 
         return this;
+    }
+
+    public HttpResponse setFileAsBody(String resourcePath) throws IOException, URISyntaxException {
+        return setFileAsBody(resourcePath, true, true);
     }
 
     public HttpResponse setFileAsBody(String resourcePath, boolean setContentLength, boolean guessContentType) throws IOException, URISyntaxException {

@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class HttpRequest {
 
@@ -30,24 +31,26 @@ public class HttpRequest {
 
     private ParamMap requestParams = new ParamMap();
 
-    public HttpRequest(String firstLine, BufferedReader br) throws IOException, HttpException {
+    public HttpRequest(String firstLine, BufferedReader br) throws HttpException {
         parse(firstLine, br);
     }
 
-    public boolean parse(String requestLine, BufferedReader br) throws IOException, HttpException {
-        // TODO throw 400 if fail
+    public void parse(String requestLine, BufferedReader br) throws HttpException {
+        try {
+            readRequestLine(requestLine);
 
-        readRequestLine(requestLine);
+            readHeaders(br);
 
-        readHeaders(br);
+            // TODO check host header
 
-        // TODO check host header
+            readBody(br);
 
-        readBody(br);
+            readRequestParamsFromBody();
+        } catch (Exception e) {
+            logger.error("fail to parse http req", e);
 
-        readRequestParamsFromBody();
-
-        return true;
+            throw HttpException.badRequest();
+        }
     }
 
     private void readRequestParamsFromBody() throws HttpException {
@@ -57,7 +60,7 @@ public class HttpRequest {
             // check charset first
             int paramIndex = mediaType.indexOf(";");
             if (paramIndex >= 0) {
-                ParamMap mediaTypeParams = new ParamMap(mediaType.substring(paramIndex));
+                ParamMap mediaTypeParams = new ParamMap(mediaType.substring(paramIndex), ";", "=", Function.identity());
 
                 String charset = mediaTypeParams.getOrDefault(CONTENT_TYPE_PARAM_CHARSET, DEFAULT_CHARSET);
 
@@ -70,7 +73,7 @@ public class HttpRequest {
         }
     }
 
-    private boolean readRequestLine(String requestLine) throws IOException, HttpException {
+    private boolean readRequestLine(String requestLine) throws HttpException {
         logger.debug("{}", requestLine);
 
         String[] split = requestLine.split(HttpMessage.SP);

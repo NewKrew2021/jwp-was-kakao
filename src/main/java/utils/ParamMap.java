@@ -8,17 +8,10 @@ import java.util.stream.Collectors;
 
 public class ParamMap {
 
-    private static final String DEFAULT_LIST_DELIM = ";";
-    private static final String DEFAULT_KEY_VALUE_DELIM = "=";
-
     private Map<String, String> kvMap;
 
     public ParamMap() {
         kvMap = new HashMap<>();
-    }
-
-    public ParamMap(String s) {
-        this(s, DEFAULT_LIST_DELIM, DEFAULT_KEY_VALUE_DELIM, Function.identity());
     }
 
     public ParamMap(String s, String listDelim, String kvDelim, Function<String, String> applyToValue) {
@@ -39,10 +32,6 @@ public class ParamMap {
 
     public String getOrDefault(String k, String defaultValue) {
         return kvMap.getOrDefault(k, defaultValue);
-    }
-
-    public String join() {
-        return join(DEFAULT_LIST_DELIM, DEFAULT_KEY_VALUE_DELIM);
     }
 
     public String join(String listDelim, String kvDelim) {

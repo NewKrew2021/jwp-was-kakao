@@ -15,7 +15,7 @@ public class FileUtils {
         return Files.readAllBytes(path);
     }
 
-    private final static Map<String, String> FILE_SUFFIX_CONTENT_TYPE_MAP = new HashMap<>();
+    private static final Map<String, String> FILE_SUFFIX_CONTENT_TYPE_MAP = new HashMap<>();
     private static final String UNKNOWN_CONTENT_TYPE = "application/octet-stream";
 
     static {
