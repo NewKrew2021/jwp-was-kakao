@@ -12,6 +12,7 @@ import webserver.response.HttpResponse;
 import java.io.DataOutputStream;
 import java.lang.reflect.Method;
 
+import static context.ApplicationContext.sessionRegistry;
 import static context.ApplicationContext.viewResolver;
 
 public class Dispatcher {
@@ -19,8 +20,10 @@ public class Dispatcher {
 
     public void dispatch(HttpRequest request, DataOutputStream out) {
         try {
-            HttpResponse response = HttpResponse.ok(request);
-            dispatch(request, response);
+            String sessionId = getSessionId(request);
+            HttpSession httpSession = sessionRegistry.getSession(sessionId);
+            HttpResponse response = HttpResponse.ok(request, sessionId);
+            dispatch(request, response, httpSession);
             response.write(out);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -28,14 +31,22 @@ public class Dispatcher {
         }
     }
 
-    private void dispatch(HttpRequest request, HttpResponse response) {
+    private String getSessionId(HttpRequest request) {
+        String sessionId = request.getSessionId();
+        if (!sessionRegistry.hasSession(sessionId)) {
+            sessionId = sessionRegistry.createSession();
+        }
+        return sessionId;
+    }
+
+    private void dispatch(HttpRequest request, HttpResponse response, HttpSession httpSession) {
         Method method = findControllerMethod(request);
         Model model = Model.empty();
         if (method == null) {
             dispatchResource(request, response);
             return;
         }
-        dispatchWithHandler(request, response, method, model);
+        dispatchWithHandler(request, response, method, model, httpSession);
     }
 
     private Method findControllerMethod(HttpRequest request) {
@@ -56,12 +67,19 @@ public class Dispatcher {
         }
     }
 
-    private void dispatchWithHandler(HttpRequest request, HttpResponse response, Method method, Model model) {
+    private void dispatchWithHandler(HttpRequest request, HttpResponse response, Method method, Model model, HttpSession httpSession) {
         if (requireRequestAndResponse(method)) {
             invokeMethod(request, response, method);
         }
+        if (requireRequestAndResponseAndSession(method)) {
+            invokeMethod(request, method, response, httpSession);
+        }
         if (requireRequestAndResponseAndModel(method)) {
             String viewPath = invokeMethod(request, method, response, model);
+            dispatchModelAndView(response, model, viewPath);
+        }
+        if (requireRequestAndResponseAndModelAndSession(method)) {
+            String viewPath = invokeMethod(request, method, response, model, httpSession);
             dispatchModelAndView(response, model, viewPath);
         }
     }
@@ -74,6 +92,35 @@ public class Dispatcher {
         if (!parameterTypes[0].equals(HttpRequest.class) ||
                 !parameterTypes[1].equals(HttpResponse.class) ||
                 !parameterTypes[2].equals(Model.class)
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean requireRequestAndResponseAndModelAndSession(Method method) {
+        if (method.getParameterCount() != 4) {
+            return false;
+        }
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (!parameterTypes[0].equals(HttpRequest.class) ||
+                !parameterTypes[1].equals(HttpResponse.class) ||
+                !parameterTypes[2].equals(Model.class) ||
+                !parameterTypes[3].equals(HttpSession.class)
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean requireRequestAndResponseAndSession(Method method) {
+        if (method.getParameterCount() != 3) {
+            return false;
+        }
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (!parameterTypes[0].equals(HttpRequest.class) ||
+                !parameterTypes[1].equals(HttpResponse.class) ||
+                !parameterTypes[2].equals(HttpSession.class)
         ) {
             return false;
         }
@@ -115,5 +162,23 @@ public class Dispatcher {
         }
     }
 
+
+    private String invokeMethod(HttpRequest request, Method method, HttpResponse response, Model model, HttpSession httpSession) {
+        try {
+            return (String) method.invoke(getController(request), request, response, model, httpSession);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void invokeMethod(HttpRequest request, Method method, HttpResponse response, HttpSession httpSession) {
+        try {
+            method.invoke(getController(request), request, response, httpSession);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 
 }

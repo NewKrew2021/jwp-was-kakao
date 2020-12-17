@@ -1,6 +1,7 @@
 package webserver.request;
 
 import org.springframework.http.HttpMethod;
+import webserver.Cookie;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,5 +76,14 @@ public class HttpRequest {
 
     public RequestHeader getHeader() {
         return header;
+    }
+
+    public String getSessionId() {
+        return getHeader().getCookies()
+                .stream()
+                .filter(cookie -> cookie.getName().equals("sessionId"))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 }

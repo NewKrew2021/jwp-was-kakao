@@ -27,6 +27,12 @@ public class ResponseHeader {
         return new ResponseHeader(request.getProtocol(), HttpStatus.OK, new ArrayList<>());
     }
 
+    public static ResponseHeader ok(HttpRequest request, String sessionId) {
+        ResponseHeader responseHeader = new ResponseHeader(request.getProtocol(), HttpStatus.OK, new ArrayList<>());
+        responseHeader.setCookie(new Cookie("sessionId", sessionId, "/"));
+        return responseHeader;
+    }
+
     public static ResponseHeader error() {
         return new ResponseHeader(Protocol.HTTP, HttpStatus.INTERNAL_SERVER_ERROR, Collections.emptyList());
     }
