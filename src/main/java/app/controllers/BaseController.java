@@ -27,7 +27,7 @@ public class BaseController {
         handlebars = new Handlebars(loader);
     }
 
-    public static HttpHandler index = req -> found("index.html");
+    public static HttpHandler index = req -> found("/index.html");
 
     protected static HttpResponse found(String location) {
         return new HttpResponse(HttpStatus.FOUND)
