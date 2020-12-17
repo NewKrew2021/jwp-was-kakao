@@ -73,7 +73,6 @@ public class HttpResponse {
         return loweredKeyHeaders.get(key.toLowerCase());
     }
 
-    // TODO extract to buildPayloadString?
     @Override
     public String toString() {
         String payload = "";

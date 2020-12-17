@@ -1,7 +1,7 @@
 package app.controllers;
 
-import db.DataBase;
-import model.User;
+import app.db.DataBase;
+import app.model.User;
 import webserver.HttpHandler;
 import webserver.HttpResponse;
 import webserver.constant.HttpHeader;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class UserController extends BaseController {
 
-    public static HttpHandler postSignUpHandler = (method, target, req) -> {
+    public static HttpHandler postSignUpHandler = req -> {
         String userId = req.getRequestParam("userId");
         String password = req.getRequestParam("password");
         String name = req.getRequestParam("name");
@@ -24,7 +24,7 @@ public class UserController extends BaseController {
         return logined();
     };
 
-    public static HttpHandler postLoginHandler = (method, target, req) -> {
+    public static HttpHandler postLoginHandler = req -> {
         String userId = req.getRequestParam("userId");
         String password = req.getRequestParam("password");
 
@@ -38,7 +38,7 @@ public class UserController extends BaseController {
         return logined();
     };
 
-    public static HttpHandler getListHandler = (method, target, req) -> {
+    public static HttpHandler getListHandler = req -> {
         Map<String, Object> params = new HashMap<>();
         params.put("users", DataBase.findAll());
 

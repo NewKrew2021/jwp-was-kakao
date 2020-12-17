@@ -4,9 +4,9 @@ import webserver.HttpHandler;
 
 public class StaticFileController extends BaseController {
 
-    public static HttpHandler getStaticFileHandler = (method, target, req) ->
-            file("./static" + target);
+    public static HttpHandler getStaticFileHandler = req ->
+            file("./static" + req.getTarget());
 
-    public static HttpHandler getStaticTemplateFileHandler = (method, target, req) ->
-            file("./templates" + target);
+    public static HttpHandler getStaticTemplateFileHandler = req ->
+            file("./templates" + req.getTarget());
 }

@@ -1,10 +1,12 @@
 package app;
 
+import app.controllers.BaseController;
 import app.controllers.StaticFileController;
 import app.controllers.UserController;
 import webserver.Router;
 import webserver.WebServer;
 import webserver.constant.HttpMethod;
+import webserver.constant.HttpStatus;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -32,6 +34,8 @@ public class Application {
 
     public void run(int port) throws IOException {
         Router router = webServer.getRouter();
+
+        router.addRoute(HttpMethod.GET, "/", BaseController.index);
 
         router.addRoute(HttpMethod.POST, "/user/create", UserController.postSignUpHandler);
         router.addRoute(HttpMethod.POST, "/user/login", UserController.postLoginHandler);

@@ -4,6 +4,7 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import webserver.HttpHandler;
 import webserver.HttpResponse;
 import webserver.constant.HttpHeader;
 import webserver.constant.HttpStatus;
@@ -25,6 +26,8 @@ public class BaseController {
 
         handlebars = new Handlebars(loader);
     }
+
+    public static HttpHandler index = req -> found("index.html");
 
     protected static HttpResponse found(String location) {
         return new HttpResponse(HttpStatus.FOUND)

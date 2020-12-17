@@ -50,9 +50,9 @@ public class Router {
                 .findFirst()
                 .orElse(defaultNotFoundHandler);
 
-        return matchedHandler.handle(method, target, req);
+        return matchedHandler.handle(req);
     }
 
-    private final static HttpHandler defaultNotFoundHandler = (method, target, req) -> new HttpResponse(HttpStatus.NOT_FOUND);
+    private final static HttpHandler defaultNotFoundHandler = req -> new HttpResponse(HttpStatus.NOT_FOUND);
 
 }
