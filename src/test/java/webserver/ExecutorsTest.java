@@ -2,7 +2,7 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StopWatch;
+//import org.springframework.util.StopWatch;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,8 +17,8 @@ public class ExecutorsTest {
     public static void main(String[] args) throws Exception {
         ExecutorService es = Executors.newFixedThreadPool(100);
 
-        StopWatch sw = new StopWatch();
-        sw.start();
+//        StopWatch sw = new StopWatch();
+//        sw.start();
         for (int i = 0; i < 100; i++) {
             es.execute(() -> {
                 int idx = counter.addAndGet(1);
@@ -30,11 +30,11 @@ public class ExecutorsTest {
                 logger.info("Thread {}", idx);
             });
         }
-        sw.stop();
+//        sw.stop();
 
         es.shutdown();
         es.awaitTermination(100, TimeUnit.SECONDS);
-        logger.info("Total Elaspsed: {}", sw.getTotalTimeSeconds());
+//        logger.info("Total Elaspsed: {}", sw.getTotalTimeSeconds());
     }
 }
 

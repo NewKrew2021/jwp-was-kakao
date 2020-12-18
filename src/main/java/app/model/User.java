@@ -1,8 +1,8 @@
-package model;
+package app.model;
 
 public class User {
     private String userId;
-    private String password;
+    private String password; // FIXME should be hashed
     private String name;
     private String email;
 
