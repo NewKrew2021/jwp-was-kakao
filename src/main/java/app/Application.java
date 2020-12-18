@@ -14,8 +14,6 @@ public class Application {
 
     private static final int DEFAULT_PORT = 8080;
 
-    private WebServer webServer;
-
     public static void main(String args[]) throws IOException {
         int port = 0;
         if (args == null || args.length == 0) {
@@ -26,6 +24,8 @@ public class Application {
 
         new Application().run(port);
     }
+
+    private WebServer webServer;
 
     public Application() {
         this.webServer = new WebServer();

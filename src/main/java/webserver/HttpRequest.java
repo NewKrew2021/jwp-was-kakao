@@ -53,31 +53,6 @@ public class HttpRequest {
         }
     }
 
-    private void readCookieFromHeaders() {
-        String c = getFirstHeaderValue(HttpHeader.COOKIE);
-        cookie = new Cookie(c);
-    }
-
-    private void readRequestParamsFromBody() throws HttpException {
-        String mediaType = getFirstHeaderValue(HttpHeader.CONTENT_TYPE);
-
-        if (mediaType != null && mediaType.startsWith(CONTENT_TYPE_FORM_URL_ENCODED)) {
-            // check charset first
-            int paramIndex = mediaType.indexOf(";");
-            if (paramIndex >= 0) {
-                ParamMap mediaTypeParams = new ParamMap(mediaType.substring(paramIndex), ";", "=", Function.identity());
-
-                String charset = mediaTypeParams.getOrDefault(CONTENT_TYPE_PARAM_CHARSET, DEFAULT_CHARSET);
-
-                if (charset != DEFAULT_CHARSET) {
-                    throw new HttpException(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-                }
-            }
-
-            requestParams = new ParamMap(new String(body), "&", "=", v -> Utils.decodeUrl(v));
-        }
-    }
-
     private boolean readRequestLine(String requestLine) throws HttpException {
         String[] split = requestLine.split(HttpMessage.SP);
 
@@ -122,6 +97,31 @@ public class HttpRequest {
 
             logger.debug("<< (body) {} bytes", clen);
         }
+    }
+
+    private void readRequestParamsFromBody() throws HttpException {
+        String mediaType = getFirstHeaderValue(HttpHeader.CONTENT_TYPE);
+
+        if (mediaType != null && mediaType.startsWith(CONTENT_TYPE_FORM_URL_ENCODED)) {
+            // check charset first
+            int paramIndex = mediaType.indexOf(";");
+            if (paramIndex >= 0) {
+                ParamMap mediaTypeParams = new ParamMap(mediaType.substring(paramIndex), ";", "=", Function.identity());
+
+                String charset = mediaTypeParams.getOrDefault(CONTENT_TYPE_PARAM_CHARSET, DEFAULT_CHARSET);
+
+                if (charset != DEFAULT_CHARSET) {
+                    throw new HttpException(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+                }
+            }
+
+            requestParams = new ParamMap(new String(body), "&", "=", v -> Utils.decodeUrl(v));
+        }
+    }
+
+    private void readCookieFromHeaders() {
+        String c = getFirstHeaderValue(HttpHeader.COOKIE);
+        cookie = new Cookie(c);
     }
 
     public String getMethod() {
