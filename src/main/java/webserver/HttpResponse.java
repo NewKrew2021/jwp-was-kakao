@@ -9,7 +9,7 @@ import webserver.constant.HttpStatus;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HttpResponse {
@@ -18,13 +18,13 @@ public class HttpResponse {
 
     private int statusCode;
     private String reasonPhrase;
-    private Map<String, String> loweredKeyHeaders;
+    private HttpHeaders httpHeaders;
     private byte[] body;
 
     public HttpResponse(int statusCode, String reasonPhrase) {
         this.statusCode = statusCode;
         this.reasonPhrase = reasonPhrase;
-        this.loweredKeyHeaders = new HashMap<>();
+        this.httpHeaders = new HttpHeaders();
         this.body = new byte[0];
     }
 
@@ -36,8 +36,14 @@ public class HttpResponse {
         this(HttpStatus.OK);
     }
 
-    public HttpResponse putHeader(String k, String v) {
-        loweredKeyHeaders.put(k.toLowerCase(), v);
+    public HttpResponse addHeader(String k, String v) {
+        httpHeaders.addHeader(k, v);
+        return this;
+    }
+
+    public HttpResponse putCookie(Cookie c) {
+        HttpHeaders setCookieHeaders = c.buildSetCookieHeaders();
+        httpHeaders.addHeaders(setCookieHeaders);
         return this;
     }
 
@@ -49,7 +55,7 @@ public class HttpResponse {
         this.body = body;
 
         if (setContentLength) {
-            putHeader(HttpHeader.CONTENT_LENGTH, Integer.toString(body.length));
+            addHeader(HttpHeader.CONTENT_LENGTH, Integer.toString(body.length));
         }
 
         return this;
@@ -63,14 +69,10 @@ public class HttpResponse {
         byte[] bytes = FileUtils.loadFileFromClasspath(resourcePath);
 
         if (guessContentType) {
-            putHeader(HttpHeader.CONTENT_TYPE, FileUtils.guessContentType(resourcePath));
+            addHeader(HttpHeader.CONTENT_TYPE, FileUtils.guessContentType(resourcePath));
         }
 
         return setBody(bytes, setContentLength);
-    }
-
-    public String getHeaderValue(String key) {
-        return loweredKeyHeaders.get(key.toLowerCase());
     }
 
     @Override
@@ -82,11 +84,13 @@ public class HttpResponse {
 
         payload += respLine + HttpMessage.CRLF;
 
-        for (Map.Entry<String, String> headerEntry : loweredKeyHeaders.entrySet()) {
-            String header = String.format("%s: %s", headerEntry.getKey(), headerEntry.getValue());
-            logger.debug(">> {}", header);
+        for (Map.Entry<String, List<String>> headerEntry : httpHeaders.entrySet()) {
+            for (String headerVal : headerEntry.getValue()) {
+                String header = String.format("%s: %s", headerEntry.getKey(), headerVal);
+                logger.debug(">> {}", header);
 
-            payload += header + HttpMessage.CRLF;
+                payload += header + HttpMessage.CRLF;
+            }
         }
 
         payload += HttpMessage.CRLF;

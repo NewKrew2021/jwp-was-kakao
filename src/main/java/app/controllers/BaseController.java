@@ -31,7 +31,7 @@ public class BaseController {
 
     protected static HttpResponse found(String location) {
         return new HttpResponse(HttpStatus.FOUND)
-                .putHeader(HttpHeader.LOCATION, location);
+                .addHeader(HttpHeader.LOCATION, location);
     }
 
     protected static HttpResponse template(String templateName, Map<String, Object> params) throws IOException {
@@ -39,7 +39,7 @@ public class BaseController {
         Template template = handlebars.compile(templateName);
 
         return new HttpResponse()
-                .putHeader(HttpHeader.CONTENT_TYPE, DEFAULT_TEMPLATE_CONTENT_TYPE)
+                .addHeader(HttpHeader.CONTENT_TYPE, DEFAULT_TEMPLATE_CONTENT_TYPE)
                 .setBody(template.apply(params).getBytes());
     }
 

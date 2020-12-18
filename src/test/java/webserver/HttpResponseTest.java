@@ -10,7 +10,7 @@ public class HttpResponseTest {
     @Test
     public void testBasicResponse() {
         String resp = new HttpResponse(HttpStatus.OK)
-                .putHeader("x-hello", "world!")
+                .addHeader("x-hello", "world!")
                 .setBody("hello response!".getBytes(), true)
                 .toString();
 

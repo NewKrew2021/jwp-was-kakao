@@ -2,9 +2,9 @@ package app.controllers;
 
 import app.db.DataBase;
 import app.model.User;
+import webserver.Cookie;
 import webserver.HttpHandler;
 import webserver.HttpResponse;
-import webserver.constant.HttpHeader;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +39,12 @@ public class UserController extends BaseController {
     };
 
     public static HttpHandler getListHandler = req -> {
+        String logined = req.getCookie().getValueOrDefault("logined", "");
+
+        if (!logined.equalsIgnoreCase("true")) {
+            return found("/user/login.html");
+        }
+
         Map<String, Object> params = new HashMap<>();
         params.put("users", DataBase.findAll());
 
@@ -46,10 +52,10 @@ public class UserController extends BaseController {
     };
 
     private static HttpResponse logined() {
-        String cookieValue = "logined=true; Path=/";
-
         return found("/index.html")
-                .putHeader(HttpHeader.SET_COOKIE, cookieValue);
+                .putCookie(new Cookie()
+                        .putValue("logined", "true")
+                        .putAttribute("Path=/"));
     }
 
 }

@@ -6,7 +6,7 @@ public class HelloController {
 
     public static HttpHandler getHelloHandler = req ->
             new HttpResponse(HttpStatus.OK)
-                    .putHeader("X-Hello", "World!")
+                    .addHeader("X-Hello", "World!")
                     .setBody("Hello World!".getBytes());
 
 }

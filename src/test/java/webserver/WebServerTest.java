@@ -1,5 +1,6 @@
 package webserver;
 
+import helper.TestHelper;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -44,7 +45,7 @@ public class WebServerTest {
 
         startSignal.await();
 
-        httpClient = HttpClients.createDefault();
+        httpClient = TestHelper.testHttpClient().build();
     }
 
     @AfterAll

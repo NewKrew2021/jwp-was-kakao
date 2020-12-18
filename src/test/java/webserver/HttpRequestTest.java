@@ -32,8 +32,8 @@ public class HttpRequestTest {
 
         assertThat(req.getMethod()).isEqualTo("POST");
         assertThat(req.getTarget()).isEqualTo("/user/create");
-        assertThat(req.getHeaderValue("Host")).isEqualTo("localhost:8080");
-        assertThat(req.getHeaderValueInt("Content-Length")).isEqualTo(body.length());
+        assertThat(req.getFirstHeaderValue("Host")).isEqualTo("localhost:8080");
+        assertThat(req.getFirstHeaderValueInt("Content-Length")).isEqualTo(body.length());
 
         assertThat(req.getRequestParam("userId")).isEqualTo("javajigi");
         assertThat(req.getRequestParam("password")).isEqualTo("password");

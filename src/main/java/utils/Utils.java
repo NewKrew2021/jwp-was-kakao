@@ -35,4 +35,7 @@ public class Utils {
         }
     }
 
+    public static boolean isNotEmtpy(String s) {
+        return s != null && s.length() > 0;
+    }
 }

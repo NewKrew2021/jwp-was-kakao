@@ -6,7 +6,6 @@ import app.controllers.UserController;
 import webserver.Router;
 import webserver.WebServer;
 import webserver.constant.HttpMethod;
-import webserver.constant.HttpStatus;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;

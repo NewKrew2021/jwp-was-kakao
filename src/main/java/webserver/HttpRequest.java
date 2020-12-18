@@ -10,8 +10,6 @@ import webserver.constant.HttpStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 public class HttpRequest {
@@ -26,9 +24,10 @@ public class HttpRequest {
     private String method;
     private String target;
     private String httpVersion;
-    private Map<String, String> headerLoweredKeyValue;
+    private HttpHeaders httpHeaders;
     private char[] body;
 
+    private Cookie cookie;
     private ParamMap requestParams = new ParamMap();
 
     public HttpRequest(String firstLine, BufferedReader br) throws HttpException {
@@ -45,6 +44,7 @@ public class HttpRequest {
 
             readBody(br);
 
+            readCookieFromHeaders();
             readRequestParamsFromBody();
         } catch (Exception e) {
             logger.error("fail to parse http req", e);
@@ -53,8 +53,13 @@ public class HttpRequest {
         }
     }
 
+    private void readCookieFromHeaders() {
+        String c = getFirstHeaderValue(HttpHeader.COOKIE);
+        cookie = new Cookie(c);
+    }
+
     private void readRequestParamsFromBody() throws HttpException {
-        String mediaType = getHeaderValue(HttpHeader.CONTENT_TYPE);
+        String mediaType = getFirstHeaderValue(HttpHeader.CONTENT_TYPE);
 
         if (mediaType != null && mediaType.startsWith(CONTENT_TYPE_FORM_URL_ENCODED)) {
             // check charset first
@@ -74,8 +79,6 @@ public class HttpRequest {
     }
 
     private boolean readRequestLine(String requestLine) throws HttpException {
-        logger.debug("{}", requestLine);
-
         String[] split = requestLine.split(HttpMessage.SP);
 
         method = split[0];
@@ -92,24 +95,24 @@ public class HttpRequest {
     }
 
     private void readHeaders(BufferedReader br) throws IOException {
-        headerLoweredKeyValue = new HashMap<>();
+        httpHeaders = new HttpHeaders();
 
         String header;
         while (!(header = br.readLine()).equals("")) {
             String[] headerKv = header.split(":", 2);
 
-            String key = headerKv[0];
-            String value = headerKv[1].trim();
+            String k = headerKv[0];
+            String v = headerKv[1].trim();
 
-            headerLoweredKeyValue.put(key.toLowerCase(), value);
+            httpHeaders.addHeader(k, v);
 
-            logger.debug("<< {} : {}", key, value);
+            logger.debug("<< {} : {}", k, v);
         }
     }
 
     private void readBody(BufferedReader br) throws HttpException, IOException {
-        if (getHeaderValue(HttpHeader.CONTENT_LENGTH) != null) {
-            int clen = getHeaderValueInt(HttpHeader.CONTENT_LENGTH);
+        if (getFirstHeaderValue(HttpHeader.CONTENT_LENGTH) != null) {
+            int clen = getFirstHeaderValueInt(HttpHeader.CONTENT_LENGTH);
             if (clen > Integer.MAX_VALUE) {
                 throw new HttpException(HttpStatus.PAYLOAD_TOO_LARGE);
             }
@@ -129,16 +132,19 @@ public class HttpRequest {
         return target;
     }
 
-    public String getHeaderValue(String key) {
-        return headerLoweredKeyValue.get(key.toLowerCase());
+    public String getFirstHeaderValue(String key) {
+        return httpHeaders.getFirstHeaderValue(key);
     }
 
-    public int getHeaderValueInt(String key) {
-        return Integer.parseInt(getHeaderValue(key));
+    public int getFirstHeaderValueInt(String key) {
+        return Integer.parseInt(getFirstHeaderValue(key));
     }
 
     public String getRequestParam(String key) {
         return requestParams.get(key);
     }
 
+    public Cookie getCookie() {
+        return cookie;
+    }
 }

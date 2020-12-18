@@ -1,5 +1,6 @@
 package app;
 
+import helper.TestHelper;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -8,13 +9,11 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import utils.FileUtils;
 import webserver.constant.HttpHeader;
 
@@ -35,13 +34,31 @@ public class ApplicationTest {
     private static final String DEFAULT_HOST_URL = "http://localhost:" + DEFAULT_PORT;
 
     private static ExecutorService executorService;
-    private static CloseableHttpClient httpClient;
+
+    private static BasicCookieStore cookieStore;
+    private static CloseableHttpClient httpCookieClient;    // rebuild for each test
 
     @BeforeAll
     public static void init() throws InterruptedException {
         startApplication();
+    }
 
-        httpClient = HttpClients.createDefault();
+    @AfterAll
+    public static void tearDown() {
+        executorService.shutdown();
+    }
+
+    @BeforeEach
+    public void before() {
+        cookieStore = new BasicCookieStore();
+        httpCookieClient = TestHelper.testHttpClient()
+                .setDefaultCookieStore(cookieStore)
+                .build();
+    }
+
+    @AfterEach
+    public void after() throws IOException {
+        httpCookieClient.close();
     }
 
     private static void startApplication() throws InterruptedException {
@@ -58,19 +75,12 @@ public class ApplicationTest {
         startSignal.await();
     }
 
-    @AfterAll
-    public static void tearDown() throws IOException {
-        httpClient.close();
-
-        executorService.shutdown();
-    }
-
     @Test
     public void testStaticFile() throws IOException, URISyntaxException {
         String file = "/css/styles.css";
 
         HttpGet httpGet = new HttpGet(DEFAULT_HOST_URL + file);
-        CloseableHttpResponse resp = httpClient.execute(httpGet);
+        CloseableHttpResponse resp = httpCookieClient.execute(httpGet);
 
         try {
             assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
@@ -101,7 +111,7 @@ public class ApplicationTest {
                 new BasicNameValuePair("password", password),
                 new BasicNameValuePair("email", email)));
 
-        CloseableHttpResponse signUpResp = httpClient.execute(postSignUp);
+        CloseableHttpResponse signUpResp = httpCookieClient.execute(postSignUp);
 
         try {
             assertThat(signUpResp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
@@ -117,7 +127,7 @@ public class ApplicationTest {
                 new BasicNameValuePair("userId", "not_my_id"),
                 new BasicNameValuePair("password", "not_my_pw")));
 
-        CloseableHttpResponse loginFailResp = httpClient.execute(postLoginFail);
+        CloseableHttpResponse loginFailResp = httpCookieClient.execute(postLoginFail);
 
         try {
             assertThat(loginFailResp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
@@ -134,7 +144,7 @@ public class ApplicationTest {
                 new BasicNameValuePair("userId", userId),
                 new BasicNameValuePair("password", password)));
 
-        CloseableHttpResponse loginResp = httpClient.execute(postLogin);
+        CloseableHttpResponse loginResp = httpCookieClient.execute(postLogin);
 
         try {
             assertThat(loginResp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
@@ -146,7 +156,7 @@ public class ApplicationTest {
 
         // list
         HttpGet getList = new HttpGet(DEFAULT_HOST_URL + "/user/list");
-        CloseableHttpResponse listResp = httpClient.execute(getList);
+        CloseableHttpResponse listResp = httpCookieClient.execute(getList);
 
         try {
             assertThat(listResp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
@@ -155,6 +165,21 @@ public class ApplicationTest {
 
             assertThat(body).contains(userId);
             assertThat(body).contains(email);
+        } finally {
+            listResp.close();
+        }
+    }
+
+    @Test
+    public void testNoLoginAndNoList() throws IOException {
+        // list
+        HttpGet getList = new HttpGet(DEFAULT_HOST_URL + "/user/list");
+        CloseableHttpResponse listResp = httpCookieClient.execute(getList);
+
+        try {
+            assertThat(listResp.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_MOVED_TEMPORARILY);
+
+            assertThat(listResp.getFirstHeader(HttpHeader.LOCATION).getValue()).isEqualTo("/user/login.html");
         } finally {
             listResp.close();
         }
