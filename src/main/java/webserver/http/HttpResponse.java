@@ -21,11 +21,29 @@ public class HttpResponse {
         this.responseHeaders = new HashMap<>();
     }
 
+    public void addHeaderValue(String key, String value) {
+        responseHeaders.put(key, value);
+    }
+
+    private void responseHeader() {
+        try {
+            for (String key : responseHeaders.keySet()) {
+                String value = responseHeaders.get(key);
+                String header = key + ": " + value + "\r\n";
+
+                dos.writeBytes(header);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+        }
+    }
+
     public void response200Header(int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: " + contentType + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            responseHeader();
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -44,6 +62,7 @@ public class HttpResponse {
     public void response404Header() {
         try {
             dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            responseHeader();
             dos.writeBytes("\r\n");
 
         } catch (IOException e) {
@@ -56,6 +75,7 @@ public class HttpResponse {
         try {
             dos.writeBytes("HTTP/1.1 302 Found " + "\r\n");
             dos.writeBytes("Location: " + location + "\r\n");
+            responseHeader();
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());

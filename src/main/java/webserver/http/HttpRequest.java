@@ -3,6 +3,7 @@ package webserver.http;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.parser.CookieParser;
 
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
@@ -10,11 +11,14 @@ public class HttpRequest {
     private final HttpRequestLine line;
     private final HttpRequestHeader header;
     private final ParameterBag params;
+    private final Cookie cookie;
 
     public HttpRequest(HttpRequestLine line, HttpRequestHeader header, ParameterBag params) {
         this.line = line;
         this.header = header;
         this.params = params;
+
+        this.cookie = CookieParser.parse(header.getHeader("Cookie"));
     }
 
     public boolean isMethod(HttpMethod method) {
@@ -64,5 +68,17 @@ public class HttpRequest {
             return "image/png";
         }
         return "text/html";
+    }
+
+    public String getCookie(String key) {
+        return cookie.getCookie(key);
+    }
+
+    public boolean isGetMethod() {
+        return isMethod(HttpMethod.GET);
+    }
+
+    public boolean isPostMethod() {
+        return isMethod(HttpMethod.POST);
     }
 }

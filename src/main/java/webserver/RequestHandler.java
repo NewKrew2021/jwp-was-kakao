@@ -32,6 +32,8 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error("IOException occur!");
             logger.error(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
