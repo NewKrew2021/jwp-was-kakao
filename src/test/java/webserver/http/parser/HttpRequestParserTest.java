@@ -8,6 +8,7 @@ import webserver.http.HttpRequest;
 import java.io.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpRequestParserTest {
 
@@ -20,6 +21,7 @@ public class HttpRequestParserTest {
         HttpRequest httpRequest = HttpRequestParser.fromInputStream(in);
         assertThat(httpRequest.isMethod(HttpMethod.GET)).isTrue();
     }
+
     @Test
     @DisplayName("루트 주소로 POST 요청을 보냄")
     void isPostMethod() throws Exception {
@@ -27,6 +29,29 @@ public class HttpRequestParserTest {
         HttpRequest httpRequest = HttpRequestParser.fromInputStream(in);
         assertThat(httpRequest.isMethod(HttpMethod.POST)).isTrue();
         assertThat(httpRequest.getParam("param1")).isEqualTo("paramValue1");
+    }
+
+    @Test
+    @DisplayName("Post 전달")
+    void postWithData() throws Exception {
+        InputStream in = new FileInputStream(new File(resourceDirectory + "Http_POST"));
+        HttpRequest request = HttpRequestParser.fromInputStream(in);
+
+        assertEquals(true, request.isPostMethod());
+        assertEquals("/user/create", request.getPath());
+        assertEquals("keep-alive", request.getHeader("Connection"));
+        assertEquals("javajigi", request.getParam("userId"));
+    }
+
+    @Test
+    @DisplayName("Post 전달 with QueryString 테스트")
+    void postMethodWithQueryString() throws Exception {
+        InputStream in = new FileInputStream(new File(resourceDirectory + "Http_POST2"));
+        HttpRequest httpRequest = HttpRequestParser.fromInputStream(in);
+        assertThat(httpRequest.isMethod(HttpMethod.POST)).isTrue();
+        assertThat(httpRequest.getPath()).isEqualTo("/user/create");
+        assertThat(httpRequest.getParam("id")).isEqualTo("1");
+        assertEquals("javajigi", httpRequest.getParam("userId"));
     }
 
 }

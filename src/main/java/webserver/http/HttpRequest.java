@@ -25,14 +25,23 @@ public class HttpRequest {
         return line.getMethod() == method;
     }
 
+    public String getHeader(String key) {
+        return header.getHeader(key);
+    }
+
     public String getPath() {
         return line.getPath();
     }
 
     public String getParam(String key) {
 
-        if ((line.getMethod() == HttpMethod.GET) && line.hasQueryString()) {
-            return line.getQueryString().getParameter(key);
+        if (line.hasQueryString()) {
+            ParameterBag queryString = line.getQueryString();
+            String value = queryString.getParameter(key);
+
+            if(value != null) {
+                return value;
+            }
         }
 
         return params.getParameter(key);
