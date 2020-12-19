@@ -13,4 +13,8 @@ public class ParameterBag {
     public String getParameter(String key) {
         return parameters.get(key);
     }
+
+    public boolean hasParameter(String key) {
+        return parameters.containsKey(key);
+    }
 }

@@ -17,16 +17,14 @@ public class HttpRequestParserTest {
     @DisplayName("루트 주소로 Get 요청을 보냄")
     void isGetMethod() throws Exception {
         InputStream in = new FileInputStream(new File(resourceDirectory + "GET_ROOT_TEST"));
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        HttpRequest httpRequest = HttpRequestParser.fromReader(bufferedReader);
+        HttpRequest httpRequest = HttpRequestParser.fromInputStream(in);
         assertThat(httpRequest.isMethod(HttpMethod.GET)).isTrue();
     }
     @Test
     @DisplayName("루트 주소로 POST 요청을 보냄")
     void isPostMethod() throws Exception {
         InputStream in = new FileInputStream(new File(resourceDirectory + "POST_ROOT_TEST"));
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        HttpRequest httpRequest = HttpRequestParser.fromReader(bufferedReader);
+        HttpRequest httpRequest = HttpRequestParser.fromInputStream(in);
         assertThat(httpRequest.isMethod(HttpMethod.POST)).isTrue();
         assertThat(httpRequest.getParam("param1")).isEqualTo("paramValue1");
     }

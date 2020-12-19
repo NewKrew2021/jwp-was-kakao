@@ -52,4 +52,11 @@ class ParameterBagTest {
     }
 
 
+    @Test
+    @DisplayName("파라미터 값이 들어 있는지 조회")
+    void 파라미터_값_보유_여부_확인() {
+        ParameterBag parameterBag = ParameterBagParser.parse("param1=paramValue1&param2=paramValue2&param3");
+        assertThat(parameterBag.hasParameter("param1")).isEqualTo(true);
+    }
+
 }

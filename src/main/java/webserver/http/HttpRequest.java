@@ -1,5 +1,6 @@
 package webserver.http;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,14 @@ public class HttpRequest {
 
         return params.getParameter(key);
 
+    }
+
+    public User user() {
+
+        if ((line.getMethod() == HttpMethod.GET) && line.hasQueryString()) {
+            return User.createUser(line.getQueryString());
+        }
+        return User.createUser(params);
     }
 
     public String getContentType() {

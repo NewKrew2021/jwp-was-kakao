@@ -2,6 +2,7 @@ package webserver.http;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import webserver.http.parser.ParameterBagParser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +14,6 @@ class HttpRequestLineTest {
 
         HttpRequestLine line = new HttpRequestLine(HttpMethod.GET, "/", null, new Protocol("HTTP", "1.1"));
         assertThat(line.getMethod()).isEqualTo(HttpMethod.GET);
-
     }
 
     @Test
@@ -22,7 +22,6 @@ class HttpRequestLineTest {
 
         HttpRequestLine line = new HttpRequestLine(HttpMethod.GET, "/", null, new Protocol("HTTP", "1.1"));
         assertThat(line.getPath()).isEqualTo("/");
-
     }
 
     @Test
@@ -31,7 +30,15 @@ class HttpRequestLineTest {
 
         HttpRequestLine line = new HttpRequestLine(HttpMethod.GET, "/", null, new Protocol("HTTP", "1.1"));
         assertThat(line.getQueryString()).isEqualTo(null);
+    }
 
+    @Test
+    @DisplayName("쿼리 스트링 확인")
+    void hasQueryString() {
+
+        ParameterBag parameterBag = ParameterBagParser.parse("");
+        HttpRequestLine line = new HttpRequestLine(HttpMethod.GET, "/", parameterBag, new Protocol("HTTP", "1.1"));
+        assertThat(line.hasQueryString()).isEqualTo(true);
     }
 
     @Test
@@ -40,7 +47,6 @@ class HttpRequestLineTest {
 
         HttpRequestLine line = new HttpRequestLine(HttpMethod.GET, "/", null, new Protocol("HTTP", "1.1"));
         assertThat(line.getProtocol()).isEqualTo("HTTP");
-
     }
 
     @Test
@@ -49,6 +55,5 @@ class HttpRequestLineTest {
 
         HttpRequestLine line = new HttpRequestLine(HttpMethod.GET, "/", null, new Protocol("HTTP", "1.1"));
         assertThat(line.getVersion()).isEqualTo("1.1");
-
     }
 }
