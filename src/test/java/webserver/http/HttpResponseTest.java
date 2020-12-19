@@ -37,7 +37,7 @@ class HttpResponseTest {
 
         String redirectLocation = "http://github.com";
 
-        response.response302Header(redirectLocation);
+        response.sendRedirect(redirectLocation);
 
         String outputString = outputStream.toString();
         assertThat(outputString).contains(redirectLocation, "302 Found", "Location");
@@ -54,6 +54,20 @@ class HttpResponseTest {
 
         String outputString = outputStream.toString();
         assertThat(outputString).contains("404 Not Found");
+    }
+
+    @Test
+    @DisplayName("쿠키 확인")
+    public void checkCookie() {
+
+        OutputStream outputStream = getOutputStream();
+        HttpResponse response = new HttpResponse(outputStream);
+
+        response.addHeaderValue("Set-Cookie", "logined=true");
+        response.sendRedirect("/index.html");
+
+        String outputString = outputStream.toString();
+        assertThat(outputString).contains("index.html", "logined=true", "Set-Cookie");
     }
 
     private OutputStream getOutputStream() {

@@ -70,7 +70,7 @@ public class HttpResponse {
         }
     }
 
-    public void response302Header(String location) {
+    public void sendRedirect(String location) {
 
         try {
             dos.writeBytes("HTTP/1.1 302 Found " + "\r\n");

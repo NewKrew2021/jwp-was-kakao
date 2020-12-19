@@ -29,7 +29,7 @@ public class ResponseHandler {
         byte[] bodyContent = new byte[0];
 
         if (requestPath.equals("/") && request.isGetMethod()) {
-            response.response302Header("/index.html");
+            response.sendRedirect("/index.html");
             return ;
         }
 
@@ -39,7 +39,7 @@ public class ResponseHandler {
 
             DataBase.addUser(user);
 
-            response.response302Header("/index.html");
+            response.sendRedirect("/index.html");
             return;
         }
 
@@ -52,10 +52,10 @@ public class ResponseHandler {
 
             if(foundUser == null || !foundUser.getPassword().equals(password)) {
                 response.addHeaderValue("Set-Cookie", "logined=false; Path=/");
-                response.response302Header("/user/login_failed.html");
+                response.sendRedirect("/user/login_failed.html");
             }else{
                 response.addHeaderValue("Set-Cookie", "logined=true; Path=/");
-                response.response302Header("/index.html");
+                response.sendRedirect("/index.html");
             }
             return ;
         }
@@ -77,7 +77,7 @@ public class ResponseHandler {
                 response.response200Header(pageContent.length(), contentType);
                 response.responseBody(body);
             }else{
-                response.response302Header("/index.html");
+                response.sendRedirect("/index.html");
             }
             return ;
         }
