@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class HttpRequestTest {
+public class WebServerTest {
     @Test
     void request_resttemplate() {
         RestTemplate restTemplate = new RestTemplate();

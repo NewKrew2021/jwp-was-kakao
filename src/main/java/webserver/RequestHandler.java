@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 import webserver.model.ContentType;
 import webserver.model.HttpStatus;
-import webserver.model.Request;
+import webserver.model.HttpRequest;
 
 import java.io.*;
 import java.net.Socket;
@@ -34,7 +34,7 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            Request request = Request.from(in);
+            HttpRequest request = HttpRequest.from(in);
             DataOutputStream dos = new DataOutputStream(out);
 
             if (request.getPath().equals("/user/create")) {
@@ -58,7 +58,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void handleUserCreate(Request request, DataOutputStream dos) {
+    private void handleUserCreate(HttpRequest request, DataOutputStream dos) {
         User user = new User(
                 request.getParameter("userId"),
                 request.getParameter("password"),
@@ -69,7 +69,7 @@ public class RequestHandler implements Runnable {
         responseHeaderOnly(dos, HttpStatus.FOUND, Collections.singletonMap("Location", "/index.html"));
     }
 
-    private void handleUserLogin(Request request, DataOutputStream dos) {
+    private void handleUserLogin(HttpRequest request, DataOutputStream dos) {
         String userId = request.getParameter("userId");
         String password = request.getParameter("password");
         boolean logined = Optional.ofNullable(DataBase.findUserById(userId))
@@ -83,7 +83,7 @@ public class RequestHandler implements Runnable {
         responseHeaderOnly(dos, HttpStatus.FOUND, headers);
     }
 
-    private void handleUserList(Request request, DataOutputStream dos) {
+    private void handleUserList(HttpRequest request, DataOutputStream dos) {
         if (!Boolean.TRUE.toString().equals(request.getCookie("logined"))) {
             responseHeaderOnly(dos, HttpStatus.FOUND, Collections.singletonMap("Location", "/user/login.html"));
             return;
@@ -101,7 +101,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void handleStatic(Request request, DataOutputStream dos) throws IOException {
+    private void handleStatic(HttpRequest request, DataOutputStream dos) throws IOException {
         ContentType contentType = ContentType.fromUrlPath(request.getPath());
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getPath());

@@ -1,10 +1,8 @@
 package webserver.model;
 
-import utils.FileIoUtils;
 import utils.IOUtils;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Request {
+public class HttpRequest {
     private static final Pattern requestLinePattern = Pattern.compile(
             "(?<method>[A-Z]+)" +         // request method
             " +(?<path>/[^?# ]*)" +        // resource path (only path part)
@@ -36,7 +34,7 @@ public class Request {
     private final Map<String, String> parameters;
     private final Map<String, String> cookies;
 
-    private Request(HttpMethod method, String path, String version, String query, String hash, Map<String, String> headers, Map<String, String> parameters) {
+    private HttpRequest(HttpMethod method, String path, String version, String query, String hash, Map<String, String> headers, Map<String, String> parameters) {
         this.method = method;
         this.path = path;
         this.version = version;
@@ -47,7 +45,7 @@ public class Request {
         this.cookies = parseCookie(headers.getOrDefault("cookie", ""));
     }
 
-    public static Request from(InputStream in) throws IOException {
+    public static HttpRequest from(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
         Matcher matcher = parseRequestLine(reader.readLine());
@@ -60,7 +58,7 @@ public class Request {
             query = IOUtils.readData(reader, Integer.parseInt(headers.getOrDefault("content-length", "0")));
         }
 
-        return new Request(
+        return new HttpRequest(
                 method,
                 matcher.group("path"),
                 matcher.group("version"),
