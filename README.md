@@ -9,6 +9,7 @@
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
 
 ## 요구사항
+### Step1
 #### 요구사항 1)
 * http://localhost:8080/index.html 로 접속했을 때 webapp 디렉토리의 index.html 파일을 읽어 클라이언트에 응답한다.
 * 모든 Request Header를 출력한다.
@@ -35,3 +36,8 @@
 
 #### 요구사항 7)
 * Stylesheet 파일을 지원하도록 구현 한다.
+
+### Step2
+#### 요구사항
+* HTTP 웹 서버 리팩토링
+* HTTP에서 POST 방식으로 데이터를 전달할 때 body를 통한 데이터 전달뿐만 아니라 Query String을 활용한 데이터 전달도 지원한다.

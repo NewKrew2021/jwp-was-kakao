@@ -6,20 +6,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ReqeustTest {
+public class RequestHeaderTest {
 
-    @DisplayName("Request 생성 테스트")
+    @DisplayName("RequestHeader 생성 테스트")
     @Test
     void create() {
         String requestHeader = "GET /index.html HTTP/1.1";
         RequestValue requestValue = parseRequestValue(requestHeader);
 
-        assertThat(Request.of(requestValue)).isEqualToComparingOnlyGivenFields(Request.of(requestValue));
+        assertThat(RequestHeader.of(requestValue))
+                .isEqualToComparingOnlyGivenFields(RequestHeader.of(requestValue));
     }
 
     @DisplayName("getURL 테스트")
@@ -31,9 +36,9 @@ public class ReqeustTest {
     }, delimiter = '|')
     void getURL(String header, String expectedURL) {
         RequestValue requestValue = parseRequestValue(header);
-        Request request = Request.of(requestValue);
+        RequestHeader requestHeader = RequestHeader.of(requestValue);
 
-        assertThat(request.getURL()).isEqualTo(expectedURL);
+        assertThat(requestHeader.getURL()).isEqualTo(expectedURL);
     }
 
     @DisplayName("getPathGateway 테스트")
@@ -45,9 +50,9 @@ public class ReqeustTest {
     }, delimiter = '|')
     void getPathGateway(String header, String expectedPathGateway) {
         RequestValue requestValue = parseRequestValue(header);
-        Request request = Request.of(requestValue);
+        RequestHeader requestHeader = RequestHeader.of(requestValue);
 
-        assertThat(request.getPathGateway()).isEqualTo(expectedPathGateway);
+        assertThat(requestHeader.getPathGateway()).isEqualTo(expectedPathGateway);
     }
 
     private RequestValue parseRequestValue(String header) {

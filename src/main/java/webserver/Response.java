@@ -1,6 +1,5 @@
 package webserver;
 
-import dto.ParamValue;
 import model.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,45 +7,45 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 public class Response {
     private static final Logger logger = LoggerFactory.getLogger(Response.class);
 
     private final String url;
-    private final HttpStatus httpStatus;
-    private final Optional<ParamValue> httpValue;
-    private final byte[] body;
+    private final Map<String, String> header;
+    private HttpStatus httpStatus;
+    private byte[] body;
 
-    private Response(String url, HttpStatus httpStatus, Optional<ParamValue> httpValue, byte[] body) {
+    private Response(String url) {
         this.url = url;
-        this.httpStatus = httpStatus;
-        this.httpValue = httpValue;
-        this.body = body;
+        this.header = new HashMap<>();
     }
 
-    public static Response of(Request request, HttpStatus httpStatus) {
-        String url = request.getURL();
-        return new Response(request.getURL(),
-                            httpStatus,
-                            Optional.empty(),
-                            ResponseHandler.getBody(url));
+    public static Response of(Request request) {
+        return new Response(request.getURL());
     }
 
-    public static Response of(Request request, HttpStatus httpStatus, String body) {
-        return new Response(request.getURL(),
-                            httpStatus,
-                            Optional.empty(),
-                            body.getBytes());
+    public void forward() {
+        httpStatus = HttpStatus.HTTP_OK;
+        body = ResponseHandler.getBody(url);
     }
 
-    public static Response ofDirect(Request request, ParamValue httpValue) {
-        String url = request.getURL();
-        return new Response(url,
-                            HttpStatus.HTTP_FOUND,
-                            Optional.of(httpValue),
-                            ResponseHandler.getBody(url));
+    public void sendRedirect(String path) {
+        httpStatus = HttpStatus.HTTP_FOUND;
+        header.put("Location", path);
+        body = ResponseHandler.getBody(url);
+    }
+
+    public void response200Body(String body) {
+        httpStatus = HttpStatus.HTTP_OK;
+        this.body = body.getBytes();
+    }
+
+    public void setHeaderCookie(boolean isLogined) {
+        header.put("Set-Cookie", "logined=" + isLogined + "; Path=/");
     }
 
     public HttpStatus getHttpStatus() {
@@ -60,9 +59,7 @@ public class Response {
     public List<String> getAddHttpDesc() {
         List<String> addHttpDesc = new ArrayList<>();
 
-        httpValue.ifPresent(paramValue -> paramValue.getParamMap()
-                .forEach((key, value) -> addHttpDesc.add(String.format("%s: %s \r\n", key, value)))
-        );
+        header.forEach((key, value) -> addHttpDesc.add(String.format("%s: %s \r\n", key, value)));
 
         return addHttpDesc;
     }

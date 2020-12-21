@@ -27,13 +27,15 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             RequestValue requestValue = RequestValue.of(in);
+            if (requestValue.isEmpty()) return;
             requestValue.printRequest();
 
             Request request = Request.of(requestValue);
-            Response response = uriFactory.create(request);
+            Response response = Response.of(request);
+
+            uriFactory.create(request, response);
 
             response.output(new DataOutputStream(out));
-
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

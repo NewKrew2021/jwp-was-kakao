@@ -1,8 +1,6 @@
 package webserver;
 
-import dto.ParamValue;
 import dto.RequestValue;
-import model.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +15,7 @@ public class ResponseTest {
     private Request request;
 
     @BeforeEach
-    private void setup(){
+    private void setup() {
         List<String> requestHeader = Arrays.asList(
                 "POST /user/create HTTP/1.1",
                 "Host: localhost:8080",
@@ -37,15 +35,16 @@ public class ResponseTest {
     @DisplayName("Response 생성 테스트")
     @Test
     void create() {
-        Response response = Response.of(request, HttpStatus.HTTP_OK);
+        Response response = Response.of(request);
 
-        assertThat(response).isEqualToComparingFieldByField(Response.of(request, HttpStatus.HTTP_OK));
+        assertThat(response).isEqualToComparingFieldByField(Response.of(request));
     }
 
     @DisplayName("Response 생성 테스트 : 리다이렉트")
     @Test
     void ofDirect() {
-        Response response = Response.ofDirect(request, ParamValue.of("Location", "/index.html"));
+        Response response = Response.of(request);
+        response.sendRedirect("/index.html");
 
         assertThat(response.getAddHttpDesc().size()).isEqualTo(1);
         assertThat(response.getAddHttpDesc().get(0)).contains("Location: /index.html");
