@@ -3,9 +3,6 @@ package webserver.http;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.RequestMappingHandler;
-import webserver.controller.MainController;
-import webserver.controller.StaticResourceController;
-import webserver.controller.UserController;
 import webserver.util.StaticResourceUtils;
 
 import java.io.*;
@@ -24,32 +21,24 @@ public class RequestMappingHandlerTest {
     }
 
     @Test
+    public void userController_GET_USER_LOGIN() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "GET_USER_LOGIN"));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+        HttpRequest request = new HttpRequest(bufferedReader);
+        HttpResponse httpResponse = new HttpResponse(createOutputStream("OUTPUT"));
+        RequestMappingHandler.resolve(request, httpResponse);
+        InputStream output = new FileInputStream(new File(testDirectory + "OUTPUT"));
+        BufferedReader outputBufferedReader = new BufferedReader(new InputStreamReader(output));
+        assertThat(outputBufferedReader.readLine()).isEqualTo("HTTP/1.1 200 OK ");
+    }
+
+    @Test
     public void isStaticResourceTest() throws IOException {
         assertThat(StaticResourceUtils.isStaticResourcePath("/static/css/style.css")).isTrue();
         assertThat(StaticResourceUtils.isStaticResourcePath("/user/list")).isFalse();
     }
 
-    @Test
-    public void getUserControllerTest() throws IOException {
-        InputStream in = new FileInputStream(new File(testDirectory + "GET_HTTP_CREATE_USER"));
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        HttpRequest request = new HttpRequest(bufferedReader);
-        assertThat(RequestMappingHandler.getController(request)).isInstanceOf(UserController.class);
-    }
-
-    @Test
-    public void getMainControllerTest() throws IOException {
-        InputStream in = new FileInputStream(new File(testDirectory + "GET_HTTP"));
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        HttpRequest request = new HttpRequest(bufferedReader);
-        assertThat(RequestMappingHandler.getController(request)).isInstanceOf(MainController.class);
-    }
-
-    @Test
-    public void getStaticResourceControllerTest() throws IOException {
-        InputStream in = new FileInputStream(new File(testDirectory + "GET_HTTP_CSS"));
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        HttpRequest request = new HttpRequest(bufferedReader);
-        assertThat(RequestMappingHandler.getController(request)).isInstanceOf(StaticResourceController.class);
+    private OutputStream createOutputStream(String fileName) throws FileNotFoundException {
+        return new FileOutputStream(new File(testDirectory + fileName));
     }
 }

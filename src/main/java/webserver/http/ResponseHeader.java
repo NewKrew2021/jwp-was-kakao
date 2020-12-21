@@ -39,7 +39,7 @@ public class ResponseHeader {
     public void setLoginCookie(HttpRequest httpRequest, boolean isLogin){
         Cookies cookies = httpRequest.getHeader().getCookies();
         cookies.add(ServerConfigConstants.LOGIN_COOKIE_KEY, String.valueOf(isLogin));
-        addHeader(HttpHeader.SET_COOKIE, ServerConfigConstants.LOGIN_COOKIE_KEY+ HttpHeader.SEPERATOR +String.valueOf(isLogin)+ HttpHeader.COOKIE_PATH);
+        addHeader(HttpHeader.SET_COOKIE, ServerConfigConstants.LOGIN_COOKIE_KEY+ HttpHeader.SEPERATOR + isLogin + HttpHeader.COOKIE_PATH);
     }
 
     public List<String> makeHeader() {

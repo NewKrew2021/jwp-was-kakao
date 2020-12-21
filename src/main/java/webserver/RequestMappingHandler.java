@@ -1,11 +1,11 @@
 package webserver;
 
 import com.github.jknack.handlebars.internal.lang3.StringUtils;
-import webserver.controller.HttpController;
 import webserver.controller.MainController;
 import webserver.controller.StaticResourceController;
 import webserver.controller.UserController;
 import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
 import webserver.util.StaticResourceUtils;
 
 public class RequestMappingHandler {
@@ -16,15 +16,15 @@ public class RequestMappingHandler {
         throw new IllegalStateException("Utility class");
     }
 
-    public static HttpController getController(HttpRequest request){
+    public static void resolve(HttpRequest request, HttpResponse httpResponse) throws Exception {
         if(StringUtils.countMatches(request.getPath(), "/") == 1){
-            return new MainController();
+            new MainController().service(request, httpResponse);
         }else if(request.getPath().startsWith(USER_CONTROLLER_MAPPING_PATH)){
-            return new UserController();
+            new UserController().service(request, httpResponse);
         }else if(StaticResourceUtils.isStaticResourcePath(request.getPath())){
-            return new StaticResourceController();
+            new StaticResourceController().service(request, httpResponse);
         }else{
-            return new StaticResourceController();
+            new StaticResourceController().service(request, httpResponse);
         }
     }
 

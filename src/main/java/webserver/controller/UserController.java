@@ -12,7 +12,9 @@ import webserver.http.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class UserController implements HttpController {
+import static webserver.config.ServerConfigConstants.TEMPLATES_RESOURCE_PATH_PREFIX;
+
+public class UserController extends HttpAbstractController{
 
     public static final String INDEX_HTML = "/index.html";
     public static final String FORM_HTML = "/form.html";
@@ -31,10 +33,10 @@ public class UserController implements HttpController {
     }
 
     @Override
-    public HttpResponse response(HttpRequest httpRequest) throws IOException, URISyntaxException {
+    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
         ResponseHeader responseHeader = ResponseHeader.of(httpRequest);
         if(httpRequest.getPath().endsWith(FORM_HTML)){
-            return HttpResponse.from(ResponseStatus.OK, responseHeader, ServerConfigConstants.TEMPLATES_RESOURCE_PATH_PREFIX + httpRequest.getPath());
+            httpResponse.forward(responseHeader, ServerConfigConstants.TEMPLATES_RESOURCE_PATH_PREFIX + httpRequest.getPath());
         }else if(httpRequest.getPath().endsWith(USER_CREATE)){
             if(httpRequest.getMethod().equals(HttpMethod.POST)){
                 RequestBody requestBody = httpRequest.getBody();
@@ -45,35 +47,35 @@ public class UserController implements HttpController {
                 User user = new User(userId, password, name, email);
                 userService.addUser(user);
             }
-            return HttpResponse.redirect(responseHeader, INDEX_HTML);
+            httpResponse.sendRedirect(responseHeader, INDEX_HTML);
         }else if(httpRequest.getPath().endsWith(LOGIN)){
             RequestBody requestBody = httpRequest.getBody();
             String userId = requestBody.getParameter("userId");
             String password = requestBody.getParameter("password");
             if(userService.isValidUserByLogin(userId, password)){
                 responseHeader.setLoginCookie(httpRequest, true);
-                return HttpResponse.redirect(responseHeader, INDEX_HTML);
+                httpResponse.sendRedirect(responseHeader, INDEX_HTML);
             }else{
                 responseHeader.setLoginCookie(httpRequest, false);
-                return HttpResponse.redirect(responseHeader, USER_LOGIN_FAILED_HTML);
+                httpResponse.sendRedirect(responseHeader, USER_LOGIN_FAILED_HTML);
             }
-        }else if(httpRequest.getPath().endsWith(USER_LIST_HTML)){
+        }else if(httpRequest.getPath().endsWith(USER_LIST_HTML) || httpRequest.getPath().endsWith(USER_LIST)){
             if(httpRequest.isLogin()){
                 Users users = userService.findAll();
                 TemplateLoader loader = new ClassPathTemplateLoader();
                 loader.setPrefix(ServerConfigConstants.TEMPLATES_LOADER_PATH_PREFIX);
                 loader.setSuffix(ResponseHeader.HTML);
                 Handlebars handlebars = new Handlebars(loader);
-                return HttpResponse.from(handlebars.compile(USER_LIST).apply(users).getBytes());
+                httpResponse.forward(handlebars.compile(USER_LIST).apply(users).getBytes());
             }else{
-                return HttpResponse.redirect(responseHeader, USER_LOGIN_HTML);
+                httpResponse.sendRedirect(responseHeader, USER_LOGIN_HTML);
             }
         }else if(httpRequest.getPath().endsWith(USER_LOGIN_HTML)){
-            return HttpResponse.from(ResponseStatus.OK, responseHeader, ServerConfigConstants.TEMPLATES_RESOURCE_PATH_PREFIX + USER_LOGIN_HTML);
+            httpResponse.forward(responseHeader, TEMPLATES_RESOURCE_PATH_PREFIX + USER_LOGIN_HTML);
         }else if(httpRequest.getPath().endsWith(LOGIN_FAILED_HTML)){
-            return HttpResponse.from(ResponseStatus.OK, responseHeader, ServerConfigConstants.TEMPLATES_RESOURCE_PATH_PREFIX + USER_LOGIN_FAILED_HTML);
+            httpResponse.forward(responseHeader, TEMPLATES_RESOURCE_PATH_PREFIX + USER_LOGIN_FAILED_HTML);
         }else {
-            return HttpResponse.error();
+            httpResponse.error();
         }
     }
 
