@@ -3,7 +3,7 @@ package controller;
 import webserver.Request;
 import webserver.Response;
 
-public class AbstractController implements Controller {
+public abstract class AbstractController implements Controller {
     @Override
     public void service(Request request, Response response) {
         if (request.isPostMethod()) {
@@ -14,11 +14,7 @@ public class AbstractController implements Controller {
         }
     }
 
-    public void doGet(Request request, Response response) {
-        // Do nothing
-    }
+    public abstract void doGet(Request request, Response response);
 
-    public void doPost(Request request, Response response) {
-        // Do nothing
-    }
+    public abstract void doPost(Request request, Response response);
 }

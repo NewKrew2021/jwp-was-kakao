@@ -3,14 +3,21 @@ package controller;
 import dto.ParamValue;
 import model.factory.UserFactory;
 import service.UserService;
+import utils.MessageUtils;
 import webserver.Request;
 import webserver.Response;
 
+import java.awt.geom.IllegalPathStateException;
 import java.util.Optional;
 
 public class LoginUserController extends AbstractController {
 
     private UserService userService = new UserService();
+
+    @Override
+    public void doGet(Request request, Response response) {
+        throw new IllegalPathStateException(MessageUtils.ILLEGAL_PATH_STATE);
+    }
 
     @Override
     public void doPost(Request request, Response response) {

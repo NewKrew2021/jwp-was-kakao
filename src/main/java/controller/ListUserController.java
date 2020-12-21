@@ -4,10 +4,12 @@ import dto.UserDTO;
 import dto.UsersDTO;
 import model.User;
 import service.UserService;
+import utils.MessageUtils;
 import webserver.Request;
 import webserver.Response;
 import webserver.ResponseHandler;
 
+import java.awt.geom.IllegalPathStateException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,11 @@ public class ListUserController extends AbstractController {
             return;
         }
         response.sendRedirect("/user/login.html");
+    }
+
+    @Override
+    public void doPost(Request request, Response response) {
+        throw new IllegalPathStateException(MessageUtils.ILLEGAL_PATH_STATE);
     }
 
     public UsersDTO getUsersDTO(List<User> users) {
