@@ -58,8 +58,7 @@ public class Request {
         if (!requestHeader.getURL().contains(QUESTION_MARK)) {
             return Optional.empty();
         }
-        String paramString = requestHeader.getURL().split(REGEX_QUESTION_MARK)[1];
-        return Optional.of(DecodeUtils.decodeUTF8(paramString));
+        return Optional.of(DecodeUtils.decodeUTF8(requestHeader.getParamString()));
     }
 
     private Optional<String> getPostParams() {

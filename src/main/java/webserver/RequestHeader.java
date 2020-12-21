@@ -10,6 +10,7 @@ public class RequestHeader {
     private static final String REGEX_BLANK = " ";
     private static final String REGEX_COLON_BLANK = ": ";
     private static final String REGEX_QUESTION_MARK_AND_PERIOD = "[?.]";
+    private static final String REGEX_QUESTION_MARK = "\\?";
 
     private static final String COOKIE_FIELD = "Cookie";
 
@@ -68,6 +69,10 @@ public class RequestHeader {
 
     public String getPathGateway() {
         return url.split(REGEX_QUESTION_MARK_AND_PERIOD)[0];
+    }
+
+    public String getParamString() {
+        return url.split(REGEX_QUESTION_MARK)[1];
     }
 
     public Map<String, String> getHeader() {
