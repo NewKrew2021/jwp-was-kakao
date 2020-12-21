@@ -12,37 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class HttpRequestTest {
-
-    @DisplayName("Valid request lines")
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "POST /", // HTTP/1.0 can be omitted
-            "GET /main?k1=val1&k2=val2&k3=val3", // query
-            "GET /main?k1[]=val1&k1[]=val2&k1[]=val3&k2=val2", // multiple query
-            "DELETE /main?k1[]=val1&k1[]=val2&k1[]=val3&k2=val2 HTTP/1.1", // multiple query and and version
-            "PUT /index.htm#anchor1", // hash
-            "GET /index.htm?name=kris&ext=lee#anchor-with-mark", // query and hash
-            "GET /index.htm?name=kris&ext=lee#anchor HTTP/1.1", // query, hash and version
-    })
-    void valid(String requestLine) {
-        InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThatCode(() -> HttpRequest.from(in)).doesNotThrowAnyException();
-    }
-
-    @DisplayName("Invalid request lines")
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "GET index.htm HTTP/1.0", // path does not started with /
-            "GET ?k1=v1 HTTP/1.1", // query without path
-            "POST #anchor", // hash without path
-            "RUN #anchor", // unknown method
-    })
-    void invalid(String requestLine) {
-        InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThatIllegalArgumentException()
-                .isThrownBy(() -> HttpRequest.from(in));
-    }
-
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = {
             "3 | GET /main?k1=val1&k2=val2&k3=val3",

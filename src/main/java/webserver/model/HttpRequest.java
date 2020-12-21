@@ -8,38 +8,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HttpRequest {
-    private static final Pattern requestLinePattern = Pattern.compile(
-            "(?<method>[A-Z]+)" +         // request method
-            " +(?<path>/[^?# ]*)" +        // resource path (only path part)
-            "(?:\\?(?<query>[^# ]+))?" +  // query string (optional)
-            "(?:#(?<hash>[^ ]+))?" +      // hash (optional)
-            "(?: +(?<version>.*))?"       // version (optional)
-    );
     private static final Pattern headerSplitPattern = Pattern.compile(" *: *");
     private static final Pattern querySplitPattern = Pattern.compile("&");
     private static final Pattern keyValuePattern = Pattern.compile("=");
     private static final Pattern cookieSplitPattern = Pattern.compile(" *; *");
 
-    private final HttpMethod method;
-    private final String path;
-    private final String query;
-    private final String hash;
-    private final String version;
+    private final HttpRequestLine httpRequestLine;
     private final Map<String, String> headers;
     private final Map<String, String> parameters;
     private final Map<String, String> cookies;
 
-    private HttpRequest(HttpMethod method, String path, String version, String query, String hash, Map<String, String> headers, Map<String, String> parameters) {
-        this.method = method;
-        this.path = path;
-        this.version = version;
-        this.query = query;
-        this.hash = hash;
+    private HttpRequest(HttpRequestLine httpRequestLine, Map<String, String> headers, Map<String, String> parameters) {
+        this.httpRequestLine = httpRequestLine;
         this.headers = headers;
         this.parameters = parameters;
         this.cookies = parseCookie(headers.getOrDefault("cookie", ""));
@@ -48,33 +32,17 @@ public class HttpRequest {
     public static HttpRequest from(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-        Matcher matcher = parseRequestLine(reader.readLine());
+        HttpRequestLine httpRequestLine = HttpRequestLine.from((reader.readLine()));
         Map<String, String> headers = parseHeaders(reader);
 
-        HttpMethod method = HttpMethod.valueOf(matcher.group("method"));
-        String query = matcher.group("query");
+        HttpMethod method = httpRequestLine.getMethod();
+        String query = httpRequestLine.getQuery();
 
         if (method == HttpMethod.POST || method == HttpMethod.PUT) {
             query = IOUtils.readData(reader, Integer.parseInt(headers.getOrDefault("content-length", "0")));
         }
 
-        return new HttpRequest(
-                method,
-                matcher.group("path"),
-                matcher.group("version"),
-                matcher.group("query"),
-                matcher.group("hash"),
-                headers,
-                parseQuery(query)
-        );
-    }
-
-    private static Matcher parseRequestLine(String requestLine) {
-        Matcher matcher;
-        if (Objects.isNull(requestLine) || !(matcher = requestLinePattern.matcher(requestLine)).find()) {
-            throw new IllegalArgumentException("Unexpected Request-Line message");
-        }
-        return matcher;
+        return new HttpRequest(httpRequestLine, headers, parseQuery(query));
     }
 
     private static Map<String, String> parseHeaders(BufferedReader reader) throws IOException {
@@ -117,7 +85,7 @@ public class HttpRequest {
     }
 
     public String getPath() {
-        return path;
+        return httpRequestLine.getPath();
     }
 
     public String getHeader(String key) {
