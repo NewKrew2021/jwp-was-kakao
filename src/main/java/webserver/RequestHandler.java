@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 import webserver.model.ContentType;
+import webserver.model.HttpResponse;
 import webserver.model.HttpStatus;
 import webserver.model.HttpRequest;
 
@@ -16,13 +17,13 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final Handlebars handlebars = new Handlebars(new ClassPathTemplateLoader("/templates", ".html"));
+
+    private static final String COOKIE_LOGINED = "logined";
 
     private Socket connection;
 
@@ -35,30 +36,30 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest request = HttpRequest.from(in);
-            DataOutputStream dos = new DataOutputStream(out);
+            HttpResponse response = new HttpResponse(out);
 
             if (request.getPath().equals("/user/create")) {
-                handleUserCreate(request, dos);
+                handleUserCreate(request, response);
                 return;
             }
 
             if (request.getPath().equals("/user/login")) {
-                handleUserLogin(request, dos);
+                handleUserLogin(request, response);
                 return;
             }
 
             if (request.getPath().equals("/user/list")) {
-                handleUserList(request, dos);
+                handleUserList(request, response);
                 return;
             }
 
-            handleStatic(request, dos);
+            handleStatic(request, response);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void handleUserCreate(HttpRequest request, DataOutputStream dos) {
+    private void handleUserCreate(HttpRequest request, HttpResponse response) {
         User user = new User(
                 request.getParameter("userId"),
                 request.getParameter("password"),
@@ -66,10 +67,10 @@ public class RequestHandler implements Runnable {
                 request.getParameter("email")
         );
         DataBase.addUser(user);
-        responseHeaderOnly(dos, HttpStatus.FOUND, Collections.singletonMap("Location", "/index.html"));
+        response.sendFound("/index.html");
     }
 
-    private void handleUserLogin(HttpRequest request, DataOutputStream dos) {
+    private void handleUserLogin(HttpRequest request, HttpResponse response) {
         String userId = request.getParameter("userId");
         String password = request.getParameter("password");
         boolean logined = Optional.ofNullable(DataBase.findUserById(userId))
@@ -77,86 +78,41 @@ public class RequestHandler implements Runnable {
                 .filter(p -> p.equals(password))
                 .isPresent();
 
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Set-Cookie", String.format("logined=%s; Path=/", logined));
-        headers.put("Location", logined ? "/index.html" : "/user/login_failed.html");
-        responseHeaderOnly(dos, HttpStatus.FOUND, headers);
+        response.setCookie(COOKIE_LOGINED, String.valueOf(logined));
+        response.sendFound(logined ? "/index.html" : "/user/login_failed.html");
     }
 
-    private void handleUserList(HttpRequest request, DataOutputStream dos) {
+    private void handleUserList(HttpRequest request, HttpResponse response) {
         if (!Boolean.TRUE.toString().equals(request.getCookie("logined"))) {
-            responseHeaderOnly(dos, HttpStatus.FOUND, Collections.singletonMap("Location", "/user/login.html"));
+            response.sendFound("/user/login.html");
             return;
         }
 
         try {
             Template template = handlebars.compile("user/list");
             String listPage = template.apply(Collections.singletonMap("userList", DataBase.findAll()));
-            byte[] body = listPage.getBytes();
-            response200Header(dos, body.length, ContentType.HTML);
-            responseBody(dos, body);
+            response.sendOk(ContentType.HTML, listPage.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-            responseHeaderOnly(dos, HttpStatus.NOT_FOUND);
+            response.sendHeader(HttpStatus.NOT_FOUND);
         }
     }
 
-    private void handleStatic(HttpRequest request, DataOutputStream dos) throws IOException {
+    private void handleStatic(HttpRequest request, HttpResponse response) throws IOException {
         ContentType contentType = ContentType.fromUrlPath(request.getPath());
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getPath());
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
+            response.sendOk(contentType, body);
             return;
         } catch (URISyntaxException | NullPointerException ignored) {
         }
 
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath("./static" + request.getPath());
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
+            response.sendOk(contentType, body);
         } catch (URISyntaxException | NullPointerException e) {
-            responseHeaderOnly(dos, HttpStatus.NOT_FOUND);
+            response.sendHeader(HttpStatus.NOT_FOUND);
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, ContentType contentType) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", contentType.getMimeType());
-        headers.put("Content-Length", String.valueOf(lengthOfBodyContent));
-        responseHeaderOnly(dos, HttpStatus.OK, headers);
-    }
-
-    private void responseHeaderOnly(DataOutputStream dos, HttpStatus status) {
-        responseHeaderOnly(dos, status, Collections.emptyMap());
-    }
-
-    private void responseHeaderOnly(DataOutputStream dos, HttpStatus status, Map<String, String> headers) {
-        ResponseWriter writer = new ResponseWriter(dos);
-        writer.format("HTTP/1.1 %d %s", status.getCode(), status.getMessage());
-        writer.println();
-        headers.forEach((k, v) -> writer.println(String.join(": ", k, v)));
-        writer.println();
-        writer.flush();
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    static class ResponseWriter extends PrintWriter {
-        ResponseWriter(OutputStream out) {
-            super(out, false);
-        }
-
-        @Override
-        public void println() {
-            write("\r\n");
-        }
-    }
 }
