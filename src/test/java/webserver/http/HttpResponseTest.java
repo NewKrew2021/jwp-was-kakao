@@ -24,14 +24,16 @@ public class HttpResponseTest {
 
     @Test
     void response_html() throws Exception {
-        HttpResponse httpResponse = HttpResponse.from(FileIoUtils.loadFileFromClasspath(ServerConfigConstants.TEMPLATES_RESOURCE_PATH_PREFIX + "/index.html"));
+        HttpResponse httpResponse = new HttpResponse(createOutputStream("OUTPUT"));
+        httpResponse.forward(FileIoUtils.loadFileFromClasspath(ServerConfigConstants.TEMPLATES_RESOURCE_PATH_PREFIX + "/index.html"));
         System.out.println(new String(httpResponse.getBody()));
 
     }
 
     @Test
     void response_file() throws Exception {
-        HttpResponse httpResponse = HttpResponse.from(FileIoUtils.loadFileFromClasspath(ServerConfigConstants.STATIC_RESOURCE_PATH_PREFIX + "/css/styles.css"));
+        HttpResponse httpResponse = new HttpResponse(createOutputStream("OUTPUT"));
+        httpResponse.forward(FileIoUtils.loadFileFromClasspath(ServerConfigConstants.STATIC_RESOURCE_PATH_PREFIX + "/css/styles.css"));
         System.out.println(new String(httpResponse.getBody()));
 
     }
@@ -39,16 +41,22 @@ public class HttpResponseTest {
     @Test
     void response_redirect() throws IOException, URISyntaxException {
         HttpRequest httpRequest = new HttpRequest(bufferedReader);
-        HttpResponse httpResponse = HttpResponse.redirect(ResponseHeader.of(httpRequest), "/user/login.html");
+        HttpResponse httpResponse = new HttpResponse(createOutputStream("OUTPUT"));
+        httpResponse.sendRedirect(ResponseHeader.of(httpRequest), "/user/login.html");
         assertThat(httpResponse.getStatus()).isEqualTo(ResponseStatus.FOUND);
 
     }
 
     @Test
-    void response_error() {
-        HttpResponse httpResponse = HttpResponse.error();
+    void response_error() throws FileNotFoundException {
+        HttpResponse httpResponse = new HttpResponse(createOutputStream("OUTPUT"));
+        httpResponse.error();
         assertThat(httpResponse.getStatus()).isEqualTo(ResponseStatus.NOT_FOUND);
 
+    }
+
+    private OutputStream createOutputStream(String fileName) throws FileNotFoundException {
+        return new FileOutputStream(new File(testDirectory + fileName));
     }
 
 }

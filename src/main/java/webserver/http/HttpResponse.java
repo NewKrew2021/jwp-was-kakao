@@ -2,47 +2,54 @@ package webserver.http;
 
 import utils.FileIoUtils;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class HttpResponse {
-    private ResponseStatus status;
-    private final ResponseHeader header;
-    private final byte[] body;
+    private static final String STATUS_PREFIX = "HTTP/1.1";
 
-    private HttpResponse(ResponseStatus responseStatus) {
-        this.status = responseStatus;
+    private ResponseStatus status;
+    private ResponseHeader header;
+    private byte[] body;
+    private final DataOutputStream dos;
+
+    public HttpResponse(final OutputStream out) {
+        this.status = ResponseStatus.OK;
         this.header = ResponseHeader.create();
         this.body = "".getBytes();
+        this.dos = new DataOutputStream(out);
     }
 
-    private HttpResponse(ResponseStatus responseStatus, ResponseHeader header) {
-        this.status = responseStatus;
-        this.header = header;
-        this.body = "".getBytes();
+    public static HttpResponse newInstance(final OutputStream out){
+        return new HttpResponse(out);
     }
 
-    private HttpResponse(ResponseStatus responseStatus, ResponseHeader header, byte[] body) {
-        this.status = responseStatus;
-        this.header = header;
+    public void error(){
+        this.status = ResponseStatus.NOT_FOUND;
+        responseBody();
+    }
+
+    public void forward(byte[] body) {
+        this.status = ResponseStatus.OK;
         this.body = body;
+        responseBody();
     }
 
-    public static HttpResponse from(byte[] body) {
-        return new HttpResponse(ResponseStatus.OK, ResponseHeader.create(), body);
+    public void forward(ResponseHeader header, String path) throws IOException, URISyntaxException {
+        this.status = ResponseStatus.OK;
+        this.header = header;
+        this.body = FileIoUtils.loadFileFromClasspath(path);
+        responseBody();
     }
 
-    public static HttpResponse from(ResponseStatus responseStatus, ResponseHeader header, String viewName) throws IOException, URISyntaxException {
-        return new HttpResponse(responseStatus, header, FileIoUtils.loadFileFromClasspath(viewName));
-    }
-
-    public static HttpResponse error(){
-        return new HttpResponse(ResponseStatus.NOT_FOUND);
-    }
-
-    public static HttpResponse redirect(ResponseHeader header, String path) throws IOException, URISyntaxException {
+    public void sendRedirect(ResponseHeader header, String path) throws IOException, URISyntaxException {
         header.addHeader("Location", path);
-        return new HttpResponse(ResponseStatus.FOUND, header);
+        this.status = ResponseStatus.FOUND;
+        this.header = header;
+        responseBody();
     }
 
     public byte[] getBody() {
@@ -57,4 +64,23 @@ public class HttpResponse {
         return status;
     }
 
+
+    private String makeStatus(ResponseStatus httpStatus) {
+        return String.format("%s %s %s \r\n", STATUS_PREFIX, httpStatus.getCode(), httpStatus.getText());
+    }
+
+    private void responseBody() {
+        try {
+            dos.writeBytes(makeStatus(status));
+            List<String> headers = header.makeHeader();
+            for (String header : headers) {
+                dos.writeBytes(header);
+            }
+            dos.writeBytes("\r\n");
+            dos.write(body, 0, body.length);
+            dos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
