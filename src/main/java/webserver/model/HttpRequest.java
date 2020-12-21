@@ -48,21 +48,22 @@ public class HttpRequest {
     private static Map<String, String> parseHeaders(BufferedReader reader) throws IOException {
         Map<String, String> headers = new HashMap<>();
         String line;
-        while (isNotEmpty(line = reader.readLine())) {
+        while (!isEmpty(line = reader.readLine())) {
             String[] keyValue = headerSplitPattern.split(line, 2);
             headers.put(keyValue[0].trim().toLowerCase(), keyValue[1].trim());
         }
         return headers;
     }
 
-    private static boolean isNotEmpty(String string) {
-        return !Objects.isNull(string) && !string.isEmpty();
+    private static boolean isEmpty(String string) {
+        return Objects.isNull(string) || string.isEmpty();
     }
 
     private static Map<String, String> parseQuery(String query) {
-        if (Objects.isNull(query) || query.trim().isEmpty()) {
+        if (isEmpty(query)) {
             return Collections.emptyMap();
         }
+
         return querySplitPattern.splitAsStream(query)
                 .map(keyValuePattern::split)
                 .filter(s -> s.length == 2)
