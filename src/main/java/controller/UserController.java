@@ -4,8 +4,8 @@ import model.Model;
 import model.user.User;
 import model.user.UsersDto;
 import service.UserService;
-import webserver.HttpSession;
 import webserver.request.HttpRequest;
+import webserver.request.HttpSession;
 import webserver.response.HttpResponse;
 
 import java.util.Optional;
@@ -32,8 +32,8 @@ public class UserController implements Controller {
         return new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"), request.getParameter("email"));
     }
 
-    public String showUsers(HttpRequest request, HttpResponse response, Model model, HttpSession httpSession) {
-        if (isLogined(httpSession)) {
+    public String showUsers(HttpRequest request, HttpResponse response, Model model) {
+        if (isLogined(request.getSession())) {
             model.put("usersDto", new UsersDto(userService.findAll()));
             return USER_LIST_PATH;
         }
@@ -45,9 +45,9 @@ public class UserController implements Controller {
         return Optional.ofNullable((Boolean) httpSession.getAttribute(LOGIN_ATTRIBUTE)).orElse(false);
     }
 
-    public void login(HttpRequest request, HttpResponse response, HttpSession httpSession) {
+    public void login(HttpRequest request, HttpResponse response) {
         boolean loginSuccess = userService.login(request.getParameter("userId"), request.getParameter("password"));
-        httpSession.setAttribute(LOGIN_ATTRIBUTE, loginSuccess);
+        request.getSession().setAttribute(LOGIN_ATTRIBUTE, loginSuccess);
         response.setRedirect(getRedirectPath(loginSuccess));
     }
 

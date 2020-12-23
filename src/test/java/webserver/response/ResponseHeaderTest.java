@@ -12,14 +12,14 @@ class ResponseHeaderTest {
 
     @Test
     void status200() {
-        assertThat(header.toString()).startsWith("HTTP/1.1 200 OK \r\n\r\n");
+        assertThat(header.toString()).startsWith("HTTP/1.1 200 OK");
     }
 
     @Test
     void status302() {
         header.setStatus(HttpStatus.FOUND);
 
-        assertThat(header.toString()).startsWith(("HTTP/1.1 302 Found \r\n\r\n"));
+        assertThat(header.toString()).startsWith(("HTTP/1.1 302 Found"));
     }
 
     @Test

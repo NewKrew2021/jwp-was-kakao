@@ -14,6 +14,7 @@ public class RequestParser {
         HttpRequest request = new HttpRequest();
         applyFirstLine(request, lines.get(0));
         applyRestLines(request, lines.subList(1, lines.size()));
+        request.setSession();
         return request;
     }
 

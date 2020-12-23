@@ -1,10 +1,12 @@
 package webserver;
 
+import webserver.request.HttpSession;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SessionRegistry {
+public class SessionManager {
     private Map<String, HttpSession> sessionMap = new HashMap<>();
 
     public boolean hasSession(String id) {

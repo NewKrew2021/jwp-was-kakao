@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import service.UserService;
-import webserver.HttpSession;
 import webserver.request.HttpRequest;
+import webserver.request.HttpSession;
 import webserver.response.HttpResponse;
 
 import java.util.Collections;
@@ -58,8 +58,9 @@ class UserControllerTest {
         when(userService.findAll()).thenReturn(Collections.singletonList(User.nobody()));
         HttpSession session = HttpSession.of("1");
         session.setAttribute(LOGIN_ATTRIBUTE, true);
+        request.setSession(session);
 
-        String viewPath = userController.showUsers(request, response, model, session);
+        String viewPath = userController.showUsers(request, response, model);
 
         assertThat(viewPath).isEqualTo("/user/list.html");
         assertThat(((UsersDto) model.getData().get("usersDto")).getUsers().size()).isEqualTo(1);
@@ -68,8 +69,8 @@ class UserControllerTest {
     @Test
     void cannotShowAllBeforeLogin() {
         HttpSession session = HttpSession.of("1");
-
-        String viewPath = userController.showUsers(request, response, model, session);
+        request.setSession(session);
+        String viewPath = userController.showUsers(request, response, model);
 
         assertThat(viewPath).isNull();
         assertThat(String.join("", response.getHeader().getHeaders())).contains("/user/login.html");
@@ -84,7 +85,8 @@ class UserControllerTest {
         request.getHeader().addParameter("userId", "user");
         request.getHeader().addParameter("password", "password");
         HttpSession session = HttpSession.of("1");
-        userController.login(request, response, session);
+        request.setSession(session);
+        userController.login(request, response);
 
         assertThat(String.join("", response.getHeader().getHeaders())).contains("index.html");
         assertThat(session.getAttribute(LOGIN_ATTRIBUTE)).isEqualTo(true);
@@ -97,8 +99,8 @@ class UserControllerTest {
         request.getHeader().addParameter("userId", "user");
         request.getHeader().addParameter("password", "password2");
         HttpSession session = HttpSession.of("1");
-
-        userController.login(request, response, session);
+        request.setSession(session);
+        userController.login(request, response);
 
         assertThat(String.join("", response.getHeader().getHeaders())).contains("/user/login_failed.html");
         assertThat(session.getAttribute(LOGIN_ATTRIBUTE)).isEqualTo(false);

@@ -1,4 +1,4 @@
-package webserver;
+package webserver.request;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ public class HttpSession {
 
     private Map<String, Object> data;
 
-    public HttpSession(String id, Map<String, Object> data) {
+    private HttpSession(String id, Map<String, Object> data) {
         this.id = id;
         this.data = data;
     }

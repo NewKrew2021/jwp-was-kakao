@@ -21,10 +21,6 @@ public class HttpResponse {
         return new HttpResponse(ResponseHeader.ok(request), "".getBytes());
     }
 
-    public static HttpResponse ok(HttpRequest request, String sessionId) {
-        return new HttpResponse(ResponseHeader.ok(request, sessionId), "".getBytes());
-    }
-
     public static HttpResponse error() {
         return new HttpResponse(ResponseHeader.error(), "".getBytes());
     }

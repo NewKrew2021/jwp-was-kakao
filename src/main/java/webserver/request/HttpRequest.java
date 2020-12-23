@@ -8,18 +8,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static context.ApplicationContext.sessionManager;
+
 public class HttpRequest {
 
+    public static final String SESSION_ID = "sessionId";
     private HttpMethod method;
     private String path;
     private Protocol protocol;
     private RequestHeader header;
     private Map<String, String> bodyParams;
+    private HttpSession session;
 
     HttpRequest() {
         header = RequestHeader.empty();
         protocol = Protocol.HTTP;
         bodyParams = new HashMap<>();
+        session = HttpSession.of(sessionManager.createSession());
     }
 
     public static HttpRequest of(List<String> lines) {
@@ -78,12 +83,32 @@ public class HttpRequest {
         return header;
     }
 
-    public String getSessionId() {
+    public void setSession(HttpSession session) {
+        this.session = session;
+    }
+
+    public void setSession() {
+        session = sessionManager.getSession(getSessionId());
+    }
+
+    private String getSessionId() {
+        String sessionId = getSessionIdFromCookie();
+        if (!sessionManager.hasSession(sessionId)) {
+            sessionId = sessionManager.createSession();
+        }
+        return sessionId;
+    }
+
+    private String getSessionIdFromCookie() {
         return getHeader().getCookies()
                 .stream()
-                .filter(cookie -> cookie.getName().equals("sessionId"))
+                .filter(cookie -> cookie.getName().equals(SESSION_ID))
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public HttpSession getSession() {
+        return session;
     }
 }
