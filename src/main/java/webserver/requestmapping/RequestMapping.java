@@ -15,6 +15,7 @@ public enum RequestMapping {
     USER_CREATE_BY_GET(GET, "/user/create", userController, "addUser"),
     USER_CREATE_BY_POST(POST, "/user/create", userController, "addUser"),
     USER_LOGIN(POST, "/user/login", userController, "login"),
+    USER_LIST_HTML(GET, "/user/list.html", userController, "showUsers"),
     USER_LIST(GET, "/user/list", userController, "showUsers");;
 
     private final HttpMethod httpMethod;

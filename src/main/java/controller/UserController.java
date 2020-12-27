@@ -4,19 +4,20 @@ import model.Model;
 import model.user.User;
 import model.user.UsersDto;
 import service.UserService;
-import webserver.Cookie;
 import webserver.request.HttpRequest;
+import webserver.request.HttpSession;
 import webserver.response.HttpResponse;
 
+import java.util.Optional;
+
 public class UserController implements Controller {
-    public static final String LOGIN_COOKIE_NAME = "logined";
+    public static final String LOGIN_ATTRIBUTE = "logined";
     private static final String HOME_PATH = "/index.html";
     private static final String LOGIN_FAILED_PATH = "/user/login_failed.html";
     private static final String LOGIN_PATH = "/user/login.html";
     private static final String USER_LIST_PATH = "/user/list.html";
 
     private final UserService userService;
-
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -32,7 +33,7 @@ public class UserController implements Controller {
     }
 
     public String showUsers(HttpRequest request, HttpResponse response, Model model) {
-        if (isLogined(request)) {
+        if (isLogined(request.getSession())) {
             model.put("usersDto", new UsersDto(userService.findAll()));
             return USER_LIST_PATH;
         }
@@ -40,21 +41,14 @@ public class UserController implements Controller {
         return null;
     }
 
-    private boolean isLogined(HttpRequest request) {
-        return request.getHeader()
-                .getCookies()
-                .stream()
-                .anyMatch(cookie -> cookie.getName().equals(LOGIN_COOKIE_NAME) && cookie.getValue().equals("true"));
+    private boolean isLogined(HttpSession httpSession) {
+        return Optional.ofNullable((Boolean) httpSession.getAttribute(LOGIN_ATTRIBUTE)).orElse(false);
     }
 
     public void login(HttpRequest request, HttpResponse response) {
         boolean loginSuccess = userService.login(request.getParameter("userId"), request.getParameter("password"));
-        response.setRedirectWithCookie(new Cookie(LOGIN_COOKIE_NAME, getCookieValue(loginSuccess), "/"),
-                getRedirectPath(loginSuccess));
-    }
-
-    private String getCookieValue(Boolean loginSuccess) {
-        return loginSuccess.toString();
+        request.getSession().setAttribute(LOGIN_ATTRIBUTE, loginSuccess);
+        response.setRedirect(getRedirectPath(loginSuccess));
     }
 
     private String getRedirectPath(boolean loginSuccess) {

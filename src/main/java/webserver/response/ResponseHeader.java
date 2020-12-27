@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static webserver.request.HttpRequest.SESSION_ID;
+
 public class ResponseHeader {
 
     private Protocol protocol;
-
     private List<String> headers;
-
     private HttpStatus status;
 
     private ResponseHeader(Protocol protocol, HttpStatus status, List<String> headers) {
@@ -24,7 +24,9 @@ public class ResponseHeader {
     }
 
     public static ResponseHeader ok(HttpRequest request) {
-        return new ResponseHeader(request.getProtocol(), HttpStatus.OK, new ArrayList<>());
+        ResponseHeader responseHeader = new ResponseHeader(request.getProtocol(), HttpStatus.OK, new ArrayList<>());
+        responseHeader.setCookie(new Cookie(SESSION_ID, request.getSession().getId(), "/"));
+        return responseHeader;
     }
 
     public static ResponseHeader error() {

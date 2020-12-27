@@ -28,6 +28,7 @@ public class Dispatcher {
         }
     }
 
+
     private void dispatch(HttpRequest request, HttpResponse response) {
         Method method = findControllerMethod(request);
         Model model = Model.empty();
@@ -114,6 +115,4 @@ public class Dispatcher {
             throw new RuntimeException(e);
         }
     }
-
-
 }

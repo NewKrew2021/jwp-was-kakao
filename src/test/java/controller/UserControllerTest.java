@@ -8,15 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import service.UserService;
-import webserver.Cookie;
 import webserver.request.HttpRequest;
-import webserver.request.RequestHeader;
+import webserver.request.HttpSession;
 import webserver.response.HttpResponse;
 
 import java.util.Collections;
 import java.util.HashMap;
 
-import static controller.UserController.LOGIN_COOKIE_NAME;
+import static controller.UserController.LOGIN_ATTRIBUTE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -57,7 +56,9 @@ class UserControllerTest {
     @Test
     void showAll() {
         when(userService.findAll()).thenReturn(Collections.singletonList(User.nobody()));
-        request.getHeader().addHeader(RequestHeader.COOKIE, Collections.singletonList(new Cookie(LOGIN_COOKIE_NAME, "true", null)));
+        HttpSession session = HttpSession.of("1");
+        session.setAttribute(LOGIN_ATTRIBUTE, true);
+        request.setSession(session);
 
         String viewPath = userController.showUsers(request, response, model);
 
@@ -67,8 +68,8 @@ class UserControllerTest {
 
     @Test
     void cannotShowAllBeforeLogin() {
-        request.getHeader().addHeader(RequestHeader.COOKIE, Collections.singletonList(new Cookie(LOGIN_COOKIE_NAME, "false", null)));
-
+        HttpSession session = HttpSession.of("1");
+        request.setSession(session);
         String viewPath = userController.showUsers(request, response, model);
 
         assertThat(viewPath).isNull();
@@ -83,10 +84,12 @@ class UserControllerTest {
 
         request.getHeader().addParameter("userId", "user");
         request.getHeader().addParameter("password", "password");
+        HttpSession session = HttpSession.of("1");
+        request.setSession(session);
         userController.login(request, response);
 
-        assertThat(String.join("", response.getHeader().getHeaders())).contains("logined=true");
         assertThat(String.join("", response.getHeader().getHeaders())).contains("index.html");
+        assertThat(session.getAttribute(LOGIN_ATTRIBUTE)).isEqualTo(true);
     }
 
     @Test
@@ -95,10 +98,11 @@ class UserControllerTest {
 
         request.getHeader().addParameter("userId", "user");
         request.getHeader().addParameter("password", "password2");
-
+        HttpSession session = HttpSession.of("1");
+        request.setSession(session);
         userController.login(request, response);
 
-        assertThat(String.join("", response.getHeader().getHeaders())).contains("logined=false");
         assertThat(String.join("", response.getHeader().getHeaders())).contains("/user/login_failed.html");
+        assertThat(session.getAttribute(LOGIN_ATTRIBUTE)).isEqualTo(false);
     }
 }
