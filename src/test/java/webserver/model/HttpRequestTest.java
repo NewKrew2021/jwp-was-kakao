@@ -19,7 +19,10 @@ public class HttpRequestTest {
     })
     void parameters(int expected, String requestLine) throws IOException {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThat(HttpRequest.from(in).getParameters().size()).isEqualTo(expected);
+        HttpRequest request = HttpRequest.from(in);
+
+        Assertions.assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
+        Assertions.assertThat(request.getParameters().size()).isEqualTo(expected);
     }
 
     @ParameterizedTest
@@ -29,7 +32,10 @@ public class HttpRequestTest {
     })
     void parameter(String queryKey, String expected, String requestLine) throws IOException {
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThat(HttpRequest.from(in).getParameter(queryKey)).isEqualTo(expected);
+        HttpRequest request = HttpRequest.from(in);
+
+        Assertions.assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
+        Assertions.assertThat(request.getParameter(queryKey)).isEqualTo(expected);
     }
 
     @Test
@@ -45,7 +51,10 @@ public class HttpRequestTest {
                 "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"
         };
         InputStream in = new ByteArrayInputStream(String.join("\r\n", requestLines).getBytes());
-        Assertions.assertThat(HttpRequest.from(in).getParameters())
+        HttpRequest request = HttpRequest.from(in);
+
+        Assertions.assertThat(request.getMethod()).isEqualTo(HttpMethod.POST);
+        Assertions.assertThat(request.getParameters())
                 .containsEntry("id", "123")
                 .containsEntry("password", "password")
                 .containsEntry("name", "박재성")
@@ -58,7 +67,10 @@ public class HttpRequestTest {
         String requestLine =
                 "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
         InputStream in = new ByteArrayInputStream(requestLine.getBytes());
-        Assertions.assertThat(HttpRequest.from(in).getParameters())
+        HttpRequest request = HttpRequest.from(in);
+
+        Assertions.assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
+        Assertions.assertThat(request.getParameters())
                 .containsEntry("password", "password")
                 .containsEntry("name", "박재성")
                 .containsEntry("userId", "javajigi")
@@ -78,7 +90,10 @@ public class HttpRequestTest {
                 "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"
         };
         InputStream in = new ByteArrayInputStream(String.join("\r\n", requestLines).getBytes());
-        Assertions.assertThat(HttpRequest.from(in).getParameters())
+        HttpRequest request = HttpRequest.from(in);
+
+        Assertions.assertThat(request.getMethod()).isEqualTo(HttpMethod.POST);
+        Assertions.assertThat(request.getParameters())
                 .containsEntry("password", "password")
                 .containsEntry("name", "박재성")
                 .containsEntry("userId", "javajigi")

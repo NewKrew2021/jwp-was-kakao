@@ -86,6 +86,10 @@ public class HttpRequest {
         }
     }
 
+    public HttpMethod getMethod() {
+        return httpRequestLine.getMethod();
+    }
+
     public String getPath() {
         return httpRequestLine.getPath();
     }
