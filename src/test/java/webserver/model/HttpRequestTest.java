@@ -99,4 +99,24 @@ public class HttpRequestTest {
                 .containsEntry("userId", "javajigi")
                 .containsEntry("email", "javajigi@slipp.net");
     }
+
+    @Test
+    void getSession() throws IOException {
+        HttpSession oldSession = new HttpSession();
+        oldSession.setAttribute("key1", "val1");
+        oldSession.setAttribute("key2", "val2");
+
+        String[] requestLines = {
+                "GET / HTTP/1.1",
+                String.format("Cookie: %s=%s",
+                        HttpSession.SESSION_COOKIE_NAME,
+                        oldSession.getId())
+        };
+        InputStream in = new ByteArrayInputStream(String.join("\r\n", requestLines).getBytes());
+        HttpRequest request = HttpRequest.from(in);
+        HttpSession newSession = request.getSession();
+
+        Assertions.assertThat(newSession.getAttribute("key1")).isEqualTo("val1");
+        Assertions.assertThat(newSession.getAttribute("key2")).isEqualTo("val2");
+    }
 }

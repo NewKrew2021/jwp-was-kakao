@@ -117,4 +117,13 @@ public class HttpRequest {
     public Map<String, String> getCookies() {
         return Collections.unmodifiableMap(cookies);
     }
+
+    public HttpSession getSession() {
+        String sessionId = getCookie(HttpSession.SESSION_COOKIE_NAME);
+        HttpSession session = HttpSession.of(sessionId);
+        if (Objects.isNull(session)) {
+            session = new HttpSession();
+        }
+        return session;
+    }
 }

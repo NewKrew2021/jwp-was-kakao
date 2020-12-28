@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import webserver.controller.*;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
+import webserver.model.HttpSession;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,7 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest request = HttpRequest.from(in);
             HttpResponse response = new HttpResponse(out);
+            response.setCookie(HttpSession.SESSION_COOKIE_NAME, request.getSession().getId());
 
             Controller controller = controllers.getOrDefault(request.getPath(), defaultController);
             controller.handle(request, response);
