@@ -36,13 +36,14 @@ public class HttpRequest {
         Map<String, String> headers = parseHeaders(reader);
 
         HttpMethod method = httpRequestLine.getMethod();
-        String query = httpRequestLine.getQuery();
+        Map<String, String> parameters = parseQuery(httpRequestLine.getQuery());
 
         if (method == HttpMethod.POST || method == HttpMethod.PUT) {
-            query = IOUtils.readData(reader, Integer.parseInt(headers.getOrDefault("content-length", "0")));
+            String contentQuery = IOUtils.readData(reader, Integer.parseInt(headers.getOrDefault("content-length", "0")));
+            parameters.putAll(parseQuery(contentQuery));
         }
 
-        return new HttpRequest(httpRequestLine, headers, parseQuery(query));
+        return new HttpRequest(httpRequestLine, headers, parameters);
     }
 
     private static Map<String, String> parseHeaders(BufferedReader reader) throws IOException {
@@ -61,7 +62,7 @@ public class HttpRequest {
 
     private static Map<String, String> parseQuery(String query) {
         if (isEmpty(query)) {
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
 
         return querySplitPattern.splitAsStream(query)

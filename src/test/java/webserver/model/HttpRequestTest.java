@@ -33,6 +33,27 @@ public class HttpRequestTest {
     }
 
     @Test
+    void queryParamsWithContent() throws IOException {
+        String[] requestLines = {
+                "POST /user?id=123 HTTP/1.1",
+                "Host: localhost:8080",
+                "Connection: keep-alive",
+                "Content-Length: 93",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Accept: */*",
+                "",
+                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net"
+        };
+        InputStream in = new ByteArrayInputStream(String.join("\r\n", requestLines).getBytes());
+        Assertions.assertThat(HttpRequest.from(in).getParameters())
+                .containsEntry("id", "123")
+                .containsEntry("password", "password")
+                .containsEntry("name", "박재성")
+                .containsEntry("userId", "javajigi")
+                .containsEntry("email", "javajigi@slipp.net");
+    }
+
+    @Test
     void createUser() throws IOException {
         String requestLine =
                 "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
