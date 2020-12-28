@@ -14,6 +14,7 @@ public class HttpResponse {
 
     private final OutputStream out;
     private final Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> cookies = new HashMap<>();
 
     public HttpResponse(OutputStream out) {
         this.out = out;
@@ -29,6 +30,7 @@ public class HttpResponse {
         writer.format("HTTP/1.1 %d %s", status.getCode(), status.getMessage());
         writer.println();
         headers.forEach((k, v) -> writer.println(String.join(": ", k, v)));
+        cookies.forEach((k, v) -> writer.println(String.format("%s: %s=%s; Path=/", SET_COOKIE, k, v)));
         writer.println();
         writer.flush();
     }
@@ -59,7 +61,7 @@ public class HttpResponse {
     }
 
     public void setCookie(String key, String value) {
-        headers.put(SET_COOKIE, String.format("%s=%s; Path=/", key, value));
+        cookies.put(key, value);
     }
 
     public void setLocation(String location) {
