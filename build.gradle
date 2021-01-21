@@ -21,6 +21,7 @@ ext {
 
 dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'org.reflections:reflections:0.9.12'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'com.github.jknack:handlebars:4.2.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
