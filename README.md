@@ -11,7 +11,7 @@
 # 요구사항 목록
 ## 1단계
 - [x] /index.html로 접속하면 webapp 디렉터리의 index.html 파일을 읽어서 클라이언트에게 응답
-- [ ] 회원가입 메뉴를 클릭하면 /user/form.html로 이동 후 회원가입
+- [x] 회원가입 메뉴를 클릭하면 /user/form.html로 이동 후 회원가입
 - [ ] /user/form.html 파일의 form 태그 method를 post로 수정
 - [ ] 회원가입을 완료하면 /index.html 이동
 - [ ] 로그인 메뉴 클릭 시 /user/login.html로 이동
