@@ -7,3 +7,16 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+# 요구사항 목록
+## 1단계
+- [x] /index.html로 접속하면 webapp 디렉터리의 index.html 파일을 읽어서 클라이언트에게 응답
+- [ ] 회원가입 메뉴를 클릭하면 /user/form.html로 이동 후 회원가입
+- [ ] /user/form.html 파일의 form 태그 method를 post로 수정
+- [ ] 회원가입을 완료하면 /index.html 이동
+- [ ] 로그인 메뉴 클릭 시 /user/login.html로 이동
+    - [ ] 성공하면 /index.html로 이동
+    - [ ] 실패하면 /user/login_failed.html로 이동
+- [ ] 로그인 상태일 경우 /user/list에 접근 시 사용자 목록 출력
+    - [ ] 로그인하지 않은 상태면 /user/login.html
+- [ ] stylesheet 파일 지원
