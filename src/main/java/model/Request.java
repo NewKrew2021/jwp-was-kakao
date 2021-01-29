@@ -21,6 +21,10 @@ public class Request {
         }
     }
 
+    public void setParams(String paramString){
+        this.params=parseParams(paramString);
+    }
+
     private Map<String, String> parseParams(String paramString) {
         Map<String, String> map = new HashMap<>();
         for (String path : paramString.split("\\&")) {

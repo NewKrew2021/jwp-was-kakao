@@ -1,14 +1,15 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.URISyntaxException;
-
 import controller.UserController;
 import model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import utils.IOUtils;
+
+import java.io.*;
+import java.net.Socket;
+import java.net.URISyntaxException;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -32,10 +33,18 @@ public class RequestHandler implements Runnable {
             if(str==null) {
                 return;
             }
+            int contentLength = -1;
+
             Request request=new Request(str);
             while (!str.equals("")){
                 logger.debug(str);
+                if(str.contains("Content-Length")){
+                    contentLength = Integer.parseInt(str.split(" ")[1]);
+                }
                 str = br.readLine();
+            }
+            if(request.getMethodType().equals("POST")){
+                request.setParams(IOUtils.readData(br,contentLength));
             }
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = requestMapper(request);

@@ -19,9 +19,9 @@
     [x] 2.1.1 Header의 첫 번째 라인에서 요청 URL을 추출하고
     [x] 2.1.2 요청 URL에서 접근 경로와 이름=값을 추출해 User 클래스에 담는다.
 
-- [ ] 3 http://localhost:8080/user/form.html 파일의 form 태그 method를 get에서 post로 수정한 후 회원가입 기능이 정상적으로 동작하도록 구현한다.
-    [ ] 3.1 Request Body의 값 추출하기
-   [ ] 3.2 회원가입시 입력한 모든 데이터를 추출해 User 객체를 생성한다
+- [x] 3 http://localhost:8080/user/form.html 파일의 form 태그 method를 get에서 post로 수정한 후 회원가입 기능이 정상적으로 동작하도록 구현한다.
+    [x] 3.1 Request Body의 값 추출하기
+   [x] 3.2 회원가입시 입력한 모든 데이터를 추출해 User 객체를 생성한다
 
 - [ ] 4 "회원가입"완료시 /index.html 페이지로 이동.
 
