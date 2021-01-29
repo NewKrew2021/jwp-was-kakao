@@ -41,15 +41,25 @@ public class RequestHandler implements Runnable {
                     User user = userRequest.toUser();
                     DataBase.addUser(user);
 
-                    byte[] body = FileIoUtils.loadFileFromClasspath("./templates/index.html");
-                    response200Header(dos, body.length);
-                    responseBody(dos, body);
+                    response302Header(dos, "http://localhost:8080/index.html");
                 }
             }
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
