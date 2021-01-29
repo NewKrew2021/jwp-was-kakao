@@ -7,3 +7,29 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+### 구현해야할 기능 목록
+- [ ] 1 http://localhost:8080/index.html 로 접속했을 때 webapp 디렉토리의 index.html 파일을 읽어 클라이언트에 응답한다.
+   [ ] 1.1 모든 Request Header 출력하기
+   [ ] 1.2 Request Line에서 Path 분리하기
+   [ ] 1.3 path에 해당하는 파일 읽어 응답하기
+
+- [ ] 2 “회원가입” 메뉴를 클릭하면 http://localhost:8080/user/form.html 으로 이동하면서 회원가입할 수 있다. 회원가입한다.
+    [ ] 2.1 Request parameter 추출하기
+    [ ] 2.1.1 Header의 첫 번째 라인에서 요청 URL을 추출하고
+    [ ] 2.1.2 요청 URL에서 접근 경로와 이름=값을 추출해 User 클래스에 담는다.
+
+- [ ] 3 http://localhost:8080/user/form.html 파일의 form 태그 method를 get에서 post로 수정한 후 회원가입 기능이 정상적으로 동작하도록 구현한다.
+    [ ] 3.1 Request Body의 값 추출하기
+   [ ] 3.2 회원가입시 입력한 모든 데이터를 추출해 User 객체를 생성한다
+
+- [ ] 4 "회원가입"완료시 /index.html 페이지로 이동.
+
+- [ ]5 “로그인” 메뉴를 클릭하면 http://localhost:8080/user/login.html 으로 이동해 로그인할 수 있다. 로그인이 성공하면 index.html로 이동하고, 로그인이 실패하면 /user/login_failed.html로 이동해야 한다.
+    [ ]5.1 로그인이 성공하면 cookie를 활용해 로그인 상태를 유지할 수 있어야 한다.
+    [ ]5.2 로그인이 성공할경우 header의 Cookie header의 값이 logined=true, 실패할 경우 logined=false로 전달되어야 한다.
+
+- [ ] 6 접근하고 있는 사용자가 “로그인” 상태일 경우(Cookie 값이 logined=true) 경우 http://localhost:8080/user/list 로 접근했을 때 사용자 목록을 출력한다. 만약 로그인하지 않은 상태라면 로그인 페이지(login.html)로 이동한다.
+
+- [ ] 7 지금까지 구현한 소스 코드는 stylesheet 파일을 지원하지 못하고 있다. Stylesheet 파일을 지원하도록 구현하도록 한다.
+
