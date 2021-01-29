@@ -7,6 +7,7 @@ import dto.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import utils.IOUtils;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -25,12 +26,16 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String lines = "";
             String line;
+
             while(!(line = br.readLine()).equals("")){
                 lines += line + "\n";
             }
-            System.out.println(lines);
 
             HttpRequest request = new HttpRequest(lines);
+            if(request.getContentLength() != 0) {
+                request.setBody(IOUtils.readData(br, request.getContentLength()));
+            }
+
             byte[] body = DispatcherServlet.run(request);
 
             DataOutputStream dos = new DataOutputStream(out);
