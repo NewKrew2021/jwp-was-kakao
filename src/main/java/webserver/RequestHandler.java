@@ -25,11 +25,16 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(reader);
             String str=br.readLine();
             logger.debug("####HTTP Request Header 출력");
-
+            String path = "";
+            if(str != null){
+                String[] token=str.split(" ");
+                path=token[1];
+            }
             while (!(str == null || str.equals(""))){
                 logger.debug(str);
                 str= br.readLine();
             }
+            logger.debug(path);
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "Hello World".getBytes();
             response200Header(dos, body.length);
