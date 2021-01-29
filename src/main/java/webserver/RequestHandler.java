@@ -1,5 +1,7 @@
 package webserver;
 
+import db.DataBase;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -48,8 +50,10 @@ public class RequestHandler implements Runnable {
             String path = request.getPath();
             if (path.endsWith(".html")) {
                 path = "./templates" + path;
-            } else {
-                path = "./static" + path;
+            }
+
+            if (path.startsWith("/user/create")) {
+                DataBase.addUser(new User(request.getParameters()));
             }
 
             byte[] body = FileIoUtils.loadFileFromClasspath(path);
