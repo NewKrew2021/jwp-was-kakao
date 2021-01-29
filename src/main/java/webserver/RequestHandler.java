@@ -20,6 +20,7 @@ public class RequestHandler implements Runnable {
     private Socket connection;
     private Map<String, String> requestParser;
     private Map<String, String> requestBodyParser;
+    private boolean login = false;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -36,19 +37,26 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             String line = bufferedReader.readLine();
+            logger.debug(line);
             parseFirstLine(line);
             while (!(line = bufferedReader.readLine()).equals("")) {
                 if (line == null)
                     return;
                 String[] currentLine = line.split(": ");
-                requestParser.put(currentLine[0],currentLine[1]);
+                requestParser.put(currentLine[0], currentLine[1]);
             }
 
-            if( requestParser.containsKey("Content-Length") && requestParser.get("url").equals("/user/create") && requestParser.get("method").equals("POST") ) {
-                String body = IOUtils.readData(bufferedReader, Integer.parseInt(requestParser.get("Content-Length")) );
+            // 쿠키 처리
+            if(requestParser.containsKey("Cookie") && requestParser.get("Cookie").equals("logined=true")) {
+                login = true;
+            }
+
+            // 회원가입
+            if (requestParser.containsKey("Content-Length") && requestParser.get("url").equals("/user/create") && requestParser.get("method").equals("POST")) {
+                String body = IOUtils.readData(bufferedReader, Integer.parseInt(requestParser.get("Content-Length")));
                 String[] currentLine = body.split("&|=");
-                for (int i = 0; i < currentLine.length ; i = i + 2) {
-                    requestBodyParser.put(currentLine[i], currentLine[i+1]);
+                for (int i = 0; i < currentLine.length; i = i + 2) {
+                    requestBodyParser.put(currentLine[i], currentLine[i + 1]);
                 }
                 for (String key : requestBodyParser.keySet()) {
                     System.out.println("key : " + key + ", value : " + requestBodyParser.get(key));
@@ -56,13 +64,30 @@ public class RequestHandler implements Runnable {
                 User user = new User(requestBodyParser.get("userId"),requestBodyParser.get("password"), requestBodyParser.get("name"), requestBodyParser.get("email") );
                 DataBase.addUser(user);
 
-                response302Header(dos);
+                response302Header(dos, "/index.html");
+                return;
+            }
+
+            // 로그인
+            if (requestParser.get("method").equals("POST") && requestParser.get("url").equals("/user/login")) {
+                String body = IOUtils.readData(bufferedReader, Integer.parseInt(requestParser.get("Content-Length")));
+                String[] currentLine = body.split("&|=");
+                for (int i = 0; i < currentLine.length; i = i + 2) {
+                    requestBodyParser.put(currentLine[i], currentLine[i + 1]);
+                }
+                login = DataBase.isPossibleLogin(requestBodyParser.get("userId"), requestBodyParser.get("password"));
+                if (login) {
+                    response302Header(dos, "/index.html");
+                }
+                else {
+                    response302Header(dos, "/user/login_failed.html");
+                }
                 return;
             }
 
 
             byte[] body = "Hello World".getBytes();
-            if(FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
+            if (FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
                 body = FileIoUtils.loadFileFromClasspath("./templates" + requestParser.get("url"));
             }
 
@@ -89,6 +114,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("Set-Cookie: logined=" + login + "; Path=/\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -96,10 +122,12 @@ public class RequestHandler implements Runnable {
     }
 
 
-    private void response302Header(DataOutputStream dos) {
+    private void response302Header(DataOutputStream dos, String url) {
         try {
-            dos.writeBytes( "HTTP/1.1 302 Found \r\n");
-            dos.writeBytes( "Location: http://localhost:8080/index.html \r\n");
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080" + url + " \r\n");
+            dos.writeBytes("Set-Cookie: logined=" + login + "; Path=/\r\n");
+            dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
