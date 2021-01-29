@@ -10,7 +10,7 @@
 
 ### 구현해야할 기능 목록
 - [ ] 1 http://localhost:8080/index.html 로 접속했을 때 webapp 디렉토리의 index.html 파일을 읽어 클라이언트에 응답한다.
-   [ ] 1.1 모든 Request Header 출력하기
+   [x] 1.1 모든 Request Header 출력하기
    [ ] 1.2 Request Line에서 Path 분리하기
    [ ] 1.3 path에 해당하는 파일 읽어 응답하기
 
