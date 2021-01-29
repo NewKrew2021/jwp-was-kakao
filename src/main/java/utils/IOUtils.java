@@ -12,10 +12,8 @@ public class IOUtils {
     public static final String NEW_LINE = System.lineSeparator();
 
     /**
-     * @param BufferedReader는
-     *            Request Body를 시작하는 시점이어야
-     * @param contentLength는
-     *            Request Header의 Content-Length 값이다.
+     * @param BufferedReader는 Request Body를 시작하는 시점이어야
+     * @param contentLength는  Request Header의 Content-Length 값이다.
      * @return
      * @throws IOException
      */
@@ -25,10 +23,20 @@ public class IOUtils {
         return String.copyValueOf(body);
     }
 
-    public static List<String> readRequest(InputStream in) throws IOException {
+    public static List<String> readRequest(InputStream in) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         List<String> texts = new ArrayList<>();
 
+        try {
+            readRequest(bufferedReader, texts);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+        return texts;
+    }
+
+    private static void readRequest(BufferedReader bufferedReader, List<String> texts) throws IOException {
         String text;
         while ((text = bufferedReader.readLine()) != null) {
             if ("".equals(text)) {
@@ -36,7 +44,5 @@ public class IOUtils {
             }
             texts.add(text);
         }
-
-        return texts;
     }
 }

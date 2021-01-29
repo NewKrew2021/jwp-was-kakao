@@ -1,27 +1,17 @@
-package utils;
+package web;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
+import utils.IOUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IOUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(IOUtilsTest.class);
-
+public class HttpRequestTest {
     @Test
-    public void readData() throws Exception {
-        String data = "abcd123";
-        StringReader sr = new StringReader(data);
-        BufferedReader br = new BufferedReader(sr);
-
-        logger.debug("parse body : {}", IOUtils.readData(br, data.length()));
-    }
-
-    @Test
-    void readRequest() throws IOException {
+    void create() {
         String data = "GET / HTTP/1.1" + IOUtils.NEW_LINE +
                 "Host: localhost:8080" + IOUtils.NEW_LINE +
                 "Connection: keep-alive" + IOUtils.NEW_LINE +
@@ -36,6 +26,9 @@ public class IOUtilsTest {
                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + IOUtils.NEW_LINE;
 
         InputStream inputStream = new ByteArrayInputStream(data.getBytes());
-        assertThat(IOUtils.readRequest(inputStream).get(0)).isEqualTo("GET / HTTP/1.1");
+        HttpRequest httpRequest = HttpRequest.of(inputStream);
+
+        assertThat(httpRequest).extracting("httpMethod").isEqualTo(HttpMethod.GET);
+        assertThat(httpRequest.getHttpUrl().getUrl()).isEqualTo("/");
     }
 }
