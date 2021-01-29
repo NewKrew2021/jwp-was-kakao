@@ -1,36 +1,63 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private Map<String, String> requestParser;
+
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
 
     public void run() {
+        requestParser = new HashMap<>();
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            String line = bufferedReader.readLine();
+            parseFirstLine(line);
+            while (!(line = bufferedReader.readLine()).equals("")) {
+                if (line == null)
+                    return;
+                String[] currentLine = line.split(": ");
+                requestParser.put(currentLine[0],currentLine[1]);
+            }
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "Hello World".getBytes();
+            if(FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
+                body = FileIoUtils.loadFileFromClasspath("./templates" + requestParser.get("url"));
+            }
             response200Header(dos, body.length);
             responseBody(dos, body);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void parseFirstLine(String line) {
+        if (line == null) {
+            throw new IllegalArgumentException("Not a RESTful request");
+        }
+        String[] currentLine = line.split(" ");
+
+        requestParser.put("method", currentLine[0]);
+        requestParser.put("url", currentLine[1]);
+        requestParser.put("version", currentLine[2]);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
