@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
 import service.LoginService;
 import utils.FileIoUtils;
+import utils.IOUtils;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -36,10 +37,6 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line = br.readLine();
             logger.debug("request : {}", line);
-//            while(!line.equals("")){
-//                line = br.readLine();
-//                logger.debug("header : " + line);
-//            }
 
             String[] filePath = line.split(" ");
 
@@ -61,7 +58,15 @@ public class RequestHandler implements Runnable {
                 responseBody(dos, body);
             }
             if (path.equals("/user/create")) {
-                Map<String, String> argument = parseArgument(requestPath[1]);
+                Map<String, String> strBuf = new HashMap<>();
+                while(!(line = br.readLine()).equals("")){
+                    String[] buf = line.split(": ");
+                    strBuf.put(buf[0], buf[1]);
+                    logger.debug("header : {}", line);
+                }
+                int contentLength = Integer.parseInt(strBuf.get("Content-Length"));
+                String body = IOUtils.readData(br,contentLength);
+                Map<String, String> argument = parseArgument(body);
                 new LoginService().createUser(argument);
             }
 
