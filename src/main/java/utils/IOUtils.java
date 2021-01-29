@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,12 +22,11 @@ public class IOUtils {
         return String.copyValueOf(body);
     }
 
-    public static List<String> readRequest(InputStream in) {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+    public static List<String> readRequestUntilHeader(BufferedReader in) {
         List<String> texts = new ArrayList<>();
 
         try {
-            readRequest(bufferedReader, texts);
+            readRequestUntilHeader(in, texts);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -36,13 +34,11 @@ public class IOUtils {
         return texts;
     }
 
-    private static void readRequest(BufferedReader bufferedReader, List<String> texts) throws IOException {
-        String text;
-        while ((text = bufferedReader.readLine()) != null) {
-            if ("".equals(text)) {
-                break;
-            }
+    private static void readRequestUntilHeader(BufferedReader bufferedReader, List<String> texts) throws IOException {
+        String text = bufferedReader.readLine();
+        while (text != null && !text.trim().isEmpty()) {
             texts.add(text);
+            text = bufferedReader.readLine();
         }
     }
 }

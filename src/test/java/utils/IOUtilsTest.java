@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,7 +22,7 @@ public class IOUtilsTest {
     }
 
     @Test
-    void readRequest() throws IOException {
+    void readRequest() {
         String data = "GET / HTTP/1.1" + IOUtils.NEW_LINE +
                 "Host: localhost:8080" + IOUtils.NEW_LINE +
                 "Connection: keep-alive" + IOUtils.NEW_LINE +
@@ -35,7 +36,8 @@ public class IOUtilsTest {
                 "Accept-Encoding: gzip, deflate, br" + IOUtils.NEW_LINE +
                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + IOUtils.NEW_LINE;
 
-        InputStream inputStream = new ByteArrayInputStream(data.getBytes());
-        assertThat(IOUtils.readRequest(inputStream).get(0)).isEqualTo("GET / HTTP/1.1");
+        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data.getBytes())));
+        assertThat(IOUtils.readRequestUntilHeader(br).get(0)).isEqualTo("GET / HTTP/1.1");
     }
+
 }

@@ -30,5 +30,6 @@ public class HttpRequestTest {
 
         assertThat(httpRequest).extracting("httpMethod").isEqualTo(HttpMethod.GET);
         assertThat(httpRequest.getHttpUrl().getUrl()).isEqualTo("/");
+        assertThat(httpRequest.getHttpHeaders().get("Host")).isEqualTo("localhost:8080");
     }
 }

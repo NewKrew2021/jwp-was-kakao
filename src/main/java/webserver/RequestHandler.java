@@ -53,6 +53,7 @@ public class RequestHandler implements Runnable {
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
+
             logger.error(e.getMessage());
         }
     }
