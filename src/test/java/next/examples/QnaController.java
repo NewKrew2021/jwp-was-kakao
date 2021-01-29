@@ -1,4 +1,4 @@
-package study.examples;
+package next.examples;
 
 import annotation.Autowired;
 import annotation.web.Controller;

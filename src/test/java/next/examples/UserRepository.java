@@ -1,4 +1,4 @@
-package study.examples;
+package next.examples;
 
 public interface UserRepository {
 
