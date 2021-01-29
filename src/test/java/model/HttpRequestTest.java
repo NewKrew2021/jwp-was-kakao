@@ -56,6 +56,27 @@ public class HttpRequestTest {
         headerMap.put("Accept", "*/*");
 
         assertThat(req.getHeaderMap()).isEqualTo(headerMap);
-        assertThat(req.getBody()).isNull();
+        assertThat(req.getBody()).isEqualTo("");
+    }
+
+    @Test
+    public void parseQueryString() throws IOException{
+        String temp = "GET /user/create?userId=jack&password=password&name=jackwon&email=jackwon%40kakaocorp.com HTTP/1.1\n" +
+                "Host: localhost:8080\n" +
+                "Connection: keep-alive\n" +
+                "Accept: */*\n" +
+                "";
+
+        InputStream is = new ByteArrayInputStream(temp.getBytes());
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        HttpRequest req = new HttpRequest(br);
+
+        Map<String, String> queryParameterMap = new HashMap<>();
+        queryParameterMap.put("userId", "jack");
+        queryParameterMap.put("password", "password");
+        queryParameterMap.put("name", "jackwon");
+        queryParameterMap.put("email", "jackwon%40kakaocorp.com");
+
+        assertThat(req.getQueryParameterMap()).isEqualTo(queryParameterMap);
     }
 }

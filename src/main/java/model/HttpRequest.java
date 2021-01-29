@@ -17,7 +17,8 @@ public class HttpRequest {
     private String path;
     private String protocol;
     private Map<String, String> headerMap = new HashMap<>();
-    private String body;
+    private Map<String, String> queryParameterMap = new HashMap<>();
+    private String body = "";
 
     private final static List<String> acceptedMethod = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
@@ -36,7 +37,7 @@ public class HttpRequest {
 
     private void setBody(BufferedReader br) throws IOException {
         while(br.ready()){
-            body.concat(br.readLine());
+            body += br.readLine();
         }
         log.debug("{}", body);
     }
@@ -63,8 +64,25 @@ public class HttpRequest {
         validateStartLine(startLine);
         log.debug(line);
         method = startLine[0];
-        path = startLine[1];
+        setPath(startLine[1]);
         protocol = startLine[2];
+    }
+
+    private void setPath(String path) {
+        String[] pathArgs = path.split("\\?", 2);
+        this.path = pathArgs[0];
+        if (pathArgs.length == 1) {
+            return;
+        }
+        setQueryParameters(pathArgs[1]);
+    }
+
+    private void setQueryParameters(String pathArg) {
+        String[] queryParams = pathArg.split("&");
+        Arrays.stream(queryParams).forEach((param) -> {
+            String[] args = param.split("=", 2);
+            queryParameterMap.put(args[0], args[1]);
+        });
     }
 
     private static void validateStartLine(String[] startLine) throws IOException {
@@ -91,5 +109,9 @@ public class HttpRequest {
 
     public String getBody() {
         return body;
+    }
+
+    public Map<String, String> getQueryParameterMap() {
+        return queryParameterMap;
     }
 }
