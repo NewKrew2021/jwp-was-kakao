@@ -1,5 +1,7 @@
 package webserver;
 
+import utils.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ public class Request {
     private final String version;
     private final Map<String, String> headers = new HashMap<>();
     private String path;
+    private String body = "";
 
     public Request(BufferedReader br) throws IOException {
         String line = br.readLine();
@@ -36,6 +39,10 @@ public class Request {
             String[] header = line.split(": ");
             headers.put(header[0], header[1]);
         }
+
+        if (headers.containsKey("Content-Length")) {
+            body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+        }
     }
 
     public String getMethod() {
@@ -56,5 +63,9 @@ public class Request {
 
     public Map<String, String> getParameters() {
         return parameters;
+    }
+
+    public String getBody() {
+        return body;
     }
 }

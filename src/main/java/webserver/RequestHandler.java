@@ -48,12 +48,15 @@ public class RequestHandler implements Runnable {
             Request request = new Request(br);
 
             String path = request.getPath();
-            if (path.endsWith(".html")) {
+            String method = request.getMethod();
+
+            if (method.equals("GET") && path.endsWith(".html")) {
                 path = "./templates" + path;
             }
 
-            if (path.startsWith("/user/create")) {
-                DataBase.addUser(new User(request.getParameters()));
+            if (method.equals("POST") && path.startsWith("/user/create")) {
+                DataBase.addUser(User.of(request.getBody()));
+                System.out.println(DataBase.findAll());
             }
 
             byte[] body = FileIoUtils.loadFileFromClasspath(path);

@@ -1,12 +1,14 @@
 package model;
 
+import utils.KeyValueTokenizer;
+
 import java.util.Map;
 
 public class User {
-    private String userId;
-    private String password;
-    private String name;
-    private String email;
+    private final String userId;
+    private final String password;
+    private final String name;
+    private final String email;
 
     public User(String userId, String password, String name, String email) {
         this.userId = userId;
@@ -20,6 +22,11 @@ public class User {
         this.password = parameters.get("password");
         this.name = parameters.get("name");
         this.email = parameters.get("email");
+    }
+
+    public static User of(String input) {
+        Map<String, String> parameters = KeyValueTokenizer.of(input);
+        return new User(parameters);
     }
 
     public String getUserId() {
