@@ -56,7 +56,6 @@ public class RequestHandler implements Runnable {
 
             if (method.equals("POST") && path.startsWith("/user/create")) {
                 DataBase.addUser(User.of(request.getBody()));
-                System.out.println(DataBase.findAll());
             }
 
             byte[] body = FileIoUtils.loadFileFromClasspath(path);
