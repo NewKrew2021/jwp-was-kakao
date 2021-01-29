@@ -1,5 +1,7 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.PathUtils;
 
 import java.io.*;
@@ -18,11 +20,11 @@ public class Request {
             this.method = requestLine[0];
             this.uri = requestLine[1];
 
-//            logger.debug("request line : {}", line);
-//            while (!"".equals(line) && line != null) {
-//                line = br.readLine();
-//                logger.debug("header : {}", line);
-//            }
+            logger.debug("request line : {}", line);
+            while (!"".equals(line) && line != null) {
+                line = br.readLine();
+                logger.debug("header : {}", line);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -34,6 +36,7 @@ public class Request {
         this.method = requestLine[0];
         this.uri = requestLine[1];
     }
+
 
     public static Request of(InputStream in) {
         return new Request(in);
@@ -49,5 +52,9 @@ public class Request {
 
     public String getUri() {
         return uri;
+    }
+
+    public String getUserRequestParam() {
+        return uri.split("\\?")[1];
     }
 }

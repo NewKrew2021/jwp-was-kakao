@@ -4,10 +4,12 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 
+import db.DataBase;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
-import utils.PathUtils;
+import webserver.user.UserRequest;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -28,12 +30,24 @@ public class RequestHandler implements Runnable {
 
             Request request = Request.of(in);
 
-            if(request.getMethod().equals("GET")) {
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
-                response200Header(dos, body.length);
-                responseBody(dos, body);
+            if (request.getMethod().equals("GET")) {
+
+                if (request.getUri().indexOf("/user/create") == 0) {
+                    UserRequest userRequest = UserRequest.of(request.getUserRequestParam());
+                    User user = userRequest.toUser();
+                    DataBase.addUser(user);
+
+                    byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                }
+                if(request.getUri().equals("/index.html")) {
+                    byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                }
             }
-            if(request.getMethod().equals("POST")) {
+            if (request.getMethod().equals("POST")) {
                 byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
                 response200Header(dos, body.length);
                 responseBody(dos, body);
