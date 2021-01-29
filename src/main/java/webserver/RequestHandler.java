@@ -1,14 +1,15 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
 import utils.ParseUtils;
+
+import java.io.*;
+import java.net.Socket;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
 
@@ -21,7 +22,7 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
-    public void run() {
+    public synchronized void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
@@ -32,22 +33,24 @@ public class RequestHandler implements Runnable {
             Map<String, String> request = new HashMap<>();
             String line = readLine(reader);
 
-            getMethodAndUrl(line,request);
+            getMethodAndUrl(line, request);
 
             line = readLine(reader);
 
-            while(!line.isEmpty()){
-                getHeaders(line,request);
+            while (!line.isEmpty()) {
+                getHeaders(line, request);
                 line = readLine(reader);
-                if(line == null){
+                if (line == null) {
                     break;
                 }
             }
 
-            byte[] body = "Hello World".getBytes();
+            String path = request.get("url");
+
+            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
             response200Header(dos, body.length);
             responseBody(dos, body);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
@@ -62,11 +65,11 @@ public class RequestHandler implements Runnable {
         request.put(ParseUtils.parseHeaderKey(header), ParseUtils.parseHeaderValue(header));
     }
 
-    private void getMethodAndUrl(String line, Map<String, String> request){
+    private void getMethodAndUrl(String line, Map<String, String> request) {
         String[] lines = line.split(" ");
-        request.put("method",lines[0]);
-        request.put("url",lines[1]);
-        request.put("version",lines[2]);
+        request.put("method", lines[0]);
+        request.put("url", lines[1]);
+        request.put("version", lines[2]);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
