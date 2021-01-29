@@ -11,7 +11,7 @@ public class FileIoUtils {
     private static final String BASE_PATH = "./templates";
 
     public static byte[] loadFileFromClasspath(String filePath) throws IOException, URISyntaxException {
-        URL resource = FileIoUtils.class.getClassLoader().getResource(BASE_PATH + filePath);
+        URL resource = FileIoUtils.class.getClassLoader().getResource(filePath);
         if (resource == null) {
             throw new IOException("존재하지 않는 파일입니다.");
         }

@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Map;
+
 public class User {
     private String userId;
     private String password;
@@ -11,6 +13,15 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public static User from(Map<String, String> params) {
+        return new User(
+                params.get("userId"),
+                params.get("password"),
+                params.get("name"),
+                params.get("email")
+        );
     }
 
     public String getUserId() {
