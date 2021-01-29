@@ -2,9 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -25,23 +27,33 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(reader);
             String str=br.readLine();
             logger.debug("####HTTP Request Header 출력");
-            String path = "";
-            if(str != null){
-                String[] token=str.split(" ");
-                path=token[1];
+            if(str==null) {
+                return;
             }
-            while (!(str == null || str.equals(""))){
+            String[] token=str.split(" ");
+            String path =token[1];
+            while (!str.equals("")){
                 logger.debug(str);
-                str= br.readLine();
+                str = br.readLine();
             }
             logger.debug(path);
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+            logger.debug("PATH:"+path);
+            byte[] body = filePathToBytes(path);
+
             response200Header(dos, body.length);
             responseBody(dos, body);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private byte[] filePathToBytes(String path) throws IOException, URISyntaxException {
+        String[] paths= path.split("\\.");
+        if(paths.length>=2&&(paths[1].equals("html")||paths[1].equals("ico"))){
+            return FileIoUtils.loadFileFromClasspath("templates" + path);
+        }
+        return FileIoUtils.loadFileFromClasspath("static"+ path);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
