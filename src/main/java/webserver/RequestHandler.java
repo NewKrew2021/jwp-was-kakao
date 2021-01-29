@@ -33,6 +33,8 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            DataOutputStream dos = new DataOutputStream(out);
+
             String line = bufferedReader.readLine();
             parseFirstLine(line);
             while (!(line = bufferedReader.readLine()).equals("")) {
@@ -53,9 +55,12 @@ public class RequestHandler implements Runnable {
                 }
                 User user = new User(requestBodyParser.get("userId"),requestBodyParser.get("password"), requestBodyParser.get("name"), requestBodyParser.get("email") );
                 DataBase.addUser(user);
+
+                response302Header(dos);
+                return;
             }
 
-            DataOutputStream dos = new DataOutputStream(out);
+
             byte[] body = "Hello World".getBytes();
             if(FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
                 body = FileIoUtils.loadFileFromClasspath("./templates" + requestParser.get("url"));
@@ -85,6 +90,17 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
+    private void response302Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes( "HTTP/1.1 302 Found \r\n");
+            dos.writeBytes( "Location: http://localhost:8080/index.html \r\n");
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

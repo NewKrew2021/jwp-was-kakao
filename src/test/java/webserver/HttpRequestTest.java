@@ -57,7 +57,7 @@ public class HttpRequestTest {
 
         String resourceUrl = "http://localhost:8080";
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
     }
 
 }
