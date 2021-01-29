@@ -23,7 +23,7 @@
     [x] 3.1 Request Body의 값 추출하기
    [x] 3.2 회원가입시 입력한 모든 데이터를 추출해 User 객체를 생성한다
 
-- [ ] 4 "회원가입"완료시 /index.html 페이지로 이동.
+- [x] 4 "회원가입"완료시 /index.html 페이지로 이동.
 
 - [ ]5 “로그인” 메뉴를 클릭하면 http://localhost:8080/user/login.html 으로 이동해 로그인할 수 있다. 로그인이 성공하면 index.html로 이동하고, 로그인이 실패하면 /user/login_failed.html로 이동해야 한다.
     [ ]5.1 로그인이 성공하면 cookie를 활용해 로그인 상태를 유지할 수 있어야 한다.

@@ -47,7 +47,14 @@ public class RequestHandler implements Runnable {
                 request.setParams(IOUtils.readData(br,contentLength));
             }
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = requestMapper(request);
+            String url=requestMapper(request);
+            if(url.split(" ")[0].equals("redirect")){
+                byte[] body = new byte[0];
+                response302Header(dos, url.split(" ")[1]);
+                responseBody(dos, body);
+                return;
+            }
+            byte[] body = filePathToBytes(url);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException | URISyntaxException e) {
@@ -63,11 +70,11 @@ public class RequestHandler implements Runnable {
         return FileIoUtils.loadFileFromClasspath("static"+ path);
     }
 
-    private byte[] requestMapper(Request request) throws IOException, URISyntaxException {
+    private String requestMapper(Request request) throws IOException, URISyntaxException {
         if(request.getPaths().length>=1&&request.getPaths()[1].equals("user")){
-            return filePathToBytes(new UserController().mapMethod(request));
+            return new UserController().mapMethod(request);
         }
-        return filePathToBytes(request.getPath());
+        return request.getPath();
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
@@ -75,6 +82,16 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String redirectUrl) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080"+redirectUrl+"\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());

@@ -22,7 +22,7 @@ public class UserController {
         ObjectMapper mapper = new ObjectMapper();
         User user = mapper.convertValue(request.getParams(), User.class);
         logger.info("UserInfo: {}, {}, {}, {}", user.getUserId(), user.getEmail(), user.getName(), user.getPassword());
-        return "/index.html";
+        return "redirect /index.html";
     }
 
 }
