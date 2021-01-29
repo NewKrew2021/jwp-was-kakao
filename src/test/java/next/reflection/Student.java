@@ -1,4 +1,4 @@
-package study.reflection;
+package next.reflection;
 
 public class Student {
     private String name;
