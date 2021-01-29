@@ -42,7 +42,7 @@ public class HttpRequestTest {
         assertThat(response.getBody()).isEqualTo(new String(bytes));
     }
 
-    @DisplayName("/index.html로 접근시 index.html을 잘읽어오는지 확인")
+    @DisplayName("회원가입")
     @Test
     void request_user_create() throws IOException, URISyntaxException {
         RestTemplate restTemplate = new RestTemplate();
@@ -60,4 +60,59 @@ public class HttpRequestTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
     }
 
+    @DisplayName("로그인 성공")
+    @Test
+    void request_user_login() throws IOException, URISyntaxException {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
+        postMap.add("userId" , "abc");
+        postMap.add("password" , "1234");
+        postMap.add("name" , "def");
+        postMap.add("email" , "abc@email.com");
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+
+        String resourceUrl = "http://localhost:8080";
+        restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
+
+        postMap = new LinkedMultiValueMap<>();
+        postMap.add("userId" , "abc");
+        postMap.add("password" , "1234");
+        request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+
+        resourceUrl = "http://localhost:8080";
+        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("http://localhost:8080/index.html");
+    }
+
+    @DisplayName("로그인 실패")
+    @Test
+    void request_user_login_fail() throws IOException, URISyntaxException {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
+        postMap.add("userId" , "abc");
+        postMap.add("password" , "1234");
+        postMap.add("name" , "def");
+        postMap.add("email" , "abc@email.com");
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+
+        String resourceUrl = "http://localhost:8080";
+        restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
+
+        postMap = new LinkedMultiValueMap<>();
+        postMap.add("userId" , "abc");
+        postMap.add("password" , "12345");
+        request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+
+        resourceUrl = "http://localhost:8080";
+        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("http://localhost:8080/user/login_failed.html");
+    }
 }
