@@ -31,9 +31,26 @@ public class RequestHandler implements Runnable {
             Request request = Request.of(in);
 
             if (request.getMethod().equals("GET")) {
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
-                response200Header(dos, body.length);
-                responseBody(dos, body);
+                if (request.getUri().indexOf("/css") == 0) {
+                    byte[] body = FileIoUtils.loadFileFromClasspath("./static/" + request.getUri());
+                    responseCssHeader(dos, body.length);
+                    responseBody(dos, body);
+                }
+
+                if (request.getUri().indexOf("/js") == 0 ||
+                        request.getUri().indexOf("/fonts") == 0) {
+                    byte[] body = FileIoUtils.loadFileFromClasspath("./static" + request.getUri());
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                }
+                if (request.getUri().indexOf("/user") == 0 ||
+                        request.getUri().indexOf("/qna") == 0 ||
+                        request.getUri().indexOf("/index.html") == 0 ||
+                        request.getUri().indexOf("/favicon.ico") == 0) {
+                    byte[] body = FileIoUtils.loadFileFromClasspath("./templates/" + request.getUri());
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                }
             }
             if (request.getMethod().equals("POST")) {
                 if (request.getUri().indexOf("/user/create") == 0) {
@@ -55,6 +72,17 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Location: " + location + "\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void responseCssHeader(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
