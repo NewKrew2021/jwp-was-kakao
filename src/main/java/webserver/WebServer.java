@@ -30,4 +30,9 @@ public class WebServer {
             }
         }
     }
+
+    //request ->
+    //requesethandler ->
+    //request handler run에서 header 파싱 ->
+    //
 }

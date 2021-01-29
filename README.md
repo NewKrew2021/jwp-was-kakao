@@ -7,3 +7,9 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+
+## 기능 요구사항
+* 헤더 읽고 파싱
+* 파싱된 리퀘스트를 컨트롤러에 뿌려줌
+* 받아서 처리하는 컨트롤러

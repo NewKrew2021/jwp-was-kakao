@@ -2,6 +2,11 @@ package utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IOUtils {
     /**
@@ -16,5 +21,18 @@ public class IOUtils {
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);
         return String.copyValueOf(body);
+    }
+
+    public static String buildString(InputStream in) throws IOException {
+        InputStreamReader is = new InputStreamReader(in);
+        BufferedReader br = new BufferedReader(is);
+
+        List<String> lines = new ArrayList<>();
+        String line = "";
+        while((line = br.readLine())!=null && !line.isEmpty()) {
+            lines.add(line);
+        }
+        return lines.stream()
+                .collect(Collectors.joining("\n"));
     }
 }
