@@ -16,4 +16,5 @@ public class RequestTest {
         Request request = Request.of("GET /index.html HTTP/1.1");
         assertThat(request.getUri()).isEqualTo("/index.html");
     }
+
 }

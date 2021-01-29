@@ -7,6 +7,8 @@ import utils.PathUtils;
 import java.io.*;
 
 public class Request {
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+
     private String method;
     private String uri;
     private String body;

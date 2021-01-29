@@ -1,5 +1,7 @@
 package model;
 
+import java.net.URLDecoder;
+
 public class User {
     private String userId;
     private String password;
