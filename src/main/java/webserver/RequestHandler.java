@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 
+import controller.UserController;
+import model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -30,17 +32,13 @@ public class RequestHandler implements Runnable {
             if(str==null) {
                 return;
             }
-            String[] token=str.split(" ");
-            String path =token[1];
+            Request request=new Request(str);
             while (!str.equals("")){
                 logger.debug(str);
                 str = br.readLine();
             }
-            logger.debug(path);
             DataOutputStream dos = new DataOutputStream(out);
-            logger.debug("PATH:"+path);
-            byte[] body = filePathToBytes(path);
-
+            byte[] body = requestMapper(request);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException | URISyntaxException e) {
@@ -54,6 +52,13 @@ public class RequestHandler implements Runnable {
             return FileIoUtils.loadFileFromClasspath("templates" + path);
         }
         return FileIoUtils.loadFileFromClasspath("static"+ path);
+    }
+
+    private byte[] requestMapper(Request request) throws IOException, URISyntaxException {
+        if(request.getPaths().length>=1&&request.getPaths()[1].equals("user")){
+            return filePathToBytes(new UserController().mapMethod(request));
+        }
+        return filePathToBytes(request.getPath());
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {

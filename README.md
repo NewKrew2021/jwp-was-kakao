@@ -14,10 +14,10 @@
    [x] 1.2 Request Line에서 Path 분리하기
    [x] 1.3 path에 해당하는 파일 읽어 응답하기
 
-- [ ] 2 “회원가입” 메뉴를 클릭하면 http://localhost:8080/user/form.html 으로 이동하면서 회원가입할 수 있다. 회원가입한다.
-    [ ] 2.1 Request parameter 추출하기
-    [ ] 2.1.1 Header의 첫 번째 라인에서 요청 URL을 추출하고
-    [ ] 2.1.2 요청 URL에서 접근 경로와 이름=값을 추출해 User 클래스에 담는다.
+- [x] 2 “회원가입” 메뉴를 클릭하면 http://localhost:8080/user/form.html 으로 이동하면서 회원가입할 수 있다. 회원가입한다.
+    [x] 2.1 Request parameter 추출하기
+    [x] 2.1.1 Header의 첫 번째 라인에서 요청 URL을 추출하고
+    [x] 2.1.2 요청 URL에서 접근 경로와 이름=값을 추출해 User 클래스에 담는다.
 
 - [ ] 3 http://localhost:8080/user/form.html 파일의 form 태그 method를 get에서 post로 수정한 후 회원가입 기능이 정상적으로 동작하도록 구현한다.
     [ ] 3.1 Request Body의 값 추출하기
