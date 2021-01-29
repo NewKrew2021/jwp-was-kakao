@@ -37,10 +37,10 @@ public class RequestHandler implements Runnable {
             }
             if (request.getMethod().equals("POST")) {
                 if (request.getUri().indexOf("/user/create") == 0) {
-//                    UserRequest userRequest = UserRequest.of(request.getBody());
-//                    User user = userRequest.toUser();
-//                    DataBase.addUser(user);
-//
+                    UserRequest userRequest = UserRequest.of(request.getBody());
+                    User user = userRequest.toUser();
+                    DataBase.addUser(user);
+
                     byte[] body = FileIoUtils.loadFileFromClasspath("./templates/index.html");
                     response200Header(dos, body.length);
                     responseBody(dos, body);

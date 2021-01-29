@@ -3,7 +3,6 @@ package webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.IOUtils;
-import utils.PathUtils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -32,7 +31,7 @@ public class Request {
             this.method = requestLine[0];
             this.uri = requestLine[1];
             if (header.containsKey("Content-Length")) {
-                this.body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length").trim()));
+                this.body = IOUtils.readData(br, Integer.parseInt(header.get("Content-Length")));
                 logger.debug("body : {} ", body);
             }
         } catch (IOException e) {
@@ -43,7 +42,7 @@ public class Request {
     private void mapHeader(String line) {
         if (!line.equals("")) {
             String[] splitLine = line.split(":");
-            header.put(splitLine[0], line.substring(splitLine[0].length() + 1));
+            header.put(splitLine[0], line.substring(splitLine[0].length() + 1).trim());
         }
     }
 
