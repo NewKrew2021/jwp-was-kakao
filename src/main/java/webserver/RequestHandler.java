@@ -31,26 +31,20 @@ public class RequestHandler implements Runnable {
             Request request = Request.of(in);
 
             if (request.getMethod().equals("GET")) {
-
-                if (request.getUri().indexOf("/user/create") == 0) {
-                    UserRequest userRequest = UserRequest.of(request.getUserRequestParam());
-                    User user = userRequest.toUser();
-                    DataBase.addUser(user);
-
-                    byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
-                    response200Header(dos, body.length);
-                    responseBody(dos, body);
-                }
-                if(request.getUri().equals("/index.html")) {
-                    byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
-                    response200Header(dos, body.length);
-                    responseBody(dos, body);
-                }
-            }
-            if (request.getMethod().equals("POST")) {
                 byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
                 response200Header(dos, body.length);
                 responseBody(dos, body);
+            }
+            if (request.getMethod().equals("POST")) {
+                if (request.getUri().indexOf("/user/create") == 0) {
+//                    UserRequest userRequest = UserRequest.of(request.getBody());
+//                    User user = userRequest.toUser();
+//                    DataBase.addUser(user);
+//
+                    byte[] body = FileIoUtils.loadFileFromClasspath("./templates/index.html");
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                }
             }
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
