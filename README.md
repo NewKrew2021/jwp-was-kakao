@@ -10,8 +10,8 @@
 ### 요구사항 1 (index.html 파일을 읽어 클라이언트에 응답)
 
 #### 모든 Request Header 출력하기
-* [ ] BufferedReader를 활용하여 header를 라인 별로 읽기
-* [ ] logger를 활용해서 http header 전체 출력하기
+* [x] BufferedReader를 활용하여 header를 라인 별로 읽기
+* [x] logger를 활용해서 http header 전체 출력하기
 
 #### Request Line에서 path 분리하기
 * [ ] header의 첫 라인에서 요청 URL 추출
