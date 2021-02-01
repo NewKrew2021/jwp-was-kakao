@@ -11,7 +11,14 @@ class HttpUrlTest {
     @Test
     void create() {
         HttpUrl httpURL = HttpUrl.of("/user/create");
-        assertThat(httpURL).extracting("url").isEqualTo("/user/create");
+        assertThat(httpURL.getUrl()).isEqualTo("/user/create");
+        assertThat(httpURL).extracting("parameters").isEqualTo(new HashMap<>());
+    }
+
+    @Test
+    void create2() {
+        HttpUrl httpURL = HttpUrl.of("/css/bootstrap.min.css");
+        assertThat(httpURL.getUrl()).isEqualTo("/css/bootstrap.min.css");
         assertThat(httpURL).extracting("parameters").isEqualTo(new HashMap<>());
     }
 

@@ -19,4 +19,4 @@
     - [x] 실패하면 /user/login_failed.html로 이동
 - [x] 로그인 상태일 경우 /user/list에 접근 시 사용자 목록 출력
     - [x] 로그인하지 않은 상태면 /user/login.html
-- [ ] stylesheet 파일 지원
+- [x] stylesheet 파일 지원

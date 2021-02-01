@@ -38,23 +38,13 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             byte[] body = "Hello World".getBytes();
-            if (httpUrl.hasSameUrl("/index.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
-                body = FileIoUtils.loadFileFromClasspath("./templates/index.html");
-                response200Header(dos, body.length);
+            if ((httpUrl.endsWith(".css") || httpUrl.endsWith(".js") || httpUrl.endsWith(".woff") || httpUrl.endsWith(".ttf")) && httpRequest.hasSameMethod(HttpMethod.GET)) {
+                body = FileIoUtils.loadFileFromClasspath("./static" + httpUrl.getUrl());
+                response200Header(dos, body.length, httpUrl.endsWith(".css") ? "text/css" : "text/html;charset=utf-8");
                 responseBody(dos, body);
             }
-            if (httpUrl.hasSameUrl("/user/form.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
-                body = FileIoUtils.loadFileFromClasspath("./templates/user/form.html");
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (httpUrl.hasSameUrl("/user/login.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
-                body = FileIoUtils.loadFileFromClasspath("./templates/user/login.html");
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (httpUrl.hasSameUrl("/user/login_failed.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
-                body = FileIoUtils.loadFileFromClasspath("./templates/user/login_failed.html");
+            if ((httpUrl.endsWith(".html") || httpUrl.endsWith(".ico")) && httpRequest.hasSameMethod(HttpMethod.GET)) {
+                body = FileIoUtils.loadFileFromClasspath("./templates" + httpUrl.getUrl());
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
@@ -114,9 +104,13 @@ public class RequestHandler implements Runnable {
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+        response200Header(dos, lengthOfBodyContent, "text/html;charset=utf-8");
+    }
+
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String type) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK " + IOUtils.NEW_LINE);
-            dos.writeBytes("Content-Type: text/html;charset=utf-8" + IOUtils.NEW_LINE);
+            dos.writeBytes("Content-Type: " + type + IOUtils.NEW_LINE);
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "" + IOUtils.NEW_LINE);
         } catch (IOException e) {
             logger.error(e.getMessage());

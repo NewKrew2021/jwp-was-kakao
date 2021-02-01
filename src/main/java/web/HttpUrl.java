@@ -35,6 +35,10 @@ public class HttpUrl {
         return this.url.equals(url);
     }
 
+    public boolean endsWith(String url) {
+        return this.url.endsWith(url);
+    }
+
     public String getParameter(String key) {
         return parameters.get(key);
     }
