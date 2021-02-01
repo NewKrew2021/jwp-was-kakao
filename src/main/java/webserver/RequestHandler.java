@@ -1,9 +1,11 @@
 package webserver;
 
 import domain.HttpRequest;
+import domain.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
 import java.io.*;
@@ -30,55 +32,19 @@ public class RequestHandler implements Runnable {
         );
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = new HttpRequest(in);;
-            User user = null;
-            DataOutputStream dos = new DataOutputStream(out);
+            HttpRequest httpRequest = new HttpRequest(in);
+            HttpResponse httpResponse = new HttpResponse(out);
 
             if (httpRequest.getPath().equals("/user/create")) {
-                user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
-                response302Header(dos, BASE_URL);
+                User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
+                httpResponse.sendRedirect(BASE_URL);
                 logger.debug(user.toString());
                 return;
             }
+            httpResponse.forward(httpRequest.getPath());
 
-            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + httpRequest.getPath());
-
-            response200Header(dos, body.length);
-            responseBody(dos, body);
         } catch (IOException e) {
-            logger.error(e.getMessage());
-        } catch (URISyntaxException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String location) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
