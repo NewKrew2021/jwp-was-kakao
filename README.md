@@ -17,6 +17,6 @@
 - [x] 로그인 메뉴 클릭 시 /user/login.html로 이동
     - [x] 성공하면 /index.html로 이동
     - [x] 실패하면 /user/login_failed.html로 이동
-- [ ] 로그인 상태일 경우 /user/list에 접근 시 사용자 목록 출력
-    - [ ] 로그인하지 않은 상태면 /user/login.html
+- [x] 로그인 상태일 경우 /user/list에 접근 시 사용자 목록 출력
+    - [x] 로그인하지 않은 상태면 /user/login.html
 - [ ] stylesheet 파일 지원

@@ -58,6 +58,16 @@ public class RequestHandler implements Runnable {
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
+            if (httpUrl.hasSameUrl("/user/list") && httpRequest.hasSameMethod(HttpMethod.GET)) {
+                String cookie = httpRequest.getHttpHeaders().get("Cookie");
+                if (cookie == null || !cookie.equals("logined=true")) {
+                    response302Header(dos, "/user/login.html");
+                } else {
+                    body = FileIoUtils.loadHandleBarFromClasspath("user/list", DataBase.findAll());
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                }
+            }
 
             if (httpUrl.hasSameUrl("/user/login") && httpRequest.hasSameMethod(HttpMethod.POST)) {
                 Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
