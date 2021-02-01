@@ -3,6 +3,9 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +51,7 @@ public class RequestHandler implements Runnable {
                 if (line == null)
                     return;
                 String[] currentLine = line.split(": ");
-                requestParser.put(currentLine[0], currentLine[1]);
+                requestParser.put(currentLine[0], URLDecoder.decode(currentLine[1],"UTF-8"));
             }
 
             // 쿠키 처리
@@ -61,11 +64,10 @@ public class RequestHandler implements Runnable {
                 String body = IOUtils.readData(bufferedReader, Integer.parseInt(requestParser.get("Content-Length")));
                 String[] currentLine = body.split("&|=");
                 for (int i = 0; i < currentLine.length; i = i + 2) {
-                    requestBodyParser.put(currentLine[i], currentLine[i + 1]);
+                    requestBodyParser.put(currentLine[i], URLDecoder.decode( currentLine[i + 1], "UTF-8" ));
                 }
                 User user = new User(requestBodyParser.get("userId"), requestBodyParser.get("password"), requestBodyParser.get("name"), requestBodyParser.get("email"));
                 DataBase.addUser(user);
-
                 response302Header(dos, "/index.html");
                 return;
             }
@@ -87,20 +89,21 @@ public class RequestHandler implements Runnable {
             }
 
             //user list 구현
-            if (requestParser.get("method").equals("GET") && requestParser.get("url").equals("/user/list")) {
-                System.out.println("userlist안으로 들어옴!!");
-                if (login && FileIoUtils.isExistFile("./templates" + requestParser.get("url") + ".html")) {
-                    System.out.println("로그인되어있음!!");
+            if (requestParser.get("method").equals("GET") && requestParser.get("url").equals("/user/list.html")) {
+                if (login && FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
                     TemplateLoader loader = new ClassPathTemplateLoader();
                     loader.setPrefix("/templates");
-                    loader.setSuffix(".html");
+                    loader.setSuffix("");
+//                    Charset utf8 = StandardCharsets.UTF_8;
+//                    loader.setCharset(utf8);
                     Handlebars handlebars = new Handlebars(loader);
 
                     Template template = handlebars.compile(requestParser.get("url"));
                     List<User> users = new ArrayList<>(DataBase.findAll());
+
                     String userListPage = template.apply(users);
 
-                    byte[] body = userListPage.getBytes();
+                    byte[] body = userListPage.getBytes(StandardCharsets.UTF_8);
                     response200Header(dos, body.length);
                     responseBody(dos, body);
                 }
@@ -115,7 +118,14 @@ public class RequestHandler implements Runnable {
             if (FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
                 body = FileIoUtils.loadFileFromClasspath("./templates" + requestParser.get("url"));
             }
-
+            logger.debug("request pre : " + requestParser.get("url"));
+            if ( FileIoUtils.isExistFile( "./static" + requestParser.get("url"))  ) {
+                logger.debug("request pro : " + "./static" + requestParser.get("url"));
+                body = FileIoUtils.loadFileFromClasspath("./static" + requestParser.get("url"));
+                response200HeaderCss(dos, body.length);
+                responseBody(dos, body);
+                return;
+            }
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException | URISyntaxException e) {
@@ -146,6 +156,16 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void response200HeaderCss(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type:" + requestParser.get("Accept") + "\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
     private void response302Header(DataOutputStream dos, String url) {
         try {
