@@ -9,9 +9,9 @@ public enum DispatchInfo {
     UserLogin(new HttpRequest(RequestMethod.POST, "/user/login"), UserController.loginUserHandler);
 
     private HttpRequest httpRequest;
-    private RequestHandler requestHandler;
+    private Handler requestHandler;
 
-    DispatchInfo(HttpRequest httpRequest, RequestHandler requestHandler) {
+    DispatchInfo(HttpRequest httpRequest, Handler requestHandler) {
         this.httpRequest = httpRequest;
         this.requestHandler = requestHandler;
     }
@@ -20,7 +20,7 @@ public enum DispatchInfo {
         return httpRequest;
     }
 
-    public RequestHandler getRequestHandler() {
+    public Handler getRequestHandler() {
         return requestHandler;
     }
 

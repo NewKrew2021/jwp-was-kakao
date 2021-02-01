@@ -1,5 +1,6 @@
 package controller;
 
+import http.HttpResponse;
 import model.User;
 import db.DataBase;
 import utils.HttpUtils;
@@ -8,7 +9,7 @@ import java.util.Map;
 
 public class UserController extends Controller {
 
-    public static RequestHandler createUserHandler = (request, dos) -> {
+    public static Handler createUserHandler = (request) -> {
         Map<String, String> params = HttpUtils.getParamMap(request.getBody());
 
         User user = new User(params.get("userId"),
@@ -16,17 +17,28 @@ public class UserController extends Controller {
                 params.get("name"),
                 params.get("email"));
         DataBase.addUser(user);
-        response302Header(dos, "/index.html");
+
+        return new HttpResponse.Builder()
+                .setStatus("HTTP/1.1 302 Found")
+                .setRedirect("/index.html")
+                .build();
     };
 
-    public static RequestHandler loginUserHandler = (request, dos) -> {
+    public static Handler loginUserHandler = (request) -> {
         Map<String, String> params = HttpUtils.getParamMap(request.getBody());
 
         User user = DataBase.findUserById(params.get("userId"));
         if (user != null && user.getPassword().equals(params.get("password"))) {
-            response302Header(dos, "/index.html", true);
-            return;
+            return new HttpResponse.Builder()
+                    .setStatus("HTTP/1.1 302 Found")
+                    .setRedirect("/index.html")
+                    .setHeader("Set-Cookie", "logined=true; Path=/")
+                    .build();
         }
-        response302Header(dos, "/user/login_failed.html", false);
+        return new HttpResponse.Builder()
+                .setStatus("HTTP/1.1 302 Found")
+                .setRedirect("/user/login_failed.html")
+                .setHeader("Set-Cookie", "logined=false; Path=/")
+                .build();
     };
 }

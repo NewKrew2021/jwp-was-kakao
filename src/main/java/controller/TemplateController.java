@@ -1,20 +1,11 @@
 package controller;
 
-import utils.FileIoUtils;
+import http.HttpResponse;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+public class TemplateController extends Controller {
 
-public class TemplateController extends Controller{
-
-    public static RequestHandler htmlHandler = (request, dos) -> {
-        try {
-            String path = request.getUri();
-            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-    };
+    public static Handler htmlHandler = (request) -> new HttpResponse.Builder()
+            .setStatus("HTTP/1.1 200 OK")
+            .setPage("./templates" + request.getUri())
+            .build();
 }

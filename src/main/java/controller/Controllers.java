@@ -1,17 +1,19 @@
 package controller;
 
 import http.HttpRequest;
+import http.HttpResponse;
 
-import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 public class Controllers {
 
-    public void dispatch(HttpRequest request, DataOutputStream dos) {
-        findMatchingHandlers(request).handleRequest(request, dos);
+    public HttpResponse dispatch(HttpRequest request) throws IOException, URISyntaxException {
+        return findMatchingHandlers(request).handleRequest(request);
     }
 
-    private RequestHandler findMatchingHandlers(HttpRequest request) {
+    private Handler findMatchingHandlers(HttpRequest request) {
         return Arrays.stream(DispatchInfo.values())
                 .filter(dispatchInfo -> dispatchInfo.matchWith(request))
                 .findAny()
