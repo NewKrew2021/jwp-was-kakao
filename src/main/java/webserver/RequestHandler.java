@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 import dto.HttpRequest;
+import dto.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -36,11 +37,11 @@ public class RequestHandler implements Runnable {
                 request.setBody(IOUtils.readData(br, request.getContentLength()));
             }
 
-            byte[] body = DispatcherServlet.run(request);
+            HttpResponse response = DispatcherServlet.run(request);
 
             DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            writeHttpResponse(dos, response);
+
         } catch (IOException e) {
             logger.error(e.getMessage());
         } catch (Exception e) {
@@ -48,22 +49,12 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
+    private void writeHttpResponse(DataOutputStream dos, HttpResponse response){
+        try{
+            dos.writeBytes(response.getHeaders());
+            dos.write(response.getBody(), 0, response.getBody().length);
             dos.flush();
-        } catch (IOException e) {
+        }catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
