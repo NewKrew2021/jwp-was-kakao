@@ -31,6 +31,7 @@ public class RequestHandler implements Runnable {
 
             String request= IOUtils.buildString(in);
             parser.parse(request);
+            System.out.println(request);
             HttpRequest httpRequest = new HttpRequest(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
 
             //Controller 찾고

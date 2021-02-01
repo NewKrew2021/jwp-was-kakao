@@ -15,10 +15,22 @@ public abstract class Controller {
         }
     }
 
-    protected static void response302Header(DataOutputStream dos) {
+    protected static void response302Header(DataOutputStream dos, String location) {
         try {
             dos.writeBytes("HTTP/1.1 302 OK \r\n");
-            dos.writeBytes("Location: /index.html\r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            //logger.error(e.getMessage());
+        }
+    }
+
+    protected static void response302Header(DataOutputStream dos, String location, boolean setCookie) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 OK \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
+            dos.writeBytes("Set-Cookie: logined=" + setCookie +"; Path=/\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
