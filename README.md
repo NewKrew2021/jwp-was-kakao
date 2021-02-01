@@ -13,3 +13,16 @@
 * 헤더 읽고 파싱
 * 파싱된 리퀘스트를 컨트롤러에 뿌려줌
 * 받아서 처리하는 컨트롤러
+
+## todo
+* [x] HttpRequest 구현
+    * [x] RequestMethod 구현 
+    * [x] HttpRequestHeader 구현 
+    * [x] HttpRequestHeaders 구현
+    * [x] HttpRequestParser 구현
+  
+* [ ] Controller 구현
+    * [x] Controllers 구현
+    * [x] DispatchInfo 구현
+    * [x] TemplateController 구현
+    * [ ] UserController 구현
