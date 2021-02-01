@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -42,12 +43,13 @@ public class RequestHandler implements Runnable {
             if (httpUrl.hasSameUrl("/user/form.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
                 body = FileIoUtils.loadFileFromClasspath("./templates/user/form.html");
             }
-            if (httpUrl.hasSameUrl("/user/create") && httpRequest.hasSameMethod(HttpMethod.GET)) {
+            if (httpUrl.hasSameUrl("/user/create") && httpRequest.hasSameMethod(HttpMethod.POST)) {
+                Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
                 DataBase.addUser(new User(
-                        httpUrl.getParameter("userId"),
-                        httpUrl.getParameter("password"),
-                        httpUrl.getParameter("name"),
-                        httpUrl.getParameter("email")));
+                        parameters.get("userId"),
+                        parameters.get("password"),
+                        parameters.get("name"),
+                        parameters.get("email")));
             }
 
             response200Header(dos, body.length);

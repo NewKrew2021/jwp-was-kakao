@@ -13,20 +13,22 @@ public class HttpUrl {
     }
 
     public static HttpUrl of(String url) {
-        Map<String, String> parameters = new HashMap<>();
         if (!url.contains("?")) {
-            return new HttpUrl(url, parameters);
+            return new HttpUrl(url, new HashMap<>());
         }
 
-        String[] urlAndParams = url.split("\\?");
-        String stringParam = urlAndParams[1];
+        String[] urlAndParams = url.split("\\?", 2);
+        return new HttpUrl(urlAndParams[0], parseParameter(urlAndParams[1]));
+    }
+
+    public static Map<String, String> parseParameter(String stringParam) {
+        Map<String, String> parameters = new HashMap<>();
         String[] paramPairs = stringParam.split("&");
         for (String paramPair : paramPairs) {
             String[] keyAndValue = paramPair.split("=");
             parameters.put(keyAndValue[0], keyAndValue[1]);
         }
-
-        return new HttpUrl(urlAndParams[0], parameters);
+        return parameters;
     }
 
     public boolean hasSameUrl(String url) {

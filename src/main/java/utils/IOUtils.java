@@ -2,8 +2,6 @@ package utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,17 +14,21 @@ public class IOUtils {
      * @return
      * @throws IOException
      */
-    public static String readData(BufferedReader br, int contentLength) throws IOException {
-        char[] body = new char[contentLength];
-        br.read(body, 0, contentLength);
-        return String.copyValueOf(body);
+    public static String readData(BufferedReader br, int contentLength) {
+        try {
+            char[] body = new char[contentLength];
+            br.read(body, 0, contentLength);
+            return String.copyValueOf(body);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
-    public static List<String> readRequestUntilHeader(BufferedReader in) {
+    public static List<String> readUntilEmptyLine(BufferedReader in) {
         List<String> texts = new ArrayList<>();
 
         try {
-            readRequestUntilHeader(in, texts);
+            readUntilEmptyLine(in, texts);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -34,7 +36,7 @@ public class IOUtils {
         return texts;
     }
 
-    private static void readRequestUntilHeader(BufferedReader bufferedReader, List<String> texts) throws IOException {
+    private static void readUntilEmptyLine(BufferedReader bufferedReader, List<String> texts) throws IOException {
         String text = bufferedReader.readLine();
         while (text != null && !text.trim().isEmpty()) {
             texts.add(text);

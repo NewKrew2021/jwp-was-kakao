@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +12,7 @@ public class IOUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(IOUtilsTest.class);
 
     @Test
-    public void readData() throws Exception {
+    public void readData() {
         String data = "abcd123";
         StringReader sr = new StringReader(data);
         BufferedReader br = new BufferedReader(sr);
@@ -37,7 +36,7 @@ public class IOUtilsTest {
                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + IOUtils.NEW_LINE;
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data.getBytes())));
-        assertThat(IOUtils.readRequestUntilHeader(br).get(0)).isEqualTo("GET / HTTP/1.1");
+        assertThat(IOUtils.readUntilEmptyLine(br).get(0)).isEqualTo("GET / HTTP/1.1");
     }
 
 }

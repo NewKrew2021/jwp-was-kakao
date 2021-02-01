@@ -15,19 +15,32 @@ public class HttpRequest {
     private final HttpMethod httpMethod;
     private final HttpHeaders httpHeaders;
     private final HttpUrl httpUrl;
+    private final HttpBody httpBody;
 
-    private HttpRequest(HttpMethod httpMethod, HttpHeaders httpHeaders, HttpUrl httpUrl) {
+    private HttpRequest(HttpMethod httpMethod, HttpHeaders httpHeaders, HttpUrl httpUrl, HttpBody httpBody) {
         this.httpMethod = httpMethod;
         this.httpHeaders = httpHeaders;
         this.httpUrl = httpUrl;
+        this.httpBody = httpBody;
     }
 
     public static HttpRequest of(InputStream in) {
-        List<String> texts = IOUtils.readRequestUntilHeader(new BufferedReader(new InputStreamReader(in)));
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        List<String> texts = IOUtils.readUntilEmptyLine(br);
         HttpHeaders httpHeaders = HttpHeaders.of(texts.subList(1, texts.size()));
         String[] firstLine = texts.get(0).split(" ");
         logger.debug(String.join("\n", texts));
-        return new HttpRequest(HttpMethod.valueOf(firstLine[0]), httpHeaders, HttpUrl.of(firstLine[1]));
+
+        HttpBody httpBody = create(httpHeaders, br);
+        return new HttpRequest(HttpMethod.valueOf(firstLine[0]), httpHeaders, HttpUrl.of(firstLine[1]), httpBody);
+    }
+
+    private static HttpBody create(HttpHeaders httpHeaders, BufferedReader br) {
+        String contentLength = httpHeaders.get("Content-Length");
+        if (contentLength == null) {
+            return HttpBody.empty();
+        }
+        return new HttpBody(IOUtils.readData(br, Integer.parseInt(contentLength)));
     }
 
     public boolean hasSameMethod(HttpMethod httpMethod) {
@@ -40,5 +53,9 @@ public class HttpRequest {
 
     public HttpHeaders getHttpHeaders() {
         return httpHeaders;
+    }
+
+    public HttpBody getHttpBody() {
+        return httpBody;
     }
 }
