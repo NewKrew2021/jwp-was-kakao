@@ -1,23 +1,23 @@
 package webserver;
 
-import db.DataBase;
-import model.User;
+import model.RequestMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import utils.IOUtils;
 import utils.Parser;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -28,72 +28,77 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            List<String> requestMessage = getRequestMessage(in);
-            Map<String, String> header = Parser.parseHeaderFromRequestMessage(requestMessage);
-            printHeader(header);
+            RequestMessage requestMessage = readRequestMessage(in);
+            printRequestMessageHeader(requestMessage.getRequestLine(), requestMessage.getRequestHeader());
 
-//            HttpMethod method = Parser.parseMethodFromRequestLine(header.get(0));
-//            String url = Parser.parseURLFromRequestLine(header.get(0));
-//            String body = Parser.parseBodyFromRequestMessage(requestMessage);
-//            handleRequestMapping(method, url, body);
+            HttpMethod method = Parser.parseMethodFromRequestLine(requestMessage.getRequestLine());
+            String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
+            url = handlerMapping(method, url, requestMessage.getRequestBody());
+            String contentType = Parser.parseContentTypeFromRequestHeader(requestMessage.getRequestHeader());
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = FileIoUtils.loadFileFromClasspath(".templates" + url);
-            response200Header(dos, body.length);
+            byte[] body = FileIoUtils.loadFileFromClasspath(url);
+            response200Header(dos, contentType, body.length);
             responseBody(dos, body);
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private List<String> getRequestMessage(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-        List<String> requestMessage = new ArrayList<>();
+    private RequestMessage readRequestMessage(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+
+        String requestLine = br.readLine();
+        Map<String, String> requestHeader = new HashMap<>();
 
         String line = br.readLine();
-        while (line != null) {
-            requestMessage.add(line);
+        while (line != null && !"".equals(line)) {
+            String[] data = line.split(": ");
+            requestHeader.put(data[0], data[1]);
             line = br.readLine();
         }
-        return requestMessage;
-    }
 
-    private void printHeader(Map<String, String> header) {
-        String message = "\n========= Request Header =========\n";
-        for (String key : header.keySet()) {
-            message += key + ": " + header.get(key) + "\n";
+        String requestBody = "";
+        if (requestHeader.containsKey("Content-Length")) {
+            int contentLength = Integer.parseInt(requestHeader.get("Content-Length"));
+            requestBody = IOUtils.readData(br, contentLength);
         }
-        message += "----------------------------------";
-        logger.debug(message);
+
+        return RequestMessage.of(requestLine, requestHeader, requestBody);
     }
 
-    private void handleRequestMapping(HttpMethod method, String url, String body) {
+    private void printRequestMessageHeader(String requestLine, Map<String, String> requestHeader) {
+        StringBuilder message = new StringBuilder();
+        message.append("\n========= Request Header =========\n")
+                .append(requestLine)
+                .append("\n");
+        for (String key : requestHeader.keySet()) {
+            message.append(key)
+                    .append(": ")
+                    .append(requestHeader.get(key))
+                    .append("\n");
+        }
+        message.append("----------------------------------");
+        logger.debug(message.toString());
+    }
+
+    private String handlerMapping(HttpMethod method, String url, String body) {
         if (url.contains("/user")) {
-            UserController.handleUser(method, url, body);
-            return;
+            return UserController.handle(method, url, body);
         }
-        return;
+        if (url.contains("/index") || url.contains("/favicon")){
+            return "./templates" + url;
+        }
+        if (url.contains("/css") || url.contains("/fonts") || url.contains("/images") || url.contains("/js")) {
+            return "./static" + url;
+        }
+        return "./templates/error.html";
     }
 
-//    private void handleUser(HttpMethod method, String url, List<String> header) {
-//        if(method == HttpMethod.GET && url.contains("/create")) {
-//            Map<String, String> params = Parser.parseUserParams(header.get(0));
-//            User user = User.from(params);
-//            logger.debug(user.toString());
-//            DataBase.addUser(user);
-//        }
-//        if(method == HttpMethod.POST && url.contains("/create")) {
-////            String body = Parser.parseBody(header);
-//            Map<String, String> params = Parser.parseUserParams(header.get(header.size() - 1));
-//            User user = User.from(params);
-//            logger.debug(user.toString());
-//        }
-//    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {

@@ -47,4 +47,10 @@ public class Parser {
         }
         return userParams;
     }
+
+    public static String parseContentTypeFromRequestHeader(Map<String, String> requestHeader) {
+        return requestHeader.get("Accept")
+                .split(";")[0]
+                .split(",")[0];
+    }
 }
