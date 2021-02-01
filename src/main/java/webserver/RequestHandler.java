@@ -1,9 +1,10 @@
 package webserver;
 
 import model.RequestMessage;
+import model.Response;
+import model.ResponseNotFound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
 import utils.IOUtils;
 import utils.Parser;
 
@@ -31,15 +32,9 @@ public class RequestHandler implements Runnable {
             RequestMessage requestMessage = readRequestMessage(in);
             printRequestMessageHeader(requestMessage.getRequestLine(), requestMessage.getRequestHeader());
 
-            HttpMethod method = Parser.parseMethodFromRequestLine(requestMessage.getRequestLine());
-            String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
-            url = handlerMapping(method, url, requestMessage.getRequestBody());
-            String contentType = Parser.parseContentTypeFromRequestHeader(requestMessage.getRequestHeader());
-
+            Response response = handlerMapping(requestMessage);
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = FileIoUtils.loadFileFromClasspath(url);
-            response200Header(dos, contentType, body.length);
-            responseBody(dos, body);
+            response.write(dos);
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
@@ -82,36 +77,15 @@ public class RequestHandler implements Runnable {
         logger.debug(message.toString());
     }
 
-    private String handlerMapping(HttpMethod method, String url, String body) {
+    private Response handlerMapping(RequestMessage requestMessage) throws IOException, URISyntaxException {
+        String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
+
         if (url.contains("/user")) {
-            return UserController.handle(method, url, body);
+            return UserController.handle(requestMessage);
         }
-        if (url.contains("/index") || url.contains("/favicon")){
-            return "./templates" + url;
+        if (ResourceController.hasResource(url)) {
+            return ResourceController.handle(requestMessage);
         }
-        if (url.contains("/css") || url.contains("/fonts") || url.contains("/images") || url.contains("/js")) {
-            return "./static" + url;
-        }
-        return "./templates/error.html";
-    }
-
-    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+        return ResponseNotFound.create();
     }
 }

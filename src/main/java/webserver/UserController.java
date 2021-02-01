@@ -1,7 +1,7 @@
 package webserver;
 
 import db.DataBase;
-import model.User;
+import model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.Parser;
@@ -11,21 +11,25 @@ import java.util.Map;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    public static String handle(HttpMethod method, String url, String body) {
+    public static Response handle(RequestMessage requestMessage) {
+        HttpMethod method = Parser.parseMethodFromRequestLine(requestMessage.getRequestLine());
+        String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
+
         if (method == HttpMethod.GET && url.contains("/create")) {
             Map<String, String> params = Parser.parseUserParams(url);
             User user = User.from(params);
             logger.debug("[" + method.name() + "] create " + user.toString());
             DataBase.addUser(user);
-            return "./templates/index.html";
+            return ResponseFound.from("./templates/index.html");
         }
         if (method == HttpMethod.POST && url.contains("/create")) {
+            String body = requestMessage.getRequestBody();
             Map<String, String> params = Parser.parseUserParams(body);
             User user = User.from(params);
             logger.debug("[" + method.name() + "] create " + user.toString());
             DataBase.addUser(user);
-            return "./templates/index.html";
+            return ResponseFound.from("./templates/index.html");
         }
-        return "./templates/error.html";
+        return ResponseNotFound.create();
     }
 }
