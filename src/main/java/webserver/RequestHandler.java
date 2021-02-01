@@ -1,7 +1,6 @@
 package webserver;
 
-import annotation.web.Controller;
-import dto.RequestHeader;
+import domain.HttpRequest;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,7 @@ import utils.FileIoUtils;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -31,32 +30,18 @@ public class RequestHandler implements Runnable {
         );
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String request = "";
-            String line = bufferedReader.readLine();
-            while (line != null && !line.equals("")) {
-                request += line + "\n";
-                line = bufferedReader.readLine();
-            }
-            RequestHeader requestHeader = RequestParser.parseHeader(request);
-
-            List<String> parameters = requestHeader.getParameters();
-
-            if (requestHeader.getMethod().equals("POST")) {
-                String body = bufferedReader.readLine();
-                parameters = RequestParser.parseUserInfo(body);
-            }
-
+            HttpRequest httpRequest = new HttpRequest(in);;
             User user = null;
             DataOutputStream dos = new DataOutputStream(out);
-            if (requestHeader.getPath().equals("/user/create")) {
-                user = new User(parameters.get(0), parameters.get(1), parameters.get(2), parameters.get(3));
+
+            if (httpRequest.getPath().equals("/user/create")) {
+                user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
                 response302Header(dos, BASE_URL);
                 logger.debug(user.toString());
                 return;
             }
 
-            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + requestHeader.getPath());
+            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + httpRequest.getPath());
 
             response200Header(dos, body.length);
             responseBody(dos, body);
