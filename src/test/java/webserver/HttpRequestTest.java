@@ -2,9 +2,10 @@ package webserver;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,37 +26,17 @@ public class HttpRequestTest {
         String resourceUrl = "http://localhost:8080";
         ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + "/index.html", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        response.getHeaders().keySet().stream().forEach(it -> {
-            System.out.println(it + ": " + response.getHeaders().get(it));});
-        System.out.println(response.getBody());
+        printResponse(response);
     }
 
     @Test
     @DisplayName("GET /user/form.html")
-    void request_resttemplate_요구사항2_1() {
+    void request_resttemplate_요구사항2() {
         RestTemplate restTemplate = new RestTemplate();
         String resourceUrl = "http://localhost:8080";
         ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + "/user/form.html", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        response.getHeaders().keySet().stream().forEach(it -> {
-            System.out.println(it + ": " + response.getHeaders().get(it));});
-        System.out.println(response.getBody());
-    }
-
-    @Test
-    @DisplayName("GET /user/create?pathvariable")
-    void request_resttemplate_요구사항2_2() {
-        RestTemplate restTemplate = new RestTemplate();
-        String resourceUrl = "http://localhost:8080";
-        String url = "/user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + url, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        response.getHeaders().keySet().stream().forEach(it -> {
-            System.out.println(it + ": " + response.getHeaders().get(it));});
-        System.out.println(response.getBody());
+        printResponse(response);
     }
 
     @Test
@@ -64,12 +45,10 @@ public class HttpRequestTest {
         RestTemplate restTemplate = new RestTemplate();
         String resourceUrl = "http://localhost:8080";
         String url = "/user/create";
-        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + url,"userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net",String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + url, "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
 
-        response.getHeaders().keySet().stream().forEach(it -> {
-            System.out.println(it + ": " + response.getHeaders().get(it));});
-        System.out.println(response.getBody());
+        printResponse(response);
     }
 
     @Test
@@ -80,13 +59,11 @@ public class HttpRequestTest {
         String urlCreate = "/user/create";
         String urlLogin = "/user/login";
         restTemplate.postForEntity(resourceUrl + urlCreate,
-                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net",String.class);
+                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net", String.class);
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + urlLogin,
-                "userId=javajigi&password=password2",String.class);
+                "userId=javajigi&password=password2", String.class);
 
-        response.getHeaders().keySet().stream().forEach(it -> {
-            System.out.println(it + ": " + response.getHeaders().get(it));});
-        System.out.println(response.getBody());
+        printResponse(response);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().get("Location").get(0).equals("/user/login_failed.html")).isTrue();
@@ -101,17 +78,50 @@ public class HttpRequestTest {
         String urlCreate = "/user/create";
         String urlLogin = "/user/login";
         restTemplate.postForEntity(resourceUrl + urlCreate,
-                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net",String.class);
+                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net", String.class);
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + urlLogin,
-                "userId=javajigi&password=password",String.class);
+                "userId=javajigi&password=password", String.class);
 
-        response.getHeaders().keySet().stream().forEach(it -> {
-            System.out.println(it + ": " + response.getHeaders().get(it));});
-        System.out.println(response.getBody());
+        printResponse(response);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().get("Location").get(0).equals("/index.html")).isTrue();
         assertThat(response.getHeaders().get("Set-Cookie").get(0).equals("logined=true; Path=/")).isTrue();
     }
+
+    @Test
+    @DisplayName("로그인 쿠키 존재함")
+    void request_resttemplate_요구사항6_1() {
+        RestTemplate restTemplate = new RestTemplate();
+        String resourceUrl = "http://localhost:8080";
+        String url = "/user/create";
+        restTemplate.postForEntity(resourceUrl + url, "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net", String.class);
+        String urlList = "/user/list";
+        final HttpHeaders headers = new HttpHeaders();
+        headers.set("Cookie", "logined=true");
+        final HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(resourceUrl + urlList, HttpMethod.GET, entity, String.class);
+        printResponse(response);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    @DisplayName("로그인 쿠키 존재하지 않음")
+    void request_resttemplate_요구사항6_2() {
+        RestTemplate restTemplate = new RestTemplate();
+        String resourceUrl = "http://localhost:8080";
+        String urlList = "/user/list";
+        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + urlList, String.class);
+        printResponse(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    private void printResponse(ResponseEntity<String> response) {
+        response.getHeaders().keySet().forEach(it -> {
+            System.out.println(it + ": " + response.getHeaders().get(it));
+        });
+    }
+
 
 }

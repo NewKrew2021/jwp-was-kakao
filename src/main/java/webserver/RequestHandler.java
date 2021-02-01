@@ -3,9 +3,16 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -51,9 +58,9 @@ public class RequestHandler implements Runnable {
             }
             Map<String, String> map = new HashMap<>();
             if (!requestUrl.endsWith(".html")) {
+                String[] urlTokens = requestUrl.split("\\?");
                 if (firstTokens[0].equals("POST")) {
                     String requestBody = IOUtils.readData(reader, Integer.parseInt(headers.get("Content-Length")));
-                    String[] urlTokens = requestUrl.split("\\?");
                     if (urlTokens[0].equals("/user/create")) {
                         String[] queryTokens = requestBody.split("&");
                         for (String query : queryTokens) {
@@ -84,8 +91,36 @@ public class RequestHandler implements Runnable {
                         responseLogin(dos, "/index.html", true);
                         return;
                     }
+
+                }
+                if(firstTokens[0].equals("GET")) {
+                    if (urlTokens[0].equals("/user/list")) {
+                        boolean logined = headers.getOrDefault("Cookie","false").equals("logined=true");
+                        if (logined) {
+                            TemplateLoader loader = new ClassPathTemplateLoader();
+                            loader.setPrefix("/templates");
+                            loader.setSuffix(".html");
+                            Handlebars handlebars = new Handlebars(loader);
+                            Template template = handlebars.compile("user/list");
+                            Map<String,List<User>> users = new HashMap();
+                            users.put("users",new ArrayList<>(DataBase.findAll()));
+                            String profilePage = template.apply(users);
+
+                            response200Header(dos, profilePage.length());
+                            responseBody(dos, profilePage.getBytes());
+                            return;
+                        }
+                        response302Header(dos,"/user/login.html");
+                        return;
+                    }
                 }
             }
+//            if (!requestUrl.endsWith(".css")) {
+//                byte[] body = FileIoUtils.loadFileFromClasspath("static/css/styles.css");
+//                response200Header(dos, body.length);
+//                responseBody(dos, body);
+//                return;
+//            }
             byte[] body = FileIoUtils.loadFileFromClasspath("templates" + requestUrl);
             response200Header(dos, body.length);
             responseBody(dos, body);
@@ -120,7 +155,7 @@ public class RequestHandler implements Runnable {
         try {
             dos.writeBytes("HTTP/1.1 200 OK\r\n");
             dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("Set-Cookie: logined=" + loginResult + "; " +"Path=/" + "\r\n");
+            dos.writeBytes("Set-Cookie: logined=" + loginResult + "; " + "Path=/" + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
