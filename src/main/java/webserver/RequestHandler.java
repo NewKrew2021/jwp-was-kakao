@@ -1,13 +1,12 @@
 package webserver;
 
+import HttpRequest.Request;
 import annotation.web.RequestMapping;
 import annotation.web.RequestMethod;
-import com.github.jknack.handlebars.internal.lang3.ObjectUtils;
 import controller.RequestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
-import utils.RequestPathSplitUtils;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -34,33 +33,24 @@ public class RequestHandler implements Runnable {
             InputStreamReader inputStreamReader = new InputStreamReader(in, "UTF-8");
             BufferedReader br = new BufferedReader(inputStreamReader);
 
-            //uri
-            String uriLine = br.readLine();
-            RequestURI requestURI = RequestPathSplitUtils.getRequestURI(uriLine);
+            Request request = new Request(br);
 
-            //header
-            Map<String, String> requestHeader = new HashMap<>();
-            String tempLine;
-            while(!(tempLine = br.readLine()).equals("")){
-                String[] splitTempLine = tempLine.split(":");
-                requestHeader.put(splitTempLine[0].trim(), splitTempLine[1].trim());
-                logger.debug("header: {}", tempLine);
-            }
+
 
             byte[] body = null;
             try {
-                File file = new File("src/main/resources/templates" + requestURI.getUri());
+                File file = new File("src/main/resources/templates" + request.getUri());
                 if(file.exists()){
-                    body = FileIoUtils.loadFileFromClasspath("./templates" + requestURI.getUri());
+                    body = FileIoUtils.loadFileFromClasspath("./templates" + request.getUri());
                     DataOutputStream dos = new DataOutputStream(out);
                     response200Header(dos, body.length);
                     responseBody(dos, body);
                     return;
                 }
 
-                file = new File("src/main/resources/static" + requestURI.getUri());
+                file = new File("src/main/resources/static" + request.getUri());
                 if(file.exists()){
-                    body = FileIoUtils.loadFileFromClasspath("./static" + requestURI.getUri());
+                    body = FileIoUtils.loadFileFromClasspath("./static" + request.getUri());
                     DataOutputStream dos = new DataOutputStream(out);
                     response200HeaderForCss(dos, body.length);
                     responseBody(dos, body);
@@ -77,7 +67,7 @@ public class RequestHandler implements Runnable {
                     RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
                     if(requestMapping.value().equals("/user/create") && requestMapping.method().equals(RequestMethod.GET)){
                         try {
-                            Map<String, String> requestParams = requestURI.getParams();
+                            Map<String, String> requestParams = request.getParams();
                             method.invoke(new RequestController(), requestParams.get("userId"), requestParams.get("password"), requestParams.get("name"), requestParams.get("email"));
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();

@@ -1,8 +1,7 @@
 package utils;
 
-import annotation.web.RequestMapping;
 import annotation.web.RequestMethod;
-import webserver.RequestURI;
+import HttpRequest.RequestUri;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +17,9 @@ public class RequestPathSplitUtils {
     }
 
 
-    public static RequestURI getRequestURI(String line){
+    public static RequestUri getRequestURI(String line){
         String[] splitLine = line.split(" ");
-        return new RequestURI(getMethodType(splitLine[0]), extractPath(splitLine[1]), extractParams(splitLine[1]));
+        return new RequestUri(getMethodType(splitLine[0]), extractPath(splitLine[1]), extractParams(splitLine[1]));
     }
 
 

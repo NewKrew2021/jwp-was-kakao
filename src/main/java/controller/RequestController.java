@@ -14,4 +14,7 @@ public class RequestController {
         System.out.println(user);
         DataBase.addUser(user);
     }
+
+//    @RequestMapping(value = "/user/create", method = RequestMethod.POST)
+//    public void createUser()
 }

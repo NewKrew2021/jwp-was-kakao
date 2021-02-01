@@ -1,15 +1,15 @@
-package webserver;
+package HttpRequest;
 
 import annotation.web.RequestMethod;
 
 import java.util.Map;
 
-public class RequestURI {
+public class RequestUri {
     private RequestMethod requestMethod;
     private String uri;
     private Map<String, String> params;
 
-    public RequestURI(RequestMethod requestMethod, String uri, Map<String, String> params) {
+    public RequestUri(RequestMethod requestMethod, String uri, Map<String, String> params) {
         this.requestMethod = requestMethod;
         this.uri = uri;
         this.params = params;
