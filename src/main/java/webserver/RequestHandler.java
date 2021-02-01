@@ -43,7 +43,17 @@ public class RequestHandler implements Runnable {
                 if(str.contains("Content-Length")){
                     contentLength = Integer.parseInt(str.split(" ")[1]);
                 }
+                if(str.contains("Cookie")){
+                    if(str.contains("true")){
+                        logger.debug("쿠키 true 설정");
+                        request.setIsLogin(true);
+                    }else{
+                        logger.debug("쿠키 false 설정");
+                        request.setIsLogin(false);
+                    }
+                }
                 str = br.readLine();
+
             }
             if(request.getMethodType().equals("POST")){
                 request.setParams(IOUtils.readData(br,contentLength));
@@ -53,19 +63,11 @@ public class RequestHandler implements Runnable {
 
             dos.write(response.getHeader().getBytes());
             dos.write(response.getCookie().getBytes());
-            dos.write(filePathToBytes(response.getPath()));
+            dos.write(response.getBody());
             dos.flush();
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private byte[] filePathToBytes(String path) throws IOException, URISyntaxException {
-        String[] paths= path.split("\\.");
-        if(paths.length>=2&&(paths[1].equals("html")||paths[1].equals("ico"))){
-            return FileIoUtils.loadFileFromClasspath("templates" + path);
-        }
-        return FileIoUtils.loadFileFromClasspath("static"+ path);
     }
 
     private Response requestMapper(Request request) throws IOException, URISyntaxException {

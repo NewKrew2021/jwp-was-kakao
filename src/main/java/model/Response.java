@@ -2,24 +2,27 @@ package model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
 
 public class Response {
     private static final Logger logger = LoggerFactory.getLogger(Response.class);
     private String path;
     private String header;
-    private String body;
+    private byte[] body;
     private String cookie;
 
     public Response(){
         this.cookie="\r\n";
+
     }
 
-    public void body(String body){
-        this.body=body;
+    public void setBody(String body){
+        this.body=body.getBytes();
     }
 
-    public void setPath(String path){
+    public void setPath(String path) {
         this.path=path;
+        this.body=filePathToBytes(path);
     }
 
     public String getPath() {
@@ -30,7 +33,7 @@ public class Response {
         return header;
     }
 
-    public String getBody() {
+    public byte[] getBody() {
         return body;
     }
 
@@ -63,4 +66,14 @@ public class Response {
     public String getCookie() {
         return cookie;
     }
+
+
+    private byte[] filePathToBytes(String path) {
+        String[] paths= path.split("\\.");
+        if(paths.length>=2&&(paths[1].equals("html")||paths[1].equals("ico"))){
+            return FileIoUtils.loadFileFromClasspath("templates" + path);
+        }
+        return FileIoUtils.loadFileFromClasspath("static"+ path);
+    }
+
 }

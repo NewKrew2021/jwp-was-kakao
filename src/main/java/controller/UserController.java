@@ -1,26 +1,35 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.Request;
 import model.Response;
 import model.User;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
+import org.json.simple.parser.JSONParser;
 
-import java.util.Optional;
+import java.util.*;
 
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     public Response mapMethod(Request request) {
-
+        logger.debug("mapMaethod 접");
         if(request.getPaths()[2].equals("create")){
             return create(request);
         }
         if(request.getPaths()[2].equals("login")){
             return login(request);
+        }
+        if(request.getPaths()[2].equals("list")){
+            return list(request);
         }
 
         Response response = new Response();
@@ -49,11 +58,40 @@ public class UserController {
         response.setResponse200Header();
         if(user.getPassword().equals(loginUser.getPassword())){
             response.setPath("/index.html");
-            response.setCookie("Set-Cookie: logined=true; Path=/\r\n"+"\r\n");
+            response.setCookie("Set-Cookie: logined=true;근 Path=/\r\n"+"\r\n");
             return response;
         }
         response.setPath("/user/login_failed.html");
         response.setCookie("Set-Cookie: logined=false; Path=/\r\n"+"\r\n");
+        return response;
+    }
+
+    private Response list(Request request){
+        Response response=new Response();
+        response.setResponse200Header();
+        if(request.isLogin()){
+            logger.debug("user/list 로그인된 상태");
+            TemplateLoader loader = new ClassPathTemplateLoader();
+            loader.setPrefix("/templates");
+            loader.setSuffix(".html");
+            Handlebars handlebars = new Handlebars(loader);
+            Template template=null;
+            try{
+                template= handlebars.compile("user/list");
+                List<User> users = new ArrayList<>(DataBase.findAll());
+                Map<String,Object> map=new HashMap<>();
+                map.put("users",users);
+                JSONObject json=new JSONObject(map);
+                String userList = template.apply(json);
+                logger.info("userList : {}", userList);
+                response.setBody(userList);
+                return response;
+            }catch (Exception e) {
+                logger.debug(e.getMessage());
+            }
+        }
+        logger.debug("user/list false 상태");
+        response.setPath("/user/login.html");
         return response;
     }
 

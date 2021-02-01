@@ -7,6 +7,7 @@ public class Request {
     private final String methodType;
     private final String[] paths;
     private final String path;
+    private boolean isLogin;
     private Map<String, String> params = new HashMap<>();
 
     //get /user/create?userId=mark&password=123&name=123&email=123%40123.com
@@ -14,6 +15,7 @@ public class Request {
         String[] token = path.split(" ");
         methodType = token[0];
         this.path = token[1];
+        this.isLogin=false;
         String[] pathToken = token[1].split("\\?");
         paths = pathToken[0].split("/");
         if (pathToken.length > 1) {
@@ -48,5 +50,13 @@ public class Request {
 
     public String getPath() {
         return path;
+    }
+
+    public void setIsLogin(boolean isLogin) {
+        this.isLogin = isLogin;
+    }
+
+    public boolean isLogin(){
+        return this.isLogin;
     }
 }
