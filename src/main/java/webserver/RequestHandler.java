@@ -79,12 +79,11 @@ public class RequestHandler implements Runnable {
 
     private Response handlerMapping(RequestMessage requestMessage) throws IOException, URISyntaxException {
         String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
-
-        if (url.contains("/user")) {
-            return UserController.handle(requestMessage);
-        }
         if (ResourceController.hasResource(url)) {
             return ResourceController.handle(requestMessage);
+        }
+        if (url.contains("/user/create")) {
+            return UserController.handle(requestMessage);
         }
         return ResponseNotFound.create();
     }

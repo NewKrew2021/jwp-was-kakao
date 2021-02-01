@@ -2,13 +2,12 @@ package model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.RequestHandler;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 public abstract class Response {
-    protected static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Response.class);
 
     public abstract void write(DataOutputStream dos);
 
