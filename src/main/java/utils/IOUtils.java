@@ -29,10 +29,29 @@ public class IOUtils {
 
         List<String> lines = new ArrayList<>();
         String line = "";
-        while((line = br.readLine())!=null && !line.isEmpty()) {
+
+        while ((line = br.readLine()) != null && !line.isEmpty()) {
             lines.add(line);
         }
+
+        int contentLength = getContentLength(lines);
+        if (contentLength > 0) {
+            line = "\n\n" + readData(br, contentLength);
+        }
+
         return lines.stream()
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining("\n")) + line;
+    }
+
+    private static int getContentLength(List<String> lines) {
+        String contentLengthLine = lines.stream()
+                .filter(it -> it.split(": ", 2)[0].equals("Content-Length"))
+                .findAny()
+                .orElse(null);
+
+        if (contentLengthLine == null) {
+            return 0;
+        }
+        return Integer.parseInt(contentLengthLine.split(": ", 2)[1]);
     }
 }

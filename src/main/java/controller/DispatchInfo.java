@@ -5,7 +5,7 @@ import http.HttpRequest;
 
 public enum DispatchInfo {
     Template(new HttpRequest(RequestMethod.GET, ".html"), TemplateController.htmlHandler),
-    UserCreate(new HttpRequest(RequestMethod.GET, "/user/create"), UserController.createUserHandler);
+    UserCreate(new HttpRequest(RequestMethod.POST, "/user/create"), UserController.createUserHandler);
 
     private HttpRequest httpRequest;
     private RequestHandler requestHandler;
