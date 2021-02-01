@@ -73,6 +73,61 @@ public class RequestHandler implements Runnable {
                 response302Header(dos, "/index.html");
             }
 
+            if (path.equals("/user/login.html")) {
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/user/login_failed.html")) {
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/user/list.html")) {
+                Map<String, String> strBuf = new HashMap<>();
+                while(!(line = br.readLine()).equals("")){
+                    String[] buf = line.split(": ");
+                    strBuf.put(buf[0], buf[1]);
+                    logger.debug("header : {}", line);
+                }
+                String loginCheck = strBuf.get("Cookie");
+                if(!Boolean.parseBoolean(loginCheck.split("=")[1])){
+                    // page 이동
+                    DataOutputStream dos = new DataOutputStream(out);
+                    response302Header(dos, "/login.html");
+                }
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/user/login")){
+                // post로 오는 id, password 분류
+                Map<String, String> strBuf = new HashMap<>();
+                while(!(line = br.readLine()).equals("")){
+                    String[] buf = line.split(": ");
+                    strBuf.put(buf[0], buf[1]);
+                    logger.debug("header : {}", line);
+                }
+                int contentLength = Integer.parseInt(strBuf.get("Content-Length"));
+                String body = IOUtils.readData(br,contentLength);
+                Map<String, String> argument = parseArgument(body);
+                String userId = argument.get("userId");
+                String password = argument.get("password");
+                DataOutputStream dos = new DataOutputStream(out);
+
+                // Database에 있는 것 불러와서 비교
+                Optional<User> user = DataBase.findUserById(userId);
+                try {
+                    user.filter(u -> u.hasPassword(password)).orElseThrow(RuntimeException::new);
+                    response302HeaderWithCookie(dos, "/index.html", "true");
+                } catch (RuntimeException e) {
+                    response302HeaderWithCookie(dos, "/user/login_failed.html", "false");
+                }
+
+            }
 
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
@@ -102,7 +157,17 @@ public class RequestHandler implements Runnable {
     }
 
 
-
+    private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes(String.format("Set-Cookie: logined=%s; Path=/\r\n", cookie));
+            dos.writeBytes(String.format("Location: http://localhost:8080%s \r\n", url));
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
     private void response302Header(DataOutputStream dos, String url) {
         try {
