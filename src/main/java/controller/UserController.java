@@ -16,5 +16,6 @@ public class UserController extends Controller {
                 params.get("name"),
                 params.get("email"));
         DataBase.addUser(user);
+        response302Header(dos);
     };
 }

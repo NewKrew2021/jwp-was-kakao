@@ -15,6 +15,17 @@ public abstract class Controller {
         }
     }
 
+    protected static void response302Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 OK \r\n");
+            dos.writeBytes("Location: /index.html\r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            //logger.error(e.getMessage());
+        }
+    }
+
     protected static void responseBody(DataOutputStream dos, byte[] body) {
         try {
             dos.write(body, 0, body.length);
@@ -23,4 +34,5 @@ public abstract class Controller {
             //logger.error(e.getMessage());
         }
     }
+
 }
