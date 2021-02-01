@@ -39,9 +39,13 @@ public class RequestHandler implements Runnable {
             byte[] body = "Hello World".getBytes();
             if (httpUrl.hasSameUrl("/index.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
                 body = FileIoUtils.loadFileFromClasspath("./templates/index.html");
+                response200Header(dos, body.length);
+                responseBody(dos, body);
             }
             if (httpUrl.hasSameUrl("/user/form.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
                 body = FileIoUtils.loadFileFromClasspath("./templates/user/form.html");
+                response200Header(dos, body.length);
+                responseBody(dos, body);
             }
             if (httpUrl.hasSameUrl("/user/create") && httpRequest.hasSameMethod(HttpMethod.POST)) {
                 Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
@@ -50,12 +54,20 @@ public class RequestHandler implements Runnable {
                         parameters.get("password"),
                         parameters.get("name"),
                         parameters.get("email")));
+                response302Header(dos, "/index.html");
             }
-
-            response200Header(dos, body.length);
-            responseBody(dos, body);
         } catch (IOException e) {
 
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found " + IOUtils.NEW_LINE);
+            dos.writeBytes("Location: " + location + IOUtils.NEW_LINE);
+            dos.writeBytes("" + IOUtils.NEW_LINE);
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
