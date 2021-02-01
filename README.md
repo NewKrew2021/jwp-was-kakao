@@ -25,9 +25,9 @@
 
 - [x] 4 "회원가입"완료시 /index.html 페이지로 이동.
 
-- [ ]5 “로그인” 메뉴를 클릭하면 http://localhost:8080/user/login.html 으로 이동해 로그인할 수 있다. 로그인이 성공하면 index.html로 이동하고, 로그인이 실패하면 /user/login_failed.html로 이동해야 한다.
-    [ ]5.1 로그인이 성공하면 cookie를 활용해 로그인 상태를 유지할 수 있어야 한다.
-    [ ]5.2 로그인이 성공할경우 header의 Cookie header의 값이 logined=true, 실패할 경우 logined=false로 전달되어야 한다.
+- [x]5 “로그인” 메뉴를 클릭하면 http://localhost:8080/user/login.html 으로 이동해 로그인할 수 있다. 로그인이 성공하면 index.html로 이동하고, 로그인이 실패하면 /user/login_failed.html로 이동해야 한다.
+    [x]5.1 로그인이 성공하면 cookie를 활용해 로그인 상태를 유지할 수 있어야 한다.
+    [x]5.2 로그인이 성공할경우 header의 Cookie header의 값이 logined=true, 실패할 경우 logined=false로 전달되어야 한다.
 
 - [ ] 6 접근하고 있는 사용자가 “로그인” 상태일 경우(Cookie 값이 logined=true) 경우 http://localhost:8080/user/list 로 접근했을 때 사용자 목록을 출력한다. 만약 로그인하지 않은 상태라면 로그인 페이지(login.html)로 이동한다.
 
