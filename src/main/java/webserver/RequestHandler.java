@@ -7,6 +7,7 @@ import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import db.DataBase;
 import model.User;
@@ -68,7 +69,10 @@ public class RequestHandler implements Runnable {
                 String body = IOUtils.readData(br,contentLength);
                 Map<String, String> argument = parseArgument(body);
                 new LoginService().createUser(argument);
+                DataOutputStream dos = new DataOutputStream(out);
+                response302Header(dos, "/index.html");
             }
+
 
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
@@ -91,6 +95,19 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
+
+
+    private void response302Header(DataOutputStream dos, String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes(String.format("Location: http://localhost:8080%s \r\n", url));
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
