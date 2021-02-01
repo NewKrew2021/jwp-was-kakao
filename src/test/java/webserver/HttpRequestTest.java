@@ -1,8 +1,5 @@
 package webserver;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import db.DataBase;
-import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.*;
@@ -11,7 +8,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import utils.FileIoUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;

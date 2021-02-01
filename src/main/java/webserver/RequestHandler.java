@@ -3,10 +3,15 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -47,7 +52,7 @@ public class RequestHandler implements Runnable {
             }
 
             // 쿠키 처리
-            if(requestParser.containsKey("Cookie") && requestParser.get("Cookie").equals("logined=true")) {
+            if (requestParser.containsKey("Cookie") && requestParser.get("Cookie").equals("logined=true")) {
                 login = true;
             }
 
@@ -75,13 +80,36 @@ public class RequestHandler implements Runnable {
                 login = DataBase.isPossibleLogin(requestBodyParser.get("userId"), requestBodyParser.get("password"));
                 if (login) {
                     response302Header(dos, "/index.html");
-                }
-                else {
+                } else {
                     response302Header(dos, "/user/login_failed.html");
                 }
                 return;
             }
 
+            //user list 구현
+            if (requestParser.get("method").equals("GET") && requestParser.get("url").equals("/user/list")) {
+                System.out.println("userlist안으로 들어옴!!");
+                if (login && FileIoUtils.isExistFile("./templates" + requestParser.get("url") + ".html")) {
+                    System.out.println("로그인되어있음!!");
+                    TemplateLoader loader = new ClassPathTemplateLoader();
+                    loader.setPrefix("/templates");
+                    loader.setSuffix(".html");
+                    Handlebars handlebars = new Handlebars(loader);
+
+                    Template template = handlebars.compile(requestParser.get("url"));
+                    List<User> users = new ArrayList<>(DataBase.findAll());
+                    String userListPage = template.apply(users);
+
+                    byte[] body = userListPage.getBytes();
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                }
+                if (!login) {
+                    System.out.println("로그인안되어있음!!");
+                    response302Header(dos, "/user/login.html");
+                }
+                return;
+            }
 
             byte[] body = "Hello World".getBytes();
             if (FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
