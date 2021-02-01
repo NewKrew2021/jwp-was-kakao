@@ -19,15 +19,15 @@ import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import utils.FileIoUtils;
 import utils.IOUtils;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
+    private HttpRequest httpRequest;
     private Socket connection;
-    private Map<String, String> requestParser;
-    private Map<String, String> requestBodyParser;
     private boolean login = false;
 
     public RequestHandler(Socket connectionSocket) {
@@ -35,51 +35,32 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        requestParser = new HashMap<>();
-        requestBodyParser = new HashMap<>();
+
+
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            this.httpRequest = new HttpRequest(in);
             DataOutputStream dos = new DataOutputStream(out);
 
-            String line = bufferedReader.readLine();
-            logger.debug(line);
-            parseFirstLine(line);
-            while (!(line = bufferedReader.readLine()).equals("")) {
-                if (line == null)
-                    return;
-                String[] currentLine = line.split(": ");
-                requestParser.put(currentLine[0], URLDecoder.decode(currentLine[1],"UTF-8"));
-            }
-
             // 쿠키 처리
-            if (requestParser.containsKey("Cookie") && requestParser.get("Cookie").equals("logined=true")) {
+            if (httpRequest.getHeader("Cookie").equals("logined=true")) {
                 login = true;
             }
 
             // 회원가입
-            if (requestParser.containsKey("Content-Length") && requestParser.get("url").equals("/user/create") && requestParser.get("method").equals("POST")) {
-                String body = IOUtils.readData(bufferedReader, Integer.parseInt(requestParser.get("Content-Length")));
-                String[] currentLine = body.split("&|=");
-                for (int i = 0; i < currentLine.length; i = i + 2) {
-                    requestBodyParser.put(currentLine[i], URLDecoder.decode( currentLine[i + 1], "UTF-8" ));
-                }
-                User user = new User(requestBodyParser.get("userId"), requestBodyParser.get("password"), requestBodyParser.get("name"), requestBodyParser.get("email"));
+            if (httpRequest.getPath().equals("/user/create") && httpRequest.getMethod().equals(HttpMethod.POST)) {
+
+                User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
                 DataBase.addUser(user);
                 response302Header(dos, "/index.html");
                 return;
             }
 
             // 로그인
-            if (requestParser.get("method").equals("POST") && requestParser.get("url").equals("/user/login")) {
-                String body = IOUtils.readData(bufferedReader, Integer.parseInt(requestParser.get("Content-Length")));
-                String[] currentLine = body.split("&|=");
-                for (int i = 0; i < currentLine.length; i = i + 2) {
-                    requestBodyParser.put(currentLine[i], currentLine[i + 1]);
-                }
-                login = DataBase.isPossibleLogin(requestBodyParser.get("userId"), requestBodyParser.get("password"));
+            if (httpRequest.getMethod().equals(HttpMethod.POST) && httpRequest.getPath().equals("/user/login")) {
+                login = DataBase.isPossibleLogin(httpRequest.getParameter("userId"), httpRequest.getParameter("password"));
                 if (login) {
                     response302Header(dos, "/index.html");
                 } else {
@@ -89,16 +70,14 @@ public class RequestHandler implements Runnable {
             }
 
             //user list 구현
-            if (requestParser.get("method").equals("GET") && requestParser.get("url").equals("/user/list.html")) {
-                if (login && FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
+            if (httpRequest.getMethod().equals(HttpMethod.GET) && httpRequest.getPath().equals("/user/list.html")) {
+                if (login && FileIoUtils.isExistFile("./templates" + httpRequest.getPath())) {
                     TemplateLoader loader = new ClassPathTemplateLoader();
                     loader.setPrefix("/templates");
                     loader.setSuffix("");
-//                    Charset utf8 = StandardCharsets.UTF_8;
-//                    loader.setCharset(utf8);
                     Handlebars handlebars = new Handlebars(loader);
 
-                    Template template = handlebars.compile(requestParser.get("url"));
+                    Template template = handlebars.compile(httpRequest.getPath());
                     List<User> users = new ArrayList<>(DataBase.findAll());
 
                     String userListPage = template.apply(users);
@@ -115,13 +94,13 @@ public class RequestHandler implements Runnable {
             }
 
             byte[] body = "Hello World".getBytes();
-            if (FileIoUtils.isExistFile("./templates" + requestParser.get("url"))) {
-                body = FileIoUtils.loadFileFromClasspath("./templates" + requestParser.get("url"));
+            if (FileIoUtils.isExistFile("./templates" + httpRequest.getPath())) {
+                body = FileIoUtils.loadFileFromClasspath("./templates" + httpRequest.getPath());
             }
-            logger.debug("request pre : " + requestParser.get("url"));
-            if ( FileIoUtils.isExistFile( "./static" + requestParser.get("url"))  ) {
-                logger.debug("request pro : " + "./static" + requestParser.get("url"));
-                body = FileIoUtils.loadFileFromClasspath("./static" + requestParser.get("url"));
+            logger.debug("request pre : " + httpRequest.getPath());
+            if ( FileIoUtils.isExistFile( "./static" + httpRequest.getPath())  ) {
+                logger.debug("request pro : " + "./static" + httpRequest.getPath());
+                body = FileIoUtils.loadFileFromClasspath("./static" + httpRequest.getPath());
                 response200HeaderCss(dos, body.length);
                 responseBody(dos, body);
                 return;
@@ -133,16 +112,6 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void parseFirstLine(String line) {
-        if (line == null) {
-            throw new IllegalArgumentException("Not a RESTful request");
-        }
-        String[] currentLine = line.split(" ");
-
-        requestParser.put("method", currentLine[0]);
-        requestParser.put("url", currentLine[1]);
-        requestParser.put("version", currentLine[2]);
-    }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
@@ -159,7 +128,7 @@ public class RequestHandler implements Runnable {
     private void response200HeaderCss(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type:" + requestParser.get("Accept") + "\r\n");
+            dos.writeBytes("Content-Type:" + httpRequest.getHeader("Accept") + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
