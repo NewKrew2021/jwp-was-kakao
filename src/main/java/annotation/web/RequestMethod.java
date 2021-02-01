@@ -19,3 +19,19 @@ public enum RequestMethod {
                 .orElse(RequestMethod.NOTHING);
     }
 }
+
+/*
+HttpRequest
+    RequestMethod
+    Headers
+    Uri
+    paramMap
+    bod2y
+ */
+
+/*
+    string -> parser -> requestmethod, headers, uri, paramMap, body -> HttpRequest(, , , ,);
+
+
+
+ */

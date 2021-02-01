@@ -1,6 +1,7 @@
 package http;
 
 import annotation.web.RequestMethod;
+import utils.HttpUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class HttpRequest {
         if(parsedUri.length < 2) {
             return;
         }
-        //this.params = HttpUtils.getParamMap(parsedUri[1]);
+        this.params = HttpUtils.getParamMap(parsedUri[1]);
     }
 
     public boolean sameRequestLine(HttpRequest httpRequest) {
