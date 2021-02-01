@@ -1,8 +1,9 @@
 package webserver;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import utils.FileIoUtils;
 
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpRequestTest {
+
     @Test
     void request_resttemplate() {
         RestTemplate restTemplate = new RestTemplate();
@@ -37,10 +39,15 @@ public class HttpRequestTest {
     }
 
     @Test
-    void httpRequestDtoTest(){
+    void userCreateTest(){
         RestTemplate restTemplate = new RestTemplate();
-        String resourceUrl = "http://localhost:8080/user/create?userId=javagigi&password=p&name=a&email=email@email.com";
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl, String.class);
-        assertThat(response.getBody()).isEqualTo("성공!");
+        HttpHeaders headers = new HttpHeaders();
+        String body = "userId=javagigi&password=p&name=a&email=email@email.com";
+        HttpEntity<String> request =new HttpEntity<>(body, headers);
+
+        String resourceUrl = "http://localhost:8080/user/create";
+        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl, request, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
     }
 }
