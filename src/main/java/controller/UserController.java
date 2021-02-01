@@ -50,18 +50,16 @@ public class UserController {
     }
 
     private Response login(Request request){
-
         ObjectMapper mapper = new ObjectMapper();
         User loginUser = mapper.convertValue(request.getParams(), User.class);
         User user= Optional.ofNullable(DataBase.findUserById(loginUser.getUserId())).orElseThrow(NullPointerException::new);
         Response response=new Response();
-        response.setResponse200Header();
         if(user.getPassword().equals(loginUser.getPassword())){
-            response.setPath("/index.html");
+            response.setResponse302Header("/index.html");
             response.setCookie("Set-Cookie: logined=true;근 Path=/\r\n"+"\r\n");
             return response;
         }
-        response.setPath("/user/login_failed.html");
+        response.setResponse302Header("/user/login_failed.html");
         response.setCookie("Set-Cookie: logined=false; Path=/\r\n"+"\r\n");
         return response;
     }
@@ -90,6 +88,7 @@ public class UserController {
                 logger.debug(e.getMessage());
             }
         }
+
         logger.debug("user/list false 상태");
         response.setPath("/user/login.html");
         return response;

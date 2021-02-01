@@ -32,12 +32,30 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(reader);
             String str=br.readLine();
             logger.debug("####HTTP Request Header 출력");
+
+            DataOutputStream dos = new DataOutputStream(out);
             if(str==null) {
                 return;
             }
-            int contentLength = -1;
-
             Request request=new Request(str);
+            if(str.contains(".css")){
+                Response response = new Response();
+                response.setCssResponse200Header();
+                response.setPath(request.getPath());
+
+                dosWriteResponse(dos,response);
+                return;
+            }
+            if(str.contains(".js")){
+                Response response = new Response();
+                response.setJsResponse200Header();
+                response.setPath(request.getPath());
+
+                dosWriteResponse(dos,response);
+                return;
+            }
+
+            int contentLength = -1;
             while (!str.equals("")){
                 logger.debug(str);
                 if(str.contains("Content-Length")){
@@ -53,18 +71,13 @@ public class RequestHandler implements Runnable {
                     }
                 }
                 str = br.readLine();
-
             }
             if(request.getMethodType().equals("POST")){
                 request.setParams(IOUtils.readData(br,contentLength));
             }
-            DataOutputStream dos = new DataOutputStream(out);
             Response response = requestMapper(request);
+            dosWriteResponse(dos, response);
 
-            dos.write(response.getHeader().getBytes());
-            dos.write(response.getCookie().getBytes());
-            dos.write(response.getBody());
-            dos.flush();
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
@@ -82,9 +95,11 @@ public class RequestHandler implements Runnable {
 
 
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
+    private void dosWriteResponse(DataOutputStream dos, Response response) {
         try {
-            dos.write(body, 0, body.length);
+            dos.write(response.getHeader().getBytes());
+            dos.write(response.getCookie().getBytes());
+            dos.write(response.getBody());
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());

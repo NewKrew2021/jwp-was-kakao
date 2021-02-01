@@ -51,11 +51,24 @@ public class Response {
         response.append("Content-Type: text/html;charset=utf-8\r\n");
         this.header= response.toString();
     }
+    public void setCssResponse200Header() {
+        StringBuilder response=new StringBuilder();
+        response.append("HTTP/1.1 200 OK \r\n");
+        response.append("Content-Type: text/css;charset=utf-8\r\n");
+        this.header= response.toString();
+    }
 
     public void setResponse302Header(String redirectUrl) {
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.1 302 Found \r\n");
         response.append("Location: http://localhost:8080"+redirectUrl+"\r\n");
+        this.header= response.toString();
+    }
+
+    public void setJsResponse200Header() {
+        StringBuilder response=new StringBuilder();
+        response.append("HTTP/1.1 200 OK \r\n");
+        response.append("Content-Type: application/javascript;charset=utf-8\r\n");
         this.header= response.toString();
     }
 
