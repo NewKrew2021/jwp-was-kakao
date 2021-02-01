@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Map;
+import java.util.Optional;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -47,6 +48,29 @@ public class RequestHandler implements Runnable {
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
+            if (httpUrl.hasSameUrl("/user/login.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
+                body = FileIoUtils.loadFileFromClasspath("./templates/user/login.html");
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (httpUrl.hasSameUrl("/user/login_failed.html") && httpRequest.hasSameMethod(HttpMethod.GET)) {
+                body = FileIoUtils.loadFileFromClasspath("./templates/user/login_failed.html");
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+
+            if (httpUrl.hasSameUrl("/user/login") && httpRequest.hasSameMethod(HttpMethod.POST)) {
+                Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
+                Optional<User> user = DataBase.findUserById(parameters.get("userId"));
+
+                if (!user.isPresent() || !user.get().getPassword().equals(parameters.get("password"))) {
+                    response302Header(dos, "/user/login_failed.html");
+                    responseCookieHeader(dos, "logined=false; Path=/");
+                } else {
+                    response302Header(dos, "/index.html");
+                    responseCookieHeader(dos, "logined=true; Path=/");
+                }
+            }
             if (httpUrl.hasSameUrl("/user/create") && httpRequest.hasSameMethod(HttpMethod.POST)) {
                 Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
                 DataBase.addUser(new User(
@@ -62,11 +86,18 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void responseCookieHeader(DataOutputStream dos, String cookie) {
+        try {
+            dos.writeBytes("Set-Cookie: " + cookie + IOUtils.NEW_LINE);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
     private void response302Header(DataOutputStream dos, String location) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found " + IOUtils.NEW_LINE);
             dos.writeBytes("Location: " + location + IOUtils.NEW_LINE);
-            dos.writeBytes("" + IOUtils.NEW_LINE);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -77,7 +108,6 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("HTTP/1.1 200 OK " + IOUtils.NEW_LINE);
             dos.writeBytes("Content-Type: text/html;charset=utf-8" + IOUtils.NEW_LINE);
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "" + IOUtils.NEW_LINE);
-            dos.writeBytes("" + IOUtils.NEW_LINE);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -85,6 +115,7 @@ public class RequestHandler implements Runnable {
 
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
+            dos.writeBytes("" + IOUtils.NEW_LINE);
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {

@@ -32,6 +32,7 @@ public class HttpRequest {
         logger.debug(String.join("\n", texts));
 
         HttpBody httpBody = create(httpHeaders, br);
+        logger.debug("[Body] {}", httpBody.getBody());
         return new HttpRequest(HttpMethod.valueOf(firstLine[0]), httpHeaders, HttpUrl.of(firstLine[1]), httpBody);
     }
 
