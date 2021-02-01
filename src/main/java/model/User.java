@@ -35,6 +35,10 @@ public class User {
         return email;
     }
 
+    public boolean validate(LoginUser loginUser) {
+        return userId.equals(loginUser.getUserId()) && password.equals(loginUser.getPassword());
+    }
+
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";

@@ -16,6 +16,8 @@ public class UserRequest {
     private String password;
     private String name;
     private String email;
+
+
     private UserRequest(String userRequestParam) {
         String[] tokens = userRequestParam.split("&");
         this.userId = tokens[USER_ID_INDEX].split("=")[VALUE_INDEX];
