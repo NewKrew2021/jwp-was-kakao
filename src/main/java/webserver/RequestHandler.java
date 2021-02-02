@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +74,27 @@ public class RequestHandler implements Runnable {
                 if (path.equals("/user/create")) {
                     Map<String, String> parameters = ParseUtils.getParameters(requestBody);
                     User user = User.mapOf(parameters);
-
+                    DataBase.addUser(user);
                     responseParameters.put("Location", "/index.html");
                     response(dos, new Response302Header(), responseParameters);
                     return;
                 }
+
+                if (path.equals("/user/login")) {
+                    Map<String, String> parameters = ParseUtils.getParameters(requestBody);
+                    User user = DataBase.findUserById(parameters.get("userId"));
+                    if (user == null || !user.getPassword().equals(parameters.get("password"))) {
+                        responseParameters.put("Location", "/user/login_failed.html");
+                        responseParameters.put("Set-Cookie", "logined=false");
+                    }
+                    else {
+                        responseParameters.put("Location", "/index.html");
+                        responseParameters.put("Set-Cookie", "logined=true; Path=/");
+                    }
+                    response(dos, new Response302Header(), responseParameters);
+                    return;
+                }
+
             }
 
             responseParameters.put("path", path);

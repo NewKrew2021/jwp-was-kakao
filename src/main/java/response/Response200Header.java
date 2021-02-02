@@ -17,8 +17,15 @@ public class Response200Header implements ResponseHeader{
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + response.get("Content-Length") + "\r\n");
-            dos.writeBytes("\r\n");
+            for(String key : response.keySet()){
+                StringBuilder sb = new StringBuilder();
+                sb.append(key);
+                sb.append(KEY_VALUE_REGEX);
+                sb.append(response.get(key));
+                sb.append(NEW_LINE_PREFIX);
+                dos.writeBytes(sb.toString());
+            }
+            dos.writeBytes(NEW_LINE_PREFIX);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
