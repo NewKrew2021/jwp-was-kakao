@@ -22,7 +22,6 @@ public class UserController extends Controller {
         putHandler("/create", "POST", this::handleCreate);
         putHandler("/login", "POST", this::handleLogin);
         putHandler("/list", "GET", new SecuredHandler(this::handleUserList));
-        putHandler("/list.html", "GET", new SecuredHandler(this::handleUserList));
         putHandler("/logout", "GET", new SecuredHandler(this::handleLogout));
     }
 
