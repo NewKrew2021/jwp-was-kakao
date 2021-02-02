@@ -10,7 +10,7 @@ public class User {
         this.userId = userId;
         this.password = password;
         this.name = name;
-        this.email = email;
+        this.email = email.replace("%40", "@");
     }
 
     public String getUserId() {

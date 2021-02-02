@@ -2,6 +2,7 @@ package model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,8 +17,8 @@ public class HttpRequest {
     private String method;
     private String path;
     private String protocol;
-    private Map<String, String> headerMap = new HashMap<>();
-    private Map<String, String> queryParameterMap = new HashMap<>();
+    private final Map<String, String> headerMap = new HashMap<>();
+    private final Map<String, String> queryParameterMap = new HashMap<>();
     private String body = "";
 
     private final static List<String> acceptedMethod = Arrays.asList("GET", "POST", "PUT", "DELETE");
@@ -37,7 +38,7 @@ public class HttpRequest {
 
     private void setBody(BufferedReader br) throws IOException {
         while(br.ready()){
-            body += br.readLine();
+            body = IOUtils.readData(br, Integer.parseInt(headerMap.get("Content-Length")));
         }
         log.debug("{}", body);
     }
@@ -48,7 +49,7 @@ public class HttpRequest {
             log.debug("{}", line);
             String[] headerLine = line.split(":", 2);
             validateHeaderLine(headerLine);
-            headerMap.put(headerLine[0], headerLine[1].trim());
+            headerMap.put(headerLine[0].trim(), headerLine[1].trim());
             line = br.readLine();
         }
     }
@@ -81,7 +82,7 @@ public class HttpRequest {
         String[] queryParams = pathArg.split("&");
         Arrays.stream(queryParams).forEach((param) -> {
             String[] args = param.split("=", 2);
-            queryParameterMap.put(args[0], args[1]);
+            queryParameterMap.put(args[0].trim(), args[1].trim());
         });
     }
 
@@ -107,11 +108,39 @@ public class HttpRequest {
         return headerMap;
     }
 
+    public String getHeader(String header){
+        return headerMap.get(header);
+    }
+
     public String getBody() {
         return body;
     }
 
+    public Map<String, String> getParsedBody(){
+        Map<String, String> parsedBody = new HashMap<>();
+        String[] queryParams = body.split("&");
+        Arrays.stream(queryParams).forEach((param) -> {
+            String[] args = param.split("=", 2);
+            parsedBody.put(args[0].trim(), args[1].trim());
+        });
+        return parsedBody;
+    }
+
+    public String getCookie(String cookieParam){
+        Map<String, String> parsedCookie = new HashMap<>();
+        String[] cookies = getHeader("Cookie").split(";");
+        Arrays.stream(cookies).forEach((cookie) -> {
+           String[] args = cookie.split("=", 2);
+           parsedCookie.put(args[0].trim(), args[1].trim());
+        });
+        return parsedCookie.get(cookieParam);
+    }
+
     public Map<String, String> getQueryParameterMap() {
         return queryParameterMap;
+    }
+
+    public String getParameter(String parameter){
+        return queryParameterMap.get(parameter);
     }
 }

@@ -14,13 +14,14 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
-    private List<Controller> controllers = Arrays.asList(new UserController());
+    private final List<Controller> controllers = Arrays.asList(new UserController(), new ViewController());
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -32,13 +33,19 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = new HttpRequest(in);
-            Controller selectedController = controllers.stream()
+            List<Controller> selectedControllers = controllers.stream()
                     .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
-                    .findFirst()
-                    .orElseGet(ViewController::new);
-            selectedController.handle(httpRequest, out);
+                    .collect(Collectors.toList());
+            handleRequest(out, httpRequest, selectedControllers);
         } catch (URISyntaxException | IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private void handleRequest(OutputStream out, HttpRequest httpRequest, List<Controller> controllers)
+            throws URISyntaxException, IOException {
+        for(Controller controller: controllers){
+            if(controller.handle(httpRequest, out)) return;
         }
     }
 }

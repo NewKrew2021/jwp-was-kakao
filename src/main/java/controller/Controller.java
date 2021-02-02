@@ -9,5 +9,5 @@ import java.net.URISyntaxException;
 public interface Controller {
     boolean hasSameBasePath(String path);
 
-    void handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException;
+    boolean handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException;
 }
