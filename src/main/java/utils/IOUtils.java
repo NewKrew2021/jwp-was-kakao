@@ -1,18 +1,15 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class IOUtils {
     /**
-     * @param BufferedReader는
-     *            Request Body를 시작하는 시점이어야
-     * @param contentLength는
-     *            Request Header의 Content-Length 값이다.
+     * @param BufferedReader는 Request Body를 시작하는 시점이어야
+     * @param contentLength는  Request Header의 Content-Length 값이다.
      * @return
      * @throws IOException
      */
@@ -38,7 +35,14 @@ public class IOUtils {
             lines.add("\n" + readData(br, contentLength));
         }
 
-        return String.join("\n", lines);
+        return lines.stream()
+                .map(it -> {
+                    try {
+                        return URLDecoder.decode(it, "utf-8");
+                    } catch (UnsupportedEncodingException e) {
+                    }
+                    return it;
+                }).collect(Collectors.joining("\n"));
     }
 
     private static int getContentLength(List<String> lines) {
