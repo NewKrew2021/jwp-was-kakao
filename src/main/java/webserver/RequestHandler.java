@@ -1,20 +1,25 @@
 package webserver;
 
-import controller.UserController;
+import controller.Controller;
+import controller.CreateUserController;
+import controller.ListUserController;
+import controller.LoginController;
 import model.Request;
 import model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
-import utils.IOUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static Map<String, Controller> pathMap = new HashMap<>();
 
     private Socket connection;
 
@@ -25,7 +30,6 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             Request request = new Request(in);
             Response response = new Response(out);
@@ -37,12 +41,15 @@ public class RequestHandler implements Runnable {
     }
 
     private void requestMapper(Request request,Response response) throws IOException, URISyntaxException {
-        String[] paths = request.getPath().split("/");
-        if(paths.length>=1 && paths[1].equals("user")){
-            new UserController().mapMethod(request, response);
+        Map<String,Controller> pathMap=new HashMap<>();
+        pathMap.put("/user/create", new CreateUserController());
+        pathMap.put("/user/list", new ListUserController());
+        pathMap.put("/user/login", new LoginController());
+        if(pathMap.get(request.getPath()) == null) {
+            response.forward(request.getPath());
             return;
         }
-        response.forward(request.getPath());
+        pathMap.get(request.getPath()).service(request,response);
     }
 
 }
