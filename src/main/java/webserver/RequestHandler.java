@@ -8,6 +8,7 @@ import utils.ParseUtils;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,9 +48,15 @@ public class RequestHandler implements Runnable {
 
             String path = request.get("url");
 
-            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            try{
+                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
+                logger.error(fsnfe.getMessage());
+                response404Header(dos);
+            }
+
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
@@ -78,6 +85,17 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response404Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

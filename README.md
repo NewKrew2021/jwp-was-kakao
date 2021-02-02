@@ -18,7 +18,7 @@
 
 #### path에 해당하는 파일 읽어 응답하기
 * [x] utils.FileIoUtils를 이용해 classpath에 있는 파일 읽기
-* [ ] 서버 내 파일이 없으면 404 (Not Found)를 반환
+* [x] 서버 내 파일이 없으면 404 (Not Found)를 반환
 
 #### Http Request 메세지 저장하기
 * [x] Request 전체를 파싱해서 key-value의 map으로 저장
