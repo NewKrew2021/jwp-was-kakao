@@ -14,6 +14,7 @@ public class Response {
     public Response(OutputStream out){
         dos = new DataOutputStream(out);
         header = new ResponseHeader();
+        body=new Body();
     }
 
     public void addHeader(String key, String value){
@@ -22,9 +23,9 @@ public class Response {
 
     public void forward(String path) {
         addContentType(path);
-        response200Header(body.getLength());
+        response200Header(this.body.getLength());
         try {
-            dos.write(body.getBytes());
+            dos.write(this.body.getBytes());
             dos.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,21 +34,21 @@ public class Response {
 
     private void addContentType(String path){
         if(path.contains(".html")){
-            this.body=new Body(FileIoUtils.loadFileFromClasspath("templates"+path));
+            this.body.setBody(FileIoUtils.loadFileFromClasspath("templates"+path));
             header.addHeader("Content-Type","text/html");
         }
         if(path.contains(".css")){
-            this.body=new Body(FileIoUtils.loadFileFromClasspath("static"+path));
+            this.body.setBody(FileIoUtils.loadFileFromClasspath("static"+path));
             header.addHeader("Content-Type","text/css");
         }
         if(path.contains(".js")){
-            this.body=new Body(FileIoUtils.loadFileFromClasspath("static"+path));
+            this.body.setBody(FileIoUtils.loadFileFromClasspath("static"+path));
             header.addHeader("Content-Type","application/javascript");
         }
     }
 
     public void forwardBody(String body) {
-        this.body=new Body(body.getBytes());
+        this.body.setBody(body.getBytes());
         response200Header(this.body.getLength());
         try {
             dos.write(this.body.getBytes());

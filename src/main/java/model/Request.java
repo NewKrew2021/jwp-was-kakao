@@ -17,7 +17,7 @@ public class Request {
     private static final Logger logger = LoggerFactory.getLogger(Request.class);
     private RequestMethod method;
     private String path;
-    private Parameter parameter;
+    private Parameter parameter=new Parameter();
     private RequestHeader requestHeader;
 
     public Request(InputStream in) throws IOException {

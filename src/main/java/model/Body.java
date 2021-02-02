@@ -3,7 +3,11 @@ package model;
 public class Body {
     private byte[] body;
 
-    public Body(byte[] body){
+    public Body(){
+        this.body=new byte[0];
+    }
+
+    public void setBody(byte[] body){
         this.body=body;
     }
 
