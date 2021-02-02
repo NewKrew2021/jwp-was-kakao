@@ -1,10 +1,9 @@
-package webserver;
+package webserver.domain;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import webserver.domain.HttpRequest;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -13,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpRequestTest {
-    private String testDirectory = "./src/test/resources/";
+    private final String testDirectory = "./src/test/resources/";
 
     @Test
     void request_resttemplate() {
