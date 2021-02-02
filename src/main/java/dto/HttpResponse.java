@@ -9,14 +9,14 @@ public class HttpResponse {
     private Map<String, String> headers = new HashMap<>();
     private byte[] body = new byte[0];
 
-    public void setBody(byte[] body){
+    public void setBody(byte[] body, String contentType){
         this.body = body;
-        this.headers.put("Content-Type", "text/html;charset=utf-8");
+        this.headers.put("Content-Type", contentType + ";charset=utf-8");
         this.headers.put("Content-Length", "" + body.length);
     }
 
     public HttpResponse(byte[] body) {
-        setBody(body);
+        setBody(body, "");
     }
 
     public HttpResponse(String status) {
