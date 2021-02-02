@@ -16,11 +16,12 @@ public class UserController {
     }
 
     public void registerAll() {
-        this.dispatcher.register("/user/create", "GET", this::create);
+        this.dispatcher.register("/user/create", "GET", this::createByGet);
+        this.dispatcher.register("/user/create", "POST", this::createByPost);
     }
 
     //Get, post
-    public byte[] create(Request request) {
+    public byte[] createByGet(Request request) {
         Map<String, String> quires = request.getQueries();
         DataBase.addUser(new User(
                 quires.get("userId"),
@@ -28,7 +29,20 @@ public class UserController {
                 quires.get("name"),
                 quires.get("email")
         ));
-        return ("TEST" + DataBase.findUserById(quires.get("userId"))).getBytes(StandardCharsets.UTF_8);
+        return ("HTTP/1.1 302 Found\n" +
+                "Location: http://localhost/index.html").getBytes();
+       // return ("TEST" + DataBase.findUserById(quires.get("userId"))).getBytes(StandardCharsets.UTF_8);
+    }
+
+    public byte[] createByPost(Request request) {
+        Map<String, String> bodies = request.getBodies();
+        DataBase.addUser(new User(
+                bodies.get("userId"),
+                bodies.get("password"),
+                bodies.get("name"),
+                bodies.get("email")
+        ));
+        return ("TEST" + DataBase.findUserById(bodies.get("userId"))).getBytes(StandardCharsets.UTF_8);
     }
 
     public static UserController getInstance() {
