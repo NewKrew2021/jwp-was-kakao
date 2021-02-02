@@ -47,7 +47,7 @@ public class HttpRequest {
     private void parseUri(String uri) {
         String[] parsedUri = uri.split("\\?", 2);
         this.uri = parsedUri[0];
-        if(parsedUri.length < 2) {
+        if (parsedUri.length < 2) {
             return;
         }
         this.params = HttpUtils.getParamMap(parsedUri[1]);
@@ -59,5 +59,10 @@ public class HttpRequest {
 
     public boolean isTemplateRequest() {
         return requestMethod == RequestMethod.GET && uri.endsWith(".html");
+    }
+
+    public boolean isStaticRequest() {
+        return requestMethod
+                == RequestMethod.GET && (uri.startsWith("/css") || uri.startsWith("/fonts") || uri.startsWith("/images") || uri.startsWith("/js"));
     }
 }

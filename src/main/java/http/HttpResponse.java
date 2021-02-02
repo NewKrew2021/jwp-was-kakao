@@ -48,16 +48,23 @@ public class HttpResponse {
             return this;
         }
 
-        public Builder setPage(String path) throws IOException, URISyntaxException {
+        public Builder setHtml(String path) throws IOException, URISyntaxException {
             this.body = FileIoUtils.loadFileFromClasspath(path);
             headers.put("Content-Type", "text/html;charset=utf-8");
             headers.put("Content-Length", String.valueOf(body.length));
             return this;
         }
 
-        public Builder setBody(byte[] body) {
+        public Builder setHtml(byte[] body) {
             this.body = body;
             headers.put("Content-Type", "text/html;charset=utf-8");
+            headers.put("Content-Length", String.valueOf(body.length));
+            return this;
+        }
+
+        public Builder setCss(String path) throws IOException, URISyntaxException {
+            this.body = FileIoUtils.loadFileFromClasspath(path);
+            headers.put("Content-Type", "text/css;charset=utf-8");
             headers.put("Content-Length", String.valueOf(body.length));
             return this;
         }

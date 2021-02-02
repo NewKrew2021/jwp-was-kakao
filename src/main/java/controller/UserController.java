@@ -53,7 +53,7 @@ public class UserController extends Controller {
 
             return new HttpResponse.Builder()
                     .setStatus("HTTP/1.1 200 OK")
-                    .setBody(TemplateUtils.buildPage(request.getUri(), params))
+                    .setHtml(TemplateUtils.buildPage(request.getUri(), params))
                     .build();
         }
         return new HttpResponse.Builder()
