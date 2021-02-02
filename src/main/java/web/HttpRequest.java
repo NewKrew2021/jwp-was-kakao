@@ -1,7 +1,5 @@
 package web;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import utils.DecodeUtils;
@@ -13,7 +11,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class HttpRequest {
-    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
     private final HttpMethod httpMethod;
     private final HttpHeaders httpHeaders;
     private final HttpUrl httpUrl;
@@ -31,27 +28,8 @@ public class HttpRequest {
         List<String> texts = IOUtils.readUntilEmptyLine(br);
         HttpHeaders httpHeaders = HttpHeaders.of(texts.subList(1, texts.size()));
         String[] firstLine = texts.get(0).split(" ");
-        logger.debug(String.join("\n", texts));
 
-        HttpBody httpBody = create(httpHeaders, br);
-        logger.debug("[Body] {}", httpBody.getBody());
-        return new HttpRequest(HttpMethod.valueOf(firstLine[0]), httpHeaders, HttpUrl.of(firstLine[1]), httpBody);
-    }
-
-    private static HttpBody create(HttpHeaders httpHeaders, BufferedReader br) {
-        String contentLength = httpHeaders.get("Content-Length");
-        if (contentLength == null) {
-            return HttpBody.empty();
-        }
-
-        String body = IOUtils.readData(br, Integer.parseInt(contentLength));
-        String contentType = httpHeaders.get("Content-Type");
-
-        if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(contentType)) {
-            body = DecodeUtils.decodeUrl(body);
-        }
-
-        return new HttpBody(body);
+        return new HttpRequest(HttpMethod.valueOf(firstLine[0]), httpHeaders, HttpUrl.of(firstLine[1]), HttpBody.of(httpHeaders, br));
     }
 
     public boolean hasSameMethod(HttpMethod httpMethod) {
