@@ -41,9 +41,9 @@
 ### 요구사항 4 (회원가입 완료 후 index.html로 이동)
 
 #### redirect 사용하여 index.html로 이동
-* [ ] 회원가입 버튼 클릭 시 index.html로 redirect
-* [ ] status code 302 헤더 만들기
-* [ ] status code 302 리턴
+* [x] 회원가입 버튼 클릭 시 index.html로 redirect
+* [x] status code 302 헤더 만들기
+* [x] status code 302 리턴
 
 ### 요구사항 5 (로그인 구현)
 

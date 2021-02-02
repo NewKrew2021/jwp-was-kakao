@@ -3,6 +3,10 @@ package webserver;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import response.Response200Header;
+import response.Response302Header;
+import response.Response404Header;
+import response.ResponseHeader;
 import utils.FileIoUtils;
 import utils.IOUtils;
 import utils.ParseUtils;
@@ -36,6 +40,7 @@ public class RequestHandler implements Runnable {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             Map<String, String> request = new HashMap<>();
             String line = readLine(reader);
+            Map<String, String> responseParameters = new HashMap<>();
 
             getMethodAndUrl(line, request);
             String path = ParseUtils.getUrlPath(request.get("url"));
@@ -63,26 +68,41 @@ public class RequestHandler implements Runnable {
                     }
                 }
 
-                String body = IOUtils.readData(reader, Integer.parseInt(request.get("Content-Length")));
+                String requestBody = IOUtils.readData(reader, Integer.parseInt(request.get("Content-Length")));
 
                 if (path.equals("/user/create")) {
-                    Map<String, String> parameters = ParseUtils.getParameters(body);
+                    Map<String, String> parameters = ParseUtils.getParameters(requestBody);
                     User user = User.mapOf(parameters);
-                    logger.debug(user.toString());
+
+                    responseParameters.put("Location", "/index.html");
+                    response(dos, new Response302Header(), responseParameters);
+                    return;
                 }
             }
 
-            try {
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
-                logger.error(fsnfe.getMessage());
-                response404Header(dos);
-            }
+            responseParameters.put("path", path);
+            response(dos, new Response200Header(), responseParameters);
 
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private void response(DataOutputStream dos, ResponseHeader responseHeader, Map<String, String> responseParameters)
+            throws IOException, URISyntaxException {
+        try {
+            byte[] responseBody = new byte[0];
+
+            if (responseParameters.containsKey("path")) {
+                responseBody = FileIoUtils.loadFileFromClasspath("./templates" + responseParameters.get("path"));
+            }
+
+            responseParameters.put("Content-Length", String.valueOf(responseBody.length));
+            responseHeader.responseHeader(dos, responseParameters);
+            responseBody(dos, responseBody);
+        } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
+            logger.error(fsnfe.getMessage());
+            new Response404Header().responseHeader(dos, responseParameters);
         }
     }
 
@@ -101,28 +121,6 @@ public class RequestHandler implements Runnable {
         request.put("method", lines[0]);
         request.put("url", lines[1]);
         request.put("version", lines[2]);
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response404Header(DataOutputStream dos) {
-        try {
-            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("\r\n");
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
     }
 
     private void responseBody(DataOutputStream dos, byte[] body) {
