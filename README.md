@@ -25,11 +25,8 @@
 
 ### 요구사항 2 (회원가입 기능 - GET 방식)
 
-#### form.html 응답하기
-* [ ] Request를 해석하여 form.html 응답하기
-
 #### Request Parameter 추출하기
-* [ ] 요청 Url의 접근 경로에서 Parameter 분리하기
+* [x] 요청 Url의 접근 경로에서 Parameter 분리하기
 * [ ] 분리한 Parameter 값을 User 클래스에 저장
 
 #### path에 해당하는 파일 읽어 응답하기
