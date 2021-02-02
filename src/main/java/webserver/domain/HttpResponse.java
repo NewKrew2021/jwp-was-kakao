@@ -1,8 +1,9 @@
-package webserver;
+package webserver.domain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import webserver.RequestHandler;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -40,12 +41,43 @@ public class HttpResponse {
         responseBody(response);
     }
 
+    public void sendRedirect(String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 REDIRECTED\r\n");
+            printHeader();
+            dos.writeBytes(HttpHeader.LOCATION + ": " + location + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void send405BadMethod() {
+        try {
+            dos.writeBytes("HTTP/1.1 405 Method Not Allowed\r\n");
+            printHeader();
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void send501NotImplemented() {
+        try {
+            dos.writeBytes("HTTP/1.1 501 Not Implemented\r\n");
+            printHeader();
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
     private void response200Header(int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             printHeader();
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes(HttpHeader.CONTENT_TYPE + ": text/html;charset=utf-8\r\n");
+            dos.writeBytes(HttpHeader.CONTENT_LENGTH + ": " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -56,17 +88,6 @@ public class HttpResponse {
         try {
             dos.write(body, 0, body.length);
             dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    public void sendRedirect(String location) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 REDIRECTED\r\n");
-            printHeader();
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

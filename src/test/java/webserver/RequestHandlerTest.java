@@ -4,11 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.*;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class RequestHandlerTest {
     @Test
@@ -129,12 +131,20 @@ public class RequestHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    @Test
+    @DisplayName("405 잘못된 메서드")
+    void request_resttemplate_405_bad_method() {
+        RestTemplate restTemplate = new RestTemplate();
+        String resourceUrl = "http://localhost:8080";
+        String url = "/user/create";
+
+        assertThatExceptionOfType(HttpClientErrorException.MethodNotAllowed.class)
+                .isThrownBy(() -> restTemplate.exchange(resourceUrl + url, HttpMethod.DELETE, null, String.class));
+    }
 
     private void printResponse(ResponseEntity<String> response) {
         response.getHeaders().keySet().forEach(it -> {
             System.out.println(it + ": " + response.getHeaders().get(it));
         });
     }
-
-
 }

@@ -1,4 +1,4 @@
-package webserver;
+package webserver.domain;
 
 import utils.IOUtils;
 
@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,37 +17,38 @@ public class HttpRequest {
     private String path;
     private HttpMethod method;
 
-    public HttpRequest(InputStream in) throws IOException, URISyntaxException {
+    public HttpRequest(InputStream in) throws IOException {
         this.headers = new HashMap<>();
         this.parameters = new HashMap<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-        String line = reader.readLine();
-        String[] firstTokens = line.split(" ");
-        String requestUrl = firstTokens[1];
+        String[] firstLineTokens = reader.readLine().split(" ");
+        String requestUrl = firstLineTokens[1];
         parseUrl(requestUrl);
+        readHeaders(reader);
 
-        this.method = HttpMethod.valueOf(firstTokens[0]);
-
-        while (true) {
-            line = reader.readLine();
-            if (line == null) {
-                break;
-            }
-            if ("".equals(line)) {
-                break;
-            }
-            String[] header = line.split(": ");
-            this.headers.put(header[0], header[1]);
-        }
-        if(this.headers.containsKey("Content-Length")) {
+        this.method = HttpMethod.valueOf(firstLineTokens[0]);
+        if (this.headers.containsKey(HttpHeader.CONTENT_LENGTH)) {
             this.body = IOUtils.readData(reader, Integer.parseInt(this.headers.get("Content-Length")));
             parseParameter(this.body);
         }
     }
 
+    private void readHeaders(BufferedReader reader) throws IOException {
+        String line = reader.readLine();
+        while (isValid(line)) {
+            String[] header = line.split(": ");
+            this.headers.put(header[0], header[1]);
+            line = reader.readLine();
+        }
+    }
+
+    private boolean isValid(String line) {
+        return (line != null) && !"".equals(line);
+    }
+
     private void parseUrl(String requestUrl) {
-        if(requestUrl.indexOf('?') == -1){
+        if (requestUrl.indexOf('?') == -1) {
             this.path = requestUrl;
             return;
         }
@@ -58,14 +59,15 @@ public class HttpRequest {
 
     private void parseParameter(String parameterString) {
         String[] parameterToken = parameterString.split("&");
-        for(String token : parameterToken){
-            if(token.indexOf('=') == -1){
-                this.parameters.put(token, null);
-                continue;
-            }
-            String[] keyValue = token.split("=");
-            this.parameters.put(keyValue[0], keyValue[1]);
-        }
+        Arrays.stream(parameterToken)
+                .forEach(token -> {
+                    if (token.indexOf('=') == -1) {
+                        this.parameters.put(token, null);
+                        return;
+                    }
+                    String[] keyValue = token.split("=");
+                    this.parameters.put(keyValue[0], keyValue[1]);
+                });
     }
 
     public HttpMethod getMethod() {
@@ -85,7 +87,7 @@ public class HttpRequest {
     }
 
     public String getBody() {
-        if(body == null){
+        if (body == null) {
             return "";
         }
         return body;

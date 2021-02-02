@@ -1,6 +1,8 @@
 package webserver;
 
 import org.junit.jupiter.api.Test;
+import webserver.domain.HttpMethod;
+import webserver.domain.HttpRequest;
 
 import java.io.File;
 import java.io.FileInputStream;
