@@ -38,5 +38,35 @@
 * [x] util.IOUtils를 활용하여 Http Body를 읽기
 * [x] Http Body를 해석하여 User 객체 생성
 
+### 요구사항 4 (회원가입 완료 후 index.html로 이동)
+
+#### redirect 사용하여 index.html로 이동
+* [ ] 회원가입 버튼 클릭 시 index.html로 redirect
+* [ ] status code 302 헤더 만들기
+* [ ] status code 302 리턴
+
+### 요구사항 5 (로그인 구현)
+
+#### 로그인 성공 여부 구현
+* [ ] 로그인이 성공하면 index.html 이동
+* [ ] 로그인이 실패하면 /user/login_failed.html 이동
+* [ ] 로그인 시 아이디와 비밀번호가 일치하는지 확인하는 기능
+
+#### 세션 구현
+* [ ] 로그인 성공 여부에 대한 세션값을 헤더에 설정
+* [ ] 회원가입 시 User를 DataBase.addUser() 메서드를 활용해 저장
+
+### 요구사항 6 (사용자 목록 구현)
+
+#### 사용자 목록 출력
+* [ ] /user/list 접속 분기 처리 구현
+* [ ] 로그인 여부에 따라 사용자 목록 출력 여부 판단
+* [ ] handlebars.java를 이용하여 동적으로 사용자 목록을 포함한 html을 생성
+
+### 요구사항 7 (Stylesheet 파일 지원 구현)
+
+#### Stylesheet 파일 지원 구현
+* [ ] 모든 페이지에 Stylesheet 적용
+
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
