@@ -1,35 +1,54 @@
 package webserver;
 
-import db.DataBase;
 import model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.Parser;
+import utils.UserService;
 
 import java.util.Map;
 
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    public static Response handle(RequestMessage requestMessage) {
-        HttpMethod method = Parser.parseMethodFromRequestLine(requestMessage.getRequestLine());
-        String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
+    private UserController() {
+    }
 
-        if (method == HttpMethod.GET && url.contains("/create")) {
-            Map<String, String> params = Parser.parseUserParams(url);
-            User user = User.from(params);
-            logger.debug("[" + method.name() + "] create " + user.toString());
-            DataBase.addUser(user);
-            return ResponseFound.from("/index.html");
+    public static Response handle(RequestMessage requestMessage) {
+        String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
+        if (url.contains("/create")) {
+            return create(requestMessage);
         }
-        if (method == HttpMethod.POST && url.contains("/create")) {
-            String body = requestMessage.getRequestBody();
-            Map<String, String> params = Parser.parseUserParams(body);
-            User user = User.from(params);
-            logger.debug("[" + method.name() + "] create " + user.toString());
-            DataBase.addUser(user);
-            return ResponseFound.from("/index.html");
+        if (url.contains("/login")) {
+            return login(requestMessage);
         }
         return ResponseNotFound.create();
+    }
+
+    public static Response create(RequestMessage requestMessage) {
+        HttpMethod method = Parser.parseMethodFromRequestLine(requestMessage.getRequestLine());
+        if (method == HttpMethod.POST) {
+            String body = requestMessage.getRequestBody();
+            Map<String, String> params = Parser.parseUserParams(body);
+            UserService.insert(params);
+            logger.debug("create user success");
+            return ResponseFound.from("/");
+        }
+        return ResponseBadRequest.create();
+    }
+
+    public static Response login(RequestMessage requestMessage) {
+        HttpMethod method = Parser.parseMethodFromRequestLine(requestMessage.getRequestLine());
+        if (method == HttpMethod.POST) {
+            String body = requestMessage.getRequestBody();
+            Map<String, String> params = Parser.parseUserParams(body);
+            if (UserService.isInValidUser(params)) {
+                logger.debug("login failed");
+                return ResponseFound.from("/user/login_failed.html");
+            }
+            logger.debug("login success");
+            return ResponseFound.of("/", true);
+        }
+        return ResponseBadRequest.create();
     }
 }

@@ -63,4 +63,54 @@ public class UserControllerTest {
         assertThat(response).isInstanceOf(ResponseFound.class);
         assertThat(actual).isEqualTo(expected);
     }
+
+    @DisplayName("POST 메서드로 로그인 요청시, 유효한 사용자라면 헤더에 로그인 성공을 담아 index.html로 이동한다.")
+    @Test
+    void login() {
+        // given
+        User expected = User.of("jordy", "1q2w3e4r!", "죠르디", "jordy@kakaocorp.com");
+        DataBase.addUser(expected);
+
+        String requestLine = "POST /user/login HTTP/1.1";
+        Map<String, String> requestHeader = new HashMap<>();
+        requestHeader.put("Host", "localhost:8080");
+        requestHeader.put("Connection", "keep-alive");
+        requestHeader.put("Content-Length", "32");
+        requestHeader.put("Content-Type", "application/x-www-form-urlencoded");
+        requestHeader.put("Accept", "*/*");
+        String requestBody = "userId=jordy&password=1q2w3e4r!";
+
+        RequestMessage requestMessage = RequestMessage.of(requestLine, requestHeader, requestBody);
+
+        // when
+        Response response = UserController.handle(requestMessage);
+
+        // then
+        assertThat(response).isEqualTo(ResponseFound.of("/", true));
+    }
+
+    @DisplayName("POST 메서드로 로그인 요청시, 유효하지 않은 사용자라면 헤더에 로그인 실패를 담아 login_failed.html로 이동한다.")
+    @Test
+    void login2() {
+        // given
+        User expected = User.of("jordy", "1q2w3e4r!", "죠르디", "jordy@kakaocorp.com");
+        DataBase.addUser(expected);
+
+        String requestLine = "POST /user/login HTTP/1.1";
+        Map<String, String> requestHeader = new HashMap<>();
+        requestHeader.put("Host", "localhost:8080");
+        requestHeader.put("Connection", "keep-alive");
+        requestHeader.put("Content-Length", "32");
+        requestHeader.put("Content-Type", "application/x-www-form-urlencoded");
+        requestHeader.put("Accept", "*/*");
+        String requestBody = "userId=ryan&password=1q2w3e4r!";
+
+        RequestMessage requestMessage = RequestMessage.of(requestLine, requestHeader, requestBody);
+
+        // when
+        Response response = UserController.handle(requestMessage);
+
+        // then
+        assertThat(response).isEqualTo(ResponseFound.of("/user/login_failed.html", false));
+    }
 }
