@@ -71,6 +71,49 @@ public class WebAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
     }
 
+    @DisplayName("POST /user/login")
+    @Test
+    void loginSuccess() {
+        String path = "/user/login";
+
+        회원가입_POST(path, user);
+
+        String userId = user.getUserId();
+        String password = user.getPassword();
+
+        ExtractableResponse<Response> response = 로그인요청(path, userId, password);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.cookies().get("logined")).isEqualTo("true");
+    }
+
+    @DisplayName("POST /user/login")
+    @Test
+    void loginFail() {
+        String path = "/user/login";
+
+        회원가입_POST(path, user);
+
+        String userId = "NotUser";
+        String password = "NotUser";
+
+        ExtractableResponse<Response> response = 로그인요청(path, userId, password);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.cookies().get("logined")).isEqualTo("false");
+    }
+
+    private ExtractableResponse<Response> 로그인요청(String path, String userId, String password) {
+        return RestAssured.
+                given().log().all().
+                param("userId", userId).
+                param("password", password).
+                when().post(path).
+                then().log().all().
+                statusCode(HttpStatus.OK.value()).
+                extract();
+    }
+
     ExtractableResponse<Response> 회원가입_GET(String path, User user) {
         return RestAssured.
                 given().log().all().
@@ -80,7 +123,6 @@ public class WebAcceptanceTest {
                 param("email", user.getEmail()).
                 when().get(path).
                 then().log().all().
-                statusCode(HttpStatus.OK.value()).
                 extract();
     }
 
@@ -93,7 +135,6 @@ public class WebAcceptanceTest {
                 param("email", user.getEmail()).
                 when().post(path).
                 then().log().all().
-                statusCode(HttpStatus.FOUND.value()).
                 extract();
     }
 }

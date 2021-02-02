@@ -32,6 +32,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = new HttpRequest(in);
+            logger.debug(httpRequest.toString());
             if (httpRequest.isEmpty()) {
                 return;
             }
@@ -44,9 +45,6 @@ public class RequestHandler implements Runnable {
                 logger.debug(user.toString());
                 return;
             }
-            logger.debug("11111" + httpRequest.getMethod());
-            logger.debug("22222" + httpRequest.getPath());
-            logger.debug("33333" + httpRequest.getParameters());
 
             if (httpRequest.getPath().equals("/user/login")) {
                 String userId = httpRequest.getParameter("userId");
