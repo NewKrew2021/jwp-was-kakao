@@ -1,5 +1,6 @@
 package model;
 
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -12,7 +13,6 @@ import java.util.Map;
 
 public class Response {
     private static final Logger logger = LoggerFactory.getLogger(Response.class);
-    private String path;
     private Map<String, String> header;
     private DataOutputStream dos;
     private byte[] body = new byte[0];
@@ -26,15 +26,22 @@ public class Response {
         this.body=body.getBytes();
     }
 
-    public void setPath(String path) {
-        this.path=path;
-    }
-
     public void addHeader(String key, String value){
         this.header.put(key, value);
     }
 
     public void forward(String path) {
+        addContentType(path);
+        response200Header(body.length);
+        try {
+            dos.write(body);
+            dos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addContentType(String path){
         if(path.contains(".html")){
             this.body=FileIoUtils.loadFileFromClasspath("templates"+path);
             header.put("Content-Type","text/html");
@@ -46,13 +53,6 @@ public class Response {
         if(path.contains(".js")){
             this.body=FileIoUtils.loadFileFromClasspath("static"+path);
             header.put("Content-Type","application/javascript");
-        }
-        response200Header(body.length);
-        try {
-            dos.write(body);
-            dos.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
