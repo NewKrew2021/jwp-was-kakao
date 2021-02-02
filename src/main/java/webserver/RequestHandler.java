@@ -33,13 +33,11 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        System.out.println("####################### try 진입 ######################33");
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             DataOutputStream dos = new DataOutputStream(out);
 
             String line = reader.readLine();
-            System.out.println(line);
 
             String[] firstTokens = line.split(" ");
             String requestUrl = firstTokens[1];
@@ -115,19 +113,24 @@ public class RequestHandler implements Runnable {
                     }
                 }
             }
-//            if (!requestUrl.endsWith(".css")) {
-//                byte[] body = FileIoUtils.loadFileFromClasspath("static/css/styles.css");
-//                response200Header(dos, body.length);
-//                responseBody(dos, body);
-//                return;
-//            }
+            if (requestUrl.endsWith(".css")) {
+                byte[] body = FileIoUtils.loadFileFromClasspath("static" + requestUrl);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+                return;
+            }
+            if (requestUrl.endsWith(".js")) {
+                byte[] body = FileIoUtils.loadFileFromClasspath("static" + requestUrl);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+                return;
+            }
             byte[] body = FileIoUtils.loadFileFromClasspath("templates" + requestUrl);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
-        System.out.println("####################### try 탈출 ######################33");
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {

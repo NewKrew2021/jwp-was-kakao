@@ -117,6 +117,18 @@ public class HttpRequestTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    @Test
+    @DisplayName("CSS 파일 요청")
+    void request_resttemplate_요구사항7() {
+        RestTemplate restTemplate = new RestTemplate();
+        String resourceUrl = "http://localhost:8080";
+        String urlList = "/css/style.css";
+        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + urlList, String.class);
+        printResponse(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+
     private void printResponse(ResponseEntity<String> response) {
         response.getHeaders().keySet().forEach(it -> {
             System.out.println(it + ": " + response.getHeaders().get(it));
