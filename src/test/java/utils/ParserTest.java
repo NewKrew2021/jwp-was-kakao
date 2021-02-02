@@ -43,9 +43,6 @@ public class ParserTest {
 
         // then
         Map<String, String> actual = Parser.parseUserParams(header);
-        for(String key : actual.keySet()) {
-            System.out.println(key + " \t " + actual.get(key));
-            assertThat(actual.get(key)).isEqualTo(expected.get(key));
-        }
+        assertThat(actual).isEqualTo(expected);
     }
 }

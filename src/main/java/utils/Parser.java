@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Parser {
+    private Parser() {
+    }
 
     public static HttpMethod parseMethodFromRequestLine(String requestLine) {
         String method = requestLine.split(" ")[0];
@@ -13,10 +15,15 @@ public class Parser {
     }
 
     public static String parseURLFromRequestLine(String requestLine) {
-        return requestLine.split(" ")[1];
+        String url = requestLine.split(" ")[1];
+        return url.equals("/") ? "/index.html" : url;
     }
 
     public static Map<String, String> parseUserParams(String query) {
+        if (query.startsWith("GET")) {
+            query = query.split(" ")[1];
+        }
+
         int beginIdx = query.indexOf("?");
         String[] params = query.substring(beginIdx + 1)
                 .split("&");
@@ -33,5 +40,9 @@ public class Parser {
         return requestHeader.get("Accept")
                 .split(";")[0]
                 .split(",")[0];
+    }
+
+    public static String parseCookie(Map<String, String> requestHeader) {
+        return requestHeader.get("Cookie");
     }
 }
