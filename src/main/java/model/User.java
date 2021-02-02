@@ -29,6 +29,10 @@ public class User {
         return new User(parameters);
     }
 
+    public boolean validatePassword(String password) {
+        return this.password.equals(password);
+    }
+
     public String getUserId() {
         return userId;
     }

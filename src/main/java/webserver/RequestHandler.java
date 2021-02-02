@@ -5,10 +5,13 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import utils.KeyValueTokenizer;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -49,6 +52,14 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void addLoginCookie(DataOutputStream dos, boolean value) {
+        try {
+            dos.writeBytes("Set-Cookie: logined=" + value + "; Path=/");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
@@ -72,6 +83,22 @@ public class RequestHandler implements Runnable {
                 response302Header(dos,"/index.html");
                 return;
             }
+
+            if (method.equals("POST") && path.startsWith("/user/login")) {
+                String body = request.getBody();
+                Map<String, String> bodyMap = KeyValueTokenizer.of(body);
+                User user = DataBase.findUserById(bodyMap.get("userId"));
+                boolean isLoginSuccess = user.validatePassword(bodyMap.get("password"));
+                if (isLoginSuccess) {
+                    response302Header(dos, "/index.html");
+                }
+                else {
+                    response302Header(dos, "/user/login_failed.html");
+                }
+                addLoginCookie(dos, isLoginSuccess);
+                return;
+            }
+
             byte[] body = FileIoUtils.loadFileFromClasspath(path);
 
             response200Header(dos, body.length);
