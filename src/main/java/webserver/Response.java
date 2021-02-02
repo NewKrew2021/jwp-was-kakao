@@ -35,6 +35,16 @@ public class Response {
     private void initializeExtension() {
         contentType.put("js", "text/javascript");
         contentType.put("css", "text/css");
+        contentType.put("html", "text/html");
+        contentType.put("ico", "image/png");
+        contentType.put("png", "image/png");
+        contentType.put("jpg", "image/jpeg");
+        contentType.put("jpeg", "image/jpeg");
+        contentType.put("svg", "image/svg+xml");
+        contentType.put("eot", "application/vnd.ms-fontobject");
+        contentType.put("ttf", "application/x-font-ttf");
+        contentType.put("woff", "application/font-woff");
+        contentType.put("woff2", "application/font-woff2");
 
         contentLocation.put("ico", "./templates/");
         contentLocation.put("html", "./templates/");
