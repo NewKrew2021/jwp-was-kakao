@@ -3,7 +3,13 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.List;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.LoginUser;
 import model.User;
@@ -41,6 +47,28 @@ public class RequestHandler implements Runnable {
                     response200Header(dos, body.length);
                     responseBody(dos, body);
                 }
+                if (request.getUri().indexOf("/user/list") == 0) {
+                    if (request.getHeader("Cookie") != null &&
+                            request.getHeader("Cookie").contains("logined=true")) {
+
+
+                        TemplateLoader loader = new ClassPathTemplateLoader();
+                        loader.setPrefix("/templates");
+                        loader.setSuffix(".html");
+                        Handlebars handlebars = new Handlebars(loader);
+
+                        Template template = handlebars.compile("user/list");
+                        Collection<User> users = DataBase.findAll();
+                        String profilePage = template.apply(users);
+                        logger.debug("ProfilePage : {}", profilePage);
+
+                        byte[] body = profilePage.getBytes();
+                        response200Header(dos, body.length);
+                        responseBody(dos, body);
+                        return;
+                    }
+                    response302Header(dos, "/user/login.html");
+                }
                 if (request.getUri().indexOf("/user") == 0 ||
                         request.getUri().indexOf("/qna") == 0 ||
                         request.getUri().indexOf("/index.html") == 0 ||
@@ -61,7 +89,7 @@ public class RequestHandler implements Runnable {
                     LoginUser loginUser = LoginRequest.of(request.getBody()).toLoginUser();
                     User user = DataBase.findUserById(loginUser.getUserId());
                     if (user != null && user.validate(loginUser)) {
-                        response302HeaderWithCookie(dos, "/index.html","logined=true");
+                        response302HeaderWithCookie(dos, "/index.html", "logined=true");
                         return;
                     }
                     response302HeaderWithCookie(dos, "/user/login_failed.html", "logined=false");
@@ -112,6 +140,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Location: " + location + "\r\n");
             dos.writeBytes("Set-Cookie: " + cookie + "; path=/");
             dos.writeBytes("\r\n");
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

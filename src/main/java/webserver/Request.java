@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import utils.IOUtils;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    HashMap<String, String> header = new HashMap<>();
+    private HashMap<String, String> header = new HashMap<>();
     private String method;
     private String uri;
     private String body;
@@ -75,5 +77,9 @@ public class Request {
 
     public String getBody() {
         return body;
+    }
+
+    public String getHeader(String headerName) {
+        return header.get(headerName);
     }
 }
