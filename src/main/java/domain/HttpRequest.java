@@ -69,9 +69,6 @@ public class HttpRequest {
     }
 
     public String getPath() {
-        if (path.equals("")) {
-            return "/index.html";
-        }
         return path;
     }
 

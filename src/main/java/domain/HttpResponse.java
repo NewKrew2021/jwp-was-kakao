@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 
 public class HttpResponse {
 
+    private final String INDEX = "/index.html";
+
     private DataOutputStream dos;
 
     public HttpResponse(OutputStream out) {
@@ -16,12 +18,15 @@ public class HttpResponse {
     }
 
     public void forward(String path) {
+        if(path.equals("/")) {
+            path = INDEX;
+        }
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
-
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("\r\n");
             writeResponseBody(body);
         } catch (IOException e) {
             sendInternalServerError();
