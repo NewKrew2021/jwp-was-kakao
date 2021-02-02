@@ -10,7 +10,6 @@ import utils.Parser;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class RequestHandler implements Runnable {
             Response response = handlerMapping(requestMessage);
             DataOutputStream dos = new DataOutputStream(out);
             response.write(dos);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
@@ -63,26 +62,27 @@ public class RequestHandler implements Runnable {
     }
 
     private void printRequestMessageHeader(String requestLine, Map<String, String> requestHeader) {
-        StringBuilder message = new StringBuilder();
-        message.append("\n========= Request Header =========\n")
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n========= Request Header =========\n")
                 .append(requestLine)
                 .append("\n");
-        for (String key : requestHeader.keySet()) {
-            message.append(key)
+        for (Map.Entry<String, String> entries : requestHeader.entrySet()) {
+            sb.append(entries.getKey())
                     .append(": ")
-                    .append(requestHeader.get(key))
+                    .append(entries.getValue())
                     .append("\n");
         }
-        message.append("----------------------------------");
-        logger.debug(message.toString());
+        sb.append("----------------------------------");
+        String message = sb.toString();
+        logger.debug(message);
     }
 
-    private Response handlerMapping(RequestMessage requestMessage) throws IOException, URISyntaxException {
+    private Response handlerMapping(RequestMessage requestMessage) {
         String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
-        if (ResourceController.hasResource(url)) {
+        if (ResourceController.isResource(url)) {
             return ResourceController.handle(requestMessage);
         }
-        if (url.contains("/user/create")) {
+        if (url.contains("/user")) {
             return UserController.handle(requestMessage);
         }
         return ResponseNotFound.create();
