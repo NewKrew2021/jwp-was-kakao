@@ -15,8 +15,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpRequestTest {
 
+    private static String port = "8080";
+
+    @BeforeAll
+    public static void setUp() {
+        Runnable thread = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WebServer.main(new String[]{port});
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        new Thread(thread).start();
+    }
+
     @Test
     void request_resttemplate() {
+
         RestTemplate restTemplate = new RestTemplate();
         String resourceUrl = "https://edu.nextstep.camp";
         ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + "/c/4YUvqn9V", String.class);
