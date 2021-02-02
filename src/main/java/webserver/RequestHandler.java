@@ -5,13 +5,13 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
+import domain.HttpRequest;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 import utils.KeyValueTokenizer;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -79,8 +78,8 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private boolean isLogined(Request request){
-        return request.getHeaders().getOrDefault("Cookie","logined=false").equals("logined=true");
+    private boolean isLogined(HttpRequest httpRequest){
+        return httpRequest.getHeader("Cookie").equals("logined=true");
     }
 
     private boolean isStaticResources(String path) {
@@ -93,11 +92,11 @@ public class RequestHandler implements Runnable {
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
              OutputStream out = connection.getOutputStream()) {
-            Request request = new Request(br);
+            HttpRequest httpRequest = new HttpRequest(br);
             DataOutputStream dos = new DataOutputStream(out);
 
-            String path = request.getPath();
-            String method = request.getMethod();
+            String path = httpRequest.getUrl();
+            String method = httpRequest.getMethod();
 
             if (method.equals("GET") && isStaticResources(path)) {
                 path = "./static" + path;
@@ -108,7 +107,7 @@ public class RequestHandler implements Runnable {
             }
 
             if (method.equals("GET") && path.startsWith("/user/list")) {
-                if(!isLogined(request)){
+                if(!isLogined(httpRequest)){
                     response302Header(dos,"login.html");
                     return;
                 }
@@ -135,16 +134,14 @@ public class RequestHandler implements Runnable {
             }
 
             if (method.equals("POST") && path.startsWith("/user/create")) {
-                DataBase.addUser(User.of(request.getBody()));
+                DataBase.addUser(new User(httpRequest.getParameters()));
                 response302Header(dos, "/index.html");
                 return;
             }
 
             if (method.equals("POST") && path.startsWith("/user/login")) {
-                String body = request.getBody();
-                Map<String, String> bodyMap = KeyValueTokenizer.of(body);
-                User user = DataBase.findUserById(bodyMap.get("userId"));
-                boolean isLoginSuccess = user.validatePassword(bodyMap.get("password"));
+                User user = DataBase.findUserById(httpRequest.getParameter("userId"));
+                boolean isLoginSuccess = user.validatePassword(httpRequest.getParameter("password"));
                 if (isLoginSuccess) {
                     response302Header(dos, "/index.html");
                 } else {

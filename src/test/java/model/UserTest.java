@@ -2,7 +2,7 @@ package model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import webserver.Request;
+import domain.HttpRequest;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,8 +21,8 @@ class UserTest {
 
         InputStream stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         try {
-            Request request = new Request(new BufferedReader(new InputStreamReader(stream)));
-            User user = new User(request.getParameters());
+            HttpRequest httpRequest = new HttpRequest(new BufferedReader(new InputStreamReader(stream)));
+            User user = new User(httpRequest.getParameters());
             assertThat(user.getUserId()).isEqualTo("javajigi");
             assertThat(user.getPassword()).isEqualTo("password");
             assertThat(user.getName()).isEqualTo("자바지기");
