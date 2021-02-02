@@ -1,10 +1,9 @@
 package utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -16,44 +15,52 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileIoUtils {
-    private static final Logger logger = LoggerFactory.getLogger(FileIoUtils.class);
+    private static final String RESOURCES_PATH = "/resources";
+    private static final String DOT = ".";
+    private static final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(FileIoUtils.class.getClassLoader());
 
-    public static byte[] loadFileFromClasspath(String filePath) throws IOException, URISyntaxException {
-        URL resource = FileIoUtils.class.getClassLoader().getResource(filePath);
-        if (resource == null) {
-            logger.error(filePath + "이(가) 존재하지 않습니다.");
-            return new byte[0];
-        }
-
-        Path path = Paths.get(resource.toURI());
-        return Files.readAllBytes(path);
+    private FileIoUtils() {
     }
 
-    public static List<String> loadFileList(String filePath) throws IOException {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(FileIoUtils.class.getClassLoader());
-        Resource[] resources = resolver.getResources(filePath + "/**");
+    public static byte[] loadFileFromClasspath(String filePath) {
+        URL resource = FileIoUtils.class.getClassLoader().getResource(filePath);
+        if (resource == null) {
+            throw new RuntimeException(filePath + "이(가) 존재하지 않습니다.");
+        }
 
+        try {
+            Path path = Paths.get(resource.toURI());
+            return Files.readAllBytes(path);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public static List<String> getResources(String filePath) {
+        Resource[] resources;
+        try {
+            resources = resolver.getResources(filePath + "/**");
+        } catch (IOException e) {
+            throw new RuntimeException("파일을 불러올 수 없습니다.");
+        }
         return Arrays.stream(resources)
-                .map(resource -> getPath(resource, filePath))
-                .filter(FileIoUtils::isFile)
+                .map(FileIoUtils::getFile)
+                .filter(file -> !file.isDirectory())
+                .map(FileIoUtils::getPath)
                 .collect(Collectors.toList());
     }
 
-    private static String getPath(Resource resource, String filePath) {
-        int dotIdx = filePath.indexOf("./");
-        filePath = filePath.substring(dotIdx + 1);
-
+    private static File getFile(Resource resource) {
         try {
-            String fullPath = resource.getFile().getPath();
-            int beginIdx = fullPath.lastIndexOf(filePath);
-            return fullPath.substring(beginIdx);
+            return resource.getFile();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            throw new RuntimeException("파일을 불러올 수 없습니다.");
         }
-        return null;
     }
 
-    private static boolean isFile(String name) {
-        return name != null && name.contains(".");
+    private static String getPath(File file) {
+        String path = file.getPath();
+        int idx = path.lastIndexOf(RESOURCES_PATH);
+        return DOT + path.substring(idx + RESOURCES_PATH.length());
     }
 }

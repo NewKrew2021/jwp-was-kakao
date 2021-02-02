@@ -1,57 +1,67 @@
 package webserver;
 
-import model.RequestMessage;
-import model.Response;
-import model.ResponseOK;
+import model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
 import utils.Parser;
+import utils.ResourceLoader;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
 public class ResourceController {
-    private static final String TEMPLATES_PATH = "./templates";
-    private static final String STATIC_PATH = "./static";
-    private static final List<String> templatesResource = loadFileList(TEMPLATES_PATH);
-    private static final List<String> staticResource = loadFileList(STATIC_PATH);
     private static final Logger logger = LoggerFactory.getLogger(ResourceController.class);
-
-    private static List<String> loadFileList(String filePath) {
-        try {
-            return FileIoUtils.loadFileList(filePath);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-        return new ArrayList<>();
-    }
 
     private ResourceController() {
     }
 
-    public static boolean hasResource(String url) {
-        return Stream.concat(templatesResource.stream(), staticResource.stream())
-                .anyMatch(resource -> resource.contains(url));
+    public static Response handle(RequestMessage requestMessage) {
+        HttpMethod httpMethod = Parser.parseMethodFromRequestLine(requestMessage.getRequestLine());
+        if (httpMethod != HttpMethod.GET) {
+            return ResponseBadRequest.create();
+        }
+
+        String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
+        if (url.contains("list")) {
+            return list(requestMessage);
+        }
+        return load(requestMessage);
     }
 
-    public static Response handle(RequestMessage requestMessage) throws IOException, URISyntaxException {
+    private static Response list(RequestMessage requestMessage) {
+        try {
+            validate(requestMessage.getRequestHeader());
+        } catch (RuntimeException e) {
+            return ResponseFound.from("/user/login.html");
+        }
+        byte[] page = ResourceLoader.getDynamicPage("user/list");
+        logger.debug("load dynamic page success");
+        String contentType = Parser.parseContentTypeFromRequestHeader(requestMessage.getRequestHeader());
+        return ResponseOK.of(contentType, page);
+    }
+
+    private static void validate(Map<String, String> requestHeader) {
+        String cookie = Parser.parseCookie(requestHeader);
+        if (!isLogined(cookie)) {
+            String message = "로그인이 필요합니다.";
+            logger.debug(message);
+            throw new RuntimeException(message);
+        }
+    }
+
+    private static boolean isLogined(String cookie) {
+        return cookie != null && cookie.equals("logined=true");
+    }
+
+    private static Response load(RequestMessage requestMessage) {
         String url = Parser.parseURLFromRequestLine(requestMessage.getRequestLine());
         String contentType = Parser.parseContentTypeFromRequestHeader(requestMessage.getRequestHeader());
-
-        byte[] body = FileIoUtils.loadFileFromClasspath(getResourcePath(url));
+        byte[] body = ResourceLoader.getBytes(url);
+        logger.debug("load success");
         return ResponseOK.of(contentType, body);
     }
 
-    private static String getResourcePath(String url) {
-        return isTemplateResource(url) ? TEMPLATES_PATH + url : STATIC_PATH + url;
-    }
-
-    private static boolean isTemplateResource(String url) {
-        return templatesResource.stream()
-                .anyMatch(resource -> resource.contains(url));
+    public static boolean isResource(String url) {
+        int idx = url.lastIndexOf('.');
+        return idx != -1 && idx < url.length() - 1;
     }
 }
