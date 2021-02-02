@@ -1,5 +1,9 @@
 package webserver;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -16,7 +20,9 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystemNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RequestHandler implements Runnable {
@@ -56,6 +62,33 @@ public class RequestHandler implements Runnable {
                         break;
                     }
                 }
+
+                if (path.equals("/user/list")) {
+                    String cookie = request.get("Cookie");
+                    if (cookie == null || !cookie.contains("logined=true")) {
+                        responseParameters.put("Location", "/user/login.html");
+                        responseParameters.put("body", "");
+                        response(dos, new Response302Header(), responseParameters);
+                        return;
+                    }
+
+                    TemplateLoader loader = new ClassPathTemplateLoader();
+                    loader.setPrefix("/templates");
+                    loader.setSuffix(".html");
+                    Handlebars handlebars = new Handlebars(loader);
+
+                    Template template = handlebars.compile("user/list");
+
+                    Map<String, List> parameters = new HashMap<>();
+                    List<User> users = new ArrayList<>(DataBase.findAll());
+                    parameters.put("users", users);
+
+                    String profilePage = template.apply(parameters);
+
+                    responseParameters.put("body", profilePage);
+                    response(dos, new Response302Header(), responseParameters);
+                    return;
+                }
             }
 
             if (request.get("method").equals(HTTP_POST)) {
@@ -76,6 +109,7 @@ public class RequestHandler implements Runnable {
                     User user = User.mapOf(parameters);
                     DataBase.addUser(user);
                     responseParameters.put("Location", "/index.html");
+                    responseParameters.put("body", "");
                     response(dos, new Response302Header(), responseParameters);
                     return;
                 }
@@ -86,18 +120,19 @@ public class RequestHandler implements Runnable {
                     if (user == null || !user.getPassword().equals(parameters.get("password"))) {
                         responseParameters.put("Location", "/user/login_failed.html");
                         responseParameters.put("Set-Cookie", "logined=false");
-                    }
-                    else {
+                    } else {
                         responseParameters.put("Location", "/index.html");
                         responseParameters.put("Set-Cookie", "logined=true; Path=/");
                     }
+                    responseParameters.put("body", "");
                     response(dos, new Response302Header(), responseParameters);
                     return;
                 }
-
             }
 
             responseParameters.put("path", path);
+            responseParameters.put("body", "");
+
             response(dos, new Response200Header(), responseParameters);
 
         } catch (IOException | URISyntaxException e) {
@@ -108,11 +143,13 @@ public class RequestHandler implements Runnable {
     private void response(DataOutputStream dos, ResponseHeader responseHeader, Map<String, String> responseParameters)
             throws IOException, URISyntaxException {
         try {
-            byte[] responseBody = new byte[0];
+            byte[] responseBody = responseParameters.get("body").getBytes();
+            responseParameters.remove("body");
 
             if (responseParameters.containsKey("path")) {
                 responseBody = FileIoUtils.loadFileFromClasspath("./templates" + responseParameters.get("path"));
             }
+            responseParameters.remove("path");
 
             responseParameters.put("Content-Length", String.valueOf(responseBody.length));
             responseHeader.responseHeader(dos, responseParameters);
