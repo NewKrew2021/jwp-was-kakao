@@ -46,10 +46,10 @@ public class UserController extends Controller {
         User user = DataBase.findUserById(bodyParsed.get("userId"));
 
         if (user == null) {
-            HttpResponse.of(out).setCookie("logined=false; Path=/").sendRedirect("/user/login_failed.html");
+            HttpResponse.of(out).setCookie("logined=false").sendRedirect("/user/login_failed.html");
             return;
         }
-        HttpResponse.of(out).setCookie("logined=true; Path=/").sendRedirect("/index.html");
+        HttpResponse.of(out).setCookie("logined=true").sendRedirect("/index.html");
     }
 
     public void handleUserList(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
@@ -61,6 +61,6 @@ public class UserController extends Controller {
 
     public void handleLogout(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
         log.info("handling Logout");
-        HttpResponse.of(out).setCookie("logined=false; Path=/").sendRedirect("/index.html");
+        HttpResponse.of(out).setCookie("logined=false").sendRedirect("/index.html");
     }
 }

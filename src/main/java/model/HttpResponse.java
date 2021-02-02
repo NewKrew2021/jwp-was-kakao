@@ -58,7 +58,7 @@ public class HttpResponse {
     }
 
     public HttpResponse setCookie(String cookie) {
-        headers.put("Set-Cookie", cookie);
+        headers.put("Set-Cookie", cookie + "; Path=/; HttpOnly");
         return this;
     }
 

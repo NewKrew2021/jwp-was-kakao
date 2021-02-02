@@ -20,6 +20,7 @@ public class DataBase {
     }
 
     public static User findUserById(String userId) {
+        log.info("find user {}", userId);
         return users.get(userId);
     }
 

@@ -108,8 +108,12 @@ public class HttpRequest {
         return headerMap;
     }
 
-    public String getHeader(String header){
-        return headerMap.get(header);
+    public String getHeader(String key){
+        String header = headerMap.get(key);
+        if(header == null) {
+            throw new RuntimeException("유효하지 않은 헤더입니다.");
+        }
+        return header;
     }
 
     public String getBody() {
@@ -128,7 +132,9 @@ public class HttpRequest {
 
     public String getCookie(String cookieParam){
         Map<String, String> parsedCookie = new HashMap<>();
-        String[] cookies = getHeader("Cookie").split(";");
+        String cookieHeader = getHeader("Cookie");
+
+        String[] cookies = cookieHeader.split(";");
         Arrays.stream(cookies).forEach((cookie) -> {
            String[] args = cookie.split("=", 2);
            parsedCookie.put(args[0].trim(), args[1].trim());
@@ -140,7 +146,11 @@ public class HttpRequest {
         return queryParameterMap;
     }
 
-    public String getParameter(String parameter){
-        return queryParameterMap.get(parameter);
+    public String getParameter(String value){
+        String parameter = queryParameterMap.get(value);
+        if(parameter == null) {
+            throw new RuntimeException("유효하지 않은 헤더입니다.");
+        }
+        return parameter;
     }
 }
