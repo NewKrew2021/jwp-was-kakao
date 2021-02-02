@@ -26,14 +26,15 @@ public class Request {
         String str=br.readLine();
         logger.debug("####HTTP Request Header 출력");
         parsePath(str);
-        while (!str.equals("")){
+        str = br.readLine();
+        while (str!=null&&!str.equals("")){
             logger.debug(str);
-            String[] token=str.split(": ");
+            String[] token=str.split("\\: ");
             header.put(token[0],token[1]);
             str = br.readLine();
         }
         if(this.method.equals(RequestMethod.POST)){
-            parameter =parseParams(IOUtils.readData(br,Integer.parseInt(header.get("Content-Length"))));
+            parameter.putAll(parseParams(IOUtils.readData(br,Integer.parseInt(header.get("Content-Length")))));
         }
     }
 
@@ -61,12 +62,20 @@ public class Request {
     }
 
 
-    public Map<String, String> getParameter() {
+    public String getParameter(String key) {
+        return parameter.get(key);
+    }
+
+    public Map<String,String> getAllParameter(){
         return parameter;
     }
 
     public String getPath() {
         return path;
+    }
+
+    public String getHeader(String key) {
+        return header.get(key);
     }
 
     public boolean isLogin(){
