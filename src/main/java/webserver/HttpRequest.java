@@ -15,7 +15,6 @@ public class HttpRequest {
     private Map<String, String> parameters = new HashMap<>();
     private HttpMethod httpMethod;
     private String path;
-    private String body;
 
     public HttpRequest(InputStream in) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
@@ -46,10 +45,11 @@ public class HttpRequest {
     }
 
     private void parseHeader(BufferedReader bufferedReader) throws IOException {
-        String line;
-        while (!(line = bufferedReader.readLine()).equals("") || line == null) {
+        String line = bufferedReader.readLine();
+        while ( line != null && !line.equals("")) {
             String[] currentLine = line.split(": ");
             httpHeader.put(currentLine[0], URLDecoder.decode(currentLine[1],"UTF-8"));
+            line = bufferedReader.readLine();
         }
     }
 
