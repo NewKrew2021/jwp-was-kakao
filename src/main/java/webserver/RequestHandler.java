@@ -1,9 +1,6 @@
 package webserver;
 
-import controller.Controller;
-import controller.CreateUserController;
-import controller.ListUserController;
-import controller.LoginController;
+import controller.ControllerMapper;
 import model.Request;
 import model.Response;
 import org.slf4j.Logger;
@@ -14,12 +11,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static Map<String, Controller> pathMap = new HashMap<>();
+
 
     private Socket connection;
 
@@ -41,15 +36,11 @@ public class RequestHandler implements Runnable {
     }
 
     private void requestMapper(Request request,Response response) throws IOException, URISyntaxException {
-        Map<String,Controller> pathMap=new HashMap<>();
-        pathMap.put("/user/create", new CreateUserController());
-        pathMap.put("/user/list", new ListUserController());
-        pathMap.put("/user/login", new LoginController());
-        if(pathMap.get(request.getPath()) == null) {
+        if(ControllerMapper.get(request.getPath()) == null) {
             response.forward(request.getPath());
             return;
         }
-        pathMap.get(request.getPath()).service(request,response);
+        ControllerMapper.get(request.getPath()).service(request,response);
     }
 
 }
