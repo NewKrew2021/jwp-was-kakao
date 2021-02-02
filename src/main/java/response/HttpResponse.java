@@ -1,5 +1,10 @@
 package response;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
@@ -7,13 +12,15 @@ import webserver.RequestHandler;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.util.Collection;
 
 public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     DataOutputStream dos;
 
-    public HttpResponse(OutputStream out){
+    public HttpResponse(OutputStream out) {
         this.dos = new DataOutputStream(out);
     }
 
@@ -72,5 +79,17 @@ public class HttpResponse {
         }
     }
 
+    public void responseBodyTemplate(Collection<User> users) throws IOException {
+        TemplateLoader loader = new ClassPathTemplateLoader();
+        loader.setPrefix("/templates");
+        loader.setSuffix(".html");
+        Handlebars handlebars = new Handlebars(loader);
 
+        Template template = handlebars.compile("user/list");
+        String result = template.apply(users);
+        result = URLDecoder.decode(result,"UTF-8");
+        byte[] body = result.getBytes("UTF-8");
+        response200Header(body.length);
+        responseBody(body);
+    }
 }

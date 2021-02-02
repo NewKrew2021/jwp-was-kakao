@@ -14,7 +14,6 @@ public class LoginController extends AbstractController{
         String password = params.get("password");
         if(DataBase.findUserById(userId).getPassword().equals(password)) {
             httpResponse.response302Header("/index.html" , "true");
-
         }
         httpResponse.response302Header("/user/login_failed.html" , "false");
     }

@@ -13,7 +13,7 @@ public class Controllers {
     public Controllers() {
         controllerMap.put("/user/create" , new CreateUserController());
         controllerMap.put("/user/login" , new LoginController());
-        controllerMap.put("/user/list" , new ListUserController());
+        controllerMap.put("/user/list.html" , new ListUserController());
     }
 
     public Controller getController(String uri) {

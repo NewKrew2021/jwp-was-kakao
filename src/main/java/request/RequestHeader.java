@@ -16,4 +16,11 @@ public class RequestHeader {
         }
         return Optional.empty();
     }
+
+    public Optional<String> getHeaderValue(String key){
+        if(header.containsKey(key)){
+            return Optional.of(header.get(key));
+        }
+        return Optional.empty();
+    }
 }

@@ -32,6 +32,8 @@ public class HttpRequest {
         createRequestBody(br);
     }
 
+    public Optional<String> getParam(String key) { return requestHeader.getHeaderValue(key);}
+
     public String getUri(){
         return requestUri.getUri();
     }
