@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
 public class HttpResponse {
 
     private final String INDEX = "/index.html";
+    private final String TEMPLATE_BASE_PATH = "./templates";
+    private final String STATIC_BASE_PATH = "./static";
 
     private DataOutputStream dos;
 
@@ -21,11 +23,13 @@ public class HttpResponse {
         if(path.equals("/")) {
             path = INDEX;
         }
+
         try {
-            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
+            byte[] body = FileIoUtils.loadFileFromClasspath(addBasePath(path));
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + findContentType(path) + "; charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("Content-Location: " + path + "\r\n");
             dos.writeBytes("\r\n");
             writeResponseBody(body);
         } catch (IOException e) {
@@ -33,6 +37,28 @@ public class HttpResponse {
         } catch (URISyntaxException e) {
             sendInternalServerError();
         }
+    }
+
+    private String addBasePath(String path) {
+        if (path.startsWith("/css")
+                || path.startsWith("/fonts")
+                || path.startsWith("/images")
+                || path.startsWith("/js")) {
+            return STATIC_BASE_PATH + path;
+        }
+        return TEMPLATE_BASE_PATH + path;
+    }
+
+    private String findContentType(String path) {
+        if (path.startsWith("/css")) {
+            return "text/css";
+        }
+//        if (path.startsWith("/fonts")
+//                || path.startsWith("/images")
+//                || path.startsWith("/js")) {
+//
+//        }
+        return "text/html";
     }
 
     public void sendRedirect(String location) {
@@ -47,32 +73,22 @@ public class HttpResponse {
 
     public void loginTrue() {
         try {
-            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + INDEX);
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: " + INDEX + "\r\n");
             dos.writeBytes("Set-Cookie: logined=true; Path=/\r\n");
             dos.writeBytes("\r\n");
-            writeResponseBody(body);
         } catch (IOException e) {
-            sendInternalServerError();
-        } catch (URISyntaxException e) {
             sendInternalServerError();
         }
     }
 
     public void loginFalse() {
         try {
-            byte[] body = FileIoUtils.loadFileFromClasspath("./templates/user/login_failed.html");
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: /user/login_failed.html\r\n");
             dos.writeBytes("Set-Cookie: logined=false; Path=/\r\n");
             dos.writeBytes("\r\n");
-            writeResponseBody(body);
         } catch (IOException e) {
-            sendInternalServerError();
-        } catch (URISyntaxException e) {
             sendInternalServerError();
         }
     }

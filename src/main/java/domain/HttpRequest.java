@@ -16,6 +16,7 @@ public class HttpRequest {
     private String path;
     private Map<String, String> parameters = new HashMap<>();
     private Map<String, String> header = new HashMap<>();
+    private Map<String, String> cookies = new HashMap<>();
 
     public HttpRequest(InputStream in) {
         try {
@@ -29,11 +30,16 @@ public class HttpRequest {
                 line = bufferedReader.readLine();
             }
 
+            if(header.containsKey("Cookie")) {
+                Arrays.stream(header.get("Cookie").split("; "))
+                        .forEach(cookie -> cookies.put(cookie.split("=")[0], cookie.split("=")[1]));
+            }
+
             if (getMethod().equals(RequestMethod.POST)) {
                 int bodySize = Integer.parseInt(header.get("Content-Length"));
                 char[] body = new char[bodySize];
                 bufferedReader.read(body);
-                parseUserInfo(new String(body));
+                parseParameter(new String(body));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,10 +61,10 @@ public class HttpRequest {
         if (requestPath.length == 1) {
             return;
         }
-        parseUserInfo(requestPath[1]);
+        parseParameter(requestPath[1]);
     }
 
-    private void parseUserInfo(String request) {
+    private void parseParameter(String request) {
         Arrays.stream(request.split("&"))
                 .forEach(rawParameter -> {
                     String[] split = rawParameter.split("=");
@@ -76,6 +82,10 @@ public class HttpRequest {
 
     public String getParameter(String parameter) {
         return parameters.get(parameter);
+    }
+
+    public String getCookie(String key) {
+        return cookies.get(key);
     }
 
     public Map<String, String> getParameters() {

@@ -47,14 +47,23 @@ public class RequestHandler implements Runnable {
             }
 
             if (httpRequest.getPath().equals("/user/login")) {
-                String userId = httpRequest.getParameter("userId");
+                String id = httpRequest.getParameter("userId");
                 String password = httpRequest.getParameter("password");
-                User user = DataBase.findUserById(userId);
+                User user = DataBase.findUserById(id);
                 if (user == null || !user.getPassword().equals(password)) {
                     httpResponse.loginFalse();
                     return;
                 }
                 httpResponse.loginTrue();
+                return;
+            }
+
+            if(httpRequest.getPath().equals("/user/list")) {
+                if (httpRequest.getCookie("logined") == null || httpRequest.getCookie("logined").equals("false")) {
+                    httpResponse.forward("/user/login.html");
+                    return;
+                }
+                httpResponse.forward("/user/list.html");
                 return;
             }
 
