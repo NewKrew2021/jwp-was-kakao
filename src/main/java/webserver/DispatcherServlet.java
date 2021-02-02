@@ -10,11 +10,22 @@ public class DispatcherServlet {
             if(request.getUri().startsWith("/user/create")){
                 return UserController.create(request);
             }
+            if(request.getUri().startsWith("/user/login")){
+                return UserController.login(request);
+            }
         }
 
         if(request.getMethod().equals("GET")){
-            if(request.getUri().endsWith(".html")){
+            if(request.getUri().endsWith(".html") || request.getUri().endsWith(".css") || request.getUri().endsWith(".js")){
                 return FileController.get(request);
+            }
+
+            if(request.getUri().startsWith("/user/list")){
+                try{
+                    return UserController.getUsers(request);
+                } catch(Exception e){
+
+                }
             }
         }
 
