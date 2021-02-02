@@ -1,39 +1,30 @@
 package model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Response {
-    private static final Logger logger = LoggerFactory.getLogger(Response.class);
-    private Map<String, String> header;
+    private ResponseHeader header;
     private DataOutputStream dos;
-    private byte[] body = new byte[0];
+    private Body body;
 
     public Response(OutputStream out){
         dos = new DataOutputStream(out);
-        header = new HashMap<>();
-    }
-
-    public void setBody(String body){
-        this.body=body.getBytes();
+        header = new ResponseHeader();
     }
 
     public void addHeader(String key, String value){
-        this.header.put(key, value);
+        this.header.addHeader(key, value);
     }
 
     public void forward(String path) {
         addContentType(path);
-        response200Header(body.length);
+        response200Header(body.getLength());
         try {
-            dos.write(body);
+            dos.write(body.getBytes());
             dos.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,24 +33,24 @@ public class Response {
 
     private void addContentType(String path){
         if(path.contains(".html")){
-            this.body=FileIoUtils.loadFileFromClasspath("templates"+path);
-            header.put("Content-Type","text/html");
+            this.body=new Body(FileIoUtils.loadFileFromClasspath("templates"+path));
+            header.addHeader("Content-Type","text/html");
         }
         if(path.contains(".css")){
-            this.body=FileIoUtils.loadFileFromClasspath("static"+path);
-            header.put("Content-Type","text/css");
+            this.body=new Body(FileIoUtils.loadFileFromClasspath("static"+path));
+            header.addHeader("Content-Type","text/css");
         }
         if(path.contains(".js")){
-            this.body=FileIoUtils.loadFileFromClasspath("static"+path);
-            header.put("Content-Type","application/javascript");
+            this.body=new Body(FileIoUtils.loadFileFromClasspath("static"+path));
+            header.addHeader("Content-Type","application/javascript");
         }
     }
 
     public void forwardBody(String body) {
-        this.body=body.getBytes();
-        response200Header(this.body.length);
+        this.body=new Body(body.getBytes());
+        response200Header(this.body.getLength());
         try {
-            dos.write(this.body);
+            dos.write(this.body.getBytes());
             dos.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,9 +60,7 @@ public class Response {
     private void response200Header(int lengthOfBodyContent) {
         StringBuilder response=new StringBuilder();
         response.append("HTTP/1.1 200 OK \r\n");
-        for (String key : header.keySet()) {
-            response.append(key+": "+header.get(key)+"\r\n");
-        }
+        response.append(header.toString());
         response.append("Content-Length: " + lengthOfBodyContent + "\r\n");
         response.append("\r\n");
 
@@ -90,9 +79,7 @@ public class Response {
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.1 302 Found \r\n");
         response.append("Location: http://localhost:8080"+redirectUrl+"\r\n");
-        for (String key : header.keySet()) {
-            response.append(key+": "+header.get(key)+"\r\n");
-        }
+        response.append(header.toString());
         response.append("\r\n");
         try {
             dos.write(response.toString().getBytes());
