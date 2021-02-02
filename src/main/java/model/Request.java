@@ -11,39 +11,47 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(Request.class);
     private RequestMethod method;
     private String path;
-    private Map<String, String> parameter = new HashMap<>();
-    private Map<String, String> header = new HashMap<>();
+    private Parameter parameter;
+    private RequestHeader requestHeader;
 
     public Request(InputStream in) throws IOException {
         InputStreamReader reader= new InputStreamReader(in);
         BufferedReader br = new BufferedReader(reader);
-        String str=br.readLine();
+        String requestLine=br.readLine();
         logger.debug("####HTTP Request Header 출력");
-        parsePath(str);
-        str = br.readLine();
-        while (str!=null&&!str.equals("")){
-            logger.debug(str);
-            String[] token=str.split("\\: ");
-            header.put(token[0],token[1]);
-            str = br.readLine();
-        }
-        if(this.method.equals(RequestMethod.POST)){
-            parameter.putAll(parseParams(IOUtils.readData(br,Integer.parseInt(header.get("Content-Length")))));
-        }
+        parsePath(requestLine);
+        requestLine = br.readLine();
+        parseRequest(br, requestLine);
     }
 
-    public void parsePath(String path) {
+    private void parseRequest(BufferedReader br, String requestLine) throws IOException {
+        Map<String, String> header=new HashMap<>();
+        while (requestLine !=null&&!requestLine.equals("")){
+            logger.debug(requestLine);
+            String[] token= requestLine.split("\\: ");
+            header.put(token[0],token[1]);
+            requestLine = br.readLine();
+        }
+        if(this.method.equals(RequestMethod.POST)){
+            int contentLength = Integer.parseInt(header.get("Content-Length"));
+            parameter.merge(new Parameter(parseParams(IOUtils.readData(br, contentLength))));
+        }
+        requestHeader = new RequestHeader(header);
+    }
+
+    private void parsePath(String path) {
         String[] token = path.split(" ");
         this.method =RequestMethod.stringToRequestMethod(token[0]);
         String[] pathToken = token[1].split("\\?");
         this.path = pathToken[0];
         if (pathToken.length > 1) {
-            this.parameter = parseParams(pathToken[1]);
+            this.parameter = new Parameter(parseParams(pathToken[1]));
         }
     }
 
@@ -65,8 +73,8 @@ public class Request {
         return parameter.get(key);
     }
 
-    public Map<String,String> getAllParameter(){
-        return parameter;
+    public Map<String, String> getAllParameter(){
+        return parameter.getAllParameter();
     }
 
     public String getPath() {
@@ -74,10 +82,11 @@ public class Request {
     }
 
     public String getHeader(String key) {
-        return header.get(key);
+        return requestHeader.get(key);
     }
 
     public boolean isLogin(){
-        return header.get("Cookie").equals("logined=true");
+        String cookie= Optional.ofNullable(requestHeader.get("Cookie")).orElse("logined=false");
+        return cookie.equals("logined=true");
     }
 }
