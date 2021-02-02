@@ -4,11 +4,16 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -46,6 +51,7 @@ public class RequestHandler implements Runnable {
             // /user/create
             String path = requestPath[0];
             logger.debug("path : {}", path);
+
             if (path.equals("/index.html")) {
                 DataOutputStream dos = new DataOutputStream(out);
                 byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
@@ -93,13 +99,24 @@ public class RequestHandler implements Runnable {
                     logger.debug("header : {}", line);
                 }
                 String loginCheck = strBuf.get("Cookie");
-                if(!Boolean.parseBoolean(loginCheck.split("=")[1])){
-                    // page 이동
+                if(loginCheck == null || !Boolean.parseBoolean(loginCheck.split("=")[1])){
+                    // 로그인 쿠키 값이 false일 경우 page 이동
                     DataOutputStream dos = new DataOutputStream(out);
-                    response302Header(dos, "/login.html");
+                    response302Header(dos, "/user/login.html");
                 }
+
+                TemplateLoader loader = new ClassPathTemplateLoader();
+                loader.setPrefix("/templates");
+                loader.setSuffix(".html");
+                Handlebars handlebars = new Handlebars(loader);
+
+
+                Template template = handlebars.compile("user/list");
+
+                String html = template.apply(DataBase.findAll());
+
                 DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
+                byte[] body = html.getBytes(StandardCharsets.UTF_8);
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
@@ -155,6 +172,8 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
+
+
 
 
     private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
