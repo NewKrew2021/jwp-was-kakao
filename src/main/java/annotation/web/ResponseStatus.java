@@ -1,6 +1,6 @@
 package annotation.web;
 
-public enum ResponseMethod {
+public enum ResponseStatus {
     OK(200, "OK"),
     FOUND(302, "Found"),
     BAD_REQUEST(400, "Bad Request");
@@ -8,7 +8,7 @@ public enum ResponseMethod {
     private final int statusCode;
     private final String message;
 
-    ResponseMethod(int statusCode, String message) {
+    ResponseStatus(int statusCode, String message) {
         this.statusCode = statusCode;
         this.message = message;
     }
