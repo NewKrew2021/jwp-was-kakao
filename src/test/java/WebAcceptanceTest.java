@@ -21,11 +21,11 @@ public class WebAcceptanceTest {
     public void setUp() throws IOException, URISyntaxException {
         indexBody = FileIoUtils.loadFileFromClasspath("./templates/index.html");
 
-        String userId = "javajigi";
+        String id = "javajigi";
         String password = "password";
         String name = "javajigi";
         String email = "javajigi@javajigi.com";
-        user = new User(userId, password, name, email);
+        user = new User(id, password, name, email);
     }
 
     @DisplayName("GET /index.html")
@@ -67,7 +67,6 @@ public class WebAcceptanceTest {
         String path = "/user/create";
 
         ExtractableResponse<Response> response = 회원가입_POST(path, user);
-
         assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
     }
 
@@ -78,10 +77,10 @@ public class WebAcceptanceTest {
 
         회원가입_POST(path, user);
 
-        String userId = user.getUserId();
+        String id = user.getId();
         String password = user.getPassword();
 
-        ExtractableResponse<Response> response = 로그인요청(path, userId, password);
+        ExtractableResponse<Response> response = 로그인요청(path, id, password);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.cookies().get("logined")).isEqualTo("true");
@@ -94,19 +93,52 @@ public class WebAcceptanceTest {
 
         회원가입_POST(path, user);
 
-        String userId = "NotUser";
+        String id = "NotUser";
         String password = "NotUser";
 
-        ExtractableResponse<Response> response = 로그인요청(path, userId, password);
+        ExtractableResponse<Response> response = 로그인요청(path, id, password);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.cookies().get("logined")).isEqualTo("false");
     }
 
-    private ExtractableResponse<Response> 로그인요청(String path, String userId, String password) {
+    @DisplayName("GET /user/list")
+    @Test
+    void getUserListSuccess() {
+        String loginPath = "/user/login";
+        String path = "/user/list";
+        회원가입_POST(loginPath, user);
+        ExtractableResponse<Response> loginResponse = 로그인요청(loginPath, user.getId(), user.getPassword());
+        ExtractableResponse<Response> response = 사용자리스트요청(path, loginResponse.cookie("logined"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.header("Content-Location")).isEqualTo("/user/list.html");
+    }
+
+    @DisplayName("GET /user/list")
+    @Test
+    void getUserListFail() {
+        String loginPath = "/user/login";
+        String path = "/user/list";
+        회원가입_POST(loginPath, user);
+        ExtractableResponse<Response> loginResponse = 로그인요청(loginPath, "NotUser", "NotUser");
+        ExtractableResponse<Response> response = 사용자리스트요청(path, loginResponse.cookie("logined"));
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.header("Content-Location")).isEqualTo("/user/login.html");
+    }
+
+    private ExtractableResponse<Response> 사용자리스트요청(String path, String logined) {
+        return RestAssured.
+                given().log().all().cookie("logined", logined).
+                when().get(path).
+                then().log().all().
+                statusCode(HttpStatus.OK.value()).
+                extract();
+    }
+
+    private ExtractableResponse<Response> 로그인요청(String path, String id, String password) {
         return RestAssured.
                 given().log().all().
-                param("userId", userId).
+                param("userId", id).
                 param("password", password).
                 when().post(path).
                 then().log().all().
@@ -117,7 +149,7 @@ public class WebAcceptanceTest {
     ExtractableResponse<Response> 회원가입_GET(String path, User user) {
         return RestAssured.
                 given().log().all().
-                param("userId", user.getUserId()).
+                param("userId", user.getId()).
                 param("password", user.getPassword()).
                 param("name", user.getName()).
                 param("email", user.getEmail()).
@@ -129,7 +161,7 @@ public class WebAcceptanceTest {
     ExtractableResponse<Response> 회원가입_POST(String path, User user) {
         return RestAssured.
                 given().log().all().
-                param("userId", user.getUserId()).
+                param("userId", user.getId()).
                 param("password", user.getPassword()).
                 param("name", user.getName()).
                 param("email", user.getEmail()).
