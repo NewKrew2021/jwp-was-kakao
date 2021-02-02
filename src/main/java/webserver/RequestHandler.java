@@ -27,54 +27,22 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            InputStreamReader reader= new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(reader);
-            String str=br.readLine();
-            logger.debug("####HTTP Request Header 출력");
-
             DataOutputStream dos = new DataOutputStream(out);
-            if(str==null) {
-                return;
-            }
-            Request request=new Request(str);
-            if(str.contains(".css")){
-                Response response = new Response();
-                response.setCssResponse200Header();
-                response.setPath(request.getPath());
+            Request request = new Request(in);
 
-                dosWriteResponse(dos,response);
-                return;
-            }
-            if(str.contains(".js")){
-                Response response = new Response();
-                response.setJsResponse200Header();
-                response.setPath(request.getPath());
+//            if(str.contains(".css")){
+//                Response response = new Response();
+//                response.setCssResponse200Header();
+//                response.setPath(request.getPath());
+//                return;
+//            }
+//            if(str.contains(".js")){
+//                Response response = new Response();
+//                response.setJsResponse200Header();
+//                response.setPath(request.getPath());
+//                return;
+//            }
 
-                dosWriteResponse(dos,response);
-                return;
-            }
-
-            int contentLength = -1;
-            while (!str.equals("")){
-                logger.debug(str);
-                if(str.contains("Content-Length")){
-                    contentLength = Integer.parseInt(str.split(" ")[1]);
-                }
-                if(str.contains("Cookie")){
-                    if(str.contains("true")){
-                        logger.debug("쿠키 true 설정");
-                        request.setIsLogin(true);
-                    }else{
-                        logger.debug("쿠키 false 설정");
-                        request.setIsLogin(false);
-                    }
-                }
-                str = br.readLine();
-            }
-            if(request.getMethodType().equals("POST")){
-                request.setParams(IOUtils.readData(br,contentLength));
-            }
             Response response = requestMapper(request);
             dosWriteResponse(dos, response);
 
@@ -84,7 +52,8 @@ public class RequestHandler implements Runnable {
     }
 
     private Response requestMapper(Request request) throws IOException, URISyntaxException {
-        if(request.getPaths().length>=1&&request.getPaths()[1].equals("user")){
+        String[] paths = request.getPath().split("/");
+        if(paths.length>=1 && paths[1].equals("user")){
             return new UserController().mapMethod(request);
         }
         Response response = new Response();

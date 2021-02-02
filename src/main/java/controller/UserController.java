@@ -13,7 +13,6 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
-import org.json.simple.parser.JSONParser;
 
 import java.util.*;
 
@@ -21,14 +20,15 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     public Response mapMethod(Request request) {
-        logger.debug("mapMaethod 접");
-        if(request.getPaths()[2].equals("create")){
+        String[] paths = request.getPath().split("/");
+
+        if(paths[2].equals("create")){
             return create(request);
         }
-        if(request.getPaths()[2].equals("login")){
+        if(paths[2].equals("login")){
             return login(request);
         }
-        if(request.getPaths()[2].equals("list")){
+        if(paths[2].equals("list")){
             return list(request);
         }
 
@@ -40,7 +40,7 @@ public class UserController {
 
     private Response create(Request request){
         ObjectMapper mapper = new ObjectMapper();
-        User user = mapper.convertValue(request.getParams(), User.class);
+        User user = mapper.convertValue(request.getParameter(), User.class);
         DataBase.addUser(user);
         logger.info("UserInfo: {}, {}, {}, {}", user.getUserId(), user.getEmail(), user.getName(), user.getPassword());
 
@@ -51,7 +51,7 @@ public class UserController {
 
     private Response login(Request request){
         ObjectMapper mapper = new ObjectMapper();
-        User loginUser = mapper.convertValue(request.getParams(), User.class);
+        User loginUser = mapper.convertValue(request.getParameter(), User.class);
         User user= Optional.ofNullable(DataBase.findUserById(loginUser.getUserId())).orElseThrow(NullPointerException::new);
         Response response=new Response();
         if(user.getPassword().equals(loginUser.getPassword())){

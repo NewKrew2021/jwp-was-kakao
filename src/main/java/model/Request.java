@@ -1,30 +1,50 @@
 package model;
 
+import annotation.web.RequestMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpRequest;
+import utils.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Request {
-    private final String methodType;
-    private final String[] paths;
-    private final String path;
-    private boolean isLogin;
-    private Map<String, String> params = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(Request.class);
+    private RequestMethod method;
+    private String path;
+    private Map<String, String> parameter = new HashMap<>();
+    private Map<String, String> header = new HashMap<>();
 
-    //get /user/create?userId=mark&password=123&name=123&email=123%40123.com
-    public Request(String path) {
-        String[] token = path.split(" ");
-        methodType = token[0];
-        this.path = token[1];
-        this.isLogin=false;
-        String[] pathToken = token[1].split("\\?");
-        paths = pathToken[0].split("/");
-        if (pathToken.length > 1) {
-            params = parseParams(pathToken[1]);
+    public Request(InputStream in) throws IOException {
+        InputStreamReader reader= new InputStreamReader(in);
+        BufferedReader br = new BufferedReader(reader);
+        String str=br.readLine();
+        logger.debug("####HTTP Request Header 출력");
+        parsePath(str);
+        while (!str.equals("")){
+            logger.debug(str);
+            String[] token=str.split(": ");
+            header.put(token[0],token[1]);
+            str = br.readLine();
+        }
+        if(this.method.equals(RequestMethod.POST)){
+            parameter =parseParams(IOUtils.readData(br,Integer.parseInt(header.get("Content-Length"))));
         }
     }
 
-    public void setParams(String paramString){
-        this.params=parseParams(paramString);
+    public void parsePath(String path) {
+        String[] token = path.split(" ");
+        this.method =RequestMethod.stringToRequestMethod(token[0]);
+        String[] pathToken = token[1].split("\\?");
+        this.path = pathToken[0];
+        if (pathToken.length > 1) {
+            this.parameter = parseParams(pathToken[1]);
+        }
     }
 
     private Map<String, String> parseParams(String paramString) {
@@ -36,27 +56,20 @@ public class Request {
         return map;
     }
 
-    public String getMethodType() {
-        return methodType;
+    public RequestMethod getMethod() {
+        return method;
     }
 
-    public String[] getPaths() {
-        return paths;
-    }
 
-    public Map<String, String> getParams() {
-        return params;
+    public Map<String, String> getParameter() {
+        return parameter;
     }
 
     public String getPath() {
         return path;
     }
 
-    public void setIsLogin(boolean isLogin) {
-        this.isLogin = isLogin;
-    }
-
     public boolean isLogin(){
-        return this.isLogin;
+        return header.get("Cookie").equals("logined=true");
     }
 }
