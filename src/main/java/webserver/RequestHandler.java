@@ -51,6 +51,54 @@ public class RequestHandler implements Runnable {
             // /user/create
             String path = requestPath[0];
             logger.debug("path : {}", path);
+            if (path.equals("/css/bootstrap.min.css")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithCss(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/css/index.css")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithCss(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/css/styles.css")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithCss(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/js/jquery-2.2.0.min.js")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithJs(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/js/scripts.js")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithJs(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/fonts/glyphicons-halflings-regular.ttf")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithJs(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/fonts/glyphicons-halflings-regular.woff")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithJs(dos, body.length);
+                responseBody(dos, body);
+            }
+            if (path.equals("/js/bootstrap.min.js")){
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
+                response200HeaderWithJs(dos, body.length);
+                responseBody(dos, body);
+            }
 
             if (path.equals("/index.html")) {
                 DataOutputStream dos = new DataOutputStream(out);
@@ -173,7 +221,27 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void response200HeaderWithCss(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
+    private void response200HeaderWithJs(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: */*;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
 
     private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
