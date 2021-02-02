@@ -30,8 +30,10 @@ public class HttpRequest {
             }
 
             if (getMethod().equals(RequestMethod.POST)) {
-                String body = bufferedReader.readLine();
-                parseUserInfo(body);
+                int bodySize = Integer.parseInt(header.get("Content-Length"));
+                char[] body = new char[bodySize];
+                bufferedReader.read(body);
+                parseUserInfo(new String(body));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,5 +80,29 @@ public class HttpRequest {
 
     public Map<String, String> getParameters() {
         return parameters;
+    }
+
+    public boolean isEmpty() {
+        return path == null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("HttpRequest\n").append("Method = ").append(method).append("\nPath = ").append(path).append("\n");
+        if (!parameters.isEmpty()) {
+            sb.append("Parameters[\n");
+            for (String s : parameters.keySet()) {
+                sb.append("\t").append(s).append(" : ").append(parameters.get(s)).append("\n");
+            }
+            sb.append("]\n");
+        }
+        if (!header.isEmpty()) {
+            sb.append("Header[\n");
+            for (String s : header.keySet()) {
+                sb.append("\t").append(s).append(" : ").append(header.get(s)).append("\n");
+            }
+            sb.append("]\n");
+        }
+        return sb.toString();
     }
 }

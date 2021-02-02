@@ -45,6 +45,38 @@ public class HttpResponse {
         }
     }
 
+    public void loginTrue() {
+        try {
+            byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + INDEX);
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("Set-Cookie: logined=true; Path=/\r\n");
+            dos.writeBytes("\r\n");
+            writeResponseBody(body);
+        } catch (IOException e) {
+            sendInternalServerError();
+        } catch (URISyntaxException e) {
+            sendInternalServerError();
+        }
+    }
+
+    public void loginFalse() {
+        try {
+            byte[] body = FileIoUtils.loadFileFromClasspath("./templates/user/login_failed.html");
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("Set-Cookie: logined=false; Path=/\r\n");
+            dos.writeBytes("\r\n");
+            writeResponseBody(body);
+        } catch (IOException e) {
+            sendInternalServerError();
+        } catch (URISyntaxException e) {
+            sendInternalServerError();
+        }
+    }
+
     private void writeResponseBody(byte[] body) {
         try {
             dos.write(body, 0, body.length);
