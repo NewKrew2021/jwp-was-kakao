@@ -3,20 +3,12 @@ package webserver;
 import controller.Controller;
 import controller.Controllers;
 import request.HttpRequest;
-import annotation.web.RequestMapping;
-import annotation.web.RequestMethod;
-import controller.RequestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import response.HttpResponse;
-import utils.FileIoUtils;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.Socket;
-import java.net.URISyntaxException;
-import java.util.*;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);

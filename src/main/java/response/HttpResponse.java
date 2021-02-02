@@ -54,10 +54,23 @@ public class HttpResponse {
     public void response302Header(String location) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: http://localhost:8080"+ location + "\r\n");
+            dos.writeBytes("Location: http://localhost:8080" + location + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
+
+    public void response302Header(String location, String logined) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080" + location + "\r\n");
+            dos.writeBytes("Set-Cookie: logined=" + logined + "; Path=/\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
 }
