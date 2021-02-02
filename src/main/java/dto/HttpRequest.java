@@ -63,4 +63,11 @@ public class HttpRequest {
             bodyParams.put(key, value);
         }
     }
+
+    public String getCookie(){
+        if(headers.containsKey("Cookie")){
+            return headers.get("Cookie");
+        }
+        return "logined=false";
+    }
 }
