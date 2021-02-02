@@ -3,25 +3,13 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
-import model.User;
+import controller.Controller;
+import controller.ControllerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RestController;
-import service.LoginService;
-import utils.FileIoUtils;
-import utils.IOUtils;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -41,237 +29,35 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String line = br.readLine();
-            logger.debug("request : {}", line);
 
-            String[] filePath = line.split(" ");
-
-            String[] requestPath = filePath[1].split("\\?");
-            // /index.html
-            // /user/create
-            String path = requestPath[0];
-            logger.debug("path : {}", path);
-            if (path.equals("/css/bootstrap.min.css")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithCss(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/css/index.css")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithCss(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/css/styles.css")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithCss(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/js/jquery-2.2.0.min.js")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithJs(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/js/scripts.js")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithJs(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/fonts/glyphicons-halflings-regular.ttf")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithJs(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/fonts/glyphicons-halflings-regular.woff")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithJs(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/js/bootstrap.min.js")){
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./static" + filePath[1]);
-                response200HeaderWithJs(dos, body.length);
-                responseBody(dos, body);
-            }
-
-            if (path.equals("/index.html")) {
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/user/form.html")) {
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/user/create")) {
-                Map<String, String> strBuf = new HashMap<>();
-                while(!(line = br.readLine()).equals("")){
-                    String[] buf = line.split(": ");
-                    strBuf.put(buf[0], buf[1]);
-                    logger.debug("header : {}", line);
-                }
-                int contentLength = Integer.parseInt(strBuf.get("Content-Length"));
-                String body = IOUtils.readData(br,contentLength);
-                Map<String, String> argument = parseArgument(body);
-                new LoginService().createUser(argument);
-                DataOutputStream dos = new DataOutputStream(out);
-                response302Header(dos, "/index.html");
-            }
-
-            if (path.equals("/user/login.html")) {
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/user/login_failed.html")) {
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + filePath[1]);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/user/list.html")) {
-                Map<String, String> strBuf = new HashMap<>();
-                while(!(line = br.readLine()).equals("")){
-                    String[] buf = line.split(": ");
-                    strBuf.put(buf[0], buf[1]);
-                    logger.debug("header : {}", line);
-                }
-                String loginCheck = strBuf.get("Cookie");
-                if(loginCheck == null || !Boolean.parseBoolean(loginCheck.split("=")[1])){
-                    // 로그인 쿠키 값이 false일 경우 page 이동
-                    DataOutputStream dos = new DataOutputStream(out);
-                    response302Header(dos, "/user/login.html");
-                }
-
-                TemplateLoader loader = new ClassPathTemplateLoader();
-                loader.setPrefix("/templates");
-                loader.setSuffix(".html");
-                Handlebars handlebars = new Handlebars(loader);
+            HttpRequest httpRequest = new HttpRequest(br);
+            HttpResponse httpResponse = new HttpResponse(new DataOutputStream(out));
+            httpResponse.addHeader("Content-Type", getContentType(httpRequest));
 
 
-                Template template = handlebars.compile("user/list");
+            String path = parsePath(httpRequest.getPath());
 
-                String html = template.apply(DataBase.findAll());
-
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = html.getBytes(StandardCharsets.UTF_8);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
-            if (path.equals("/user/login")){
-                // post로 오는 id, password 분류
-                Map<String, String> strBuf = new HashMap<>();
-                while(!(line = br.readLine()).equals("")){
-                    String[] buf = line.split(": ");
-                    strBuf.put(buf[0], buf[1]);
-                    logger.debug("header : {}", line);
-                }
-                int contentLength = Integer.parseInt(strBuf.get("Content-Length"));
-                String body = IOUtils.readData(br,contentLength);
-                Map<String, String> argument = parseArgument(body);
-                String userId = argument.get("userId");
-                String password = argument.get("password");
-                DataOutputStream dos = new DataOutputStream(out);
-
-                // Database에 있는 것 불러와서 비교
-                Optional<User> user = DataBase.findUserById(userId);
-                try {
-                    user.filter(u -> u.hasPassword(password)).orElseThrow(RuntimeException::new);
-                    response302HeaderWithCookie(dos, "/index.html", "true");
-                } catch (RuntimeException e) {
-                    response302HeaderWithCookie(dos, "/user/login_failed.html", "false");
-                }
-
-            }
+            Map<String, Controller> controllers = ControllerEntity.getControllers();
+            Controller controller = controllers.get(path);
+            controller.service(httpRequest, httpResponse);
 
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
 
-    protected Map<String, String> parseArgument(String argumentText) throws UnsupportedEncodingException {
-        String[] argumentStr = argumentText.split("&");
-        Map<String, String> argument = new HashMap<>();
-
-        for (String s : argumentStr) {
-            String[] ss = s.split("=");
-            argument.put(ss[0], URLDecoder.decode(ss[1], "UTF-8"));
-        }
-        return argument;
+    
+    private String getContentType(HttpRequest httpRequest) {
+        return httpRequest.getHeader("Accept").split(",")[0] + ";charset=utf-8";
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+    private String parsePath(String path) {
+        String prefix = path.split("/")[1];
 
-    private void response200HeaderWithCss(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        if (prefix.equals("js") || prefix.equals("css") || prefix.equals("fonts")){
+            return "/" + prefix;
         }
+        return path;
     }
-
-    private void response200HeaderWithJs(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: */*;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-
-    private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes(String.format("Set-Cookie: logined=%s; Path=/\r\n", cookie));
-            dos.writeBytes(String.format("Location: http://localhost:8080%s \r\n", url));
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String url) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes(String.format("Location: http://localhost:8080%s \r\n", url));
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+    
 }
