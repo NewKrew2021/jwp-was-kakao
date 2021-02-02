@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
+import exceptions.MethodNotAllowedException;
 import model.Request;
 import model.Response;
 import model.User;
@@ -28,7 +29,7 @@ public class ListUserController extends AbstractController{
 
     @Override
     void doPost(Request request, Response response) {
-
+        throw new MethodNotAllowedException();
     }
 
     @Override

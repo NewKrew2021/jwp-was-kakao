@@ -1,5 +1,6 @@
 package utils;
 
+import exceptions.FileNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,7 @@ public class FileIoUtils {
             Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource(filePath).toURI());
             return Files.readAllBytes(path);
         }catch (Exception e){
-            return new byte[0];
+            throw new FileNotFoundException();
         }
-
     }
 }

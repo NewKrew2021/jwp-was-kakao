@@ -2,6 +2,7 @@ package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import db.DataBase;
+import exceptions.MethodNotAllowedException;
 import model.Request;
 import model.Response;
 import model.User;
@@ -31,6 +32,6 @@ public class LoginController extends AbstractController {
 
     @Override
     void doGet(Request request, Response response) {
-
+        throw new MethodNotAllowedException();
     }
 }
