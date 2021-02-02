@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+
     private static final int KEY_INDEX = 0;
     private static final int VALUE_INDEX = 1;
     private static final int REQUEST_LINE_INDEX = 0;
@@ -18,19 +19,20 @@ public class Request {
     private static final int PARAMETER_INDEX = 0;
     private static final int METHOD_INDEX = 0;
     private static final int URI_INDEX = 1;
+
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> parameters = new HashMap<>();
     private String method;
     private String uri;
+    private BufferedReader br;
 
     private Request(InputStream in) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-        initializeHeader(br);
-        initializeRequest(br);
+        br = new BufferedReader(new InputStreamReader(in));
+        initializeHeader();
+        initializeRequest();
     }
 
-    private void initializeHeader(BufferedReader br) throws IOException {
+    private void initializeHeader() throws IOException {
         String line = br.readLine();
         headers.put("Request-Line", getRequestLine(line));
 
@@ -51,7 +53,7 @@ public class Request {
         return line;
     }
 
-    private void initializeRequest(BufferedReader br) throws IOException {
+    private void initializeRequest() throws IOException {
         String[] requestLine = headers.get("Request-Line").split(" ");
         this.method = requestLine[METHOD_INDEX];
         this.uri = requestLine[URI_INDEX];
