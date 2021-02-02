@@ -17,10 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- 2. acceptance test 없음
  3. 에러핸들링도 빈약하고
- 4. 서비스 없음
- 5. 로깅 정리
  */
 
 public class RequestHandler implements Runnable {

@@ -13,6 +13,8 @@ public class ViewController extends Controller {
         setBasePath("");
         putHandler("/js/.*", "GET", this::handleFile);
         putHandler("/css/.*", "GET", this::handleFile);
+        putHandler("/fonts/.*", "GET", this::handleFile);
+        putHandler("/favicon.ico", "GET", this::handleFile);
         putHandler("/.*", "GET", this::handleView);
     }
 

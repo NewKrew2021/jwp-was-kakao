@@ -1,5 +1,7 @@
 package model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 
 import java.io.DataOutputStream;
@@ -10,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
+    private static final Logger log = LoggerFactory.getLogger( HttpResponse.class );
     private final DataOutputStream dos;
     private final Map<String, String> headers = new HashMap<>();
 
@@ -23,11 +26,15 @@ public class HttpResponse {
         contentType.put(".js", "text/js");
         contentType.put(".html", "text/html");
         contentType.put(".css", "text/css");
+        contentType.put(".woff", "application/font-woff");
+        contentType.put(".ttf", "application/x-font-ttf");
+        contentType.put(".ico", "image/x-icon");
     }
 
     private static final Map<Integer, String> httpStatusCode = new HashMap<>();
     static {
         httpStatusCode.put(200, "OK");
+        httpStatusCode.put(201, "CREATED");
         httpStatusCode.put(302, "FOUND");
         httpStatusCode.put(404, "NOT FOUND");
         httpStatusCode.put(500, "INTERNAL SERVER ERROR");
@@ -99,6 +106,7 @@ public class HttpResponse {
             dos.write(body, 0, body.length);
 
         dos.flush();
+        log.info("{}", startLine);
     }
 
     public void sendView(byte[] body) throws IOException {

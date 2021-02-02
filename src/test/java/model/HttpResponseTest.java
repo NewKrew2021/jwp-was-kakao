@@ -16,10 +16,10 @@ public class HttpResponseTest {
     @Test
     void responseTest() throws IOException {
         HttpResponse response = HttpResponse.of(new DataOutputStream(new ByteArrayOutputStream()));
-        response.setCookie("logined=true; Path=/").sendRedirect("/path");
+        response.setCookie("logined=true").sendRedirect("/path");
 
         Map<String, String> expected = new HashMap<>();
-        expected.put("Set-Cookie", "logined=true; Path=/");
+        expected.put("Set-Cookie", "logined=true; Path=/; HttpOnly");
         expected.put("Location", "/path");
         assertThat(response.getHeaders()).isEqualTo(expected);
         assertThat(response.getStartLine()).isEqualTo("HTTP/1.1 302 FOUND");

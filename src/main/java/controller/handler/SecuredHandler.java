@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 
 public class SecuredHandler implements Handler {
-    Handler handler;
+    private final Handler handler;
 
     public SecuredHandler(Handler handler) {
         this.handler = handler;

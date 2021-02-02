@@ -1,7 +1,5 @@
 package model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -23,8 +21,6 @@ public class HttpRequest {
 
     private final static List<String> acceptedMethod = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
-    private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
-
     public HttpRequest(InputStream in) throws IOException {
         this(new BufferedReader(new InputStreamReader(in)));
     }
@@ -40,13 +36,11 @@ public class HttpRequest {
         while(br.ready()){
             body = IOUtils.readData(br, Integer.parseInt(headerMap.get("Content-Length")));
         }
-        log.debug("{}", body);
     }
 
     private void setHeaderLine(BufferedReader br) throws IOException {
         String line = br.readLine();
         while (!(line == null || line.trim().equals(""))) {
-            log.debug("{}", line);
             String[] headerLine = line.split(":", 2);
             validateHeaderLine(headerLine);
             headerMap.put(headerLine[0].trim(), headerLine[1].trim());
@@ -63,7 +57,6 @@ public class HttpRequest {
     private void setStartLine(String line) throws IOException {
         String[] startLine = line.split(" ");
         validateStartLine(startLine);
-        log.debug(line);
         method = startLine[0];
         setPath(startLine[1]);
         protocol = startLine[2];

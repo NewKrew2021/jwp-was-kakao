@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class Controller {
-    private static final Logger log = LoggerFactory.getLogger(Controller.class);
-    protected final Map<MethodPath, Handler> handlers = new HashMap<>();
+    private static final Logger log = LoggerFactory.getLogger( Controller.class );
+    protected final Map<MethodPath, Handler> handlers = new LinkedHashMap<>();
     protected String basePath = "";
 
     public void putHandler(String path, String method, Handler handler) {
@@ -30,9 +30,9 @@ public abstract class Controller {
 
     public boolean handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
         for (Map.Entry<MethodPath, Handler> entry : handlers.entrySet()) {
-            log.info("{} {}", request.getPath(), entry.getKey().getPath());
+            log.info("matching {} with controller {}", request.getPath(), entry.getKey().getPath());
             if (request.getPath().matches(entry.getKey().getPath())) {
-                log.info("matched *******************");
+                log.info("handling {} with controller {}", request.getPath(), entry.getKey().getPath());
                 entry.getValue().handle(request, out);
                 return true;
             }

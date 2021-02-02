@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 public class FileIoUtils {
     private static final Logger log = LoggerFactory.getLogger( FileIoUtils.class );
     public static byte[] loadFileFromClasspath(String filePath) throws IOException, URISyntaxException {
-        log.info("{}", filePath);
+        log.info("reading file {}", filePath);
         Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource(filePath).toURI());
         return Files.readAllBytes(path);
     }
