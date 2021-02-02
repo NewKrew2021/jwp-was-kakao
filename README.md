@@ -23,3 +23,4 @@
 
 ## 2단계
 - [x] HttpResponse 분리
+- [x] Handler를 사용한 분기 처리
