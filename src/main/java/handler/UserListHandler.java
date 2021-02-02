@@ -4,6 +4,7 @@ import db.DataBase;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
+import web.HttpHeaders;
 import web.HttpRequest;
 import web.HttpResponse;
 import web.HttpUrl;
@@ -15,15 +16,15 @@ public class UserListHandler implements HttpServlet {
         String cookie = httpRequest.getHttpHeaders().get("Cookie");
         if (cookie == null || !cookie.equals("logined=true")) {
             HttpResponse httpResponse = HttpResponse.of(HttpStatus.FOUND);
-            httpResponse.addHeader("Location", "/user/login.html");
+            httpResponse.addHeader(HttpHeaders.LOCATION, "/user/login.html");
             return httpResponse;
         }
 
         String body = FileIoUtils.loadHandleBarFromClasspath("user/list", DataBase.findAll());
         HttpResponse httpResponse = HttpResponse.of(HttpStatus.OK);
 
-        httpResponse.addHeader("Content-Type", "text/html;charset=utf-8");
-        httpResponse.addHeader("Content-Length", String.valueOf(body.length()));
+        httpResponse.addHeader(HttpHeaders.CONTENT_TYPE, "text/html;charset=utf-8");
+        httpResponse.addHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(body.length()));
         httpResponse.setBody(body);
 
         return httpResponse;

@@ -9,10 +9,12 @@ import java.util.Map;
 public class HttpHeaders {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String LOCATION = "Location";
+    public static final String SET_COOKIE = "Set-Cookie";
+    private static final String DELIMITER = ": ";
     private static final int SPLIT_SIZE = 2;
     private static final int KEY = 0;
     private static final int VALUE = 1;
-    private static final String DELIMITER = ": ";
 
     private final Map<String, String> headers;
 

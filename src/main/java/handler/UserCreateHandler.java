@@ -4,6 +4,7 @@ import db.DataBase;
 import model.User;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import web.HttpHeaders;
 import web.HttpRequest;
 import web.HttpResponse;
 import web.HttpUrl;
@@ -22,7 +23,7 @@ public class UserCreateHandler implements HttpServlet {
                 parameters.get("email")));
 
         HttpResponse httpResponse = HttpResponse.of(HttpStatus.FOUND);
-        httpResponse.addHeader("Location", "/index.html");
+        httpResponse.addHeader(HttpHeaders.LOCATION, "/index.html");
 
         return httpResponse;
     }
