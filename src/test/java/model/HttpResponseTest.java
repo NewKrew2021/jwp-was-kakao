@@ -1,11 +1,11 @@
 package model;
 
+import exception.utils.NoFileException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class HttpResponseTest {
     }
 
     @Test
-    void responseWithBodyTest() throws URISyntaxException, IOException {
+    void responseWithBodyTest() throws NoFileException, IOException {
         HttpResponse response = HttpResponse.of(new DataOutputStream(new ByteArrayOutputStream()));
         response.forward("./template", "/testhtml.html");
 

@@ -1,11 +1,11 @@
 package controller.handler;
 
+import exception.utils.NoFileException;
 import model.HttpRequest;
 import model.HttpResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 
 public class SecuredHandler implements Handler {
     private final Handler handler;
@@ -14,7 +14,7 @@ public class SecuredHandler implements Handler {
         this.handler = handler;
     }
 
-    public void handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
+    public void handle(HttpRequest request, OutputStream out) throws NoFileException, IOException {
         if (request.getCookie("logined") == null ||
                 request.getCookie("logined").equals("false")) {
             HttpResponse.of(out).sendRedirect("/user/login.html");

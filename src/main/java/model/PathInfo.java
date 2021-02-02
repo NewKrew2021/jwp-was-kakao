@@ -1,12 +1,12 @@
-package controller;
+package model;
 
 import java.util.Objects;
 
-public class MethodPath {
+public class PathInfo {
     private final String path;
     private final String method;
 
-    public MethodPath(String path, String method) {
+    public PathInfo(String path, String method) {
         this.path = path;
         this.method = method;
     }
@@ -15,7 +15,7 @@ public class MethodPath {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MethodPath that = (MethodPath) o;
+        PathInfo that = (PathInfo) o;
         return Objects.equals(path, that.path) && Objects.equals(method, that.method);
     }
 

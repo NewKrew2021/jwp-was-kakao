@@ -1,5 +1,9 @@
 package model;
 
+import exception.http.IllegalExtensionException;
+import exception.http.IllegalLocationException;
+import exception.http.IllegalStatusCodeException;
+import exception.utils.NoFileException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -7,12 +11,13 @@ import utils.FileIoUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-    private static final Logger log = LoggerFactory.getLogger( HttpResponse.class );
+    private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
+    private static final String PROTOCOL = "HTTP/1.1";
+
     private final DataOutputStream dos;
     private final Map<String, String> headers = new HashMap<>();
 
@@ -20,8 +25,8 @@ public class HttpResponse {
     private String startLine;
     private byte[] body;
 
-    private static final String PROTOCOL = "HTTP/1.1";
     private static final Map<String, String> contentType = new HashMap<>();
+
     static {
         contentType.put(".js", "text/js");
         contentType.put(".html", "text/html");
@@ -36,6 +41,8 @@ public class HttpResponse {
         httpStatusCode.put(200, "OK");
         httpStatusCode.put(201, "CREATED");
         httpStatusCode.put(302, "FOUND");
+        httpStatusCode.put(400, "BAD REQUEST");
+        httpStatusCode.put(401, "Unauthorized");
         httpStatusCode.put(404, "NOT FOUND");
         httpStatusCode.put(500, "INTERNAL SERVER ERROR");
     }
@@ -50,7 +57,7 @@ public class HttpResponse {
 
     public HttpResponse setStatus(int statusCode) {
         if (httpStatusCode.get(statusCode) == null)
-            throw new RuntimeException("상태코드가 유효하지 않습니다.");
+            throw new IllegalStatusCodeException();
 
         status = statusCode;
         startLine = String.join(" ", PROTOCOL,
@@ -71,23 +78,25 @@ public class HttpResponse {
 
     public HttpResponse setLocation(String url) {
         if (status != 201 && status / 100 != 3)
-            throw new RuntimeException("올바르지 않은 요청입니다");
+            throw new IllegalLocationException();
 
         headers.put("Location", url);
         return this;
     }
 
-    public void sendFile(String basePath, String path) throws URISyntaxException, IOException {
+    public HttpResponse sendFile(String basePath, String path) throws NoFileException {
         body = FileIoUtils.loadFileFromClasspath(basePath + path);
 
         String extension = path.substring(path.lastIndexOf("."));
         if (contentType.get(extension) == null)
-            throw new RuntimeException("확장자가 유효하지 않습니다.");
+            throw new IllegalExtensionException();
         setHeader("Content-Type", contentType.get(extension) + ";charset=utf-8");
         setHeader("Content-Length", String.valueOf(body.length));
+
+        return this;
     }
 
-    public void sendHtml(byte[] body) throws IOException {
+    public void sendHtml(byte[] body) {
         this.body = body;
         setHeader("Content-Type", contentType.get("html") + ";charset=utf-8");
         setHeader("Content-Length", String.valueOf(body.length));
@@ -121,7 +130,7 @@ public class HttpResponse {
         ok();
     }
 
-    public void forward(String basePath, String path) throws URISyntaxException, IOException {
+    public void forward(String basePath, String path) throws NoFileException, IOException {
         setStatus(200);
         sendFile(basePath, path);
         ok();

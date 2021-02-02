@@ -1,5 +1,10 @@
 package model;
 
+import exception.user.WrongEmailException;
+import exception.user.WrongIdException;
+import exception.user.WrongNameException;
+import exception.user.WrongPasswordException;
+
 public class User {
     private final String userId;
     private final String password;
@@ -15,27 +20,27 @@ public class User {
 
     private String validatePw(String password) {
         if(!password.matches("^[\\w]{1,30}$")){
-            throw new RuntimeException("올바르지 않은 비밀번호입니다.");
+            throw new WrongPasswordException();
         }
         return password;
     }
 
     private String validateId(String userId) {
         if(!userId.matches("^[\\w]{1,30}$"))
-            throw new RuntimeException("올바르지 않은 ID입니다.");
+            throw new WrongIdException();
         return userId;
     }
 
     private String validateName(String name) {
-        if(!name.matches("^[\\w]{1,30}$")){
-            throw new RuntimeException("올바르지 않은 이름입니다.");
+        if (!name.matches("^[\\w가-힣]{1,30}$")) {
+            throw new WrongNameException();
         }
         return name;
     }
 
     private String validateEmail(String email) {
         if(!email.matches("^[\\w]{1,30}@[\\w]{1,30}.[\\w]{1,30}$")){
-            throw new RuntimeException("올바르지 않은 이메일입니다.");
+            throw new WrongEmailException();
         }
         return email;
     }

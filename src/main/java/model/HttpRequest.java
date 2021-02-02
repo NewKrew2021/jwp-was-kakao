@@ -1,5 +1,6 @@
 package model;
 
+import exception.http.IllegalHeaderException;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -12,14 +13,15 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpRequest {
+    private final static List<String> acceptedMethod = Arrays.asList("GET", "POST", "PUT", "DELETE");
+
+    private final Map<String, String> headerMap = new HashMap<>();
+    private final Map<String, String> queryParameterMap = new HashMap<>();
+
     private String method;
     private String path;
     private String protocol;
-    private final Map<String, String> headerMap = new HashMap<>();
-    private final Map<String, String> queryParameterMap = new HashMap<>();
     private String body = "";
-
-    private final static List<String> acceptedMethod = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
     public HttpRequest(InputStream in) throws IOException {
         this(new BufferedReader(new InputStreamReader(in)));
@@ -104,7 +106,7 @@ public class HttpRequest {
     public String getHeader(String key){
         String header = headerMap.get(key);
         if(header == null) {
-            throw new RuntimeException("유효하지 않은 헤더입니다.");
+            throw new IllegalHeaderException();
         }
         return header;
     }
@@ -137,13 +139,5 @@ public class HttpRequest {
 
     public Map<String, String> getQueryParameterMap() {
         return queryParameterMap;
-    }
-
-    public String getParameter(String value){
-        String parameter = queryParameterMap.get(value);
-        if(parameter == null) {
-            throw new RuntimeException("유효하지 않은 헤더입니다.");
-        }
-        return parameter;
     }
 }

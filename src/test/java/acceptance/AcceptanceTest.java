@@ -38,4 +38,10 @@ public class AcceptanceTest {
                 .get("/user/list")
                 .then().statusCode(200);
     }
+
+    @Test
+    public void notFoundTest() {
+        RestAssured.when().get("/notfound")
+                .then().statusCode(404);
+    }
 }
