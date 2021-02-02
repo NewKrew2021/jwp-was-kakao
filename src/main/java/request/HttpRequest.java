@@ -1,4 +1,4 @@
-package HttpRequest;
+package request;
 
 import annotation.web.RequestMethod;
 import org.slf4j.Logger;
@@ -8,11 +8,13 @@ import webserver.RequestHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class Request {
+public class HttpRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     RequestUri requestUri;
@@ -20,7 +22,9 @@ public class Request {
     RequestBody requestBody;
 
 
-    public  Request(BufferedReader br) throws IOException {
+    public HttpRequest(InputStream in) throws IOException {
+        InputStreamReader inputStreamReader = new InputStreamReader(in, "UTF-8");
+        BufferedReader br = new BufferedReader(inputStreamReader);
         String uriLine = br.readLine();
         logger.debug(uriLine);
         createRequestURI(uriLine);
@@ -34,6 +38,14 @@ public class Request {
 
     public Map<String, String> getParams(){
         return requestUri.getParams();
+    }
+
+    public Map<String, String> getBody(){
+        return requestBody.getBody();
+    }
+
+    public RequestMethod getRequestMethod(){
+        return requestUri.getRequestMethod();
     }
 
 

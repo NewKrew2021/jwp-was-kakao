@@ -1,4 +1,4 @@
-package HttpRequest;
+package request;
 
 import java.util.Map;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package HttpRequest;
+package request;
 
 import annotation.web.RequestMethod;
 

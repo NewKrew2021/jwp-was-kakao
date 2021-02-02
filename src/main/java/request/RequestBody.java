@@ -1,4 +1,4 @@
-package HttpRequest;
+package request;
 
 import java.util.Map;
 
@@ -7,5 +7,9 @@ public class RequestBody {
 
     public RequestBody(Map<String, String> body){
         this.body = body;
+    }
+
+    public Map<String, String> getBody() {
+        return body;
     }
 }

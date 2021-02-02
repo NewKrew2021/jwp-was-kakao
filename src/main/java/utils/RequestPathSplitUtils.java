@@ -1,7 +1,7 @@
 package utils;
 
 import annotation.web.RequestMethod;
-import HttpRequest.RequestUri;
+import request.RequestUri;
 
 import java.util.HashMap;
 import java.util.Map;
