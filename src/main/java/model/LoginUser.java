@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Map;
+
 public class LoginUser {
     private String userId;
     private String password;
@@ -9,8 +11,8 @@ public class LoginUser {
         this.password = password;
     }
 
-    public static LoginUser of(String userId, String password) {
-        return new LoginUser(userId, password);
+    public static LoginUser of(Map<String, String> parameter) {
+        return new LoginUser(parameter.get("userId"), parameter.get("password"));
     }
 
     public String getUserId() {

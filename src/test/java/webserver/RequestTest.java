@@ -2,19 +2,41 @@ package webserver;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RequestTest {
+    private String testDirectory = "./src/test/resources/";
+
     @Test
-    void getMethodTest() {
-        Request request = Request.of("GET /index.html HTTP/1.1");
-        assertThat(request.getMethod()).isEqualTo("GET");
+    public void request_POST() throws Exception {
+        InputStream in = new FileInputStream(testDirectory + "Http_POST.txt");
+        Request request = Request.of(in);
+
+        assertEquals("POST", request.getMethod());
+        assertEquals("/user/create", request.getUri());
+        assertEquals("keep-alive", request.getHeader("Connection"));
+        assertEquals("1234", request.getParameter("userId"));
+        assertEquals("1234", request.getParameter("password"));
+        assertEquals("박재성", request.getParameter("name"));
+        assertEquals("email@email.com", request.getParameter("email"));
     }
 
     @Test
-    void getUriTest() {
-        Request request = Request.of("GET /index.html HTTP/1.1");
-        assertThat(request.getUri()).isEqualTo("/index.html");
+    void getMethodTest() throws Exception {
+        InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
+        Request request = Request.of(in);
+        assertEquals(request.getMethod(), "GET");
+    }
+
+    @Test
+    void getUriTest() throws Exception {
+        InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
+        Request request = Request.of(in);
+        assertEquals(request.getUri(), "/index.html");
     }
 
 }

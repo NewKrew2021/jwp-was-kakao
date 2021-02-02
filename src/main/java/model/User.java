@@ -1,6 +1,6 @@
 package model;
 
-import java.net.URLDecoder;
+import java.util.Map;
 
 public class User {
     private String userId;
@@ -15,8 +15,8 @@ public class User {
         this.email = email;
     }
 
-    public static User of(String userId, String password, String name, String email) {
-        return new User(userId, password, name, email);
+    public static User of(Map<String, String> parameter) {
+        return new User(parameter.get("userId"), parameter.get("password"), parameter.get("name"), parameter.get("email"));
     }
 
     public String getUserId() {
