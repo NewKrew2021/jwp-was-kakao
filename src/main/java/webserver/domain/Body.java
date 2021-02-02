@@ -2,7 +2,6 @@ package webserver.domain;
 
 import org.apache.commons.io.FilenameUtils;
 import utils.FileIoUtils;
-import webserver.RequestHandler;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -66,9 +65,5 @@ public class Body {
 
     public byte[] getBody() {
         return body;
-    }
-
-    public boolean isNotEmpty() {
-        return contentLength > 0;
     }
 }
