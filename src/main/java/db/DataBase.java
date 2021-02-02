@@ -2,6 +2,7 @@ package db;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.Maps;
 
@@ -14,8 +15,11 @@ public class DataBase {
         users.put(user.getUserId(), user);
     }
 
-    public static User findUserById(String userId) {
-        return users.get(userId);
+    public static Optional<User> findUserById(String userId) {
+        if(users.containsKey(userId)){
+            return Optional.of(users.get(userId));
+        }
+        return Optional.empty();
     }
 
     public static Collection<User> findAll() {

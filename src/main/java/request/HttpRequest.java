@@ -76,7 +76,6 @@ public class HttpRequest {
         }
     }
 
-
     private RequestMethod getMethodType(String line){
         String method = line.split(" ")[0];
         if(method.equals("GET")){

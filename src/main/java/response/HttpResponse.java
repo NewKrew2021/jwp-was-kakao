@@ -26,22 +26,10 @@ public class HttpResponse {
 
 
     // GET /index.html HTTP/1.1
-    public void response200Header(int lengthOfBodyContent) {
+    public void response200Header(int lengthOfBodyContent, String type) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    // GET /css/style.css HTTP/1.1
-    public void response200HeaderForCss(int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: text/" + type + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -79,7 +67,7 @@ public class HttpResponse {
         }
     }
 
-    public void responseBodyTemplate(Collection<User> users) throws IOException {
+    public void responseTemplate(Collection<User> users) throws IOException {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
         loader.setSuffix(".html");
@@ -89,7 +77,7 @@ public class HttpResponse {
         String result = template.apply(users);
         result = URLDecoder.decode(result,"UTF-8");
         byte[] body = result.getBytes("UTF-8");
-        response200Header(body.length);
+        response200Header(body.length, "html");
         responseBody(body);
     }
 }
