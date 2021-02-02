@@ -60,6 +60,17 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void responseCSSHeader(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addLoginCookie(DataOutputStream dos, boolean value) {
         try {
             dos.writeBytes("Set-Cookie: logined=" + value + "; Path=/");
@@ -70,6 +81,10 @@ public class RequestHandler implements Runnable {
 
     private boolean isLogined(Request request){
         return request.getHeaders().getOrDefault("Cookie","logined=false").equals("logined=true");
+    }
+
+    private boolean isStaticResources(String path) {
+        return path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".ico") || path.endsWith(".ttf") || path.endsWith(".woff");
     }
 
     public void run() {
@@ -83,6 +98,14 @@ public class RequestHandler implements Runnable {
 
             String path = request.getPath();
             String method = request.getMethod();
+
+            if (method.equals("GET") && isStaticResources(path)) {
+                path = "./static" + path;
+                byte[] body = FileIoUtils.loadFileFromClasspath(path);
+                responseCSSHeader(dos, body.length);
+                responseBody(dos, body);
+                return;
+            }
 
             if (method.equals("GET") && path.startsWith("/user/list")) {
                 if(!isLogined(request)){
