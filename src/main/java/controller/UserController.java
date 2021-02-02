@@ -1,9 +1,5 @@
 package controller;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
 import controller.handler.SecuredHandler;
 import db.DataBase;
 import model.HttpRequest;
@@ -11,12 +7,11 @@ import model.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import view.View;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.Map;
 
 public class UserController extends Controller {
@@ -42,9 +37,7 @@ public class UserController extends Controller {
         );
         DataBase.addUser(user);
 
-        DataOutputStream dos = new DataOutputStream(out);
-        HttpResponse.response302Header(dos, "/index.html");
-        HttpResponse.responseWithoutBody(dos);
+        HttpResponse.of(out).setStatus(302).setLocation("/index.html").ok();
     }
 
     public void handleLogin(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
@@ -53,51 +46,22 @@ public class UserController extends Controller {
         log.info("{} {}", bodyParsed.get("userId"), bodyParsed.get("password"));
         User user = DataBase.findUserById(bodyParsed.get("userId"));
 
-        DataOutputStream dos = new DataOutputStream(out);
         if (user == null) {
-            HttpResponse.response302Header(dos, "/user/login_failed.html");
-            HttpResponse.setCookie(dos, "logined=false; Path=/");
-            HttpResponse.responseWithoutBody(dos);
+            HttpResponse.of(out).setStatus(302).setLocation("/user/login_failed.html").setCookie("logined=false; Path=/").ok();
             return;
         }
-        HttpResponse.response302Header(dos, "/index.html");
-        HttpResponse.setCookie(dos, "logined=true; Path=/");
-        HttpResponse.responseWithoutBody(dos);
+        HttpResponse.of(out).setStatus(302).setLocation("/index.html").setCookie("logined=true; Path=/").ok();
     }
 
     public void handleUserList(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
         log.info("handling User List");
-        Collection<User> users = DataBase.findAll();
 
-        DataOutputStream dos = new DataOutputStream(out);
-        if (request.getCookie("logined") == null ||
-                request.getCookie("logined").equals("false")) {
-            Response.response302Header(dos, "/user/login.html");
-            Response.responseWithoutBody(dos);
-            return;
-        }
-
-        log.info("{}", request.getCookie("logined").equals("false"));
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-        Handlebars handlebars = new Handlebars(loader);
-
-        Template template = handlebars.compile("/user/list");
-        String profilePage = template.apply(users);
-        log.debug("ProfilePage : {}", profilePage);
-
-        byte[] body = profilePage.getBytes();
-        HttpResponse.response200Header(dos, body.length);
-        HttpResponse.responseBody(dos, body);
+        byte[] body = View.getUsersView(DataBase.findAll(), "/user/list");
+        HttpResponse.of(out).setStatus(200).sendView(body);
     }
 
     public void handleLogout(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
         log.info("handling Logout");
-
-        DataOutputStream dos = new DataOutputStream(out);
-        HttpResponse.response302Header(dos, "/index.html");
-        HttpResponse.setCookie(dos, "logined=false; Path=/");
-        HttpResponse.responseWithoutBody(dos);
+        HttpResponse.of(out).setStatus(302).setLocation("/index.html").setCookie("logined=false; Path=/").ok();
     }
 }
