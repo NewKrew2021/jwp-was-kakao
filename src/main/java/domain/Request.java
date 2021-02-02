@@ -5,18 +5,30 @@ import java.net.URLDecoder;
 import java.util.*;
 
 public class Request {
-    private String urlPath;
-    private String method;
-    private Map<String, String> queries;
+    private final String urlPath;
+    private final String method;
+    private final Map<String, String> queries;
+    private final Map<String, String> bodies;
 
     public Request(List<String> lines) {
         List<String> urlProperties = Arrays.asList(lines.get(0).split(" "));
         this.method = urlProperties.get(0);
-        this.urlPath = getUrlPath(urlProperties.get(1));
+        this.urlPath = makeUrlPath(urlProperties.get(1));
         this.queries = makeQueries(urlProperties.get(1));
+        this.bodies = this.method.equals("POST") ? makeBodies(lines.get(lines.size() - 1)) : null;
     }
 
-    private String getUrlPath(String fullUrl) {
+    private Map<String, String> makeBodies(String fullUrl) {
+        Map<String, String> bodies = new HashMap<>();
+        Arrays.asList(fullUrl.split("&"))
+                .forEach(query -> {
+                    List<String> result = Arrays.asList(query.split("="));
+                    bodies.put(decodeURL(result.get(0)), decodeURL(result.get(1)));
+                });
+        return bodies;
+    }
+
+    private String makeUrlPath(String fullUrl) {
         return fullUrl.split("\\?")[0];
     }
 
@@ -30,7 +42,6 @@ public class Request {
                         queries.put(decodeURL(result.get(0)), decodeURL(result.get(1)));
                     });
         }
-        System.out.println(queries);
         return queries;
     }
 
@@ -54,6 +65,10 @@ public class Request {
 
     public Map<String, String> getQueries(){
         return queries;
+    }
+
+    public Map<String, String> getBodies() {
+        return bodies;
     }
 
     @Override

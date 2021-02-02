@@ -5,20 +5,24 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import controller.UserController;
 import domain.Dispatcher;
 import domain.Request;
+import domain.Response;
+import domain.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import utils.IOUtils;
 
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
     private final Dispatcher dispatcher = Dispatcher.getInstance();
     private final UserController userController = UserController.getInstance();
 
@@ -35,51 +39,29 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-            List<String> lines = new ArrayList<>();
-            String line = br.readLine();
-            while(!line.equals("")) {
-                lines.add(line);
-                line = br.readLine();
-            }
-
+            List<String> lines = Arrays.asList(IOUtils.readData(br, 5000).split("\n"));
             Request request = new Request(lines);
 
-            byte[] body = "No Page".getBytes();
-
+            Response response = Response.ofDefaultFile(new ResponseBody("No Page"));
 
             if (FileIoUtils.pathIsFile(request.getUrlPath())) {
-                body = FileIoUtils.loadFileFromUrlPath(request.getUrlPath());
+                response = FileIoUtils.loadFileFromUrlPath(request.getUrlPath());
             } else {
-                body = dispatcher.run(request);
+                response = dispatcher.run(request);
             }
 
+            printResponse(out, response);
 
-            DataOutputStream dos = new DataOutputStream(out);
-
-            response200Header(dos, body.length);
-            responseBody(dos, body);
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private void printResponse(OutputStream out, Response response) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+        dos.write(response.toBytes(),
+                0,
+                response.toBytes().length);
+        dos.flush();
     }
 }

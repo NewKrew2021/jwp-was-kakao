@@ -1,11 +1,10 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import domain.Response;
+import domain.ResponseBody;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,17 +15,22 @@ public class FileIoUtils {
         return Files.readAllBytes(path);
     }
 
-    public static byte[] loadFileFromUrlPath(String urlPath) throws IOException, URISyntaxException {
+    public static Response loadFileFromUrlPath(String urlPath) throws IOException, URISyntaxException {
         if (urlPath.contains(".html")) {
-            return loadFileFromClasspath("./templates" + urlPath);
+            return Response.ofDefaultFile(
+                    new ResponseBody(
+                            loadFileFromClasspath("./templates" + urlPath)));
         }
         if (urlPath.matches("(.*)(.js|.css|.eot|.svg|.ttf|.woff|.woff2|.png)")) {
-            return loadFileFromClasspath("./static" + urlPath);
+            return Response.ofDefaultFile(
+                    new ResponseBody(
+                            loadFileFromClasspath("./static" + urlPath)));
         }
-        return "No Page!".getBytes();
+        return Response.ofDefaultFile(
+                new ResponseBody("No Page!"));
     }
 
-    public static boolean pathIsFile(String urlPath){
+    public static boolean pathIsFile(String urlPath) {
         return urlPath.matches("(.*)(.html|.js|.css|.eot|.svg|.ttf|.woff|.woff2|.png)");
     }
 }

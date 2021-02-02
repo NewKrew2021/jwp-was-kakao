@@ -6,17 +6,17 @@ import java.util.function.Function;
 
 public class Dispatcher {
     private static final Dispatcher instance = new Dispatcher();
-    private final Map<String, Function<Request, byte[]>> dispatcher;
+    private final Map<String, Function<Request, Response>> dispatcher;
 
     private Dispatcher() {
         this.dispatcher = new HashMap<>();
     }
 
-    public void register(String urlPath, String method, Function<Request, byte[]> function) {
+    public void register(String urlPath, String method, Function<Request, Response> function) {
         dispatcher.put(makeKey(urlPath, method), function);
     }
 
-    public byte[] run(Request request) {
+    public Response run(Request request) {
         return dispatcher
                 .get(makeKey(request.getUrlPath(), request.getMethod()))
                 .apply(request);
