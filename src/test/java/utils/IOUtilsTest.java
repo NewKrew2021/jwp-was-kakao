@@ -25,11 +25,11 @@ public class IOUtilsTest {
 
     @Test
     void buildString() throws Exception {
-        String reqHeader = "GET /index.html HTTP/1.1\n" +
+        String requestHeader = "GET /index.html HTTP/1.1\n" +
                 "Host: localhost:8080\n" +
                 "Connection: keep-alive\n" +
                 "Accept: */*";
-        InputStream is = new ByteArrayInputStream(reqHeader.getBytes());
-        assertThat(reqHeader).isEqualTo(IOUtils.buildString(is));
+        InputStream is = new ByteArrayInputStream(requestHeader.getBytes());
+        assertThat(requestHeader).isEqualTo(IOUtils.buildString(is));
     }
 }

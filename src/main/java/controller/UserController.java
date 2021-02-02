@@ -9,8 +9,7 @@ import utils.TemplateUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserController extends Controller {
-
+public class UserController {
     public static Handler createUserHandler = (request) -> {
         Map<String, String> params = HttpUtils.getParamMap(request.getBody());
 

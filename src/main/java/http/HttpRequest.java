@@ -24,10 +24,6 @@ public class HttpRequest {
         this.body = body;
     }
 
-    public RequestMethod getRequestMethod() {
-        return requestMethod;
-    }
-
     public String getUri() {
         return uri;
     }

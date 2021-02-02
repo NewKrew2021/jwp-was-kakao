@@ -10,9 +10,11 @@
 
 
 ## 기능 요구사항
-* 헤더 읽고 파싱
-* 파싱된 리퀘스트를 컨트롤러에 뿌려줌
-* 받아서 처리하는 컨트롤러
+1. InputStream -> HttpRequest
+2. HttpRequest -> Controllers
+3. Controllers -> Controller
+4. Controller -> HttpResponse
+5. HttpResponse -> OutputStream
 
 ## todo
 * [x] HttpRequest 구현
@@ -26,3 +28,4 @@
     * [x] DispatchInfo 구현
     * [x] TemplateController 구현
     * [x] UserController 구현
+    * [x] StaticController 구현

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class IOUtils {
     /**
@@ -28,7 +27,7 @@ public class IOUtils {
         BufferedReader br = new BufferedReader(is);
 
         List<String> lines = new ArrayList<>();
-        String line = "";
+        String line;
 
         while ((line = br.readLine()) != null && !line.isEmpty()) {
             lines.add(line);
@@ -36,11 +35,10 @@ public class IOUtils {
 
         int contentLength = getContentLength(lines);
         if (contentLength > 0) {
-            line = "\n\n" + readData(br, contentLength);
+            lines.add("\n" + readData(br, contentLength));
         }
 
-        return lines.stream()
-                .collect(Collectors.joining("\n")) + line;
+        return String.join("\n", lines);
     }
 
     private static int getContentLength(List<String> lines) {

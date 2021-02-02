@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 public class Controllers {
-
     public HttpResponse dispatch(HttpRequest request) throws IOException, URISyntaxException {
         return findMatchingHandlers(request).handleRequest(request);
     }

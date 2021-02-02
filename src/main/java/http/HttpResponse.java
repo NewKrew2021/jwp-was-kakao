@@ -22,19 +22,16 @@ public class HttpResponse {
         return httpStatus;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
     public byte[] getBody() {
         return body;
     }
 
     public String headersToString() {
         StringBuilder sb = new StringBuilder();
-        headers.keySet().forEach(key -> {
-            sb.append(key +": " + headers.get(key) + " \r\n");
-        });
+        headers.keySet().forEach(key -> sb.append(key)
+                .append(": ")
+                .append(headers.get(key))
+                .append(" \r\n"));
         return sb.toString();
     }
 
@@ -48,18 +45,15 @@ public class HttpResponse {
             return this;
         }
 
-        public Builder setHtml(String path) throws IOException, URISyntaxException {
-            this.body = FileIoUtils.loadFileFromClasspath(path);
-            headers.put("Content-Type", "text/html;charset=utf-8");
-            headers.put("Content-Length", String.valueOf(body.length));
-            return this;
-        }
-
         public Builder setHtml(byte[] body) {
             this.body = body;
             headers.put("Content-Type", "text/html;charset=utf-8");
             headers.put("Content-Length", String.valueOf(body.length));
             return this;
+        }
+
+        public Builder setHtml(String path) throws IOException, URISyntaxException {
+            return setHtml(FileIoUtils.loadFileFromClasspath(path));
         }
 
         public Builder setCss(String path) throws IOException, URISyntaxException {
