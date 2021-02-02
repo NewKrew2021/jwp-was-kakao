@@ -27,7 +27,7 @@ public class HttpRequest {
         BufferedReader br = new BufferedReader(inputStreamReader);
         String uriLine = br.readLine();
         logger.debug(uriLine);
-        createRequestURI(uriLine);
+        createRequestUri(uriLine);
         createRequestHeader(br);
         createRequestBody(br);
     }
@@ -51,7 +51,7 @@ public class HttpRequest {
     }
 
 
-    private void createRequestURI(String line){
+    private void createRequestUri(String line){
         String[] splitLine = line.split(" ");
         this.requestUri = new RequestUri(getMethodType(splitLine[0]), extractPath(splitLine[1]), extractParams(splitLine[1]));
     }

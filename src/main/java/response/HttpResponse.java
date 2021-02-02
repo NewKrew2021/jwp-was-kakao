@@ -7,6 +7,7 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.IOUtils;
 import webserver.RequestHandler;
 
 import java.io.DataOutputStream;
@@ -18,7 +19,7 @@ import java.util.Collection;
 public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    DataOutputStream dos;
+    private DataOutputStream dos;
 
     public HttpResponse(OutputStream out) {
         this.dos = new DataOutputStream(out);
@@ -75,7 +76,7 @@ public class HttpResponse {
 
         Template template = handlebars.compile("user/list");
         String result = template.apply(users);
-        result = URLDecoder.decode(result,"UTF-8");
+        result = IOUtils.decodeDate(result);
         byte[] body = result.getBytes("UTF-8");
         response200Header(body.length, "html");
         responseBody(body);
