@@ -55,6 +55,13 @@ public class HttpResponse {
             return this;
         }
 
+        public Builder setBody(byte[] body) {
+            this.body = body;
+            headers.put("Content-Type", "text/html;charset=utf-8");
+            headers.put("Content-Length", String.valueOf(body.length));
+            return this;
+        }
+
         public Builder setRedirect(String location) {
             headers.put("Location", location);
             return this;

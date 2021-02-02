@@ -34,7 +34,6 @@ public class RequestHandler implements Runnable {
             String request= IOUtils.buildString(in);
             parser.parse(request);
             HttpRequest httpRequest = new HttpRequest(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
-
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = controllers.dispatch(httpRequest);
             sendResponse(dos, response);
@@ -54,6 +53,7 @@ public class RequestHandler implements Runnable {
             }
             dos.flush();
         } catch (IOException e) {
+            logger.error(e.getMessage());
         }
     }
 }

@@ -6,7 +6,8 @@ import http.HttpRequest;
 public enum DispatchInfo {
     Template(new HttpRequest(RequestMethod.GET, ".html"), TemplateController.htmlHandler),
     UserCreate(new HttpRequest(RequestMethod.POST, "/user/create"), UserController.createUserHandler),
-    UserLogin(new HttpRequest(RequestMethod.POST, "/user/login"), UserController.loginUserHandler);
+    UserLogin(new HttpRequest(RequestMethod.POST, "/user/login"), UserController.loginUserHandler),
+    UserList(new HttpRequest(RequestMethod.GET, "/user/list"), UserController.listUserHandler);
 
     private HttpRequest httpRequest;
     private Handler requestHandler;

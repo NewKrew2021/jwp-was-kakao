@@ -4,7 +4,9 @@ import http.HttpResponse;
 import model.User;
 import db.DataBase;
 import utils.HttpUtils;
+import utils.TemplateUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class UserController extends Controller {
@@ -39,6 +41,24 @@ public class UserController extends Controller {
                 .setStatus("HTTP/1.1 302 Found")
                 .setRedirect("/user/login_failed.html")
                 .setHeader("Set-Cookie", "logined=false; Path=/")
+                .build();
+    };
+
+    public static Handler listUserHandler = (request) -> {
+        String logined = request.getRequestHeaders().getHeader("Cookie");
+
+        if("logined=true".equals(logined)) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("users", DataBase.findAll());
+
+            return new HttpResponse.Builder()
+                    .setStatus("HTTP/1.1 200 OK")
+                    .setBody(TemplateUtils.buildPage(request.getUri(), params))
+                    .build();
+        }
+        return new HttpResponse.Builder()
+                .setStatus("HTTP/1.1 302 Found")
+                .setRedirect("/user/login.html")
                 .build();
     };
 }
