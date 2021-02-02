@@ -2,7 +2,6 @@ package db;
 
 import com.google.common.collect.Maps;
 import model.User;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
 import java.util.Map;

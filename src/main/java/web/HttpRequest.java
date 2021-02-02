@@ -1,8 +1,6 @@
 package web;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import utils.DecodeUtils;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -11,6 +9,11 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class HttpRequest {
+    private static final int START_LINE = 0;
+    private static final int METHOD = 0;
+    private static final int URL = 1;
+    private static final String START_LINE_DELIMITER = " ";
+
     private final HttpMethod httpMethod;
     private final HttpHeaders httpHeaders;
     private final HttpUrl httpUrl;
@@ -25,11 +28,11 @@ public class HttpRequest {
 
     public static HttpRequest of(InputStream in) {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        List<String> texts = IOUtils.readUntilEmptyLine(br);
-        HttpHeaders httpHeaders = HttpHeaders.of(texts.subList(1, texts.size()));
-        String[] firstLine = texts.get(0).split(" ");
+        List<String> lines = IOUtils.readUntilEmptyLine(br);
+        String[] startLine = lines.get(START_LINE).split(START_LINE_DELIMITER);
+        HttpHeaders httpHeaders = HttpHeaders.of(lines.subList(START_LINE + 1, lines.size()));
 
-        return new HttpRequest(HttpMethod.valueOf(firstLine[0]), httpHeaders, HttpUrl.of(firstLine[1]), HttpBody.of(httpHeaders, br));
+        return new HttpRequest(HttpMethod.valueOf(startLine[METHOD]), httpHeaders, HttpUrl.of(startLine[URL]), HttpBody.of(httpHeaders, br));
     }
 
     public boolean hasSameMethod(HttpMethod httpMethod) {

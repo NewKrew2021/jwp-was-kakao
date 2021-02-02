@@ -15,13 +15,13 @@ public class HttpBody {
     }
 
     public static HttpBody of(HttpHeaders httpHeaders, BufferedReader br) {
-        String contentLength = httpHeaders.get("Content-Length");
+        String contentLength = httpHeaders.get(HttpHeaders.CONTENT_LENGTH);
         if (contentLength == null) {
             return HttpBody.empty();
         }
 
         String body = IOUtils.readData(br, Integer.parseInt(contentLength));
-        String contentType = httpHeaders.get("Content-Type");
+        String contentType = httpHeaders.get(HttpHeaders.CONTENT_TYPE);
 
         if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(contentType)) {
             body = DecodeUtils.decodeUrl(body);

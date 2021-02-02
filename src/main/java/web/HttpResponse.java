@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import utils.IOUtils;
 
 public class HttpResponse {
+    private static final String HTTP_1_1 = "HTTP/1.1 ";
+
     private final HttpHeaders httpHeaders;
     private final HttpStatus httpStatus;
     private HttpBody httpBody;
@@ -29,7 +31,7 @@ public class HttpResponse {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("HTTP/1.1 ").append(httpStatus.value()).append(" ").append(httpStatus.getReasonPhrase()).append(IOUtils.NEW_LINE);
+        sb.append(HTTP_1_1).append(httpStatus.value()).append(" ").append(httpStatus.getReasonPhrase()).append(IOUtils.NEW_LINE);
         if (!httpHeaders.isEmpty()) {
             sb.append(httpHeaders);
         }
