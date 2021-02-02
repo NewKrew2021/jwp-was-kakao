@@ -32,11 +32,11 @@
 ### 요구사항 3 (회원가입 기능 - POST 방식)
 
 #### Http Method 분기 처리
-* [ ] Get / Post에 대한 요청 분기 처리
+* [x] Get / Post에 대한 요청 분기 처리
 
 #### Request Body 추출하기
-* [ ] util.IOUtils를 활용하여 Http Body를 읽기
-* [ ] Http Body를 해석하여 User 객체 생성
+* [x] util.IOUtils를 활용하여 Http Body를 읽기
+* [x] Http Body를 해석하여 User 객체 생성
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)

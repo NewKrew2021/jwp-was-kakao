@@ -4,6 +4,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import utils.IOUtils;
 import utils.ParseUtils;
 
 import java.io.*;
@@ -16,7 +17,8 @@ import java.util.Map;
 public class RequestHandler implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private final String HEADER_REGEX = ":";
+    private final String HTTP_GET = "GET";
+    private final String HTTP_POST = "POST";
 
     private Socket connection;
 
@@ -36,25 +38,41 @@ public class RequestHandler implements Runnable {
             String line = readLine(reader);
 
             getMethodAndUrl(line, request);
+            String path = ParseUtils.getUrlPath(request.get("url"));
 
-            line = readLine(reader);
-
-            while (!line.isEmpty()) {
-                getHeaders(line, request);
+            if (request.get("method").equals(HTTP_GET)) {
                 line = readLine(reader);
-                if (line == null) {
-                    break;
+
+                while (!line.isEmpty()) {
+                    getHeaders(line, request);
+                    line = readLine(reader);
+                    if (line == null) {
+                        break;
+                    }
                 }
             }
 
-            String path = ParseUtils.getUrlPath(request.get("url"));
+            if (request.get("method").equals(HTTP_POST)) {
+                line = readLine(reader);
 
-            if(path.equals("/user/create")){
-                Map<String, String> parameters = ParseUtils.getParameters(request.get("url"));
-                User user = User.mapOf(parameters);
+                while (!line.isEmpty()) {
+                    getHeaders(line, request);
+                    line = readLine(reader);
+                    if (line == null) {
+                        break;
+                    }
+                }
+
+                String body = IOUtils.readData(reader, Integer.parseInt(request.get("Content-Length")));
+
+                if (path.equals("/user/create")) {
+                    Map<String, String> parameters = ParseUtils.getParameters(body);
+                    User user = User.mapOf(parameters);
+                    logger.debug(user.toString());
+                }
             }
 
-            try{
+            try {
                 byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
                 response200Header(dos, body.length);
                 responseBody(dos, body);

@@ -19,10 +19,11 @@ public class ParseUtils {
     public static String parseHeaderKey(String header) {
         return header.substring(START_INDEX, header.indexOf(HEADER_REGEX));
     }
-    public static Map<String, String> getParameters(String requestUrl) {
+
+    public static Map<String, String> getParameters(String parameterPairs) {
         Map<String, String> parameters = new HashMap<>();
 
-        Arrays.stream(requestUrl.split(REQUEST_URL_REGEX)[1].split(PARAMETER_PAIR_REGEX))
+        Arrays.stream(parameterPairs.split(PARAMETER_PAIR_REGEX))
                 .map(pair -> pair.split(PARAMETER_KEY_VALUE_REGEX))
                 .forEach(keyValue -> parameters.put(keyValue[0], keyValue[1]));
 
@@ -31,5 +32,9 @@ public class ParseUtils {
 
     public static String getUrlPath(String url) {
         return url.split(REQUEST_URL_REGEX)[0];
+    }
+
+    public static String getParameterPairs(String url) {
+        return url.split(REQUEST_URL_REGEX)[1];
     }
 }
