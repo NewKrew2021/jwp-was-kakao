@@ -37,7 +37,7 @@ public class UserController extends Controller {
         );
         DataBase.addUser(user);
 
-        HttpResponse.of(out).setStatus(302).setLocation("/index.html").ok();
+        HttpResponse.of(out).sendRedirect("/index.html");
     }
 
     public void handleLogin(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
@@ -47,21 +47,21 @@ public class UserController extends Controller {
         User user = DataBase.findUserById(bodyParsed.get("userId"));
 
         if (user == null) {
-            HttpResponse.of(out).setStatus(302).setLocation("/user/login_failed.html").setCookie("logined=false; Path=/").ok();
+            HttpResponse.of(out).setCookie("logined=false; Path=/").sendRedirect("/user/login_failed.html");
             return;
         }
-        HttpResponse.of(out).setStatus(302).setLocation("/index.html").setCookie("logined=true; Path=/").ok();
+        HttpResponse.of(out).setCookie("logined=true; Path=/").sendRedirect("/index.html");
     }
 
     public void handleUserList(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
         log.info("handling User List");
 
         byte[] body = View.getUsersView(DataBase.findAll(), "/user/list");
-        HttpResponse.of(out).setStatus(200).sendView(body);
+        HttpResponse.of(out).sendView(body);
     }
 
     public void handleLogout(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
         log.info("handling Logout");
-        HttpResponse.of(out).setStatus(302).setLocation("/index.html").setCookie("logined=false; Path=/").ok();
+        HttpResponse.of(out).setCookie("logined=false; Path=/").sendRedirect("/index.html");
     }
 }

@@ -17,7 +17,7 @@ public class SecuredHandler implements Handler {
     public void handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
         if (request.getCookie("logined") == null ||
                 request.getCookie("logined").equals("false")) {
-            HttpResponse.of(out).setStatus(302).setLocation("/user/login.html").ok();
+            HttpResponse.of(out).sendRedirect("/user/login.html");
             return;
         }
         handler.handle(request, out);

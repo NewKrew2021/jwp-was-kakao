@@ -11,15 +11,14 @@ import java.util.Map;
 
 public class HttpResponse {
     private final DataOutputStream dos;
+    private final Map<String, String> headers = new HashMap<>();
 
     private int status;
     private String startLine;
-    private final Map<String, String> headers = new HashMap<>();
     private byte[] body;
 
     private static final String PROTOCOL = "HTTP/1.1";
     private static final Map<String, String> contentType = new HashMap<>();
-
     static {
         contentType.put(".js", "text/js");
         contentType.put(".html", "text/html");
@@ -27,7 +26,6 @@ public class HttpResponse {
     }
 
     private static final Map<Integer, String> httpStatusCode = new HashMap<>();
-
     static {
         httpStatusCode.put(200, "OK");
         httpStatusCode.put(302, "FOUND");
@@ -49,7 +47,7 @@ public class HttpResponse {
 
         status = statusCode;
         startLine = String.join(" ", PROTOCOL,
-                String.valueOf(statusCode), httpStatusCode.get(statusCode)) + "\r\n";
+                String.valueOf(statusCode), httpStatusCode.get(statusCode));
 
         return this;
     }
@@ -80,11 +78,17 @@ public class HttpResponse {
             throw new RuntimeException("확장자가 유효하지 않습니다.");
         setHeader("Content-Type", contentType.get(extension) + ";charset=utf-8");
         setHeader("Content-Length", String.valueOf(body.length));
-        ok();
+    }
+
+    public void sendHtml(byte[] body) throws IOException {
+        this.body = body;
+        setHeader("Content-Type", contentType.get("html") + ";charset=utf-8");
+        setHeader("Content-Length", String.valueOf(body.length));
     }
 
     public void ok() throws IOException {
         dos.writeBytes(startLine);
+        dos.writeBytes("\r\n");
 
         for (Map.Entry<String, String> header : headers.entrySet()) {
             dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
@@ -98,75 +102,28 @@ public class HttpResponse {
     }
 
     public void sendView(byte[] body) throws IOException {
-        this.body = body;
-        setHeader("Content-Type", contentType.get("html") + ";charset=utf-8");
-        setHeader("Content-Length", String.valueOf(body.length));
+        setStatus(200);
+        sendHtml(body);
         ok();
     }
-//
-//    public void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-//        try {
-//            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-//            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-//            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
-//
-//    public void response200CssHeader(DataOutputStream dos, int lengthOfBodyContent) {
-//        try {
-//            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-//            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
-//            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
-//
-//    public void response200JsHeader(DataOutputStream dos, int lengthOfBodyContent) {
-//        try {
-//            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-//            dos.writeBytes("Content-Type: text/js;charset=utf-8\r\n");
-//            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
-//
-//    public void setCookie(DataOutputStream dos, String cookie){
-//        try {
-//            dos.writeBytes("Set-Cookie: " + cookie + "\r\n");
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
-//
-//    public void response302Header(DataOutputStream dos, String url) {
-//        try {
-//            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-//            dos.writeBytes("Location: " + url + "\r\n");
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
-//
-//    public void responseWithoutBody(DataOutputStream dos){
-//        try {
-//            dos.writeBytes("\r\n");
-//            dos.flush();
-//        } catch (IOException e){
-//            log.error(e.getMessage());
-//        }
-//    }
-//
-//    public void responseBody(DataOutputStream dos, byte[] body) {
-//        try {
-//            dos.writeBytes("\r\n");
-//            dos.write(body, 0, body.length);
-//            dos.flush();
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
+
+    public void sendRedirect(String url) throws IOException {
+        setStatus(302);
+        setLocation(url);
+        ok();
+    }
+
+    public void forward(String basePath, String path) throws URISyntaxException, IOException {
+        setStatus(200);
+        sendFile(basePath, path);
+        ok();
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public String getStartLine() {
+        return startLine;
+    }
 }

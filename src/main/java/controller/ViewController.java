@@ -20,11 +20,11 @@ public class ViewController extends Controller {
     }
 
     public void handleFile(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
-        HttpResponse.of(out).setStatus(200).sendFile("./static", request.getPath());
+        HttpResponse.of(out).forward("./static", request.getPath());
     }
 
     public void handleView(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
-        HttpResponse.of(out).setStatus(200).sendFile("./templates",
+        HttpResponse.of(out).forward("./templates",
                 (request.getPath().equals("/") ? "/index.html" : request.getPath()));
     }
 }
