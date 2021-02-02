@@ -78,7 +78,7 @@ public class HttpRequest {
             int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", "0"));
             return IOUtils.readData(br, contentLength);
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException(e.getMessage() + "\nError while reading body data");
         }
     }
 
@@ -86,7 +86,7 @@ public class HttpRequest {
         try {
             return br.readLine();
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException(e.getMessage() + "\nError while reading from input stream");
         }
     }
 
