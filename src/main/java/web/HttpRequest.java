@@ -3,6 +3,8 @@ package web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import utils.DecodeUtils;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -41,7 +43,15 @@ public class HttpRequest {
         if (contentLength == null) {
             return HttpBody.empty();
         }
-        return new HttpBody(IOUtils.readData(br, Integer.parseInt(contentLength)));
+
+        String body = IOUtils.readData(br, Integer.parseInt(contentLength));
+        String contentType = httpHeaders.get("Content-Type");
+
+        if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(contentType)) {
+            body = DecodeUtils.decodeUrl(body);
+        }
+
+        return new HttpBody(body);
     }
 
     public boolean hasSameMethod(HttpMethod httpMethod) {
