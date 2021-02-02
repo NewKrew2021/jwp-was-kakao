@@ -4,9 +4,10 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import controller.handler.SecuredHandler;
 import db.DataBase;
 import model.HttpRequest;
-import model.Response;
+import model.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,23 +17,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
-public class UserController implements Controller {
+public class UserController extends Controller {
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
-    private static final Map<MethodPath, Handler> handlers = new HashMap<>();
-
-    private static final String basePath = "/user";
 
     {
+        setBasePath("/user");
         putHandler("/create", "POST", this::handleCreate);
         putHandler("/login", "POST", this::handleLogin);
-        putHandler("/list", "GET", this::handleUserList);
-    }
-
-    public static void putHandler(String path, String method, Handler handler) {
-        handlers.put(new MethodPath(basePath + path, method), handler);
+        putHandler("/list", "GET", new SecuredHandler(this::handleUserList));
+        putHandler("/list.html", "GET", new SecuredHandler(this::handleUserList));
+        putHandler("/logout", "GET", new SecuredHandler(this::handleLogout));
     }
 
     public void handleCreate(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
@@ -47,8 +43,8 @@ public class UserController implements Controller {
         DataBase.addUser(user);
 
         DataOutputStream dos = new DataOutputStream(out);
-        Response.response302Header(dos, "/index.html");
-        Response.responseWithoutBody(dos);
+        HttpResponse.response302Header(dos, "/index.html");
+        HttpResponse.responseWithoutBody(dos);
     }
 
     public void handleLogin(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
@@ -59,14 +55,14 @@ public class UserController implements Controller {
 
         DataOutputStream dos = new DataOutputStream(out);
         if (user == null) {
-            Response.response302Header(dos, "/user/login_failed.html");
-            Response.setCookie(dos, "logined=false; Path=/");
-            Response.responseWithoutBody(dos);
+            HttpResponse.response302Header(dos, "/user/login_failed.html");
+            HttpResponse.setCookie(dos, "logined=false; Path=/");
+            HttpResponse.responseWithoutBody(dos);
             return;
         }
-        Response.response302Header(dos, "/index.html");
-        Response.setCookie(dos, "logined=true; Path=/");
-        Response.responseWithoutBody(dos);
+        HttpResponse.response302Header(dos, "/index.html");
+        HttpResponse.setCookie(dos, "logined=true; Path=/");
+        HttpResponse.responseWithoutBody(dos);
     }
 
     public void handleUserList(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
@@ -92,25 +88,16 @@ public class UserController implements Controller {
         log.debug("ProfilePage : {}", profilePage);
 
         byte[] body = profilePage.getBytes();
-        Response.response200Header(dos, body.length);
-        Response.responseBody(dos, body);
+        HttpResponse.response200Header(dos, body.length);
+        HttpResponse.responseBody(dos, body);
     }
 
-    @Override
-    public boolean hasSameBasePath(String path) {
-        return path.startsWith(basePath);
-    }
+    public void handleLogout(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
+        log.info("handling Logout");
 
-    @Override
-    public boolean handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
-        for (Map.Entry<MethodPath, Handler> entry : handlers.entrySet()) {
-            log.info("{} {}", request.getPath(), entry.getKey().getPath());
-            if (request.getPath().matches(entry.getKey().getPath())) {
-                log.info("matched *******************");
-                entry.getValue().handle(request, out);
-                return true;
-            }
-        }
-        return false;
+        DataOutputStream dos = new DataOutputStream(out);
+        HttpResponse.response302Header(dos, "/index.html");
+        HttpResponse.setCookie(dos, "logined=false; Path=/");
+        HttpResponse.responseWithoutBody(dos);
     }
 }

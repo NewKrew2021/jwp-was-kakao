@@ -1,13 +1,42 @@
 package controller;
 
+import controller.handler.Handler;
 import model.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface Controller {
-    boolean hasSameBasePath(String path);
+public abstract class Controller {
+    private static final Logger log = LoggerFactory.getLogger(Controller.class);
+    protected final Map<MethodPath, Handler> handlers = new HashMap<>();
+    protected String basePath = "";
 
-    boolean handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException;
+    public void putHandler(String path, String method, Handler handler) {
+        handlers.put(new MethodPath(basePath + path, method), handler);
+    }
+
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
+    }
+
+    public boolean hasSameBasePath(String path) {
+        return path.startsWith(basePath);
+    }
+
+    public boolean handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException {
+        for (Map.Entry<MethodPath, Handler> entry : handlers.entrySet()) {
+            log.info("{} {}", request.getPath(), entry.getKey().getPath());
+            if (request.getPath().matches(entry.getKey().getPath())) {
+                log.info("matched *******************");
+                entry.getValue().handle(request, out);
+                return true;
+            }
+        }
+        return false;
+    }
 }

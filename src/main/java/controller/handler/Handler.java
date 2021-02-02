@@ -1,4 +1,4 @@
-package controller;
+package controller.handler;
 
 import model.HttpRequest;
 
@@ -7,6 +7,6 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 
 @FunctionalInterface
-interface Handler {
+public interface Handler {
     void handle(HttpRequest request, OutputStream out) throws URISyntaxException, IOException;
 }
