@@ -43,7 +43,7 @@ public class RequestHandler implements Runnable {
 
             // 쿠키 처리
             if (httpRequest.getHeader("Cookie").equals("logined=true")) {
-                httpResponse.addHeader("Set-Cookie","logined=true");
+                httpResponse.addHeader("Set-Cookie", "logined=true");
                 login = true;
             }
 
@@ -58,7 +58,7 @@ public class RequestHandler implements Runnable {
             // 로그인
             if (httpRequest.getMethod().equals(HttpMethod.POST) && httpRequest.getPath().equals("/user/login")) {
                 boolean login = DataBase.isPossibleLogin(httpRequest.getParameter("userId"), httpRequest.getParameter("password"));
-                httpResponse.addHeader("Set-Cookie","logined=" + login);
+                httpResponse.addHeader("Set-Cookie", "logined=" + login);
                 if (login) {
                     httpResponse.sendRedirect("/index.html");
                 } else {
@@ -91,15 +91,15 @@ public class RequestHandler implements Runnable {
             }
 
             //css + js
-            if ( FileIoUtils.isExistFile( "./static" + httpRequest.getPath())  ) {
-                httpResponse.addHeader("Accept",httpRequest.getHeader("Accept"));
+            if (FileIoUtils.isExistFile("./static" + httpRequest.getPath())) {
+                httpResponse.addHeader("Accept", httpRequest.getHeader("Accept"));
                 httpResponse.forward("./static" + httpRequest.getPath());
                 return;
             }
 
             //html
             if (FileIoUtils.isExistFile("./templates" + httpRequest.getPath())) {
-                httpResponse.addHeader("Accept","text/html;charset=utf-8");
+                httpResponse.addHeader("Accept", "text/html;charset=utf-8");
                 httpResponse.forward("./templates" + httpRequest.getPath());
                 return;
             }
@@ -108,49 +108,4 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
-
-
-//    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-//        try {
-//            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-//            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-//            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-//            dos.writeBytes("Set-Cookie: logined=" + login + "; Path=/\r\n");
-//            dos.writeBytes("\r\n");
-//        } catch (IOException e) {
-//            logger.error(e.getMessage());
-//        }
-//    }
-//
-//    private void response200HeaderCss(DataOutputStream dos, int lengthOfBodyContent) {
-//        try {
-//            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-//            dos.writeBytes("Content-Type:" + httpRequest.getHeader("Accept") + "\r\n");
-//            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-//            dos.writeBytes("\r\n");
-//        } catch (IOException e) {
-//            logger.error(e.getMessage());
-//        }
-//    }
-//
-//    private void response302Header(DataOutputStream dos, String url) {
-//        try {
-//            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-//            dos.writeBytes("Location: http://localhost:8080" + url + " \r\n");
-//            dos.writeBytes("Set-Cookie: logined=" + login + "; Path=/\r\n");
-//            dos.writeBytes("\r\n");
-//            dos.flush();
-//        } catch (IOException e) {
-//            logger.error(e.getMessage());
-//        }
-//    }
-//
-//    private void responseBody(DataOutputStream dos, byte[] body) {
-//        try {
-//            dos.write(body, 0, body.length);
-//            dos.flush();
-//        } catch (IOException e) {
-//            logger.error(e.getMessage());
-//        }
-//    }
 }
