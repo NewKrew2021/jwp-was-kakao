@@ -1,9 +1,19 @@
 package webserver.domain;
 
-public class HttpHeader {
-    public static final String CONTENT_LENGTH = "Content-Length";
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String LOCATION = "Location";
-    public static final String SET_COOKIE = "Set-Cookie";
-    public static final String COOKIE = "Cookie";
+public enum HttpHeader {
+    CONTENT_LENGTH("Content-Length"),
+    CONTENT_TYPE("Content-Type"),
+    LOCATION("Location"),
+    SET_COOKIE("Set-Cookie"),
+    COOKIE("Cookie");
+
+    private final String message;
+
+    HttpHeader(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

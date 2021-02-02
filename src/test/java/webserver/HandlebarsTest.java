@@ -13,7 +13,7 @@ public class HandlebarsTest {
     private static final Logger log = LoggerFactory.getLogger(HandlebarsTest.class);
 
     @Test
-    void name() throws Exception {
+    void Handlebars() throws Exception {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
         loader.setSuffix(".html");

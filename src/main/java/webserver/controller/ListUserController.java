@@ -9,6 +9,7 @@ import model.User;
 import webserver.domain.HttpHeader;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
+import webserver.domain.HttpStatusCode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,15 +19,16 @@ import java.util.Map;
 
 public class ListUserController extends AbstractController {
     @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
-        if (!isLogin(httpRequest.getHeader(HttpHeader.COOKIE))) {
-            httpResponse.sendRedirect("/user/login.html");
+    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+        if (!isLogin(httpRequest.getHeaders().get(HttpHeader.COOKIE))) {
+            httpResponse.getHeaders().add(HttpHeader.LOCATION, "/user/login.html");
+            httpResponse.send(HttpStatusCode.FOUND);
             return;
         }
         try {
-            httpResponse.forwardBody(getProfilePage());
+            httpResponse.send(HttpStatusCode.OK, getProfilePage());
         } catch (IOException e) {
-            e.printStackTrace();
+            httpResponse.send(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -44,6 +46,9 @@ public class ListUserController extends AbstractController {
     }
 
     private boolean isLogin(String loginCookie) {
+        if (loginCookie == null) {
+            return false;
+        }
         return loginCookie.contains("logined=true");
     }
 }

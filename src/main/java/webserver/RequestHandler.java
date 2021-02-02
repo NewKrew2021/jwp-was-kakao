@@ -1,20 +1,17 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.controller.Controller;
-import webserver.controller.CreateUserController;
-import webserver.controller.ListUserController;
-import webserver.controller.LoginController;
+import webserver.controller.*;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -35,22 +32,12 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            control(in, out);
-        } catch (IOException | URISyntaxException e) {
+            HttpRequest httpRequest = new HttpRequest(in);
+            HttpResponse httpResponse = new HttpResponse(out);
+            controllers.getOrDefault(httpRequest.getPath(), new DefaultController()).service(httpRequest, httpResponse);
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private void control(InputStream in, OutputStream out) throws IOException, URISyntaxException {
-        HttpRequest httpRequest = new HttpRequest(in);
-        HttpResponse httpResponse = new HttpResponse(out);
-        String path = httpRequest.getPath();
-        if (controllers.containsKey(path)) {
-            controllers.get(path).service(httpRequest, httpResponse);
-            return;
-        }
-        httpResponse.forward(path);
     }
 }

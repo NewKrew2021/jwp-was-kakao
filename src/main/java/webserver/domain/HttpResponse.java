@@ -1,113 +1,63 @@
 package webserver.domain;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
-import webserver.RequestHandler;
+import webserver.exceptions.RequiredHeaderNotFoundException;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HttpResponse {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final String TEMPLATE_PREFIX = "templates";
-    private static final String STATIC_PREFIX = "static";
-
     DataOutputStream dos;
-    Map<String, String> headers;
+    HttpHeaders headers;
 
-    public HttpResponse(OutputStream out) {
+    public HttpResponse(OutputStream out) throws IOException {
         dos = new DataOutputStream(out);
-        headers = new HashMap<>();
+        headers = new HttpHeaders();
     }
 
-    public void addHeader(String key, String value) {
-        headers.put(key, value);
+    public void send(HttpStatusCode code) {
+        send(code, null);
     }
 
-    public void forward(String path) throws IOException, URISyntaxException {
-        byte[] response = readFile(path);
-        response200Header(response.length);
-        responseBody(response);
-    }
-
-    public void forwardBody(String body) {
-        byte[] response = body.getBytes();
-        response200Header(response.length);
-        responseBody(response);
-    }
-
-    public void sendRedirect(String location) {
+    public void send(HttpStatusCode code, String body) {
+        if (body == null) {
+            body = "";
+        }
+        if (body.length() > 0) {
+            headers.add(HttpHeader.CONTENT_LENGTH, String.valueOf(body.length()));
+        }
         try {
-            dos.writeBytes("HTTP/1.1 302 REDIRECTED\r\n");
-            printHeader();
-            dos.writeBytes(HttpHeader.LOCATION + ": " + location + "\r\n");
+            sendHeaders(code);
             dos.writeBytes("\r\n");
+            dos.writeBytes(body);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    public void send405BadMethod() {
-        try {
-            dos.writeBytes("HTTP/1.1 405 Method Not Allowed\r\n");
-            printHeader();
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private void sendHeaders(HttpStatusCode code) throws IOException {
+        validateRequiredHeaders(code);
+        dos.writeBytes(String.format("HTTP/1.1 %d %s\r\n", code.getCode(), code.getMessage()));
+        printHeader();
     }
 
-    public void send501NotImplemented() {
-        try {
-            dos.writeBytes("HTTP/1.1 501 Not Implemented\r\n");
-            printHeader();
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            printHeader();
-            dos.writeBytes(HttpHeader.CONTENT_TYPE + ": text/html;charset=utf-8\r\n");
-            dos.writeBytes(HttpHeader.CONTENT_LENGTH + ": " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    private void validateRequiredHeaders(HttpStatusCode code) {
+        for (HttpHeader header : code.getRequiredHeaders()) {
+            if (!headers.contain(header)) {
+                throw new RequiredHeaderNotFoundException(code.getCode() + " HTTP 코드에 따른 필수 응답 헤더인 " + header.getMessage() + "가 없습니다");
+            }
         }
     }
 
     private void printHeader() throws IOException {
-        this.headers.forEach((key, value) -> {
-            try {
-                dos.writeBytes(String.format("%s: %s\r\n", key, value));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        for (String key : headers.getHeaders().keySet()) {
+            String value = headers.getHeaders().get(key);
+            dos.writeBytes(String.format("%s: %s\r\n", key, value));
+        }
     }
 
-    private byte[] readFile(String path) throws IOException, URISyntaxException {
-        if (path.endsWith(".html") || path.endsWith(".ico")) {
-            return FileIoUtils.loadFileFromClasspath(TEMPLATE_PREFIX + path);
-        }
-        return FileIoUtils.loadFileFromClasspath(STATIC_PREFIX + path);
+    public HttpHeaders getHeaders() {
+        return headers;
     }
 
 }
