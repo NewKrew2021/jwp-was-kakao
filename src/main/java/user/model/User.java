@@ -3,10 +3,10 @@ package user.model;
 import com.github.jknack.handlebars.internal.lang3.StringUtils;
 
 public class User {
-    private String userId;
-    private String password;
-    private String name;
-    private String email;
+    private final String userId;
+    private final String password;
+    private final String name;
+    private final String email;
 
     public User(String userId, String password, String name, String email) {
         this.userId = userId;
@@ -15,6 +15,10 @@ public class User {
         this.email = email;
 
         checkIsValidUser();
+    }
+
+    public boolean same(String password) {
+        return this.password.equals(password);
     }
 
     public String getUserId() {
@@ -59,9 +63,5 @@ public class User {
     private boolean isInvalidEmail() {
         String pattern = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
         return !email.matches(pattern);
-    }
-
-    public boolean same(String password) {
-        return this.password.equals(password);
     }
 }

@@ -36,11 +36,11 @@ public class UserView {
 
         try {
             Template template = handlebars.compile("user/profile");
-            String userList = template.apply(UserService.findById(userId));
+            String userProfile = template.apply(UserService.findById(userId));
 
-            return userList.getBytes();
+            return userProfile.getBytes();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not compile list.html template");
+            throw new IllegalArgumentException("Could not compile profile.html template");
         }
     }
 }
