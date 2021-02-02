@@ -1,6 +1,7 @@
 package webserver;
 
 import utils.IOUtils;
+import utils.KeyValueTokenizer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.StringTokenizer;
 public class Request {
 
     private final String method;
-    private final Map<String, String> parameters = new HashMap<>();
+    private Map<String, String> parameters = new HashMap<>();
     private final String version;
     private final Map<String, String> headers = new HashMap<>();
     private String path;
@@ -25,10 +26,7 @@ public class Request {
         if (path.contains("?")) {
             String[] pathWithParameter = path.split("\\?");
             path = pathWithParameter[0];
-            StringTokenizer stk = new StringTokenizer(pathWithParameter[1], "=&");
-            while (stk.hasMoreTokens()) {
-                parameters.put(stk.nextToken(), stk.nextToken());
-            }
+            parameters = KeyValueTokenizer.of(pathWithParameter[1]);
         }
         version = split[2];
 

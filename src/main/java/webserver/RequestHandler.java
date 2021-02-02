@@ -39,6 +39,17 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void response302Header(DataOutputStream dos, String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + url);
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
@@ -46,9 +57,11 @@ public class RequestHandler implements Runnable {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
              OutputStream out = connection.getOutputStream()) {
             Request request = new Request(br);
+            DataOutputStream dos = new DataOutputStream(out);
 
             String path = request.getPath();
             String method = request.getMethod();
+
 
             if (method.equals("GET") && path.endsWith(".html")) {
                 path = "./templates" + path;
@@ -56,11 +69,10 @@ public class RequestHandler implements Runnable {
 
             if (method.equals("POST") && path.startsWith("/user/create")) {
                 DataBase.addUser(User.of(request.getBody()));
+                response302Header(dos,"/index.html");
+                return;
             }
-
             byte[] body = FileIoUtils.loadFileFromClasspath(path);
-
-            DataOutputStream dos = new DataOutputStream(out);
 
             response200Header(dos, body.length);
             responseBody(dos, body);
