@@ -1,5 +1,6 @@
 package webserver;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -46,7 +47,12 @@ public class RequestHandler implements Runnable {
                 }
             }
 
-            String path = request.get("url");
+            String path = ParseUtils.getUrlPath(request.get("url"));
+
+            if(path.equals("/user/create")){
+                Map<String, String> parameters = ParseUtils.getParameters(request.get("url"));
+                User user = User.mapOf(parameters);
+            }
 
             try{
                 byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + path);
