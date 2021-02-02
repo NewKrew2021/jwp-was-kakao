@@ -22,6 +22,6 @@ public class HandlerMapper {
         return handlers.stream()
                 .filter(handler -> handler.isSupport(httpRequest))
                 .findFirst()
-                .orElse(new NotAllowedMethodHandler());
+                .orElseGet(NotAllowedMethodHandler::new);
     }
 }
