@@ -4,16 +4,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Response {
     private static final Logger logger = LoggerFactory.getLogger(Response.class);
     private String path;
-    private String header;
-    private byte[] body;
-    private String cookie;
+    private Map<String, String> header;
+    private DataOutputStream dos;
+    private byte[] body = new byte[0];
 
-    public Response(){
-        this.cookie="\r\n";
-
+    public Response(OutputStream out){
+        dos = new DataOutputStream(out);
+        header = new HashMap<>();
     }
 
     public void setBody(String body){
@@ -22,71 +28,79 @@ public class Response {
 
     public void setPath(String path) {
         this.path=path;
-        this.body=filePathToBytes(path);
     }
 
-    public String getPath() {
-        return path;
+    public void addHeader(String key, String value){
+        this.header.put(key, value);
     }
 
-    public String getHeader() {
-        return header;
+    public void forward(String path) {
+        if(path.contains(".html")){
+            this.body=FileIoUtils.loadFileFromClasspath("templates"+path);
+            header.put("Content-Type","text/html");
+        }
+        if(path.contains(".css")){
+            this.body=FileIoUtils.loadFileFromClasspath("static"+path);
+            header.put("Content-Type","text/css");
+        }
+        if(path.contains(".js")){
+            this.body=FileIoUtils.loadFileFromClasspath("static"+path);
+            header.put("Content-Type","application/javascript");
+        }
+        response200Header(body.length);
+        try {
+            dos.write(body);
+            dos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public byte[] getBody() {
-        return body;
+    public void forwardBody(String body) {
+        this.body=body.getBytes();
+        response200Header(this.body.length);
+        try {
+            dos.write(this.body);
+            dos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setResponse200Header(int lengthOfBodyContent) {
+    private void response200Header(int lengthOfBodyContent) {
         StringBuilder response=new StringBuilder();
         response.append("HTTP/1.1 200 OK \r\n");
-        response.append("Content-Type: text/html;charset=utf-8\r\n");
+        for (String key : header.keySet()) {
+            response.append(key+": "+header.get(key)+"\r\n");
+        }
         response.append("Content-Length: " + lengthOfBodyContent + "\r\n");
-        this.header = response.toString();
+        response.append("\r\n");
+
+        try {
+            dos.write(response.toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setResponse200Header() {
-        StringBuilder response=new StringBuilder();
-        response.append("HTTP/1.1 200 OK \r\n");
-        response.append("Content-Type: text/html;charset=utf-8\r\n");
-        this.header= response.toString();
-    }
-    public void setCssResponse200Header() {
-        StringBuilder response=new StringBuilder();
-        response.append("HTTP/1.1 200 OK \r\n");
-        response.append("Content-Type: text/css;charset=utf-8\r\n");
-        this.header= response.toString();
+    public void sendRedirect(String path){
+        response302Header(path);
     }
 
-    public void setResponse302Header(String redirectUrl) {
+    private void response302Header(String redirectUrl) {
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.1 302 Found \r\n");
         response.append("Location: http://localhost:8080"+redirectUrl+"\r\n");
-        this.header= response.toString();
-    }
-
-    public void setJsResponse200Header() {
-        StringBuilder response=new StringBuilder();
-        response.append("HTTP/1.1 200 OK \r\n");
-        response.append("Content-Type: application/javascript;charset=utf-8\r\n");
-        this.header= response.toString();
-    }
-
-    public void setCookie(String cookie){
-        this.cookie=cookie;
-    }
-
-    public String getCookie() {
-        return cookie;
-    }
-
-
-    private byte[] filePathToBytes(String path) {
-        String[] paths= path.split("\\.");
-        if(paths.length>=2&&(paths[1].equals("html")||paths[1].equals("ico"))){
-            return FileIoUtils.loadFileFromClasspath("templates" + path);
+        for (String key : header.keySet()) {
+            response.append(key+": "+header.get(key)+"\r\n");
         }
-        return FileIoUtils.loadFileFromClasspath("static"+ path);
+        response.append("\r\n");
+        try {
+            dos.write(response.toString().getBytes());
+            dos.flush();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
 }

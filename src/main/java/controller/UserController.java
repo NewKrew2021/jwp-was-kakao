@@ -19,61 +19,54 @@ import java.util.*;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    public Response mapMethod(Request request) {
+    public void mapMethod(Request request, Response response) {
         String[] paths = request.getPath().split("/");
 
         if(paths[2].equals("create")){
-            return create(request);
+            create(request, response);
+            return;
         }
         if(paths[2].equals("login")){
-            return login(request);
+            login(request, response);
+            return;
         }
         if(paths[2].equals("list")){
-            return list(request);
+            list(request,response);
+            return;
         }
-
-        Response response = new Response();
-        response.setResponse200Header();
-        response.setPath(request.getPath());
-        return response;
+        response.forward(request.getPath());
+        return;
     }
 
-    private Response create(Request request){
+    private void create(Request request, Response response){
         ObjectMapper mapper = new ObjectMapper();
         User user = mapper.convertValue(request.getAllParameter(), User.class);
         DataBase.addUser(user);
         logger.info("UserInfo: {}, {}, {}, {}", user.getUserId(), user.getEmail(), user.getName(), user.getPassword());
-
-        Response response = new Response();
-        response.setResponse302Header("/index.html");
-        return response;
+        response.sendRedirect("/index.html");
     }
 
-    private Response login(Request request){
+    private void login(Request request, Response response){
         ObjectMapper mapper = new ObjectMapper();
         User loginUser = mapper.convertValue(request.getAllParameter(), User.class);
         User user= Optional.ofNullable(DataBase.findUserById(loginUser.getUserId())).orElseThrow(NullPointerException::new);
-        Response response=new Response();
         if(user.getPassword().equals(loginUser.getPassword())){
-            response.setResponse302Header("/index.html");
-            response.setCookie("Set-Cookie: logined=true;근 Path=/\r\n"+"\r\n");
-            return response;
+            response.addHeader("Set-Cookie", "logined=true; Path=/");
+            response.sendRedirect("/index.html");
+            return;
         }
-        response.setResponse302Header("/user/login_failed.html");
-        response.setCookie("Set-Cookie: logined=false; Path=/\r\n"+"\r\n");
-        return response;
+        response.addHeader("Set-Cookie", "logined=false;");
+        response.sendRedirect("/user/login_faild.html");
     }
 
-    private Response list(Request request){
-        Response response=new Response();
-        response.setResponse200Header();
+    private void list(Request request, Response response){
         if(request.isLogin()){
             logger.debug("user/list 로그인된 상태");
             TemplateLoader loader = new ClassPathTemplateLoader();
             loader.setPrefix("/templates");
             loader.setSuffix(".html");
             Handlebars handlebars = new Handlebars(loader);
-            Template template=null;
+            Template template = null;
             try{
                 template= handlebars.compile("user/list");
                 List<User> users = new ArrayList<>(DataBase.findAll());
@@ -82,16 +75,15 @@ public class UserController {
                 JSONObject json=new JSONObject(map);
                 String userList = template.apply(json);
                 logger.info("userList : {}", userList);
-                response.setBody(userList);
-                return response;
-            }catch (Exception e) {
+                response.forwardBody(userList);
+                return;
+            } catch (Exception e) {
                 logger.debug(e.getMessage());
             }
         }
-
         logger.debug("user/list false 상태");
-        response.setPath("/user/login.html");
-        return response;
+        response.sendRedirect("/user/login.html");
+        return;
     }
 
 }
