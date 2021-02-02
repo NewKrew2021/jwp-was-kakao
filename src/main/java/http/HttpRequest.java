@@ -24,6 +24,10 @@ public class HttpRequest {
         this.body = body;
     }
 
+    public HttpRequest(HttpRequestParser parser) {
+        this(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
+    }
+
     public String getUri() {
         return uri;
     }

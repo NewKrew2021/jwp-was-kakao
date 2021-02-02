@@ -12,7 +12,7 @@ public class Controllers {
         return findMatchingHandlers(request).handleRequest(request);
     }
 
-    private Handler findMatchingHandlers(HttpRequest request) {
+    Handler findMatchingHandlers(HttpRequest request) {
         return Arrays.stream(DispatchInfo.values())
                 .filter(dispatchInfo -> dispatchInfo.matchWith(request))
                 .findAny()

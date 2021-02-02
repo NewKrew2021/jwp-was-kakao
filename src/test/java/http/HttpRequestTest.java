@@ -20,7 +20,7 @@ class HttpRequestTest {
                 "Host: localhost:8080\n" +
                 "Connection: keep-alive\n" +
                 "Accept: */*");
-        request = new HttpRequest(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
+        request = new HttpRequest(parser);
     }
 
     @DisplayName("올바른 파라미터를 반환하는지 테스트")
@@ -43,7 +43,7 @@ class HttpRequestTest {
                 "Host: localhost:8080\n" +
                 "Connection: keep-alive\n" +
                 "Accept: */*");
-        request = new HttpRequest(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
+        request = new HttpRequest(parser);
 
         assertThat(request.isTemplateRequest()).isTrue();
     }
@@ -55,7 +55,7 @@ class HttpRequestTest {
                 "Host: localhost:8080\n" +
                 "Accept: text/css,*/*;q=0.1\n" +
                 "Connection: keep-alive");
-        request = new HttpRequest(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
+        request = new HttpRequest(parser);
 
         assertThat(request.isStaticRequest()).isTrue();
     }
