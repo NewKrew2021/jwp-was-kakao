@@ -51,7 +51,7 @@ public class HttpHeaders {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : headers.entrySet()) {
-            sb.append(entry.getKey()).append(DELIMITER).append(entry.getValue()).append(IOUtils.NEW_LINE);
+            sb.append(entry.getKey()).append(DELIMITER).append(entry.getValue()).append(IOUtils.CRLF);
         }
         return sb.toString();
     }

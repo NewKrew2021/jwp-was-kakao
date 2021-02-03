@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IOUtils {
-    public static final String NEW_LINE = System.lineSeparator();
+    public static final String CRLF = "\r\n";
 
     /**
      * @param BufferedReader는 Request Body를 시작하는 시점이어야

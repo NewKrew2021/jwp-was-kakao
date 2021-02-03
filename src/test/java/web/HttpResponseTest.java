@@ -13,15 +13,15 @@ class HttpResponseTest {
         httpResponse.addHeader("Location", "/user/1");
 
         assertThat(httpResponse.toString()).isEqualTo(
-                "HTTP/1.1 200 OK" + IOUtils.NEW_LINE
-                        + "Location: /user/1" + IOUtils.NEW_LINE);
+                "HTTP/1.1 200 OK" + IOUtils.CRLF
+                        + "Location: /user/1" + IOUtils.CRLF);
 
         httpResponse.setBody("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
 
         assertThat(httpResponse.toString()).isEqualTo(
-                "HTTP/1.1 200 OK" + IOUtils.NEW_LINE
-                        + "Location: /user/1" + IOUtils.NEW_LINE + IOUtils.NEW_LINE
-                        + "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net" + IOUtils.NEW_LINE
+                "HTTP/1.1 200 OK" + IOUtils.CRLF
+                        + "Location: /user/1" + IOUtils.CRLF + IOUtils.CRLF
+                        + "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net" + IOUtils.CRLF
         );
     }
 }

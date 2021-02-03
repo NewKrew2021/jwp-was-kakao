@@ -31,12 +31,12 @@ public class HttpResponse {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(HTTP_1_1).append(httpStatus.value()).append(" ").append(httpStatus.getReasonPhrase()).append(IOUtils.NEW_LINE);
+        sb.append(HTTP_1_1).append(httpStatus.value()).append(" ").append(httpStatus.getReasonPhrase()).append(IOUtils.CRLF);
         if (!httpHeaders.isEmpty()) {
             sb.append(httpHeaders);
         }
         if (!httpBody.equals(HttpBody.empty())) {
-            sb.append(IOUtils.NEW_LINE).append(httpBody.getBody()).append(IOUtils.NEW_LINE);
+            sb.append(IOUtils.CRLF).append(httpBody.getBody()).append(IOUtils.CRLF);
         }
 
         return sb.toString();
