@@ -1,52 +1,48 @@
 package model;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class User {
+
+    private static final String NOT_EXIST_USERID_MESSAGE = "아이디가 입력되지 않았습니다.";
+    private static final String NOT_EXIST_PASSWORD_MESSAGE = "비밀번호가 입력되지 않았습니다.";
+    private static final String NOT_EXIST_NAME_MESSAGE = "이름이 입력되지 않았습니다.";
+    private static final String NOT_EXIST_EMAIL_MESSAGE = "이메일이 입력되지 않았습니다.";
+
     private final String userId;
     private final String password;
     private final String name;
     private final String email;
 
     public User(String userId, String password, String name, String email) {
-        validate(userId, password, name, email);
+        validateUserArgument(userId, password, name, email);
         this.userId = userId;
         this.password = password;
         this.name = name;
         this.email = email;
     }
 
-    private void validate(String userId, String password, String name, String email) {
+    private void validateUserArgument(String userId, String password, String name, String email) {
         if (isEmpty(userId)) {
-            throw new IllegalArgumentException("아이디가 존재하지 않습니다.");
+            throw new IllegalArgumentException(NOT_EXIST_USERID_MESSAGE);
         }
         if (isEmpty(password)) {
-            throw new IllegalArgumentException("비밀번호가 존재하지 않습니다.");
+            throw new IllegalArgumentException(NOT_EXIST_PASSWORD_MESSAGE);
         }
         if (isEmpty(name)) {
-            throw new IllegalArgumentException("이름이 존재하지 않습니다.");
+            throw new IllegalArgumentException(NOT_EXIST_NAME_MESSAGE);
         }
         if (isEmpty(email)) {
-            throw new IllegalArgumentException("이메일이 존재하지 않습니다.");
+            throw new IllegalArgumentException(NOT_EXIST_EMAIL_MESSAGE);
         }
-    }
-
-    public static User of(String userId, String password, String name, String email) {
-        return new User(userId, password, name, email);
-    }
-
-    public static User from(Map<String, String> params) {
-        return new User(
-                params.get("userId"),
-                params.get("password"),
-                params.get("name"),
-                params.get("email")
-        );
     }
 
     private boolean isEmpty(String str) {
         return str == null || str.isEmpty();
+    }
+
+    public static User of(String userId, String password, String name, String email) {
+        return new User(userId, password, name, email);
     }
 
     public String getUserId() {
@@ -63,6 +59,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public boolean isCorrectPassword(String password) {
+        return this.password.equals(password);
     }
 
     @Override

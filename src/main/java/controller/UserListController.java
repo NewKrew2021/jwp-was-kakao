@@ -1,14 +1,12 @@
 package controller;
 
+import exception.UserAuthorizationException;
 import utils.ResourceLoader;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public class UserListController extends AbstractController {
-    @Override
-    public String getPath() {
-        return "/user/list";
-    }
+    private static final String NEED_LOGIN_MESSAGE = "로그인이 필요합니다.";
 
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
@@ -16,27 +14,21 @@ public class UserListController extends AbstractController {
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        try {
-            validate(httpRequest);
-            byte[] page = ResourceLoader.getDynamicPage("user/list");
-            logger.debug("Succeeded in loading user-list page");
-            httpResponse.forwardBody(page);
-        } catch (RuntimeException e) {
-            logger.debug(e.getMessage());
-            httpResponse.sendRedirect("/user/login.html");
-        }
+        validateLogin(httpRequest);
+        byte[] page = ResourceLoader.getDynamicPageWithUser("user/list");
+        logger.debug("Succeeded in loading user-list page");
+        httpResponse.forwardBody(page);
     }
 
-    private void validate(HttpRequest httpRequest) {
+    private void validateLogin(HttpRequest httpRequest) {
         String cookie = httpRequest.getHeader("Cookie");
-        if (!isLogined(cookie)) {
-            String message = "비로그인 사용자입니다.";
-            logger.error(message);
-            throw new RuntimeException(message);
+        if (!isLogin(cookie)) {
+            logger.error(NEED_LOGIN_MESSAGE);
+            throw new UserAuthorizationException(NEED_LOGIN_MESSAGE);
         }
     }
 
-    private boolean isLogined(String cookie) {
+    private boolean isLogin(String cookie) {
         return cookie != null && cookie.equals("logined=true");
     }
 }

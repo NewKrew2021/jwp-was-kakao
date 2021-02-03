@@ -9,13 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+
+    private static final String NOT_EXIST_MESSAGE = "(이)가 존재하지 않습니다.";
 
     private final HttpMethod httpMethod;
     private final String path;
@@ -32,16 +31,16 @@ public class HttpRequest {
     public static HttpRequest from(InputStream in) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String[] requestLine = readRequestLine(br);
-            HttpMethod httpMethod= getHttpMethodFromRequestLine(requestLine);
+            List<String> requestLine = readRequestLine(br);
+            HttpMethod httpMethod = getHttpMethodFromRequestLine(requestLine);
             String path = getPathFromRequestLine(requestLine);
+            Map<String, String> parameters = getParametersFromRequestLine(requestLine);
 
             List<String> requestHeader = readRequestHeader(br);
             Map<String, String> header = getHeaderFromRequestHeader(requestHeader);
 
             int contentLength = header.containsKey("Content-Length") ? Integer.parseInt(header.get("Content-Length")) : 0;
             String requestBody = readRequestBody(br, contentLength);
-            Map<String, String> parameters = getParametersFromRequestLine(requestLine);
             parameters.putAll(getParametersFromRequestBody(requestBody));
             return new HttpRequest(httpMethod, path, header, parameters);
         } catch (IOException e) {
@@ -49,8 +48,32 @@ public class HttpRequest {
         }
     }
 
-    private static String[] readRequestLine(BufferedReader br) throws IOException {
-        return br.readLine().split(" ");
+    private static List<String> readRequestLine(BufferedReader br) throws IOException {
+        return new ArrayList(Arrays.asList(br.readLine().split(" ")));
+    }
+
+    private static HttpMethod getHttpMethodFromRequestLine(List<String> requestLine) {
+        return HttpMethod.valueOf(requestLine.get(0));
+    }
+
+    private static String getPathFromRequestLine(List<String> requestLine) {
+        String path = requestLine.get(1);
+        int idx = path.indexOf('?');
+        if (idx != -1) {
+            path = path.substring(0, idx);
+        }
+        return path.equals("/") ? "/index.html" : path;
+    }
+
+    private static Map<String, String> getParametersFromRequestLine(List<String> requestLine) {
+        Map<String, String> parameters = new HashMap<>();
+        String line = requestLine.get(1);
+        int idx = line.indexOf('?');
+        if (idx != -1) {
+            String[] queries = line.substring(idx+1).split("&");
+            parameters = getParametersFromQueries(queries);
+        }
+        return parameters;
     }
 
     private static List<String> readRequestHeader(BufferedReader br) throws IOException {
@@ -63,23 +86,6 @@ public class HttpRequest {
         return header;
     }
 
-    private static String readRequestBody(BufferedReader br, int contentLength) throws IOException {
-        return IOUtils.readData(br, contentLength);
-    }
-
-    private static HttpMethod getHttpMethodFromRequestLine(String[] requestLine) {
-        return HttpMethod.valueOf(requestLine[0]);
-    }
-
-    private static String getPathFromRequestLine(String[] requestLine) {
-        String path = requestLine[1];
-        int idx = path.indexOf('?');
-        if (idx != -1) {
-            path = path.substring(0, idx);
-        }
-        return path.equals("/") ? "/index.html" : path;
-    }
-
     private static Map<String, String> getHeaderFromRequestHeader(List<String> requestHeader) {
         Map<String, String> header = new HashMap<>();
         for(String line: requestHeader) {
@@ -89,24 +95,8 @@ public class HttpRequest {
         return header;
     }
 
-    private static Map<String, String> getParametersFromRequestLine(String[] requestLine) {
-        Map<String, String> parameters = new HashMap<>();
-        String line = requestLine[1];
-        int idx = line.indexOf('?');
-        if (idx != -1) {
-            String[] queries = line.substring(idx+1).split("&");
-            parameters = getParametersFromQueries(queries);
-        }
-        return parameters;
-    }
-    
-    private static Map<String, String> getParametersFromQueries(String[] queries) {
-        Map<String, String> parameters = new HashMap<>();
-        for(String query : queries) {
-            String[] data = query.split("=");
-            parameters.put(data[0], data[1]);
-        }
-        return parameters;
+    private static String readRequestBody(BufferedReader br, int contentLength) throws IOException {
+        return IOUtils.readData(br, contentLength);
     }
 
     private static Map<String, String> getParametersFromRequestBody(String requestBody) {
@@ -117,6 +107,14 @@ public class HttpRequest {
         return getParametersFromQueries(queries);
     }
 
+    private static Map<String, String> getParametersFromQueries(String[] queries) {
+        Map<String, String> parameters = new HashMap<>();
+        for(String query : queries) {
+            String[] data = query.split("=");
+            parameters.put(data[0], data[1]);
+        }
+        return parameters;
+    }
 
     public HttpMethod getMethod() {
         return httpMethod;
@@ -128,11 +126,10 @@ public class HttpRequest {
 
     public String getHeader(String key) {
         if (!header.containsKey(key)) {
-            String message = key + "(이)가 존재하지 않습니다.";
+            String message = key + NOT_EXIST_MESSAGE;
             logger.error(message);
             throw new RuntimeException(message);
         }
-
         return header.get(key);
     }
 
@@ -150,8 +147,7 @@ public class HttpRequest {
             sb.append(entries.getKey())
                     .append(": ").append(entries.getValue()).append("\n");
         }
-        sb.append("----------------------------------");
-        String message = sb.toString();
-        logger.debug(message);
+        sb.append("\n");
+        logger.debug(sb.toString());
     }
 }

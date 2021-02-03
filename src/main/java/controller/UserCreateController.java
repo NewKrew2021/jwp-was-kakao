@@ -1,25 +1,15 @@
 package controller;
 
-import utils.UserService;
+import service.UserService;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public class UserCreateController extends AbstractController {
     @Override
-    public String getPath() {
-        return "/user/create";
-    }
-
-    @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        UserService.insert(
-                httpRequest.getParameter("userId"),
-                httpRequest.getParameter("password"),
-                httpRequest.getParameter("name"),
-                httpRequest.getParameter("email")
-        );
-        logger.debug("create user success");
-        httpResponse.sendRedirect("/");
+        UserService.insert(httpRequest);
+        logger.debug("create user successfully");
+        httpResponse.sendRedirect("/index.html");
     }
 
     @Override

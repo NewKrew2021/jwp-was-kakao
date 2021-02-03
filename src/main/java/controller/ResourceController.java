@@ -6,11 +6,6 @@ import webserver.HttpResponse;
 
 public class ResourceController extends AbstractController {
     @Override
-    public String getPath() {
-        return "/";
-    }
-
-    @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
     }
 
@@ -19,7 +14,7 @@ public class ResourceController extends AbstractController {
         String path = httpRequest.getPath();
         if (!isResource(path)) {
             logger.debug(path + " is not resource");
-            httpResponse.badRequest();
+            httpResponse.notFound();
             return;
         }
 

@@ -48,10 +48,6 @@ public class HttpResponse {
         statusCode = HttpStatusCode.NOT_FOUND;
     }
 
-    public void unauthorized() {
-        statusCode = HttpStatusCode.UNAUTHORIZED;
-    }
-
     public void writeResponse() {
         try {
             writeResponseLine();
