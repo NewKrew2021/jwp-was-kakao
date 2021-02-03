@@ -19,11 +19,11 @@ public class StaticController extends AbstractController {
 
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (fileExist(TEMPLATES_FILE_PATH, httpRequest.getUri())) {
-            makeResponse(TEMPLATES_PATH_PREFIX, httpRequest.getUri(), httpResponse, HTML);
+        if (fileExist(TEMPLATES_FILE_PATH, httpRequest.getPath())) {
+            makeResponse(TEMPLATES_PATH_PREFIX, httpRequest.getPath(), httpResponse, HTML);
         }
-        if (fileExist(STATIC_FILE_PATH, httpRequest.getUri())) {
-            makeResponse(STATIC_PATH_PREFIX, httpRequest.getUri(), httpResponse, CSS);
+        if (fileExist(STATIC_FILE_PATH, httpRequest.getPath())) {
+            makeResponse(STATIC_PATH_PREFIX, httpRequest.getPath(), httpResponse, CSS);
         }
 
     }

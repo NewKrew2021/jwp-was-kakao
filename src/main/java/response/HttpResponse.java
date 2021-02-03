@@ -13,7 +13,6 @@ import webserver.RequestHandler;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLDecoder;
 import java.util.Collection;
 
 public class HttpResponse {
@@ -25,8 +24,6 @@ public class HttpResponse {
         this.dos = new DataOutputStream(out);
     }
 
-
-    // GET /index.html HTTP/1.1
     public void response200Header(int lengthOfBodyContent, String type) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
@@ -76,9 +73,10 @@ public class HttpResponse {
 
         Template template = handlebars.compile("user/list");
         String result = template.apply(users);
-        result = IOUtils.decodeDate(result);
+        result = IOUtils.decodeData(result);
         byte[] body = result.getBytes("UTF-8");
         response200Header(body.length, "html");
         responseBody(body);
     }
+
 }

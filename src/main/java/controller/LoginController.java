@@ -19,9 +19,8 @@ public class LoginController extends AbstractController{
 
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        Map<String,String> params = httpRequest.getBody();
-        String userId = params.get(USER_ID);
-        String password = params.get(PASSWORD);
+        String userId = httpRequest.getParameter(USER_ID);
+        String password = httpRequest.getParameter(PASSWORD);
         Optional<User> user =  DataBase.findUserById(userId);
         if(user.isPresent() && user.get().getPassword().equals(password)) {
             httpResponse.response302Header(INDEX_HTML, TRUE);

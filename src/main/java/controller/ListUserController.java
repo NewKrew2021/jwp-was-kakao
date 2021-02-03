@@ -16,7 +16,7 @@ public class ListUserController extends AbstractController{
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if(isLogin(httpRequest.getParam(COOKIE))) {
+        if(isLogin(httpRequest.getHeader(COOKIE))) {
             try {
                 httpResponse.responseTemplate(DataBase.findAll());
             } catch (IOException e) {

@@ -26,14 +26,13 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = new HttpRequest(in);
+            HttpRequest httpRequest = HttpRequest.from(in);
             HttpResponse httpResponse = new HttpResponse(out);
-            Controller controller = controllers.getController(httpRequest.getUri());
+            Controller controller = controllers.getController(httpRequest.getPath());
             controller.service(httpRequest, httpResponse);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
-
 
 }
