@@ -1,6 +1,8 @@
 package request;
 
 import annotation.web.RequestMethod;
+import exceptions.HeaderNotFoundException;
+import exceptions.ParameterNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
@@ -42,20 +44,20 @@ public class HttpRequest {
     }
 
     public String getParameter(String key) {
-        if(requestBody.getBodyValue(key).isPresent()) {
+        if (requestBody.getBodyValue(key).isPresent()) {
             return requestBody.getBodyValue(key).get();
         }
-        if(requestUri.getUriValue(key).isPresent()) {
+        if (requestUri.getUriValue(key).isPresent()) {
             return requestUri.getUriValue(key).get();
         }
-        throw new RuntimeException("커스텀 익셉션 필요. 벨류를 찾을 수 없음");
+        throw new ParameterNotFoundException();
     }
 
     public String getHeader(String key) {
-        if(requestHeader.getHeaderValue(key).isPresent()) {
+        if (requestHeader.getHeaderValue(key).isPresent()) {
             return requestHeader.getHeaderValue(key).get();
         }
-        throw new RuntimeException("커스텀 익셉션 필요. 벨류를 찾을 수 없음");
+        throw new HeaderNotFoundException();
     }
 
     public RequestMethod getMethod() {
@@ -75,4 +77,5 @@ public class HttpRequest {
         Optional<String> cookieValue = requestHeader.getHeaderValue(COOKIE);
         return cookieValue.isPresent() && cookieValue.get().equals(COOKIE_TRUE_VALUE);
     }
+
 }

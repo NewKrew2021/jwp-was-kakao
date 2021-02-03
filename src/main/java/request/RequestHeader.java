@@ -9,6 +9,11 @@ import java.util.Map;
 import java.util.Optional;
 
 public class RequestHeader {
+    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String HEADER_DISTINGUISH_REGEX = ": ";
+    private static final int KEY_INDEX = 0;
+    private static final int VALUE_INDEX = 1;
+
     Map<String, String> header;
 
     private RequestHeader(Map<String, String> header) {
@@ -18,17 +23,17 @@ public class RequestHeader {
     public static RequestHeader of(BufferedReader br, Logger logger) throws IOException {
         Map<String, String> requestHeader = new HashMap<>();
         String tempLine;
-        while(!(tempLine = br.readLine()).equals("")){
-            String[] splitTempLine = tempLine.split(": ");
-            requestHeader.put(splitTempLine[0].trim(), splitTempLine[1].trim());
+        while (!(tempLine = br.readLine()).equals("")) {
+            String[] splitTempLine = tempLine.split(HEADER_DISTINGUISH_REGEX);
+            requestHeader.put(splitTempLine[KEY_INDEX].trim(), splitTempLine[VALUE_INDEX].trim());
             logger.debug("header: {}", tempLine);
         }
         return new RequestHeader(requestHeader);
     }
 
     public Optional<Integer> getContentLength() {
-        if (header.containsKey("Content-Length")) {
-            return Optional.of(Integer.parseInt(header.get("Content-Length")));
+        if (header.containsKey(CONTENT_LENGTH)) {
+            return Optional.of(Integer.parseInt(header.get(CONTENT_LENGTH)));
         }
         return Optional.empty();
     }
@@ -39,4 +44,5 @@ public class RequestHeader {
         }
         return Optional.empty();
     }
+
 }

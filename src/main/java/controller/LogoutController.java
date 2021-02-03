@@ -11,4 +11,5 @@ public class LogoutController extends AbstractController {
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.response302Header(INDEX_HTML, FALSE);
     }
+
 }

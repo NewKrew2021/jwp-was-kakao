@@ -5,8 +5,6 @@ import model.User;
 import request.HttpRequest;
 import response.HttpResponse;
 
-import java.util.Map;
-
 public class CreateUserController extends AbstractController {
 
     public static final String INDEX_HTML = "/index.html";

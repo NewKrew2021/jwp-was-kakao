@@ -44,8 +44,8 @@ public class RequestBodyTest {
 
     @DisplayName("request body 값이 요청으로 들어 왔을때 getBodyValue 로 이를 반환할 수 있다.")
     @ParameterizedTest
-    @CsvSource({"userId,javajigi" , "password,password" , "name,박재성"})
-    public void 요청_바디_값_추출_테스트(String givenParam, String expected){
+    @CsvSource({"userId,javajigi", "password,password", "name,박재성"})
+    public void 요청_바디_값_추출_테스트(String givenParam, String expected) {
         //given, when
         //then
         assertThat(requestBody.getBodyValue(givenParam)).isEqualTo(Optional.of(expected));

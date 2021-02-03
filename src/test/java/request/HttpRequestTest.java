@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpRequestTest {
 
-
     @DisplayName("POST 방식에서 요청이 들어 왔을 때, HttpRequest가 요청을 제대로 저장하고 있는지 확인한다.")
     @Test
     public void request_POST() throws Exception {

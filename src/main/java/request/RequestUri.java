@@ -1,13 +1,13 @@
 package request;
 
 import annotation.web.RequestMethod;
+import exceptions.MethodNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static utils.HttpRequestUtils.*;
-
 
 
 public class RequestUri {
@@ -24,30 +24,30 @@ public class RequestUri {
     public static RequestUri from(String line) {
         String[] splitLine = line.split(" ");
         Optional<String> queryString = extractParams(splitLine[1]);
-        if(queryString.isPresent()){
+        if (queryString.isPresent()) {
             return new RequestUri(getMethodType(splitLine[0]), extractPath(splitLine[1]), requestStringToMap(queryString.get()));
         }
         return new RequestUri(getMethodType(splitLine[0]), extractPath(splitLine[1]), new HashMap<>());
     }
 
-    private static RequestMethod getMethodType(String line){
+    private static RequestMethod getMethodType(String line) {
         String method = line.split(" ")[0];
-        if(method.equals("GET")){
+        if (method.equals("GET")) {
             return RequestMethod.GET;
         }
-        if (method.equals("POST")){
+        if (method.equals("POST")) {
             return RequestMethod.POST;
         }
-        if (method.equals("DELETE")){
+        if (method.equals("DELETE")) {
             return RequestMethod.DELETE;
         }
-        if(method.equals("PUT")){
+        if (method.equals("PUT")) {
             return RequestMethod.PUT;
         }
-        if(method.equals("PATCH")){
+        if (method.equals("PATCH")) {
             return RequestMethod.PATCH;
         }
-        throw new RuntimeException();
+        throw new MethodNotFoundException();
     }
 
     public Optional<String> getUriValue(String key) {
@@ -66,7 +66,4 @@ public class RequestUri {
         return path;
     }
 
-    public Map<String, String> getParams() {
-        return params;
-    }
 }

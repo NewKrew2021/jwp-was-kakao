@@ -14,6 +14,7 @@ public class IOUtils {
     }
 
     public static String decodeData(String data) throws UnsupportedEncodingException {
-        return URLDecoder.decode(data,"UTF-8");
+        return URLDecoder.decode(data, "UTF-8");
     }
+
 }

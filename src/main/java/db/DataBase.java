@@ -1,12 +1,11 @@
 package db;
 
+import com.google.common.collect.Maps;
+import model.User;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-
-import com.google.common.collect.Maps;
-
-import model.User;
 
 public class DataBase {
     private static Map<String, User> users = Maps.newHashMap();
@@ -16,7 +15,7 @@ public class DataBase {
     }
 
     public static Optional<User> findUserById(String userId) {
-        if(users.containsKey(userId)){
+        if (users.containsKey(userId)) {
             return Optional.of(users.get(userId));
         }
         return Optional.empty();
@@ -25,4 +24,5 @@ public class DataBase {
     public static Collection<User> findAll() {
         return users.values();
     }
+
 }

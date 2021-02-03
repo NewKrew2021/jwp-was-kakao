@@ -1,30 +1,49 @@
 package utils;
 
+import exceptions.InvalidRequestException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class HttpRequestUtils {
+
+    private static final int MINIMUM_LENGTH_OF_PARAM_EXIST = 2;
+    private static final String DISTINGUISH_REGEX = "&";
+    private static final String EQUALS_REGEX = "=";
+    private static final String PARAMETER_START_REGEX = "\\?";
+    private static final int PATH_INDEX_IN_URI = 0;
+    private static final int PARAMS_INDEX_IN_URI = 1;
+    private static final int KEY_INDEX = 0;
+    private static final int VALUE_INDEX = 1;
+
     public static String extractPath(String uri) {
-        return uri.split("\\?")[0];
+        return uri.split(PARAMETER_START_REGEX)[PATH_INDEX_IN_URI];
     }
 
     public static Optional<String> extractParams(String uri) {
-        String[] tmp = uri.split("\\?");
-        if (tmp.length <= 1) {
+        String[] tmp = uri.split(PARAMETER_START_REGEX);
+        if (tmp.length < MINIMUM_LENGTH_OF_PARAM_EXIST) {
             return Optional.empty();
         }
-        return Optional.of(tmp[1]);
+        return Optional.of(tmp[PARAMS_INDEX_IN_URI]);
     }
 
     public static Map<String, String> requestStringToMap(String line) {
         Map<String, String> result = new HashMap<>();
-        String[] splitString = line.split("&");
+        String[] splitString = line.split(DISTINGUISH_REGEX);
         for (String pair : splitString) {
-            String[] splitPair = pair.split("=");
-            result.put(splitPair[0], splitPair[1]);
+            String[] splitPair = pair.split(EQUALS_REGEX);
+            isInvalidRequest(splitPair);
+            result.put(splitPair[KEY_INDEX], splitPair[VALUE_INDEX]);
         }
         return result;
+    }
+
+    private static void isInvalidRequest(String[] splitPair) {
+        if(splitPair.length < MINIMUM_LENGTH_OF_PARAM_EXIST) {
+            throw new InvalidRequestException();
+        }
     }
 
 }

@@ -4,15 +4,15 @@ import annotation.web.RequestMethod;
 import request.HttpRequest;
 import response.HttpResponse;
 
-public abstract class AbstractController implements Controller{
+public abstract class AbstractController implements Controller {
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if(httpRequest.getMethod().equals(RequestMethod.POST)) {
-            doPost(httpRequest,httpResponse);
+        if (httpRequest.getMethod().equals(RequestMethod.POST)) {
+            doPost(httpRequest, httpResponse);
             return;
         }
-        if(httpRequest.getMethod().equals(RequestMethod.GET)) {
-            doGet(httpRequest,httpResponse);
+        if (httpRequest.getMethod().equals(RequestMethod.GET)) {
+            doGet(httpRequest, httpResponse);
             return;
         }
     }
