@@ -7,10 +7,6 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class TemplateUtils {
     private static final String TEMPLATES_PREFIX = "/templates";

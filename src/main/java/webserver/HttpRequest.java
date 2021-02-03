@@ -24,7 +24,7 @@ public class HttpRequest {
     private void makeParameters(BufferedReader br, String[] url) throws IOException {
         parameters = new HashMap<>();
 
-        if (url.length > 1){
+        if (url.length > 1) {
             parseArgument(url[1]);
         }
         if (method == HttpMethod.POST) {
@@ -38,7 +38,7 @@ public class HttpRequest {
         headers = new HashMap<>();
 
         String line;
-        while((line = br.readLine()) != null && !line.equals("")){
+        while ((line = br.readLine()) != null && !line.equals("")) {
             String[] buf = line.split(": ");
             headers.put(buf[0], buf[1]);
         }

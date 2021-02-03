@@ -1,6 +1,5 @@
 package controller;
 
-import utils.FileIoUtils;
 import webserver.HttpMethod;
 import webserver.HttpRequest;
 import webserver.HttpResponse;

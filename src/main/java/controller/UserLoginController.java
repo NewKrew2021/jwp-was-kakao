@@ -2,12 +2,9 @@ package controller;
 
 import db.DataBase;
 import model.User;
-import utils.FileIoUtils;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 public class UserLoginController extends AbstractController {

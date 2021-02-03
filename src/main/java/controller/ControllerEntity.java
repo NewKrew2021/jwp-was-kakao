@@ -30,7 +30,7 @@ public class ControllerEntity {
     private static String filterPath(String path) {
         String prefix = path.split("/")[1];
 
-        if (prefix.equals(JS) || prefix.equals(CSS) || prefix.equals(FONTS)){
+        if (prefix.equals(JS) || prefix.equals(CSS) || prefix.equals(FONTS)) {
             return "/static";
         }
         return path;

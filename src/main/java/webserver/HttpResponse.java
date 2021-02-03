@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ public class HttpResponse {
         header.put(key, value);
     }
 
-    public void forward(byte[] body){
+    public void forward(byte[] body) {
         addHeader("Content-Length", Integer.toString(body.length));
         response200Header();
         responseBody(body);
@@ -35,14 +34,14 @@ public class HttpResponse {
         response302Header();
     }
 
-    public void setCookie(String cookie){
+    public void setCookie(String cookie) {
         addHeader("Set-Cookie", "logined=" + cookie + "; Path=/");
     }
 
     private void response200Header() {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            for(String key : header.keySet()) {
+            for (String key : header.keySet()) {
                 dos.writeBytes(key + ": " + header.get(key) + "\r\n");
             }
             dos.writeBytes("\r\n");
@@ -54,7 +53,7 @@ public class HttpResponse {
     private void response302Header() {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            for(String key : header.keySet()) {
+            for (String key : header.keySet()) {
                 dos.writeBytes(key + ": " + header.get(key) + "\r\n");
             }
             dos.writeBytes("\r\n");

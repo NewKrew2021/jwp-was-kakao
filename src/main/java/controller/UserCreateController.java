@@ -2,15 +2,8 @@ package controller;
 
 import db.DataBase;
 import model.User;
-import utils.FileIoUtils;
-import utils.IOUtils;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Map;
 
 public class UserCreateController extends AbstractController {
     private static final String INDEX_URL = "/index.html";
