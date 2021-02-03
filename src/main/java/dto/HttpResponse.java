@@ -1,15 +1,21 @@
 package dto;
 
+
+import utils.FileIoUtils;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-
+    private OutputStream out;
     private String status;
     private Map<String, String> headers = new HashMap<>();
     private byte[] body = new byte[0];
 
-    public void setBody(byte[] body, String contentType){
+    public void setBody(byte[] body, String contentType) {
         this.body = body;
         this.headers.put("Content-Type", contentType + ";charset=utf-8");
         this.headers.put("Content-Length", "" + body.length);
@@ -19,18 +25,70 @@ public class HttpResponse {
         setBody(body, "");
     }
 
-    public HttpResponse(String status) {
-        this.status = status;
-    }
-
     public HttpResponse(String status, byte[] body) {
         this(body);
         this.status = status;
     }
 
-    public HttpResponse(String status, Map<String, String> headers) {
-        this.status = status;
-        this.headers = headers;
+    public HttpResponse(OutputStream out) {
+        this.out = out;
+    }
+
+    public void addHeader(String key, String value) {
+        headers.put(key, value);
+    }
+
+    public void forward(String path) {
+        try {
+            if (path.endsWith(".html")) {
+                forwardBody(FileIoUtils.loadFileFromClasspath("templates/" + path), "text/html");
+            }
+
+            if (path.endsWith(".css")) {
+                forwardBody(FileIoUtils.loadFileFromClasspath("static/" + path), "text/css");
+            }
+
+            if (path.endsWith(".js")) {
+                forwardBody(FileIoUtils.loadFileFromClasspath("static/" + path), "text/javascript");
+            }
+        } catch (Exception e) {
+            internalServerError();
+        }
+    }
+
+    public void forwardBody(byte[] body, String contentType) {
+        setBody(body, contentType);
+        ok();
+    }
+
+    public void ok() {
+        this.status = "HTTP/1.1 200 ok";
+
+        sendHttpResponse();
+    }
+
+    public void internalServerError() {
+        this.status = "HTTP/1.1 500 INTERNAL SERVER ERROR";
+
+        sendHttpResponse();
+    }
+
+    public void notFound() {
+        this.status = "HTTP/1.1 404 NOT FOUND";
+
+        sendHttpResponse();
+    }
+
+    public void badRequest() {
+        this.status = "HTTP/1.1 400 BAD REQUEST";
+
+        sendHttpResponse();
+    }
+
+    public void sendRedirect(String path) {
+        this.status = "HTTP/1.1 302 Found";
+        addHeader("Location", "http://localhost:8080" + path);
+        sendHttpResponse();
     }
 
     public String getHeaders() {
@@ -47,5 +105,16 @@ public class HttpResponse {
 
     public byte[] getBody() {
         return body;
+    }
+
+    private void sendHttpResponse() {
+        try {
+            DataOutputStream dos = new DataOutputStream(out);
+            dos.writeBytes(getHeaders());
+            dos.write(getBody(), 0, getBody().length);
+            dos.flush();
+        } catch (IOException e) {
+
+        }
     }
 }

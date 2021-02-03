@@ -1,14 +1,15 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-
+import controller.Controller;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
-import utils.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,24 +25,14 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String lines = "";
-            String line;
-
-            while(!(line = br.readLine()).equals("")){
-                lines += line + "\n";
+            HttpRequest request = new HttpRequest(in);
+            HttpResponse response = new HttpResponse(out);
+            Controller controller = HandlerMapping.getController(request.getPath());
+            if(controller == null){
+                response.notFound();
+                return;
             }
-
-            HttpRequest request = new HttpRequest(lines);
-            if(request.getContentLength() != 0) {
-                request.setBody(IOUtils.readData(br, request.getContentLength()));
-            }
-
-            HttpResponse response = DispatcherServlet.run(request);
-
-            DataOutputStream dos = new DataOutputStream(out);
-            writeHttpResponse(dos, response);
-
+            controller.service(request, response);
         } catch (IOException e) {
             logger.error(e.getMessage());
         } catch (Exception e) {
@@ -49,13 +40,4 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void writeHttpResponse(DataOutputStream dos, HttpResponse response){
-        try{
-            dos.writeBytes(response.getHeaders());
-            dos.write(response.getBody(), 0, response.getBody().length);
-            dos.flush();
-        }catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 }
