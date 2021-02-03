@@ -1,5 +1,9 @@
-package controller;
+package utils;
 
+import controller.Handler;
+import controller.StaticController;
+import controller.TemplateController;
+import controller.UserController;
 import http.HttpRequest;
 import http.HttpRequestParser;
 import org.junit.jupiter.api.DisplayName;
@@ -7,9 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ControllersTest {
+class DispatcherTest {
     private HttpRequestParser parser = new HttpRequestParser();
-    private Controllers controllers = new Controllers();
 
     @DisplayName("htmlHandler를 반환하는지 테스트")
     @Test
@@ -20,7 +23,7 @@ class ControllersTest {
                 "Accept: */*");
         HttpRequest request = new HttpRequest(parser);
 
-        Handler handler = controllers.findMatchingHandlers(request);
+        Handler handler = Dispatcher.findMatchingHandlers(request);
 
         assertThat(handler).isEqualTo(TemplateController.htmlHandler);
     }
@@ -34,7 +37,7 @@ class ControllersTest {
                 "Connection: keep-alive");
         HttpRequest request = new HttpRequest(parser);
 
-        Handler handler = controllers.findMatchingHandlers(request);
+        Handler handler = Dispatcher.findMatchingHandlers(request);
 
         assertThat(handler).isEqualTo(StaticController.cssHandler);
     }
@@ -48,7 +51,7 @@ class ControllersTest {
                 "Connection: keep-alive");
         HttpRequest request = new HttpRequest(parser);
 
-        Handler handler = controllers.findMatchingHandlers(request);
+        Handler handler = Dispatcher.findMatchingHandlers(request);
 
         assertThat(handler).isEqualTo(TemplateController.faviconHandler);
     }
@@ -66,7 +69,7 @@ class ControllersTest {
                 "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
         HttpRequest request = new HttpRequest(parser);
 
-        Handler handler = controllers.findMatchingHandlers(request);
+        Handler handler = Dispatcher.findMatchingHandlers(request);
 
         assertThat(handler).isEqualTo(UserController.createUserHandler);
     }

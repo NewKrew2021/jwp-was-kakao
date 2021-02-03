@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 
-import controller.Controllers;
+import utils.Dispatcher;
 import http.HttpRequest;
 import http.HttpRequestParser;
 import http.HttpResponse;
@@ -14,10 +14,7 @@ import utils.IOUtils;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
     private Socket connection;
-
-    private Controllers controllers = new Controllers();
     private HttpRequestParser parser = new HttpRequestParser();
 
     public RequestHandler(Socket connectionSocket) {
@@ -32,7 +29,7 @@ public class RequestHandler implements Runnable {
             parser.parse(IOUtils.buildString(in));
             HttpRequest httpRequest = new HttpRequest(parser);
             DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse response = controllers.dispatch(httpRequest);
+            HttpResponse response = Dispatcher.dispatch(httpRequest);
             sendResponse(dos, response);
 
         } catch (IOException | URISyntaxException e) {

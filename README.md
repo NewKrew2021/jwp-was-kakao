@@ -26,7 +26,7 @@
     * [x] HttpRequestParser 구현
   
 * [x] Controller 구현
-    * [x] Controllers 구현
+    * [x] Dispatcher 구현
     * [x] DispatchInfo 구현
     * [x] TemplateController 구현
     * [x] UserController 구현
