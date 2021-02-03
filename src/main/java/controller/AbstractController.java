@@ -7,7 +7,7 @@ import webserver.HttpResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class AbstractController implements Controller {
+public abstract class AbstractController implements Controller {
 
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
         if (httpRequest.getMethod() == HttpMethod.GET) {
