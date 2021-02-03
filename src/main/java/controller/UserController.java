@@ -2,6 +2,7 @@ package controller;
 
 import controller.handler.SecuredHandler;
 import db.DataBase;
+import model.HttpMethod;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
@@ -14,13 +15,13 @@ import java.util.Map;
 public class UserController extends Controller {
     {
         setBasePath("/user");
-        putHandler("/create", "POST", this::handleCreate);
-        putHandler("/login", "POST", this::handleLogin);
-        putHandler("/list", "GET", new SecuredHandler(this::handleUserList));
-        putHandler("/logout", "GET", new SecuredHandler(this::handleLogout));
+        putHandler("/create", HttpMethod.POST, this::handleCreate);
+        putHandler("/login", HttpMethod.POST, this::handleLogin);
+        putHandler("/list", HttpMethod.GET, new SecuredHandler(this::handleUserList));
+        putHandler("/logout", HttpMethod.GET, this::handleLogout);
     }
 
-    public void handleCreate(HttpRequest request, OutputStream out) throws IOException {
+    public HttpResponse handleCreate(HttpRequest request, OutputStream out) {
         Map<String, String> bodyParsed = request.getParsedBody();
         User user = new User(
                 bodyParsed.get("userId"),
@@ -30,26 +31,25 @@ public class UserController extends Controller {
         );
         DataBase.addUser(user);
 
-        HttpResponse.of(out).sendRedirect("/index.html");
+        return HttpResponse.of(out).redirect("/index.html");
     }
 
-    public void handleLogin(HttpRequest request, OutputStream out) throws IOException {
+    public HttpResponse handleLogin(HttpRequest request, OutputStream out) {
         Map<String, String> bodyParsed = request.getParsedBody();
         User user = DataBase.findUserById(bodyParsed.get("userId"));
 
         if (user == null) {
-            HttpResponse.of(out).setCookie("logined=false").sendRedirect("/user/login_failed.html");
-            return;
+            return HttpResponse.of(out).setCookie("logined=false").redirect("/user/login_failed.html");
         }
-        HttpResponse.of(out).setCookie("logined=true").sendRedirect("/index.html");
+        return HttpResponse.of(out).setCookie("logined=true").redirect("/index.html");
     }
 
-    public void handleUserList(HttpRequest request, OutputStream out) throws IOException {
+    public HttpResponse handleUserList(HttpRequest request, OutputStream out) throws IOException {
         byte[] body = View.getUsersView(DataBase.findAll(), "/user/list");
-        HttpResponse.of(out).sendView(body);
+        return HttpResponse.of(out).view(body);
     }
 
-    public void handleLogout(HttpRequest request, OutputStream out) throws IOException {
-        HttpResponse.of(out).setCookie("logined=false").sendRedirect("/index.html");
+    public HttpResponse handleLogout(HttpRequest request, OutputStream out) {
+        return HttpResponse.of(out).setCookie("logined=false").redirect("/index.html");
     }
 }

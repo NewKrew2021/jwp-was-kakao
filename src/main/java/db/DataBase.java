@@ -13,17 +13,17 @@ public class DataBase {
     private static final Map<String, User> users = Maps.newHashMap();
 
     public static void addUser(User user) {
-        log.info("add user {}", user);
+        log.debug("add user {}", user);
         users.put(user.getUserId(), user);
     }
 
     public static User findUserById(String userId) {
-        log.info("find user {}", userId);
+        log.debug("find user {}", userId);
         return users.get(userId);
     }
 
     public static Collection<User> findAll() {
-        log.info("get All users");
+        log.debug("get All users");
         return users.values();
     }
 }

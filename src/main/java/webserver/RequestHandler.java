@@ -1,6 +1,6 @@
 package webserver;
 
-import controller.ControllerManager;
+import controller.ControllerDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +17,6 @@ public class RequestHandler implements Runnable {
     public void run() {
         log.debug("New Client Connect! Connected IP : {}, Port : {}",
                 connection.getInetAddress(), connection.getPort());
-        ControllerManager.runControllers(connection);
+        ControllerDispatcher.dispatch(connection);
     }
 }

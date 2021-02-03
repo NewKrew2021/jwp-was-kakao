@@ -48,26 +48,26 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void getMethodTest() throws IOException {
-        assertThat(postRequest.getMethod()).isEqualTo("POST");
-        assertThat(getRequest.getMethod()).isEqualTo("GET");
+    public void getMethodTest() {
+        assertThat(postRequest.getMethod()).isEqualTo(HttpMethod.POST);
+        assertThat(getRequest.getMethod()).isEqualTo(HttpMethod.GET);
     }
 
 
     @Test
-    public void getPathTest() throws IOException {
+    public void getPathTest() {
         assertThat(postRequest.getPath()).isEqualTo("/api");
         assertThat(getRequest.getPath()).isEqualTo("/index.html");
     }
 
     @Test
-    public void getProtocolTest() throws IOException {
+    public void getProtocolTest() {
         assertThat(postRequest.getProtocol()).isEqualTo("HTTP/1.1");
         assertThat(getRequest.getProtocol()).isEqualTo("HTTP/1.1");
     }
 
     @Test
-    public void headerMapTest() throws IOException{
+    public void headerMapTest() {
         Map<String, String> headerMap1 = new HashMap<>();
         headerMap1.put("Host", "localhost:8080");
         headerMap1.put("Connection", "keep-alive");
@@ -83,7 +83,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void bodyTest() throws IOException {
+    public void bodyTest() {
         assertThat(postRequest.getBody()).isEqualTo("userId=javajigi&password=password");
 
         Map<String, String> bodyExpected = new HashMap<>();
@@ -93,7 +93,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void parseQueryString() throws IOException{
+    public void parseQueryString() {
         Map<String, String> queryParameterMap = new HashMap<>();
         queryParameterMap.put("userId", "jack");
         queryParameterMap.put("password", "password");

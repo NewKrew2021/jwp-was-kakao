@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HttpResponseTest {
 
     @Test
-    void responseTest() throws IOException {
+    void responseTest() {
         HttpResponse response = HttpResponse.of(new DataOutputStream(new ByteArrayOutputStream()));
-        response.setCookie("logined=true").sendRedirect("/path");
+        response.setCookie("logined=true").redirect("/path");
 
         Map<String, String> expected = new HashMap<>();
         expected.put("Set-Cookie", "logined=true; Path=/; HttpOnly");
@@ -26,7 +25,7 @@ public class HttpResponseTest {
     }
 
     @Test
-    void responseWithBodyTest() throws NoFileException, IOException {
+    void responseWithBodyTest() throws NoFileException {
         HttpResponse response = HttpResponse.of(new DataOutputStream(new ByteArrayOutputStream()));
         response.forward("./template", "/testhtml.html");
 

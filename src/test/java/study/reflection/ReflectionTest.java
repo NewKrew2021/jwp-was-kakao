@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 
 public class ReflectionTest {
-    private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ReflectionTest.class);
 
     @Test
     public void showClass() {
         Class<Question> clazz = Question.class;
-        logger.debug(clazz.getName());
+        log.debug(clazz.getName());
     }
 
     @Test
@@ -22,9 +22,9 @@ public class ReflectionTest {
         Constructor[] constructors = clazz.getConstructors();
         for (Constructor constructor : constructors) {
             Class[] parameterTypes = constructor.getParameterTypes();
-            logger.debug("paramer length : {}", parameterTypes.length);
+            log.debug("paramer length : {}", parameterTypes.length);
             for (Class paramType : parameterTypes) {
-                logger.debug("param type : {}", paramType);
+                log.debug("param type : {}", paramType);
             }
         }
     }

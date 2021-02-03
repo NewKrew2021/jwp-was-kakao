@@ -2,7 +2,9 @@ package controller;
 
 import controller.handler.Handler;
 import exception.utils.NoFileException;
+import model.HttpMethod;
 import model.HttpRequest;
+import model.HttpResponse;
 import model.PathInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +19,7 @@ public abstract class Controller {
     protected final Map<PathInfo, Handler> handlers = new LinkedHashMap<>();
     protected String basePath = "";
 
-    public void putHandler(String path, String method, Handler handler) {
+    public void putHandler(String path, HttpMethod method, Handler handler) {
         handlers.put(new PathInfo(basePath + path, method), handler);
     }
 
@@ -29,15 +31,14 @@ public abstract class Controller {
         return path.startsWith(basePath);
     }
 
-    public boolean handle(HttpRequest request, OutputStream out) throws NoFileException, IOException {
+    public HttpResponse handle(HttpRequest request, OutputStream out) throws NoFileException, IOException {
         for (Map.Entry<PathInfo, Handler> entry : handlers.entrySet()) {
-            log.info("matching {} with controller {}", request.getPath(), entry.getKey().getPath());
+            log.debug("matching {} with controller {}", request.getPath(), entry.getKey().getPath());
             if (request.getPath().matches(entry.getKey().getPath())) {
-                log.info("handling {} with controller {}", request.getPath(), entry.getKey().getPath());
-                entry.getValue().handle(request, out);
-                return true;
+                log.debug("handling {} with controller {}", request.getPath(), entry.getKey().getPath());
+                return entry.getValue().handle(request, out);
             }
         }
-        return false;
+        return null;
     }
 }

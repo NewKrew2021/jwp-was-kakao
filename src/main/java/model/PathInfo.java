@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class PathInfo {
     private final String path;
-    private final String method;
+    private final HttpMethod method;
 
-    public PathInfo(String path, String method) {
+    public PathInfo(String path, HttpMethod method) {
         this.path = path;
         this.method = method;
     }

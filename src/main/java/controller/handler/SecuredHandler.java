@@ -14,12 +14,11 @@ public class SecuredHandler implements Handler {
         this.handler = handler;
     }
 
-    public void handle(HttpRequest request, OutputStream out) throws NoFileException, IOException {
+    public HttpResponse handle(HttpRequest request, OutputStream out) throws NoFileException, IOException {
         if (request.getCookie("logined") == null ||
                 request.getCookie("logined").equals("false")) {
-            HttpResponse.of(out).sendRedirect("/user/login.html");
-            return;
+            return HttpResponse.of(out).redirect("/user/login.html");
         }
-        handler.handle(request, out);
+        return handler.handle(request, out);
     }
 }

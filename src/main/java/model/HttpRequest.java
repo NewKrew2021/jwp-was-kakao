@@ -9,16 +9,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class HttpRequest {
-    private final static List<String> acceptedMethod = Arrays.asList("GET", "POST", "PUT", "DELETE");
-
     private final Map<String, String> headerMap = new HashMap<>();
     private final Map<String, String> queryParameterMap = new HashMap<>();
 
-    private String method;
+    private HttpMethod method;
     private String path;
     private String protocol;
     private String body = "";
@@ -30,7 +27,7 @@ public class HttpRequest {
     public HttpRequest(BufferedReader br) throws IOException {
         String line = br.readLine();
         setStartLine(line);
-        setHeaderLine(br);
+        setHeader(br);
         setBody(br);
     }
 
@@ -40,7 +37,7 @@ public class HttpRequest {
         }
     }
 
-    private void setHeaderLine(BufferedReader br) throws IOException {
+    private void setHeader(BufferedReader br) throws IOException {
         String line = br.readLine();
         while (!(line == null || line.trim().equals(""))) {
             String[] headerLine = line.split(":", 2);
@@ -59,7 +56,7 @@ public class HttpRequest {
     private void setStartLine(String line) throws IOException {
         String[] startLine = line.split(" ");
         validateStartLine(startLine);
-        method = startLine[0];
+        method = HttpMethod.valueOf(startLine[0]);
         setPath(startLine[1]);
         protocol = startLine[2];
     }
@@ -82,12 +79,12 @@ public class HttpRequest {
     }
 
     private static void validateStartLine(String[] startLine) throws IOException {
-        if (startLine.length != 3 || !acceptedMethod.contains(startLine[0]) || !startLine[1].startsWith("/")) {
+        if (startLine.length != 3 || !startLine[1].startsWith("/")) {
             throw new IOException();
         }
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
