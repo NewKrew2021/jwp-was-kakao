@@ -16,7 +16,8 @@ public class Response200Header implements ResponseHeader{
     public void responseHeader(DataOutputStream dos, Map<String, String> response) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+
+            //dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             for(String key : response.keySet()){
                 StringBuilder sb = new StringBuilder();
                 sb.append(key);

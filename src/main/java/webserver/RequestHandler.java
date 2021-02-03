@@ -147,7 +147,39 @@ public class RequestHandler implements Runnable {
             responseParameters.remove("body");
 
             if (responseParameters.containsKey("path")) {
-                responseBody = FileIoUtils.loadFileFromClasspath("./templates" + responseParameters.get("path"));
+                String path = responseParameters.get("path");
+                if(path.endsWith(".css")){
+                    responseBody = FileIoUtils.loadFileFromClasspath("./static" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","text/css");
+                }
+                else if (path.endsWith(".js")){
+                    responseBody = FileIoUtils.loadFileFromClasspath("./static" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","application/js");
+                }
+                else if (path.endsWith(".png")){
+                    responseBody = FileIoUtils.loadFileFromClasspath("./static" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","image/png");
+                }
+                else if (path.endsWith(".eot")){
+                    responseBody = FileIoUtils.loadFileFromClasspath("./static" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","application/vnd.ms-fontobject");
+                }
+                else if (path.endsWith(".svg")){
+                    responseBody = FileIoUtils.loadFileFromClasspath("./static" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","image/svg+xml");
+                }
+                else if (path.endsWith(".ttf")){
+                    responseBody = FileIoUtils.loadFileFromClasspath("./static" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","application/octet-stream");
+                }
+                else if (path.endsWith(".woff") || path.endsWith(".woff2")){
+                    responseBody = FileIoUtils.loadFileFromClasspath("./static" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","application/font-woff");
+                }
+                else{
+                    responseBody = FileIoUtils.loadFileFromClasspath("./templates" + responseParameters.get("path"));
+                    responseParameters.put("Content-Type","text/html");
+                }
             }
             responseParameters.remove("path");
 
