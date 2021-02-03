@@ -77,6 +77,7 @@ public class Request {
                 "urlPath='" + urlPath + '\'' +
                 ", method='" + method + '\'' +
                 ", queries=" + queries +
+                ", bodies=" + bodies+
                 '}';
     }
 }

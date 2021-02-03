@@ -41,6 +41,10 @@ public class Response {
         );
     }
 
+    public void addHeader(String key, String value){
+        headers.addHeader(key, value);
+    }
+
     public byte[] toBytes() {
         return this.toString().getBytes(StandardCharsets.UTF_8);
     }

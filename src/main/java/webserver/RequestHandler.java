@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import controller.LoginController;
 import controller.UserController;
 import domain.Dispatcher;
 import domain.Request;
@@ -25,10 +26,12 @@ public class RequestHandler implements Runnable {
     private final Socket connection;
     private final Dispatcher dispatcher = Dispatcher.getInstance();
     private final UserController userController = UserController.getInstance();
+    private final LoginController loginController = LoginController.getInstance();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
         userController.registerAll();
+        loginController.registerAll();
     }
 
     public void run() {
@@ -39,7 +42,7 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-            List<String> lines = Arrays.asList(IOUtils.readData(br, 5000).split("\n"));
+            List<String> lines = Arrays.asList(IOUtils.readData(br, 5000).trim().split("\n"));
             Request request = new Request(lines);
 
             Response response = Response.ofDefaultFile(new ResponseBody("No Page"));
