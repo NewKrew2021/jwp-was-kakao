@@ -7,24 +7,28 @@ import java.util.*;
 public class Request {
     private final String urlPath;
     private final String method;
+    private final RequestHeaders headers;
     private final Map<String, String> queries;
     private final Map<String, String> bodies;
 
     public Request(List<String> lines) {
         List<String> urlProperties = Arrays.asList(lines.get(0).split(" "));
+        this.headers = new RequestHeaders(lines);
         this.method = urlProperties.get(0);
         this.urlPath = makeUrlPath(urlProperties.get(1));
         this.queries = makeQueries(urlProperties.get(1));
-        this.bodies = this.method.equals("POST") ? makeBodies(lines.get(lines.size() - 1)) : null;
+        this.bodies = makeBodies(lines.get(lines.size() - 1));
     }
 
     private Map<String, String> makeBodies(String fullUrl) {
         Map<String, String> bodies = new HashMap<>();
-        Arrays.asList(fullUrl.split("&"))
-                .forEach(query -> {
-                    List<String> result = Arrays.asList(query.split("="));
-                    bodies.put(decodeURL(result.get(0)), decodeURL(result.get(1)));
-                });
+        if(!fullUrl.equals("")) {
+            Arrays.asList(fullUrl.split("&"))
+                    .forEach(query -> {
+                        List<String> result = Arrays.asList(query.split("="));
+                        bodies.put(decodeURL(result.get(0)), decodeURL(result.get(1)));
+                    });
+        }
         return bodies;
     }
 
@@ -75,9 +79,10 @@ public class Request {
     public String toString() {
         return "Request{" +
                 "urlPath='" + urlPath + '\'' +
-                ", method='" + method + '\'' +
-                ", queries=" + queries +
-                ", bodies=" + bodies+
+                ", method='" + method + "'\n" +
+                ", headers=" + headers + "\n" +
+                ", queries=" + queries + "\n" +
+                ", bodies=" + bodies +
                 '}';
     }
 }

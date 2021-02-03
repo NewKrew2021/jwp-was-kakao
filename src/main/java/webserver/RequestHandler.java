@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import controller.LoginController;
 import controller.UserController;
@@ -42,11 +43,9 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-            List<String> lines = Arrays.asList(IOUtils.readData(br, 5000).trim().split("\n"));
-            System.out.println("#####또하나의 요청");
-            for(String line: lines){
-                System.out.println(line);
-            }
+            List<String> lines = Arrays.stream(IOUtils.readData(br, 5000).split("\r\n"))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
             Request request = new Request(lines);
 
             Response response = Response.ofDefaultFile(new ResponseBody("No Page"));
