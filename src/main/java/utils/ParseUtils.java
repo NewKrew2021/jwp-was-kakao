@@ -37,4 +37,8 @@ public class ParseUtils {
     public static String getParameterPairs(String url) {
         return url.split(REQUEST_URL_REGEX)[1];
     }
+
+    public static boolean containRequestUrlRegex(String url){
+        return url.contains(REQUEST_URL_REGEX);
+    }
 }

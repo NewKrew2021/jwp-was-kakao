@@ -8,6 +8,8 @@ import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import request.HttpMethod;
+import request.HttpRequest;
 import response.Response200Header;
 import response.Response302Header;
 import response.Response404Header;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RequestHandler implements Runnable {
 
@@ -45,26 +48,13 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            Map<String, String> request = new HashMap<>();
-            String line = readLine(reader);
+
+            HttpRequest httpRequest = readLines(reader);
             Map<String, String> responseParameters = new HashMap<>();
 
-            getMethodAndUrl(line, request);
-            String path = ParseUtils.getUrlPath(request.get("url"));
-
-            if (request.get("method").equals(HTTP_GET)) {
-                line = readLine(reader);
-
-                while (!line.isEmpty()) {
-                    getHeaders(line, request);
-                    line = readLine(reader);
-                    if (line == null) {
-                        break;
-                    }
-                }
-
-                if (path.equals("/user/list")) {
-                    String cookie = request.get("Cookie");
+            if (httpRequest.getMethod().equals(HttpMethod.GET)) {
+                if (httpRequest.getPath().equals("/user/list")) {
+                    String cookie = httpRequest.getHeaders().get("Cookie");
                     if (cookie == null || !cookie.contains("logined=true")) {
                         responseParameters.put("Location", "/user/login.html");
                         responseParameters.put("body", "");
@@ -91,22 +81,10 @@ public class RequestHandler implements Runnable {
                 }
             }
 
-            if (request.get("method").equals(HTTP_POST)) {
-                line = readLine(reader);
+            if (httpRequest.getMethod().equals(HttpMethod.POST)) {
 
-                while (!line.isEmpty()) {
-                    getHeaders(line, request);
-                    line = readLine(reader);
-                    if (line == null) {
-                        break;
-                    }
-                }
-
-                String requestBody = IOUtils.readData(reader, Integer.parseInt(request.get("Content-Length")));
-
-                if (path.equals("/user/create")) {
-                    Map<String, String> parameters = ParseUtils.getParameters(requestBody);
-                    User user = User.mapOf(parameters);
+                if (httpRequest.getPath().equals("/user/create")) {
+                    User user = User.mapOf(httpRequest.getBodys());
                     DataBase.addUser(user);
                     responseParameters.put("Location", "/index.html");
                     responseParameters.put("body", "");
@@ -114,8 +92,8 @@ public class RequestHandler implements Runnable {
                     return;
                 }
 
-                if (path.equals("/user/login")) {
-                    Map<String, String> parameters = ParseUtils.getParameters(requestBody);
+                if (httpRequest.getPath().equals("/user/login")) {
+                    Map<String, String> parameters = httpRequest.getBodys();
                     User user = DataBase.findUserById(parameters.get("userId"));
                     if (user == null || !user.getPassword().equals(parameters.get("password"))) {
                         responseParameters.put("Location", "/user/login_failed.html");
@@ -130,7 +108,7 @@ public class RequestHandler implements Runnable {
                 }
             }
 
-            responseParameters.put("path", path);
+            responseParameters.put("path", httpRequest.getPath());
             responseParameters.put("body", "");
 
             response(dos, new Response200Header(), responseParameters);
@@ -138,6 +116,29 @@ public class RequestHandler implements Runnable {
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private HttpRequest readLines(BufferedReader reader) throws IOException{
+        List<String> lines = new ArrayList<>();
+        lines.add(readLine(reader));
+
+        while(lines.get(lines.size() - 1) != null &&
+                !lines.get(lines.size() - 1).isEmpty()){
+            lines.add(readLine(reader));
+        }
+
+        HttpRequest httpRequest = HttpRequest.of(lines);
+
+        if(httpRequest.getMethod().equals(HttpMethod.POST)){
+            String body = IOUtils.readData(reader, Integer.parseInt(httpRequest.getHeaders().get("Content-Length")));
+            httpRequest.parsePostMethodBody(body);
+        }
+
+        if(httpRequest.getMethod().equals(HttpMethod.GET)){
+            httpRequest.parseGetMethodBody();
+        }
+
+        return httpRequest;
     }
 
     private void response(DataOutputStream dos, ResponseHeader responseHeader, Map<String, String> responseParameters)
@@ -196,17 +197,6 @@ public class RequestHandler implements Runnable {
         String line = reader.readLine();
         logger.debug(line);
         return line;
-    }
-
-    private void getHeaders(String header, Map<String, String> request) {
-        request.put(ParseUtils.parseHeaderKey(header), ParseUtils.parseHeaderValue(header));
-    }
-
-    private void getMethodAndUrl(String line, Map<String, String> request) {
-        String[] lines = line.split(" ");
-        request.put("method", lines[0]);
-        request.put("url", lines[1]);
-        request.put("version", lines[2]);
     }
 
     private void responseBody(DataOutputStream dos, byte[] body) {
