@@ -10,7 +10,7 @@ public class JsHandler extends FileHandler {
     }
 
     @Override
-    protected String getBody(HttpUrl httpUrl) {
+    protected byte[] getBody(HttpUrl httpUrl) {
         return FileIoUtils.loadFileFromClasspath("./static" + httpUrl.getUrl());
     }
 

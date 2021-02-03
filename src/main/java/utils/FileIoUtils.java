@@ -8,7 +8,6 @@ import exception.FileNotExistException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,14 +23,10 @@ public class FileIoUtils {
         handlebars = new Handlebars(loader);
     }
 
-    public static String loadFileFromClasspath(String filePath) {
-        return loadFileFromClasspath(filePath, StandardCharsets.UTF_8);
-    }
-
-    public static String loadFileFromClasspath(String filePath, Charset charset) {
+    public static byte[] loadFileFromClasspath(String filePath) {
         try {
             Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource(filePath).toURI());
-            return new String(Files.readAllBytes(path), charset);
+            return Files.readAllBytes(path);
         } catch (IOException | URISyntaxException e) {
             throw new FileCannotLoadedException();
         } catch (NullPointerException e) {
