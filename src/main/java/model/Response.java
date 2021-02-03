@@ -35,11 +35,11 @@ public class Response {
     private void addContentType(String path) {
         if (path.contains(".html")) {
             this.body.setBody(FileIoUtils.loadFileFromClasspath("templates" + path));
-            header.addHeader("Content-Type", FileIoUtils.getFileMemeType("templates" + path));
+            header.addHeader("Content-Type", FileIoUtils.getFileMimeType("templates" + path));
         }
         if (path.contains(".css") || path.contains(".js")) {
             this.body.setBody(FileIoUtils.loadFileFromClasspath("static" + path));
-            header.addHeader("Content-Type", FileIoUtils.getFileMemeType("static" + path));
+            header.addHeader("Content-Type", FileIoUtils.getFileMimeType("static" + path));
         }
     }
 

@@ -21,7 +21,7 @@ public class FileIoUtils {
         }
     }
 
-    public static String getFileMemeType(String filePath) {
+    public static String getFileMimeType(String filePath) {
         try {
             logger.debug("FILEPATH:" + filePath);
             Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource(filePath).toURI());
