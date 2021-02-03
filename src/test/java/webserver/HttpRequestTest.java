@@ -80,7 +80,7 @@ public class HttpRequestTest {
         HttpEntity<String> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl, request, String.class);
-        assertThat(response.getHeaders().get("Set-Cookie").get(0)).isEqualTo("logined=false; Path=/");
+        assertThat(response.getHeaders().get("Set-Cookie")).isNull();
     }
 
     @Test
@@ -97,7 +97,7 @@ public class HttpRequestTest {
         HttpEntity<String> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl, request, String.class);
-        assertThat(response.getHeaders().get("Set-Cookie").get(0)).isEqualTo("logined=true; Path=/");
+        assertThat(response.getHeaders().get("Set-Cookie")).isNotNull();
     }
 
     @Test
