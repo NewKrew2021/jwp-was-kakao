@@ -42,11 +42,11 @@ public class HandlebarsTest {
         Template template = handlebars.compile("user/list");
 
         User user = new User("test", "password", "test", "test@gmail.com");
-        Map<String,Object> map=new HashMap<>();
         List<User> users = new ArrayList<>(Arrays.asList(user));
-        map.put("users",users);
-        JSONObject json=new JSONObject(map);
-        String userList = template.apply(json);
+
+        Map<String,Object> map=new HashMap<>();
+        map.put("users", users);
+        String userList = template.apply(map);
         log.info("userList : {}", userList);
 
     }
