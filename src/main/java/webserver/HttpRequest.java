@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
-    private String method;
+    private HttpMethod method;
     private String path;
     private Map<String, String> headers;
     private Map<String, String> parameters;
@@ -14,7 +14,7 @@ public class HttpRequest {
     public HttpRequest(BufferedReader br) throws IOException {
         String[] request = br.readLine().split(" ");
         String[] url = request[1].split("\\?");
-        method = request[0];
+        method = HttpMethod.from(request[0]);
         path = url[0];
 
         makeHeaders(br);
@@ -27,7 +27,7 @@ public class HttpRequest {
         if (url.length > 1){
             parseArgument(url[1]);
         }
-        if (method.equals("POST")) {
+        if (method == HttpMethod.POST) {
             int contentLength = Integer.parseInt(getHeader("Content-Length"));
             String body = utils.IOUtils.readData(br, contentLength);
             parseArgument(body);
@@ -52,7 +52,7 @@ public class HttpRequest {
         }
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 

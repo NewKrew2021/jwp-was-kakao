@@ -20,10 +20,10 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = new HttpRequest(br);
 
-        assertEquals("GET", httpRequest.getMethod());
-        assertEquals("/user/create", httpRequest.getPath());
-        assertEquals("keep-alive", httpRequest.getHeader("Connection"));
-        assertEquals("javajigi", httpRequest.getParameter("userId"));
+        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
+        assertThat(httpRequest.getPath()).isEqualTo("/user/create");
+        assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
     }
 
     @Test
@@ -33,10 +33,10 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = new HttpRequest(br);
 
-        assertEquals("POST", httpRequest.getMethod());
-        assertEquals("/user/create", httpRequest.getPath());
-        assertEquals("keep-alive", httpRequest.getHeader("Connection"));
-        assertEquals("javajigi", httpRequest.getParameter("userId"));
+        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
+        assertThat(httpRequest.getPath()).isEqualTo("/user/create");
+        assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
     }
 
     @Test
@@ -46,10 +46,10 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = new HttpRequest(br);
 
-        assertEquals("POST", httpRequest.getMethod());
-        assertEquals("/user/create", httpRequest.getPath());
-        assertEquals("keep-alive", httpRequest.getHeader("Connection"));
-        assertEquals("1", httpRequest.getParameter("id"));
-        assertEquals("javajigi", httpRequest.getParameter("userId"));
+        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
+        assertThat(httpRequest.getPath()).isEqualTo("/user/create");
+        assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(httpRequest.getParameter("id")).isEqualTo("1");
+        assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
     }
 }

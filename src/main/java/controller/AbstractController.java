@@ -1,6 +1,7 @@
 package controller;
 
 import utils.FileIoUtils;
+import webserver.HttpMethod;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
@@ -10,7 +11,7 @@ import java.net.URISyntaxException;
 public class AbstractController implements Controller {
 
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
-        if ("GET".equals(httpRequest.getMethod())) {
+        if (httpRequest.getMethod() == HttpMethod.GET) {
             doGet(httpRequest, httpResponse);
             return;
         }
