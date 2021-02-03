@@ -1,110 +1,44 @@
 package webserver;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpMethod;
-import utils.FileIoUtils;
+import webserver.controller.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
-    private HttpRequest httpRequest;
-    private HttpResponse httpResponse;
     private Socket connection;
-    private boolean login = false;
+    private Map<String, Controller> controllers;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        controllers = new HashMap<>();
+        controllers.put("/user/create", new CreateUserController() );
+        controllers.put("/user/login" , new LoginController());
+        controllers.put("/user/list.html" , new ListUserController());
     }
 
     public void run() {
-
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            this.httpRequest = new HttpRequest(in);
-            this.httpResponse = new HttpResponse(out);
+            HttpRequest httpRequest = new HttpRequest(in);
+            HttpResponse httpResponse = new HttpResponse(out);
+            String url = httpRequest.getPath();
 
-            // 쿠키 처리
-            if (httpRequest.getHeader("Cookie").equals("logined=true")) {
-                httpResponse.addHeader("Set-Cookie", "logined=true");
-                login = true;
+            if( controllers.containsKey(url) ) {
+                controllers.get(url).service(httpRequest,httpResponse);
             }
 
-            // 회원가입
-            if (httpRequest.getPath().equals("/user/create") && httpRequest.getMethod().equals(HttpMethod.POST)) {
-                User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
-                DataBase.addUser(user);
-                httpResponse.sendRedirect("/index.html");
-                return;
-            }
-
-            // 로그인
-            if (httpRequest.getMethod().equals(HttpMethod.POST) && httpRequest.getPath().equals("/user/login")) {
-                boolean login = DataBase.isPossibleLogin(httpRequest.getParameter("userId"), httpRequest.getParameter("password"));
-                httpResponse.addHeader("Set-Cookie", "logined=" + login);
-                if (login) {
-                    httpResponse.sendRedirect("/index.html");
-                } else {
-                    httpResponse.sendRedirect("/user/login_failed.html");
-                }
-                return;
-            }
-
-            //user list 구현
-            if (httpRequest.getMethod().equals(HttpMethod.GET) && httpRequest.getPath().equals("/user/list.html")) {
-                if (login && FileIoUtils.isExistFile("./templates" + httpRequest.getPath())) {
-                    TemplateLoader loader = new ClassPathTemplateLoader();
-                    loader.setPrefix("/templates");
-                    loader.setSuffix("");
-                    Handlebars handlebars = new Handlebars(loader);
-
-                    Template template = handlebars.compile(httpRequest.getPath());
-                    List<User> users = new ArrayList<>(DataBase.findAll());
-
-                    String userListPage = template.apply(users);
-
-                    byte[] body = userListPage.getBytes(StandardCharsets.UTF_8);
-                    httpResponse.response200Header(body.length);
-                    httpResponse.responseBody(body);
-                }
-                if (!login) {
-                    httpResponse.sendRedirect("/user/login.html");
-                }
-                return;
-            }
-
-            //css + js
-            if (FileIoUtils.isExistFile("./static" + httpRequest.getPath())) {
-                httpResponse.addHeader("Accept", httpRequest.getHeader("Accept"));
-                httpResponse.forward("./static" + httpRequest.getPath());
-                return;
-            }
-
-            //html
-            if (FileIoUtils.isExistFile("./templates" + httpRequest.getPath())) {
-                httpResponse.addHeader("Accept", "text/html;charset=utf-8");
-                httpResponse.forward("./templates" + httpRequest.getPath());
-                return;
-            }
-            httpResponse.response404();
-        } catch (IOException | URISyntaxException e) {
+            new FowardController().service(httpRequest, httpResponse);
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
