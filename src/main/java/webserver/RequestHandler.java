@@ -6,11 +6,12 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import domain.HttpRequest;
+import domain.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import utils.FileIoUtils;
-import utils.KeyValueTokenizer;
 
 import java.io.*;
 import java.net.Socket;
@@ -18,7 +19,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -29,56 +29,8 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String url) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + url);
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseCSSHeader(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void addLoginCookie(DataOutputStream dos, boolean value) {
-        try {
-            dos.writeBytes("Set-Cookie: logined=" + value + "; Path=/");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean isLogined(HttpRequest httpRequest){
+    private boolean isLogined(HttpRequest httpRequest) {
         return httpRequest.getHeader("Cookie").equals("logined=true");
     }
 
@@ -93,24 +45,26 @@ public class RequestHandler implements Runnable {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
              OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = new HttpRequest(br);
-            DataOutputStream dos = new DataOutputStream(out);
+            HttpResponse httpResponse = new HttpResponse(new DataOutputStream(out));
 
-            String path = httpRequest.getUrl();
-            String method = httpRequest.getMethod();
+            String url = httpRequest.getUrl();
+            HttpMethod method = httpRequest.getMethod();
 
-            if (method.equals("GET") && isStaticResources(path)) {
-                path = "./static" + path;
-                byte[] body = FileIoUtils.loadFileFromClasspath(path);
-                responseCSSHeader(dos, body.length);
-                responseBody(dos, body);
+            byte[] body;
+
+            if (method.equals(HttpMethod.GET) && isStaticResources(url)) {
+                url = "./static" + url;
+                httpResponse.forward(url);
                 return;
             }
 
-            if (method.equals("GET") && path.startsWith("/user/list")) {
-                if(!isLogined(httpRequest)){
-                    response302Header(dos,"login.html");
+
+            if (method.equals(HttpMethod.GET) && url.startsWith("/user/list")) {
+                if (!isLogined(httpRequest)) {
+                    httpResponse.sendRedirect("login.html");
                     return;
                 }
+                url += ".html";
                 TemplateLoader loader = new ClassPathTemplateLoader();
                 loader.setPrefix("/templates");
                 loader.setSuffix(".html");
@@ -118,41 +72,40 @@ public class RequestHandler implements Runnable {
 
                 Template template = handlebars.compile("user/list");
                 List<User> users = new ArrayList<>(DataBase.findAll());
-                byte[] body = template.apply(users).getBytes();
+                body = template.apply(users).getBytes();
 
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-                return;
+                httpResponse.response200Header(url, body.length);
+                httpResponse.responseBody(body);
             }
 
-            if (method.equals("GET") && path.endsWith(".html")) {
-                path = "./templates" + path;
-                byte[] body = FileIoUtils.loadFileFromClasspath(path);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-                return;
-            }
-
-            if (method.equals("POST") && path.startsWith("/user/create")) {
+            if (method.equals(HttpMethod.POST) && url.startsWith("/user/create")) {
                 DataBase.addUser(new User(httpRequest.getParameters()));
-                response302Header(dos, "/index.html");
+                httpResponse.sendRedirect("/index.html");
                 return;
             }
 
-            if (method.equals("POST") && path.startsWith("/user/login")) {
+            if (method.equals(HttpMethod.POST) && url.startsWith("/user/login")) {
                 User user = DataBase.findUserById(httpRequest.getParameter("userId"));
+                // 아이디가 없습니다.
                 boolean isLoginSuccess = user.validatePassword(httpRequest.getParameter("password"));
+                // 패스워드가 잘못됐습니다.
                 if (isLoginSuccess) {
-                    response302Header(dos, "/index.html");
-                } else {
-                    response302Header(dos, "/user/login_failed.html");
+                    httpResponse.sendRedirect("/index.html");
+                    httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
+                    return;
                 }
-                addLoginCookie(dos, isLoginSuccess);
+                httpResponse.sendRedirect("/user/login_failed.html");
+                httpResponse.addHeader("Set-Cookie", "logined=false;");
                 return;
             }
 
+            if (method.equals(HttpMethod.GET) && url.endsWith(".html")) {
+                url = "./templates" + url;
+                httpResponse.forward(url);
+                return;
+            }
 
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }

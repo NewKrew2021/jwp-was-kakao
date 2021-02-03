@@ -1,22 +1,24 @@
 package domain;
 
+import org.springframework.http.HttpMethod;
+
 public class HttpRequestStartLine {
     public static final String LINE_DELIMITER = " ";
     public static final String PATH_DELIMITER = "?";
     public static final String PATH_DELIMETER_REGEX = "\\?";
-    private String method;
+    private HttpMethod method;
     private String url;
     private String version;
-    private String parameter;
+    private String parameter = "";
 
     public HttpRequestStartLine(String method, String url, String version) {
-        this.method = method;
+        this.method = HttpMethod.resolve(method);
         this.url = url;
         this.version = version;
     }
 
     public HttpRequestStartLine(String method, String url, String parameter, String version) {
-        this.method = method;
+        this.method = HttpMethod.resolve(method);
         this.url = url;
         this.parameter = parameter;
         this.version = version;
@@ -31,7 +33,7 @@ public class HttpRequestStartLine {
         return new HttpRequestStartLine(methodPathVersion[0], methodPathVersion[1], methodPathVersion[2]);
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
@@ -46,4 +48,5 @@ public class HttpRequestStartLine {
     public String getParameter() {
         return parameter;
     }
+
 }

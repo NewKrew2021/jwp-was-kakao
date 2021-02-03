@@ -1,5 +1,6 @@
 package domain;
 
+import org.springframework.http.HttpMethod;
 import utils.IOUtils;
 import utils.KeyValueTokenizer;
 
@@ -39,7 +40,7 @@ public class HttpRequest {
         headers.put(header[0], header[1]);
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return startLine.getMethod();
     }
 
