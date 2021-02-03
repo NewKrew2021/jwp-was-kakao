@@ -1,24 +1,25 @@
 package webserver.controller;
 
 import utils.FileIoUtils;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import webserver.domain.ContentTypes;
+import webserver.domain.HttpRequest;
+import webserver.domain.HttpResponse;
 
 import java.net.URISyntaxException;
 
 public class FowardController extends AbstractController {
+
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        super.doGet(httpRequest, httpResponse);
 
         if (isExistFile("./static" + httpRequest.getPath())) {
-            httpResponse.addHeader("Accept", httpRequest.getHeader("Accept"));
+            httpResponse.addHeader(CONTENT_TYPE, ContentTypes.getTypeFromPath(httpRequest.getPath()).getType());
             httpResponse.forward("./static" + httpRequest.getPath());
             return;
         }
 
         if (isExistFile("./templates" + httpRequest.getPath())) {
-            httpResponse.addHeader("Accept", "text/html;charset=utf-8");
+            httpResponse.addHeader(CONTENT_TYPE, ContentTypes.getTypeFromPath(httpRequest.getPath()).getType());
             httpResponse.forward("./templates" + httpRequest.getPath());
             return;
         }

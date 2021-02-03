@@ -7,9 +7,9 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import utils.FileIoUtils;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
-import webserver.controller.AbstractController;
+import webserver.domain.ContentTypes;
+import webserver.domain.HttpRequest;
+import webserver.domain.HttpResponse;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListUserController extends AbstractController {
+
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        super.doGet(httpRequest, httpResponse);
         if (!isPossibleAccessUserList(httpRequest.getPath())) {
             httpResponse.sendRedirect("/user/login.html");
             return;
@@ -28,6 +28,7 @@ public class ListUserController extends AbstractController {
 
         try {
             byte[] body = makeUserListBody(httpRequest.getPath());
+            httpResponse.addHeader(CONTENT_TYPE, ContentTypes.HTML.getType());
             httpResponse.response200Header(body.length);
             httpResponse.responseBody(body);
         } catch (IOException e) {

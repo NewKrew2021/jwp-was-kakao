@@ -1,6 +1,8 @@
 package webserver;
 
 import org.junit.jupiter.api.Test;
+import webserver.domain.ContentTypes;
+import webserver.domain.HttpResponse;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +16,7 @@ public class HttpResponseTest {
     public void responseForward() throws Exception {
         // Http_Forward.txt 결과는 응답 body에 index.html이 포함되어 있어야 한다.
         HttpResponse response = new HttpResponse(createOutputStream("Http_Forward.txt"));
-        response.addHeader("Accept","text/html;charset=utf-8");
+        response.addHeader("Content-Type", ContentTypes.getTypeFromPath("/index.html").getType());
         response.forward("./templates/index.html");
     }
 
