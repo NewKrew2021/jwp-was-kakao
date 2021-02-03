@@ -7,8 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class HttpRequest {
@@ -18,7 +16,6 @@ public class HttpRequest {
     private String path;
     private HttpParameter httpParameter;
     private HttpHeader httpHeader;
-    private Map<String, String> cookies = new HashMap<>();
 
     public HttpRequest(InputStream in) {
         try {
@@ -41,7 +38,7 @@ public class HttpRequest {
     }
 
     private void setParameter(BufferedReader br) throws IOException {
-        if(getMethod().equals(RequestMethod.GET) && path.contains("?")) {
+        if (getMethod().equals(RequestMethod.GET) && path.contains("?")) {
             String[] parsed = path.split("\\?");
             path = parsed[0];
             httpParameter = new HttpParameter(parsed[1]);
@@ -69,7 +66,7 @@ public class HttpRequest {
     }
 
     public String getCookie(String key) {
-        return cookies.get(key);
+        return httpHeader.getCookie(key);
     }
 
     public boolean isEmpty() {
