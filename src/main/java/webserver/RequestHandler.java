@@ -28,23 +28,9 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = new HttpRequestParser(IOUtils.readRequest(in)).parse();
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = Dispatcher.dispatch(httpRequest);
-            sendResponse(dos, response);
+            response.sendResponse(dos);
 
         } catch (IOException | URISyntaxException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void sendResponse(DataOutputStream dos, HttpResponse response) {
-        try {
-            dos.writeBytes(response.getHttpStatus() + " \r\n");
-            dos.writeBytes(response.headersToString());
-            dos.writeBytes("\r\n");
-            if (response.getBody() != null) {
-                dos.write(response.getBody(), 0, response.getBody().length);
-            }
-            dos.flush();
-        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }

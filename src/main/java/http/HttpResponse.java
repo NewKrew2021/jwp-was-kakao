@@ -3,6 +3,7 @@ package http;
 import utils.FileIoUtils;
 import utils.TemplateUtils;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -21,12 +22,18 @@ public class HttpResponse {
         this.cookies = cookies;
     }
 
-    public String getHttpStatus() {
-        return httpStatus;
+    public void sendResponse(DataOutputStream dos) throws IOException {
+        dos.writeBytes(getHttpStatus() + " \r\n");
+        dos.writeBytes(headersToString());
+        dos.writeBytes("\r\n");
+        if (getBody() != null) {
+            dos.write(getBody(), 0, getBody().length);
+        }
+        dos.flush();
     }
 
-    public byte[] getBody() {
-        return body;
+    public String getHttpStatus() {
+        return httpStatus;
     }
 
     public String headersToString() {
@@ -37,6 +44,10 @@ public class HttpResponse {
                 .append("\r\n"));
         sb.append(cookies.toSetCookies());
         return sb.toString();
+    }
+
+    public byte[] getBody() {
+        return body;
     }
 
     public static class Builder {
