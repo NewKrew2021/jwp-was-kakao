@@ -1,4 +1,9 @@
-HTTP/1.1 302 Found 
-Set-Cookie: logined=false; Path=/
-Location: http://localhost:8080/user/login_failed.html
+POST /user/login HTTP/1.1
+Host: localhost:8080
+Connection: keep-alive
+Content-Length: 24
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+
+userId=java&password=abc
 
