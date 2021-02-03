@@ -12,13 +12,14 @@ import model.User;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ListUserController extends AbstractController{
+public class ListUserController extends AbstractController {
     private static final Logger logger = LoggerFactory.getLogger(ListUserController.class);
 
 
@@ -34,22 +35,15 @@ public class ListUserController extends AbstractController{
 
     @Override
     void doGet(Request request, Response response) {
-        if(request.isLogin()){
-            logger.debug("user/list 로그인된 상태");
-            TemplateLoader loader = new ClassPathTemplateLoader();
-            loader.setPrefix("/templates");
-            loader.setSuffix(".html");
-            Handlebars handlebars = new Handlebars(loader);
-            Template template = null;
-            try{
-                template= handlebars.compile("user/list");
-                List<User> users = new ArrayList<>(DataBase .findAll());
-                Map<String,Object> map=new HashMap<>();
-                map.put("users",users);
-                JSONObject json=new JSONObject(map);
-                String userList = template.apply(json);
-                logger.info("userList : {}", userList);
-                response.forwardBody(userList);
+        if (request.isLogin()) {
+            try {
+                logger.debug("user/list 로그인된 상태");
+
+                List<User> users = new ArrayList<>(DataBase.findAll());
+                Map<String, Object> map = new HashMap<>();
+                map.put("users", users);
+
+                response.forwardBody(FileIoUtils.loadTemplateWithHandlebars("user/list", map));
                 return;
             } catch (Exception e) {
                 logger.debug(e.getMessage());
