@@ -39,7 +39,6 @@ public class RequestHandler implements Runnable {
                 writeResponse(dos, httpServlet.service(httpRequest));
             }
         } catch (IOException e) {
-
             logger.error(e.getMessage());
         }
     }
