@@ -9,13 +9,18 @@ import java.net.URISyntaxException;
 
 public abstract class AbstractController implements Controller {
 
-    abstract public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException;
-
-    public void doPost() {
+    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
+        if ("GET".equals(httpRequest.getMethod())) {
+            doGet(httpRequest, httpResponse);
+            return;
+        }
+        doPost(httpRequest, httpResponse);
     }
 
-    public void doGet() {
+    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    }
 
+    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
     }
 
 }

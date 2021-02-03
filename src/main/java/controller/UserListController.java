@@ -22,7 +22,7 @@ public class UserListController extends AbstractController {
     private static final String HTML_SUFFIX = ".html";
 
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
+    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         if(!isLogin(httpRequest.getHeader("Cookie"))){
             httpResponse.sendRedirect(LOGIN_URL);
             return;

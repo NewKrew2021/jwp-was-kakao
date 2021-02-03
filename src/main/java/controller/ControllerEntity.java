@@ -22,7 +22,7 @@ public class ControllerEntity {
         controllers.put("/fonts", new JsController());
     }
 
-    public static Map<String, Controller> getControllers() {
-        return controllers;
+    public static Controller getControllers(String path) {
+        return controllers.get(path);
     }
 }
