@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
+import utils.TemplateUtils;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
@@ -17,9 +18,6 @@ import java.util.Map;
 
 public class UserListController extends AbstractController {
     private static final String LOGIN_URL = "/user/login.html";
-    private static final String LIST_URL = "/user/list";
-    private static final String TEMPLATES_PREFIX = "/templates";
-    private static final String HTML_SUFFIX = ".html";
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
@@ -28,10 +26,9 @@ public class UserListController extends AbstractController {
             return;
         }
 
-        String html = parseHtml();
+        String html = TemplateUtils.makeTemplate(httpRequest.getPath());
         byte[] body = html.getBytes(StandardCharsets.UTF_8);
         httpResponse.forward(body);
-
     }
 
     private boolean isLogin(String loginCookie) {
@@ -40,15 +37,5 @@ public class UserListController extends AbstractController {
         } catch (NullPointerException e){
             return false;
         }
-    }
-
-    private String parseHtml() throws IOException {
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix(TEMPLATES_PREFIX);
-        loader.setSuffix(HTML_SUFFIX);
-        Handlebars handlebars = new Handlebars(loader);
-        Template template = handlebars.compile(LIST_URL);
-
-        return template.apply(DataBase.findAll());
     }
 }
