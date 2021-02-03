@@ -1,9 +1,9 @@
-package webserver;
+package controller;
 
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import domain.URLMapper;
+import webserver.URLMapper;
 
 public class UserLoginController extends AbstractController {
     private static final String PARAMETER_NAME_ID = "userId";

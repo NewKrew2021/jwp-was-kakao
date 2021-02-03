@@ -1,6 +1,6 @@
-package domain;
+package webserver;
 
-import webserver.*;
+import controller.*;
 
 import java.util.HashMap;
 import java.util.Map;

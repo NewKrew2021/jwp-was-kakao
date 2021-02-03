@@ -1,4 +1,4 @@
-package webserver;
+package controller;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -7,7 +7,7 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import domain.URLMapper;
+import webserver.URLMapper;
 
 import java.io.IOException;
 

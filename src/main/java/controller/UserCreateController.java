@@ -1,9 +1,9 @@
-package webserver;
+package controller;
 
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import domain.URLMapper;
+import webserver.URLMapper;
 import model.User;
 
 public class UserCreateController extends AbstractController {

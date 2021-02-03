@@ -1,8 +1,8 @@
-package webserver;
+package controller;
 
 import domain.HttpRequest;
 import domain.HttpResponse;
-import domain.URLMapper;
+import webserver.URLMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
