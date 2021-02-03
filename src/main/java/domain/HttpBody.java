@@ -2,26 +2,26 @@ package domain;
 
 public class HttpBody {
 
-    private final String body;
+    private final byte[] body;
 
     public HttpBody(byte[] body) {
-        this.body = new String(body);
-    }
-
-    public HttpBody(String body) {
         this.body = body;
     }
 
+    public HttpBody(String body) {
+        this.body = body.getBytes();
+    }
+
     public int getBytesSize() {
-        return body.getBytes().length;
+        return body.length;
     }
 
     public byte[] getBytes() {
-        return body.getBytes();
+        return body;
     }
 
     @Override
     public String toString() {
-        return body;
+        return new String(body);
     }
 }

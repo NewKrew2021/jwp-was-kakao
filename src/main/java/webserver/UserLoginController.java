@@ -3,6 +3,7 @@ package webserver;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
+import domain.URLMapper;
 
 public class UserLoginController extends AbstractController {
 
@@ -14,7 +15,7 @@ public class UserLoginController extends AbstractController {
         String location = LOGIN_FAIL_PATH;
         if (DataBase.login(httpRequest.getParameter("userId"), httpRequest.getParameter("password"))) {
             longinedCookie = "logined=true; Path=/";
-            location = RequestHandler.BASE_URL;
+            location = URLMapper.INDEX_URL;
         }
 
         httpResponse.addHeader("Set-Cookie", longinedCookie);
