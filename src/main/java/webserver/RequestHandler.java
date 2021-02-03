@@ -32,8 +32,7 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
             String request= IOUtils.buildString(in);
-            parser.parse(request);
-            HttpRequest httpRequest = new HttpRequest(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
+            HttpRequest httpRequest = HttpRequestParser.getRequest(request);
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = controllers.dispatch(httpRequest);
             sendResponse(dos, response);

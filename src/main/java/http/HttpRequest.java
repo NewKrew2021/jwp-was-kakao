@@ -9,17 +9,14 @@ import java.util.Map;
 public class HttpRequest {
     private RequestMethod requestMethod;
     private String uri;
-    private Map<String, String> params = new HashMap<>();
+    private Map<String, String> params;
     private HttpRequestHeaders httpRequestHeaders;
     private String body;
 
-    public HttpRequest(RequestMethod requestMethod, String uri) {
+    public HttpRequest(RequestMethod requestMethod, String uri, Map<String, String> params, HttpRequestHeaders httpRequestHeaders, String body) {
         this.requestMethod = requestMethod;
-        parseUri(uri);
-    }
-
-    public HttpRequest(RequestMethod requestMethod, String uri, HttpRequestHeaders httpRequestHeaders, String body) {
-        this(requestMethod, uri);
+        this.uri = uri;
+        this.params = params;
         this.httpRequestHeaders = httpRequestHeaders;
         this.body = body;
     }
@@ -42,15 +39,6 @@ public class HttpRequest {
 
     public String getParam(String key) {
         return params.get(key);
-    }
-
-    private void parseUri(String uri) {
-        String[] parsedUri = uri.split("\\?", 2);
-        this.uri = parsedUri[0];
-        if (parsedUri.length < 2) {
-            return;
-        }
-        this.params = HttpUtils.getParamMap(parsedUri[1]);
     }
 
     public boolean sameRequestLine(HttpRequest httpRequest) {

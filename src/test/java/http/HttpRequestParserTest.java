@@ -24,24 +24,22 @@ class HttpRequestParserTest {
     @DisplayName("request line을 잘 파싱하는지 테스트")
     @Test
     void testParseRequestLine() {
-        HttpRequestParser parser = new HttpRequestParser();
-        parser.parse(headGet);
+        HttpRequest requestGet = HttpRequestParser.getRequest(headGet);
 
-        assertThat(parser.getRequestMethod()).isEqualTo(RequestMethod.GET);
-        assertThat(parser.getUri()).isEqualTo("/index.html");
+        assertThat(requestGet.getRequestMethod()).isEqualTo(RequestMethod.GET);
+        assertThat(requestGet.getUri()).isEqualTo("/index.html");
 
-        parser.parse(headPost);
+        HttpRequest requestPost = HttpRequestParser.getRequest(headPost);
 
-        assertThat(parser.getRequestMethod()).isEqualTo(RequestMethod.POST);
-        assertThat(parser.getUri()).isEqualTo("/user/create");
+        assertThat(requestPost.getRequestMethod()).isEqualTo(RequestMethod.POST);
+        assertThat(requestPost.getUri()).isEqualTo("/user/create");
     }
 
     @DisplayName("header를 잘 파싱하는지 테스트")
     @Test
     void testParseHeaders() {
-        HttpRequestParser parser = new HttpRequestParser();
-        parser.parse(headGet);
-        HttpRequestHeaders headers = parser.getRequestHeaders();
+        HttpRequest requestGet = HttpRequestParser.getRequest(headGet);
+        HttpRequestHeaders headers = requestGet.getRequestHeaders();
 
         assertThat(headers.getHeader("Host")).isEqualTo("localhost:8080");
         assertThat(headers.getHeader("Connection")).isEqualTo("keep-alive");
@@ -50,9 +48,7 @@ class HttpRequestParserTest {
     @DisplayName("body를 잘 파싱하는지 테스트")
     @Test
     void testParseBody() {
-        HttpRequestParser parser = new HttpRequestParser();
-        parser.parse(headPost);
-
-        assertThat(parser.getBody()).isEqualTo("userId=wonsik&password=1234&name=wonsik&email=wonsik@kakaocorp.com");
+        HttpRequest requestPost = HttpRequestParser.getRequest(headPost);
+        assertThat(requestPost.getBody()).isEqualTo("userId=wonsik&password=1234&name=wonsik&email=wonsik@kakaocorp.com");
     }
 }
