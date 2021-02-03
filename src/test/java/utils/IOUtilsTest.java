@@ -30,6 +30,6 @@ public class IOUtilsTest {
                 "Connection: keep-alive\n" +
                 "Accept: */*";
         InputStream is = new ByteArrayInputStream(requestHeader.getBytes());
-        assertThat(requestHeader).isEqualTo(IOUtils.buildString(is));
+        assertThat(requestHeader).isEqualTo(IOUtils.readRequest(is));
     }
 }

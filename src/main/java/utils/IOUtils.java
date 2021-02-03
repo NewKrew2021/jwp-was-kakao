@@ -19,41 +19,42 @@ public class IOUtils {
         return String.copyValueOf(body);
     }
 
-    public static String buildString(InputStream in) throws IOException {
-        InputStreamReader is = new InputStreamReader(in);
-        BufferedReader br = new BufferedReader(is);
-
+    public static String readRequest(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
         List<String> lines = new ArrayList<>();
-        String line;
+        readHead(br, lines);
+        readBody(br, lines);
+        decoding(lines);
 
+        return lines.stream()
+                .collect(Collectors.joining("\n"));
+    }
+
+    private static void readHead(BufferedReader br, List<String> lines) throws IOException {
+        String line;
         while ((line = br.readLine()) != null && !line.isEmpty()) {
             lines.add(line);
         }
+    }
 
+    private static void readBody(BufferedReader br, List<String> lines) throws IOException {
         int contentLength = getContentLength(lines);
-        if (contentLength > 0) {
+        if (getContentLength(lines) > 0) {
             lines.add("\n" + readData(br, contentLength));
         }
-
-        return lines.stream()
-                .map(it -> {
-                    try {
-                        return URLDecoder.decode(it, "utf-8");
-                    } catch (UnsupportedEncodingException e) {
-                    }
-                    return it;
-                }).collect(Collectors.joining("\n"));
     }
 
     private static int getContentLength(List<String> lines) {
-        String contentLengthLine = lines.stream()
+        return lines.stream()
                 .filter(it -> it.split(": ", 2)[0].equals("Content-Length"))
                 .findAny()
-                .orElse(null);
+                .map(contentLengthLine -> Integer.parseInt(contentLengthLine.split(": ", 2)[1]))
+                .orElse(0);
+    }
 
-        if (contentLengthLine == null) {
-            return 0;
+    private static void decoding(List<String> lines) throws UnsupportedEncodingException {
+        for (int i = 0; i < lines.size(); i++) {
+            lines.set(i, URLDecoder.decode(lines.get(i), "utf-8"));
         }
-        return Integer.parseInt(contentLengthLine.split(": ", 2)[1]);
     }
 }
