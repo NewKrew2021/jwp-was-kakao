@@ -21,21 +21,6 @@ public class ListUserController extends AbstractController {
     public static final String TEMPLATES = "/templates";
     public static final String HTML = ".html";
 
-    @Override
-    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        String url = httpRequest.getUrl();
-        if (!isLogin(httpRequest.getHeader(COOKIE))) {
-            httpResponse.sendRedirect(LOGIN_HTML);
-            return;
-        }
-        try {
-            byte[] body = compileHtmlBody(url);
-            httpResponse.forward(url, body);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     boolean isLogin(String header) {
         return header.equals(LOGINED_TRUE);
     }
@@ -49,5 +34,20 @@ public class ListUserController extends AbstractController {
         Template template = handlebars.compile(url);
         List<User> users = new ArrayList<>(DataBase.findAll());
         return template.apply(users).getBytes();
+    }
+
+    @Override
+    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+        String url = httpRequest.getUrl();
+        if (!isLogin(httpRequest.getHeader(COOKIE))) {
+            httpResponse.sendRedirect(LOGIN_HTML);
+            return;
+        }
+        try {
+            byte[] body = compileHtmlBody(url);
+            httpResponse.forward(url, body);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -33,16 +33,16 @@ public class HttpRequestStartLine {
         return new HttpRequestStartLine(methodPathVersion[0], methodPathVersion[1], methodPathVersion[2]);
     }
 
+    public boolean hasParameter() {
+        return !parameter.isEmpty();
+    }
+
     public HttpMethod getMethod() {
         return method;
     }
 
     public String getUrl() {
         return url;
-    }
-
-    public boolean hasParameter() {
-        return !parameter.isEmpty();
     }
 
     public String getParameter() {

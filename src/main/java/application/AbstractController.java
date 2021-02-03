@@ -5,6 +5,12 @@ import domain.HttpResponse;
 
 public class AbstractController implements Controller {
 
+    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+    }
+
+    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    }
+
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
         if (httpRequest.getMethod().matches("POST")) {
@@ -13,9 +19,5 @@ public class AbstractController implements Controller {
         }
         doGet(httpRequest, httpResponse);
     }
-
-    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {}
-
-    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {}
 
 }

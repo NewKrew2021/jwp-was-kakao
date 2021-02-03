@@ -1,15 +1,13 @@
 package webserver;
 
+import application.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-
-import application.*;
-import db.DataBase;
-import model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -32,16 +30,16 @@ public class WebServer {
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                Thread thread = new Thread(new RequestHandler(connection,controllers));
+                Thread thread = new Thread(new RequestHandler(connection, controllers));
                 thread.start();
             }
         }
     }
 
-    private static void initController(){
-        controllers.put("/user/create",new CreateUserController());
-        controllers.put("/user/login",new LoginController());
-        controllers.put("/user/list",new ListUserController());
-        controllers.put("/main",new MainController());
+    private static void initController() {
+        controllers.put("/user/create", new CreateUserController());
+        controllers.put("/user/login", new LoginController());
+        controllers.put("/user/list", new ListUserController());
+        controllers.put("/main", new MainController());
     }
 }

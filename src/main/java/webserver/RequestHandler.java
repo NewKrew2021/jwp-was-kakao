@@ -1,34 +1,24 @@
 package webserver;
 
 import application.Controller;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpMethod;
-import utils.FileIoUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RequestHandler implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     public static final String MAIN = "/main";
-
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final Socket connection;
-    private final Map<String,Controller> controllers;
+    private final Map<String, Controller> controllers;
 
     public RequestHandler(Socket connectionSocket, Map<String, Controller> controllers) {
         this.connection = connectionSocket;
@@ -46,7 +36,7 @@ public class RequestHandler implements Runnable {
 
             String url = httpRequest.getUrl();
             Controller controller = controllers.getOrDefault(url, controllers.get(MAIN));
-            controller.service(httpRequest,httpResponse);
+            controller.service(httpRequest, httpResponse);
 
         } catch (Exception e) {
             logger.error(e.getMessage());

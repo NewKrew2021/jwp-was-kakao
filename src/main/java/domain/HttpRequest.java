@@ -16,8 +16,8 @@ public class HttpRequest {
     public static final String CONTENT_LENGTH = "Content-Length";
 
     private final HttpRequestStartLine startLine;
-    private Map<String, String> parameters = new HashMap<>();
     private final Map<String, String> headers = new HashMap<>();
+    private Map<String, String> parameters = new HashMap<>();
 
     public HttpRequest(BufferedReader br) throws IOException {
         startLine = HttpRequestStartLine.of(br.readLine());
@@ -40,20 +40,20 @@ public class HttpRequest {
         headers.put(header[0], header[1]);
     }
 
-    public HttpMethod getMethod() {
-        return startLine.getMethod();
-    }
-
-    public String getUrl() {
-        return startLine.getUrl();
-    }
-
     public String getHeader(String key) {
         return headers.getOrDefault(key, NO_KEY);
     }
 
     public String getParameter(String key) {
         return parameters.getOrDefault(key, NO_KEY);
+    }
+
+    public HttpMethod getMethod() {
+        return startLine.getMethod();
+    }
+
+    public String getUrl() {
+        return startLine.getUrl();
     }
 
     public Map<String, String> getParameters() {

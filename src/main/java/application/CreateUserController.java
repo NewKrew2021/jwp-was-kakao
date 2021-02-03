@@ -5,7 +5,7 @@ import domain.HttpRequest;
 import domain.HttpResponse;
 import model.User;
 
-public class CreateUserController extends AbstractController{
+public class CreateUserController extends AbstractController {
 
     public static final String INDEX_HTML = "/index.html";
 
