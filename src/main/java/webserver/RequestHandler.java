@@ -25,6 +25,7 @@ import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    public static final String MAIN = "/main";
 
     private final Socket connection;
     private final Map<String,Controller> controllers;
@@ -44,7 +45,7 @@ public class RequestHandler implements Runnable {
             HttpResponse httpResponse = new HttpResponse(new DataOutputStream(out));
 
             String url = httpRequest.getUrl();
-            Controller controller = controllers.getOrDefault(url, controllers.get("/main"));
+            Controller controller = controllers.getOrDefault(url, controllers.get(MAIN));
             controller.service(httpRequest,httpResponse);
 
         } catch (Exception e) {

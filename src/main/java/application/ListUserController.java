@@ -14,11 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListUserController extends AbstractController {
+
+    public static final String COOKIE = "Cookie";
+    public static final String LOGIN_HTML = "login.html";
+    public static final String LOGINED_TRUE = "logined=true";
+    public static final String TEMPLATES = "/templates";
+    public static final String HTML = ".html";
+
     @Override
     void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         String url = httpRequest.getUrl();
-        if (!isLogin(httpRequest.getHeader("Cookie"))) {
-            httpResponse.sendRedirect("login.html");
+        if (!isLogin(httpRequest.getHeader(COOKIE))) {
+            httpResponse.sendRedirect(LOGIN_HTML);
             return;
         }
         try {
@@ -30,13 +37,13 @@ public class ListUserController extends AbstractController {
     }
 
     boolean isLogin(String header) {
-        return header.equals("logined=true");
+        return header.equals(LOGINED_TRUE);
     }
 
     private byte[] compileHtmlBody(String url) throws IOException {
         TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
+        loader.setPrefix(TEMPLATES);
+        loader.setSuffix(HTML);
         Handlebars handlebars = new Handlebars(loader);
 
         Template template = handlebars.compile(url);
