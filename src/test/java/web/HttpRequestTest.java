@@ -56,6 +56,6 @@ public class HttpRequestTest {
         assertThat(httpRequest).extracting("httpMethod").isEqualTo(HttpMethod.POST);
         assertThat(httpRequest.getHttpUrl().getUrl()).isEqualTo("/");
         assertThat(httpRequest.getHttpHeaders().get("Host")).isEqualTo("localhost:8080");
-        assertThat(httpRequest.getHttpBody().getBody()).isEqualTo("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+        assertThat(httpRequest.getHttpBody().getBody()).isEqualTo("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net".getBytes());
     }
 }

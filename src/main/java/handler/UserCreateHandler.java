@@ -4,10 +4,7 @@ import db.DataBase;
 import model.User;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import web.HttpHeaders;
-import web.HttpRequest;
-import web.HttpResponse;
-import web.HttpUrl;
+import web.*;
 import webserver.HttpServlet;
 
 import java.util.Map;
@@ -15,7 +12,7 @@ import java.util.Map;
 public class UserCreateHandler implements HttpServlet {
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
-        Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
+        Map<String, String> parameters = HttpUrl.parseParameter(BodyMapper.read(httpRequest.getHttpBody().getBody(), String.class));
         DataBase.addUser(new User(
                 parameters.get("userId"),
                 parameters.get("password"),
@@ -24,7 +21,6 @@ public class UserCreateHandler implements HttpServlet {
 
         HttpResponse httpResponse = HttpResponse.of(HttpStatus.FOUND);
         httpResponse.addHeader(HttpHeaders.LOCATION, "/index.html");
-
         return httpResponse;
     }
 

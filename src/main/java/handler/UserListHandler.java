@@ -26,7 +26,6 @@ public class UserListHandler implements HttpServlet {
         httpResponse.addHeader(HttpHeaders.CONTENT_TYPE, "text/html;charset=utf-8");
         httpResponse.addHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(body.length()));
         httpResponse.setBody(body);
-
         return httpResponse;
     }
 

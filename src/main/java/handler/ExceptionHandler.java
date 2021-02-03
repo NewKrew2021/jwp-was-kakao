@@ -2,6 +2,7 @@ package handler;
 
 import exception.FileCannotLoadedException;
 import exception.FileNotExistException;
+import exception.MapperNotFoundException;
 import org.springframework.http.HttpStatus;
 import web.HttpRequest;
 import web.HttpResponse;
@@ -20,6 +21,10 @@ public class ExceptionHandler implements HttpServlet {
         try {
             return actual.service(httpRequest);
         } catch (FileNotExistException e) {
+            HttpResponse response = HttpResponse.of(HttpStatus.NOT_FOUND);
+            response.setBody(e.getMessage());
+            return response;
+        } catch (MapperNotFoundException e) {
             HttpResponse response = HttpResponse.of(HttpStatus.NOT_FOUND);
             response.setBody(e.getMessage());
             return response;

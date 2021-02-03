@@ -7,10 +7,11 @@ import utils.IOUtils;
 import java.io.BufferedReader;
 
 public class HttpBody {
-    private static final HttpBody EMPTY_BODY = new HttpBody("");
-    private final String body;
+    private static final HttpBody EMPTY_BODY = new HttpBody(null);
 
-    public HttpBody(String body) {
+    private final byte[] body;
+
+    public HttpBody(byte[] body) {
         this.body = body;
     }
 
@@ -20,21 +21,20 @@ public class HttpBody {
             return HttpBody.empty();
         }
 
-        String body = IOUtils.readData(br, Integer.parseInt(contentLength));
         String contentType = httpHeaders.get(HttpHeaders.CONTENT_TYPE);
-
+        String body = IOUtils.readData(br, Integer.parseInt(contentLength));
         if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(contentType)) {
             body = DecodeUtils.decodeUrl(body);
         }
 
-        return new HttpBody(body);
+        return new HttpBody(body.getBytes());
     }
 
     public static HttpBody empty() {
         return EMPTY_BODY;
     }
 
-    public String getBody() {
+    public byte[] getBody() {
         return body;
     }
 }

@@ -19,7 +19,7 @@ class HttpBodyTest {
                         "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net".getBytes(StandardCharsets.UTF_8))));
         HttpBody httpBody = HttpBody.of(httpHeaders, br);
 
-        assertThat(httpBody.getBody()).isEqualTo("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+        assertThat(httpBody.getBody()).isEqualTo("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net".getBytes());
     }
 
     @Test
@@ -30,6 +30,6 @@ class HttpBodyTest {
                         "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net".getBytes(StandardCharsets.UTF_8))));
         HttpBody httpBody = HttpBody.of(httpHeaders, br);
 
-        assertThat(httpBody.getBody()).isEqualTo("userId=javajigi&password=password&name=박재성&email=javajigi@slipp.net");
+        assertThat(httpBody.getBody()).isEqualTo("userId=javajigi&password=password&name=박재성&email=javajigi@slipp.net".getBytes());
     }
 }

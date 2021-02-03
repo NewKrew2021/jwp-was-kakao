@@ -3,10 +3,7 @@ package handler;
 import db.DataBase;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import web.HttpHeaders;
-import web.HttpRequest;
-import web.HttpResponse;
-import web.HttpUrl;
+import web.*;
 import webserver.HttpServlet;
 
 import java.util.Map;
@@ -14,7 +11,7 @@ import java.util.Map;
 public class UserLoginHandler implements HttpServlet {
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
-        Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
+        Map<String, String> parameters = HttpUrl.parseParameter(BodyMapper.read(httpRequest.getHttpBody().getBody(), String.class));
 
         return DataBase.findUserById(parameters.get("userId"))
                 .filter(user -> user.isSamePassword(parameters.get("password")))

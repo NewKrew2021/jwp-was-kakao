@@ -1,19 +1,15 @@
 package webserver;
 
-import handler.FontsHandler;
 import handler.HandlerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.HttpRequest;
-import web.HttpResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,25 +26,13 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = HttpRequest.of(in);
-            DataOutputStream dos = new DataOutputStream(out);
-
             HttpServlet httpServlet = HandlerMapper.map(httpRequest);
-            if (httpServlet instanceof FontsHandler) {
-                writeResponse(dos, httpServlet.service(httpRequest), StandardCharsets.ISO_8859_1);
-            } else {
-                writeResponse(dos, httpServlet.service(httpRequest));
-            }
+
+            DataOutputStream dos = new DataOutputStream(out);
+            dos.write(httpServlet.service(httpRequest).asBytes());
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private void writeResponse(DataOutputStream dos, HttpResponse httpResponse) throws IOException {
-        writeResponse(dos, httpResponse, StandardCharsets.UTF_8);
-    }
-
-    private void writeResponse(DataOutputStream dos, HttpResponse httpResponse, Charset charset) throws IOException {
-        dos.write(httpResponse.toString().getBytes(charset));
-        dos.flush();
     }
 }
