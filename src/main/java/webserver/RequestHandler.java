@@ -3,8 +3,10 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
-import controller.Controllers;
+import controller.Handler;
+import controller.HandlerMapper;
 import http.HttpRequest;
 import http.HttpRequestParser;
 import http.HttpResponse;
@@ -16,9 +18,6 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-
-    private Controllers controllers = new Controllers();
-    private HttpRequestParser parser = new HttpRequestParser();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -34,8 +33,14 @@ public class RequestHandler implements Runnable {
             String request= IOUtils.buildString(in);
             HttpRequest httpRequest = HttpRequestParser.getRequest(request);
             DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse response = controllers.dispatch(httpRequest);
-            sendResponse(dos, response);
+
+            Optional<Handler> handler = HandlerMapper.findHandler(httpRequest);
+            if(handler.isPresent()) {
+                HttpResponse response = handler.get().handleRequest(httpRequest);
+                sendResponse(dos, response);
+            } else {
+                // TODO: 2021/02/03 NOT FOUND
+            }
 
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());

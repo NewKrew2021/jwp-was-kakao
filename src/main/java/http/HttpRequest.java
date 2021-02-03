@@ -41,16 +41,4 @@ public class HttpRequest {
         return params.get(key);
     }
 
-    public boolean sameRequestLine(HttpRequest httpRequest) {
-        return requestMethod.equals(httpRequest.requestMethod) && uri.equals(httpRequest.uri);
-    }
-
-    public boolean isTemplateRequest() {
-        return requestMethod == RequestMethod.GET && uri.endsWith(".html");
-    }
-
-    public boolean isStaticRequest() {
-        return requestMethod
-                == RequestMethod.GET && (uri.startsWith("/css") || uri.startsWith("/fonts") || uri.startsWith("/images") || uri.startsWith("/js"));
-    }
 }

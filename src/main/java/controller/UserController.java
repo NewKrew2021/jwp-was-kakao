@@ -1,5 +1,7 @@
 package controller;
 
+import annotation.web.RequestMethod;
+import http.HttpRequest;
 import http.HttpResponse;
 import model.User;
 import db.DataBase;
@@ -8,8 +10,23 @@ import utils.TemplateUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class UserController extends Controller {
+
+    @Override
+    public Optional<Handler> getResponsibleHandler(HttpRequest request) {
+        if (request.getRequestMethod() == RequestMethod.POST && request.getUri().equals("/user/create")) {
+            return Optional.of(createUserHandler);
+        }
+        if (request.getRequestMethod() == RequestMethod.POST && request.getUri().equals("/user/login")) {
+            return Optional.of(loginUserHandler);
+        }
+        if (request.getRequestMethod() == RequestMethod.GET && request.getUri().equals("/user/list")) {
+            return Optional.of(listUserHandler);
+        }
+        return Optional.empty();
+    }
 
     public static Handler createUserHandler = (request) -> {
         Map<String, String> params = HttpUtils.getParamMap(request.getBody());
@@ -47,7 +64,7 @@ public class UserController extends Controller {
     public static Handler listUserHandler = (request) -> {
         String logined = request.getRequestHeaders().getHeader("Cookie");
 
-        if("logined=true".equals(logined)) {
+        if ("logined=true".equals(logined)) {
             Map<String, Object> params = new HashMap<>();
             params.put("users", DataBase.findAll());
 
@@ -61,4 +78,5 @@ public class UserController extends Controller {
                 .setRedirect("/user/login.html")
                 .build();
     };
+
 }
