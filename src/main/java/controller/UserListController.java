@@ -25,6 +25,7 @@ public class UserListController extends AbstractController {
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
         if(!isLogin(httpRequest.getHeader("Cookie"))){
             httpResponse.sendRedirect(LOGIN_URL);
+            return;
         }
 
         String html = parseHtml();
