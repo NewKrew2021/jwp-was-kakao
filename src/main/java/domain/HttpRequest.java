@@ -1,6 +1,7 @@
 package domain;
 
 import annotation.web.RequestMethod;
+import utils.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,9 +38,8 @@ public class HttpRequest {
 
             if (getMethod().equals(RequestMethod.POST)) {
                 int bodySize = Integer.parseInt(header.get("Content-Length"));
-                char[] body = new char[bodySize];
-                bufferedReader.read(body);
-                parseParameter(new String(body));
+                String body = IOUtils.readData(bufferedReader, bodySize);
+                parseQueryParameter(body);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,10 +61,10 @@ public class HttpRequest {
         if (requestPath.length == 1) {
             return;
         }
-        parseParameter(requestPath[1]);
+        parseQueryParameter(requestPath[1]);
     }
 
-    private void parseParameter(String request) {
+    private void parseQueryParameter(String request) {
         Arrays.stream(request.split("&"))
                 .forEach(rawParameter -> {
                     String[] split = rawParameter.split("=");

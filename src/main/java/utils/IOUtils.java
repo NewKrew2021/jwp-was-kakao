@@ -2,6 +2,7 @@ package utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLDecoder;
 
 public class IOUtils {
     /**
@@ -17,4 +18,6 @@ public class IOUtils {
         br.read(body, 0, contentLength);
         return String.copyValueOf(body);
     }
+
+//    URLDecoder.decode(profilePage,"UTF-8")
 }

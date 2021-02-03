@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 public class HttpResponse {
 
@@ -108,6 +109,21 @@ public class HttpResponse {
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void handleUserList(String content) {
+        byte[] body = content.getBytes();
+        String path = "/user/list";
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: " + findContentType(path) + "; charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes("Content-Location: " + path + "\r\n");
+            dos.writeBytes("\r\n");
+            writeResponseBody(body);
+        } catch (IOException e) {
+            sendInternalServerError();
         }
     }
 }

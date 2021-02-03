@@ -35,18 +35,18 @@ public class HttpRequestTest {
 
     }
 
-    @DisplayName("method1")
+    @DisplayName("GET method")
     @Test
-    void method1() {
+    void method_GET() {
         InputStream is = new ByteArrayInputStream(request1.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);
         assertThat(httpRequest.getMethod()).isEqualTo(RequestMethod.GET);
     }
 
-    @DisplayName("method2")
+    @DisplayName("POST method")
     @Test
-    void method2() {
+    void method_POST() {
         InputStream is = new ByteArrayInputStream(request3.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);

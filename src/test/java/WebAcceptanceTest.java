@@ -70,7 +70,7 @@ public class WebAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
     }
 
-    @DisplayName("POST /user/login")
+    @DisplayName("POST /user/login success")
     @Test
     void loginSuccess() {
         String path = "/user/login";
@@ -82,11 +82,11 @@ public class WebAcceptanceTest {
 
         ExtractableResponse<Response> response = 로그인요청(path, id, password);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
         assertThat(response.cookies().get("logined")).isEqualTo("true");
     }
 
-    @DisplayName("POST /user/login")
+    @DisplayName("POST /user/login fail")
     @Test
     void loginFail() {
         String path = "/user/login";
@@ -98,25 +98,25 @@ public class WebAcceptanceTest {
 
         ExtractableResponse<Response> response = 로그인요청(path, id, password);
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
         assertThat(response.cookies().get("logined")).isEqualTo("false");
     }
 
-    @DisplayName("GET /user/list")
+    @DisplayName("GET /user/list success")
     @Test
-    void getUserListSuccess() {
+    void userListSuccess() {
         String loginPath = "/user/login";
         String path = "/user/list";
         회원가입_POST(loginPath, user);
         ExtractableResponse<Response> loginResponse = 로그인요청(loginPath, user.getId(), user.getPassword());
         ExtractableResponse<Response> response = 사용자리스트요청(path, loginResponse.cookie("logined"));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.header("Content-Location")).isEqualTo("/user/list.html");
+        assertThat(response.header("Content-Location")).isEqualTo("/user/list");
     }
 
-    @DisplayName("GET /user/list")
+    @DisplayName("GET /user/list fail")
     @Test
-    void getUserListFail() {
+    void userListFail() {
         String loginPath = "/user/login";
         String path = "/user/list";
         회원가입_POST(loginPath, user);
@@ -142,7 +142,6 @@ public class WebAcceptanceTest {
                 param("password", password).
                 when().post(path).
                 then().log().all().
-                statusCode(HttpStatus.OK.value()).
                 extract();
     }
 
