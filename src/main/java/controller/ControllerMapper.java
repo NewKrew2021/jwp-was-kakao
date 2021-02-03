@@ -10,6 +10,7 @@ public class ControllerMapper {
         controllerMap=new HashMap<>();
         controllerMap.put("/user/create", new CreateUserController());
         controllerMap.put("/user/list", new ListUserController());
+        controllerMap.put("/user/list.html", new ListUserController());
         controllerMap.put("/user/login", new LoginController());
     }
 
