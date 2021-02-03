@@ -4,8 +4,6 @@ import db.DataBase;
 import model.User;
 import request.HttpRequest;
 import response.HttpResponse;
-
-import java.util.Map;
 import java.util.Optional;
 
 public class LoginController extends AbstractController{

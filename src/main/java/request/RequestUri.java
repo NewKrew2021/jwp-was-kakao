@@ -2,11 +2,13 @@ package request;
 
 import annotation.web.RequestMethod;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static utils.HttpRequestUtils.extractParams;
-import static utils.HttpRequestUtils.extractPath;
+import static utils.HttpRequestUtils.*;
+
+
 
 public class RequestUri {
     private RequestMethod requestMethod;
@@ -21,7 +23,11 @@ public class RequestUri {
 
     public static RequestUri from(String line) {
         String[] splitLine = line.split(" ");
-        return new RequestUri(getMethodType(splitLine[0]), extractPath(splitLine[1]), extractParams(splitLine[1]));
+        Optional<String> queryString = extractParams(splitLine[1]);
+        if(queryString.isPresent()){
+            return new RequestUri(getMethodType(splitLine[0]), extractPath(splitLine[1]), requestStringToMap(queryString.get()));
+        }
+        return new RequestUri(getMethodType(splitLine[0]), extractPath(splitLine[1]), new HashMap<>());
     }
 
     private static RequestMethod getMethodType(String line){

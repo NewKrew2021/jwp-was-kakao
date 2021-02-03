@@ -1,7 +1,6 @@
 package webserver;
 
 import controller.Controller;
-import controller.Controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import request.HttpRequest;
@@ -16,7 +15,7 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private Controllers controllers = new Controllers();
+    private ControllerHandler controllers = new ControllerHandler();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;

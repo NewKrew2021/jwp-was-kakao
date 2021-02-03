@@ -11,7 +11,7 @@ import java.util.Optional;
 public class RequestHeader {
     Map<String, String> header;
 
-    public RequestHeader(Map<String, String> header) {
+    private RequestHeader(Map<String, String> header) {
         this.header = header;
     }
 
@@ -19,7 +19,7 @@ public class RequestHeader {
         Map<String, String> requestHeader = new HashMap<>();
         String tempLine;
         while(!(tempLine = br.readLine()).equals("")){
-            String[] splitTempLine = tempLine.split(":");
+            String[] splitTempLine = tempLine.split(": ");
             requestHeader.put(splitTempLine[0].trim(), splitTempLine[1].trim());
             logger.debug("header: {}", tempLine);
         }

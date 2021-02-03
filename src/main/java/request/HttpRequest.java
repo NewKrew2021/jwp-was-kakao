@@ -14,10 +14,15 @@ import java.util.Optional;
 
 public class HttpRequest {
 
+    private static final String COOKIE = "Cookie";
+    private static final String COOKIE_TRUE_VALUE = "logined=true";
+
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    RequestUri requestUri;
-    RequestHeader requestHeader;
-    RequestBody requestBody;
+
+    private RequestUri requestUri;
+    private RequestHeader requestHeader;
+    private RequestBody requestBody;
+
 
     private HttpRequest(RequestUri requestUri, RequestHeader requestHeader, RequestBody requestBody) {
         this.requestUri = requestUri;
@@ -25,14 +30,14 @@ public class HttpRequest {
         this.requestBody = requestBody;
     }
 
-    static public HttpRequest from(InputStream in) throws IOException {
+    public static HttpRequest from(InputStream in) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(in, "UTF-8");
         BufferedReader br = new BufferedReader(inputStreamReader);
         String uriLine = br.readLine();
         logger.debug(uriLine);
         RequestUri requestUri = RequestUri.from(uriLine);
         RequestHeader requestHeader = RequestHeader.of(br, logger);
-        RequestBody requestBody = RequestBody.of(br, requestHeader);
+        RequestBody requestBody = RequestBody.of(br, requestHeader.getContentLength());
         return new HttpRequest(requestUri, requestHeader, requestBody);
     }
 
@@ -46,8 +51,11 @@ public class HttpRequest {
         throw new RuntimeException("커스텀 익셉션 필요. 벨류를 찾을 수 없음");
     }
 
-    public Optional<String> getHeader(String key) {
-        return requestHeader.getHeaderValue(key);
+    public String getHeader(String key) {
+        if(requestHeader.getHeaderValue(key).isPresent()) {
+            return requestHeader.getHeaderValue(key).get();
+        }
+        throw new RuntimeException("커스텀 익셉션 필요. 벨류를 찾을 수 없음");
     }
 
     public RequestMethod getMethod() {
@@ -63,4 +71,8 @@ public class HttpRequest {
     }
 
 
+    public boolean isLogined() {
+        Optional<String> cookieValue = requestHeader.getHeaderValue(COOKIE);
+        return cookieValue.isPresent() && cookieValue.get().equals(COOKIE_TRUE_VALUE);
+    }
 }

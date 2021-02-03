@@ -19,8 +19,7 @@ public class RequestBody {
         this.body = body;
     }
 
-    public static RequestBody of(BufferedReader br, RequestHeader requestHeader) throws IOException {
-        Optional<Integer> contentLength = requestHeader.getContentLength();
+    public static RequestBody of(BufferedReader br, Optional<Integer> contentLength) throws IOException {
         if (contentLength.isPresent()) {
             return new RequestBody(requestStringToMap(IOUtils.readData(br, contentLength.get())));
         }

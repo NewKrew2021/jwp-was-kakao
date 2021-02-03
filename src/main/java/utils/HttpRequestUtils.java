@@ -2,18 +2,19 @@ package utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpRequestUtils {
     public static String extractPath(String uri) {
         return uri.split("\\?")[0];
     }
 
-    public static Map<String, String> extractParams(String uri) {
+    public static Optional<String> extractParams(String uri) {
         String[] tmp = uri.split("\\?");
         if (tmp.length <= 1) {
-            return null;
+            return Optional.empty();
         }
-        return requestStringToMap(tmp[1]);
+        return Optional.of(tmp[1]);
     }
 
     public static Map<String, String> requestStringToMap(String line) {
