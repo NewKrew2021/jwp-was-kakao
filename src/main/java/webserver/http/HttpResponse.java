@@ -1,4 +1,4 @@
-package webserver.domain;
+package webserver.http;
 
 import annotation.web.ResponseStatus;
 import com.google.common.collect.Maps;
@@ -35,6 +35,11 @@ public class HttpResponse {
     public void sendRedirect(String redirectPath) {
         makeResponse(ResponseStatus.FOUND);
         addHeader("Location", redirectPath);
+        processHeadersAndSend();
+    }
+
+    public void sendStatus(ResponseStatus status) {
+        makeResponse(status);
         processHeadersAndSend();
     }
 

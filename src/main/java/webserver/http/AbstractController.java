@@ -1,7 +1,6 @@
-package webserver.controller;
+package webserver.http;
 
-import webserver.domain.HttpRequest;
-import webserver.domain.HttpResponse;
+import annotation.web.ResponseStatus;
 
 public abstract class AbstractController implements Controller {
     @Override
@@ -17,12 +16,10 @@ public abstract class AbstractController implements Controller {
     }
 
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        throw new IllegalArgumentException(
-                String.format("No implementation for %s as GET", this.getClass()));
+        httpResponse.sendStatus(ResponseStatus.METHOD_NOT_ALLOWED);
     }
 
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        throw new IllegalArgumentException(
-                String.format("No implementation for %s as POST", this.getClass()));
+        httpResponse.sendStatus(ResponseStatus.METHOD_NOT_ALLOWED);
     }
 }

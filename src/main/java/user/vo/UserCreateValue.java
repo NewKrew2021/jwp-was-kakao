@@ -1,6 +1,6 @@
 package user.vo;
 
-import webserver.domain.HttpRequest;
+import webserver.http.HttpRequest;
 
 public class UserCreateValue {
     private final String userId;

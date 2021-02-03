@@ -1,4 +1,4 @@
-package webserver.domain;
+package webserver.http;
 
 import org.apache.commons.io.FilenameUtils;
 import utils.FileIoUtils;
@@ -29,7 +29,7 @@ public class Body {
 
     public Body(String path) {
         try {
-            body = FileIoUtils.loadFileFromClasspath(getRootDirectory(path) + path);
+            body = FileIoUtils.loadFileFromClasspath(path);
             contentType = identifyContentType(path);
             contentLength = body.length;
         } catch (IOException | URISyntaxException e) {
@@ -41,14 +41,6 @@ public class Body {
         this.body = body;
         this.contentType = contentType;
         contentLength = body.length;
-    }
-
-    private String getRootDirectory(String path) {
-        String extension = FilenameUtils.getExtension(path);
-        if (extension.equals("html") || extension.equals("ico")) {
-            return "./templates";
-        }
-        return "./static";
     }
 
     private String identifyContentType(String path) throws IOException {

@@ -1,4 +1,4 @@
-package webserver.domain;
+package webserver.http;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ public class HttpResponseTest {
     @Test
     public void responseForward() throws Exception {
         HttpResponse response = new HttpResponse(createOutputStream("Http_Forward.txt"));
-        response.forward("/index.html");
+        response.forward("./templates/index.html");
 
         String lines = readFile(testDirectory + "/Http_Forward.txt");
         String expected = readFile("./src/main/resources/templates/index.html");

@@ -2,6 +2,8 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.RequestMapping;
+import webserver.service.ManualRequestMapping;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,12 +20,14 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
 
+        RequestMapping mapping = new ManualRequestMapping();
+
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);
 
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                Thread thread = new Thread(new RequestHandler(connection));
+                Thread thread = new Thread(new RequestHandler(connection, mapping));
                 thread.start();
             }
         }

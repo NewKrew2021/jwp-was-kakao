@@ -1,4 +1,4 @@
-package webserver.domain;
+package webserver.http;
 
 import annotation.web.RequestMethod;
 import com.google.common.collect.Maps;

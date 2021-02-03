@@ -1,10 +1,10 @@
 package user.controller;
 
 import user.view.UserView;
-import webserver.controller.AbstractController;
-import webserver.domain.Body;
-import webserver.domain.HttpRequest;
-import webserver.domain.HttpResponse;
+import webserver.http.AbstractController;
+import webserver.http.Body;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
 
 public class ListUserController extends AbstractController {
     @Override

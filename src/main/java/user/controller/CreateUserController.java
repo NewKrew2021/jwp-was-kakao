@@ -2,9 +2,9 @@ package user.controller;
 
 import user.service.UserService;
 import user.vo.UserCreateValue;
-import webserver.controller.AbstractController;
-import webserver.domain.HttpRequest;
-import webserver.domain.HttpResponse;
+import webserver.http.AbstractController;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
 
 public class CreateUserController extends AbstractController {
     @Override
