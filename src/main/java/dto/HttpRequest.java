@@ -14,7 +14,7 @@ public class HttpRequest {
     private final Map<String, String> params = new HashMap<>();
     private final Map<String, String> headers = new HashMap<>();
 
-    private void addHeader(String message) {
+    private void setRequest(String message) {
         String[] lines = message.split("\n");
         String[] firstLineTokens = lines[0].split(" ");
 
@@ -44,7 +44,7 @@ public class HttpRequest {
             while (!"".equals((line = br.readLine()))) {
                 lines += line + "\n";
             }
-            addHeader(lines);
+            setRequest(lines);
 
             if (getContentLength() != 0) {
                 setBody(IOUtils.readData(br, getContentLength()));
