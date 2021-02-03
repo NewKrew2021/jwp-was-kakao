@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ControllerEntity {
+    public static final String JS = "js";
+    public static final String CSS = "css";
+    public static final String FONTS = "fonts";
     private static Map<String, Controller> controllers;
 
     static {
@@ -17,12 +20,19 @@ public class ControllerEntity {
         controllers.put("/user/form.html", new UserFormController());
         controllers.put("/favicon.ico", new FaviconController());
 
-        controllers.put("/css", new CssController());
-        controllers.put("/js", new JsController());
-        controllers.put("/fonts", new JsController());
+        controllers.put("/static", new StaticController());
     }
 
     public static Controller getControllers(String path) {
-        return controllers.get(path);
+        return controllers.get(filterPath(path));
+    }
+
+    private static String filterPath(String path) {
+        String prefix = path.split("/")[1];
+
+        if (prefix.equals(JS) || prefix.equals(CSS) || prefix.equals(FONTS)){
+            return "/static";
+        }
+        return path;
     }
 }
