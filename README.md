@@ -7,3 +7,22 @@
 
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
+
+
+## 기능 요구사항
+* 헤더 읽고 파싱
+* 파싱된 리퀘스트를 컨트롤러에 뿌려줌
+* 받아서 처리하는 컨트롤러
+
+## todo
+* [x] HttpRequest 구현
+    * [x] RequestMethod 구현 
+    * [x] HttpRequestHeader 구현 
+    * [x] HttpRequestHeaders 구현
+    * [x] HttpRequestParser 구현
+  
+* [x] Controller 구현
+    * [x] Controllers 구현
+    * [x] DispatchInfo 구현
+    * [x] TemplateController 구현
+    * [x] UserController 구현
