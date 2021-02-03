@@ -7,54 +7,61 @@ public class Response {
     private final StatusCode statusCode;
     private final ResponseHeaders headers;
     private final ResponseBody body;
+    private final ContentType contentType;
 
     public Response(HttpVersion httpVersion,
                     StatusCode statusCode,
                     ResponseHeaders headers,
-                    ResponseBody body) {
+                    ResponseBody body,
+                    ContentType contentType) {
         this.httpVersion = httpVersion;
         this.statusCode = statusCode;
         this.headers = headers;
         this.body = body;
+        this.contentType = contentType;
     }
 
-    public static Response ofDefaultFile(ResponseBody body) {
+    public static Response ofDefaultFile(ResponseBody body, ContentType contentType) {
         ResponseHeaders headers = new ResponseHeaders();
-        headers.addHeader("Content-Type", "text/html;charset=utf-8");
+        headers.addHeader("Content-Type", contentType.getType() + ";charset=utf-8");
         headers.addHeader("Content-Length", body.getByteSize() + "");
         return new Response(
                 HttpVersion.HTTP1_1,
                 StatusCode.OK,
                 headers,
-                body
+                body,
+                contentType
         );
     }
 
-    public static Response ofRedirect(String redirectUrl){
+    public static Response ofRedirect(String redirectUrl) {
         ResponseHeaders headers = new ResponseHeaders();
+        headers.addHeader("Content-Type", ContentType.HTML + ";charset=utf-8");
         headers.addHeader("Location", redirectUrl);
         return new Response(
                 HttpVersion.HTTP1_1,
                 StatusCode.FOUND,
                 headers,
-                ResponseBody.ofEmptyBody()
+                ResponseBody.ofEmptyBody(),
+                ContentType.HTML
         );
     }
 
-    public static Response ofDynamicHtml(ResponseBody responseBody){
+    public static Response ofDynamicHtml(ResponseBody responseBody) {
         ResponseHeaders headers = new ResponseHeaders();
-        headers.addHeader("Content-Type", "text/html;charset=utf-8");
+        headers.addHeader("Content-Type", ContentType.HTML + ";charset=utf-8");
         headers.addHeader("Content-Length", responseBody.getByteSize() + "");
         return new Response(
                 HttpVersion.HTTP1_1,
                 StatusCode.OK,
                 headers,
-                responseBody
+                responseBody,
+                ContentType.HTML
         );
 
     }
 
-    public void addHeader(String key, String value){
+    public void addHeader(String key, String value) {
         headers.addHeader(key, value);
     }
 

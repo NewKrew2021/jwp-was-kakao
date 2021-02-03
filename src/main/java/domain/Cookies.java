@@ -11,16 +11,21 @@ public class Cookies {
 
     public Cookies(String header) {
         cookies = new HashMap<>();
-        Arrays.asList(header.split(";"))
-                .forEach(cookie->{
-                    List<String> split = Arrays.stream(cookie.split("="))
-                            .map(String::trim)
-                            .collect(Collectors.toList());
-                    cookies.put(split.get(0), split.get(1));
-                });
+        if (header != null) {
+            Arrays.asList(header.split(";"))
+                    .forEach(cookie -> {
+                        List<String> split = Arrays.stream(cookie.split("="))
+                                .map(String::trim)
+                                .collect(Collectors.toList());
+                        cookies.put(split.get(0), split.get(1));
+                    });
+        }
     }
 
     public String getValueOf(String argument) {
+        if (cookies.get(argument) == null) {
+            return "false";
+        }
         return cookies.get(argument);
     }
 

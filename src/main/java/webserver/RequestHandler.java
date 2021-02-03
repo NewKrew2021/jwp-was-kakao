@@ -11,10 +11,7 @@ import java.util.stream.Collectors;
 
 import controller.LoginController;
 import controller.UserController;
-import domain.Dispatcher;
-import domain.Request;
-import domain.Response;
-import domain.ResponseBody;
+import domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -49,7 +46,7 @@ public class RequestHandler implements Runnable {
             Request request = new Request(lines);
             System.out.println(request);
 
-            Response response = Response.ofDefaultFile(new ResponseBody("No Page"));
+            Response response = Response.ofDefaultFile(new ResponseBody("No Page"), ContentType.HTML);
 
             if (FileIoUtils.pathIsFile(request.getUrlPath())) {
                 response = FileIoUtils.loadFileFromUrlPath(request.getUrlPath());
