@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private static final String TEMPLATE_PREFIX = "templates";
     private static final String STATIC_PREFIX = "static";
 
@@ -30,9 +30,25 @@ public class HttpResponse {
     }
 
     public void forward(String path) throws IOException, URISyntaxException {
+        if(isTemplate(path)){
+            byte[] response = readFile(path);
+            response200Header(response.length);
+            responseBody(response);
+        }
         byte[] response = readFile(path);
-        response200Header(response.length);
+        responseStaticHeader(response.length);
         responseBody(response);
+    }
+
+    private void responseStaticHeader(int contentLength) throws IOException{
+        dos.writeBytes("HTTP/1.1 200 OK \r\n");
+        dos.writeBytes(String.format("%s: %s\r\n", "Content-Type", "text/css;charset=utf-8"));
+        dos.writeBytes(String.format("%s: %s\r\n", "Content-Length", contentLength));
+        dos.writeBytes("\r\n");
+    }
+
+    private boolean isTemplate(String path) {
+        return path.endsWith(".html") || path.endsWith(".ico");
     }
 
     public void forwardBody(String body) {
@@ -94,20 +110,15 @@ public class HttpResponse {
     }
 
     private void printHeader() throws IOException {
-        this.headers.forEach((key, value) -> {
-            try {
-                dos.writeBytes(String.format("%s: %s\r\n", key, value));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        for (String key : headers.keySet()) {
+            dos.writeBytes(String.format("%s: %s\r\n", key, headers.get(key)));
+        }
     }
 
     private byte[] readFile(String path) throws IOException, URISyntaxException {
-        if (path.endsWith(".html") || path.endsWith(".ico")) {
+        if (isTemplate(path)) {
             return FileIoUtils.loadFileFromClasspath(TEMPLATE_PREFIX + path);
         }
         return FileIoUtils.loadFileFromClasspath(STATIC_PREFIX + path);
     }
-
 }

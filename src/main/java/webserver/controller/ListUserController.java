@@ -17,6 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 public class ListUserController extends AbstractController {
+    private TemplateLoader loader;
+    private Handlebars handlebars;
+
+    public ListUserController() {
+        loader = new ClassPathTemplateLoader();
+        loader.setPrefix("/templates");
+        loader.setSuffix(".html");
+        handlebars = new Handlebars(loader);
+    }
+
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
         if (!isLogin(httpRequest.getHeader(HttpHeader.COOKIE))) {
@@ -31,11 +41,6 @@ public class ListUserController extends AbstractController {
     }
 
     private String getProfilePage() throws IOException {
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-
-        Handlebars handlebars = new Handlebars(loader);
         Template template = handlebars.compile("user/list");
 
         Map<String, List<User>> users = new HashMap();
