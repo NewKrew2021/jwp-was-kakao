@@ -8,24 +8,23 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 
+import static domain.HttpHeader.*;
+
 public class HttpResponse {
 
-    private final String HTTP_VERSION = "HTTP/1.1";
+    private static final String HTTP_VERSION = "HTTP/1.1";
 
-    private final String TEMPLATE_BASE_PATH = "./templates";
-    private final String STATIC_BASE_PATH = "./static";
+    private static final String TEMPLATE_BASE_PATH = "./templates";
+    private static final String STATIC_BASE_PATH = "./static";
 
-    private final String HEADER_CONTENT_LENGTH = "Content-Length";
-    private final String HEADER_CONTENT_LOCATION = "Content-Location";
-    private final String HEADER_CONTENT_TYPE = "Content-Location";
-    private final String HEADER_LOCATION = "Content-Location";
+    private static final String CONTENT_TYPE_CSS = "text/css; charset=utf-8";
+    private static final String CONTENT_TYPE_HTML = "text/html; charset=utf-8";
 
-    private final String CONTENT_TYPE_CSS = "text/css; charset=utf-8";
-    private final String CONTENT_TYPE_HTML = "text/html; charset=utf-8";
+    private static final String EXTENSION_CSS = ".css";
+    private static final String EXTENSION_ICO = ".ico";
+    private static final String EXTENSION_HTML = ".html";
 
-    private final String EXTENSION_CSS = ".css";
-    private final String EXTENSION_ICO = ".ico";
-    private final String EXTENSION_HTML = ".html";
+    private static final String SET_COOKIE_VALUE_FORMAT = "%s=%s; Path=%s";
 
     private DataOutputStream dos;
     private HttpHeader httpHeader;
@@ -101,8 +100,8 @@ public class HttpResponse {
         }
     }
 
-    public void addHeader(String key, String value) {
-        httpHeader.addHeader(key, value);
+    public void setCookieWithPath(String key, String value, String path) {
+        httpHeader.addHeader(HEADER_SET_COOKIE, String.format(SET_COOKIE_VALUE_FORMAT, key, value, path));
     }
 
     private void send() throws IOException {

@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class URLMapper {
+    public static final String ROOT_URL = "/";
     public static final String INDEX_URL = "/index.html";
-
-    private static final String USER_CREATE_URL = "/user/create";
-    private static final String USER_LOGIN_URL = "/user/login";
-    private static final String USER_LIST_URL = "/user/list";
+    public static final String USER_LOGIN_HTML_URL = "/user/login.html";
+    public static final String LOGIN_FAIL_URL = "/user/login_failed.html";
+    public static final String USER_CREATE_URL = "/user/create";
+    public static final String USER_LOGIN_URL = "/user/login";
+    public static final String USER_LIST_URL = "/user/list";
 
     private static final Map<String, Controller> urlToController = new HashMap<>();
     private static final FileController defaultController = new FileController();

@@ -2,13 +2,16 @@ package webserver;
 
 import domain.HttpRequest;
 import domain.HttpResponse;
+import domain.URLMapper;
 
 public class FileController extends AbstractController {
+
+
     @Override
     void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         String path = httpRequest.getPath();
-        if(path.equals("/")) {
-            path = "/index.html";
+        if(path.equals(URLMapper.ROOT_URL)) {
+            path = URLMapper.INDEX_URL;
         }
         httpResponse.forward(path);
     }

@@ -7,26 +7,25 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
+import domain.URLMapper;
 
 import java.io.IOException;
 
 public class UserListController extends AbstractController {
-    private final String LOGIN_COOKIE_KEY = "logined";
-    private final String LOGIN_COOKIE_VALUE_FALSE = "false";
-    private final String USER_LOGIN_URL = "/user/login.html";
-    private final String USER_LIST_URL = "/user/list";
-    private final String USER_LIST_PREFIX = "/template";
-    private final String USER_LIST_SUFFIX = ".html";
+    private static final String LOGIN_COOKIE_KEY = "logined";
+    private static final String LOGIN_COOKIE_VALUE_FALSE = "false";
+    private static final String USER_LIST_PREFIX = "/templates";
+    private static final String USER_LIST_SUFFIX = ".html";
 
     @Override
     void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         if (httpRequest.getCookie(LOGIN_COOKIE_KEY) == null
                 || httpRequest.getCookie(LOGIN_COOKIE_KEY).equals(LOGIN_COOKIE_VALUE_FALSE)) {
-            httpResponse.sendRedirect(USER_LOGIN_URL);
+            httpResponse.sendRedirect(URLMapper.USER_LOGIN_HTML_URL);
             return;
         }
 
-        httpResponse.forwardBody(USER_LIST_URL, makeProfilePage());
+        httpResponse.forwardBody(URLMapper.USER_LIST_URL, makeProfilePage());
     }
 
     private String makeProfilePage() {

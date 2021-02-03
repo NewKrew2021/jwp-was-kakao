@@ -5,11 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Cookie {
+    private static final String COOKIE_DELIMITER = "; ";
+    private static final String COOKIE_KEY_VALUE_DELIMITER = "=";
+
     private Map<String, String> cookies = new HashMap<>();
 
     public Cookie(String cookieString) {
-        Arrays.stream(cookieString.split("; "))
-                    .forEach(cookie -> cookies.put(cookie.split("=")[0], cookie.split("=")[1]));
+        Arrays.stream(cookieString.split(COOKIE_DELIMITER))
+                    .forEach(cookie -> {
+                        String[] split = cookie.split(COOKIE_KEY_VALUE_DELIMITER);
+                        cookies.put(split[0], split[1]);
+                    });
     }
 
     public String get(String key) {

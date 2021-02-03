@@ -66,7 +66,7 @@ public class WebAcceptanceTest {
     void signUpAndRedirection_POST() {
         String path = "/user/create";
 
-        ExtractableResponse<Response> response = 회원가입_POST(path, user);
+        ExtractableResponse<Response> response = 회원가입_POST(user);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
     }
 
@@ -75,7 +75,7 @@ public class WebAcceptanceTest {
     void loginSuccess() {
         String path = "/user/login";
 
-        회원가입_POST(path, user);
+        회원가입_POST(user);
 
         String id = user.getId();
         String password = user.getPassword();
@@ -91,7 +91,7 @@ public class WebAcceptanceTest {
     void loginFail() {
         String path = "/user/login";
 
-        회원가입_POST(path, user);
+        회원가입_POST(user);
 
         String id = "NotUser";
         String password = "NotUser";
@@ -107,7 +107,7 @@ public class WebAcceptanceTest {
     void userListSuccess() {
         String loginPath = "/user/login";
         String path = "/user/list";
-        회원가입_POST(loginPath, user);
+        회원가입_POST(user);
         ExtractableResponse<Response> loginResponse = 로그인요청(loginPath, user.getId(), user.getPassword());
         ExtractableResponse<Response> response = 사용자리스트요청(path, loginResponse.cookie("logined"));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -119,7 +119,7 @@ public class WebAcceptanceTest {
     void userListFail() {
         String loginPath = "/user/login";
         String path = "/user/list";
-        회원가입_POST(loginPath, user);
+        회원가입_POST(user);
         ExtractableResponse<Response> loginResponse = 로그인요청(loginPath, "NotUser", "NotUser");
         ExtractableResponse<Response> response = 사용자리스트요청(path, loginResponse.cookie("logined"));
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -157,14 +157,14 @@ public class WebAcceptanceTest {
                 extract();
     }
 
-    ExtractableResponse<Response> 회원가입_POST(String path, User user) {
+    ExtractableResponse<Response> 회원가입_POST(User user) {
         return RestAssured.
                 given().log().all().
                 param("userId", user.getId()).
                 param("password", user.getPassword()).
                 param("name", user.getName()).
                 param("email", user.getEmail()).
-                when().post(path).
+                when().post("/user/create").
                 then().log().all().
                 extract();
     }

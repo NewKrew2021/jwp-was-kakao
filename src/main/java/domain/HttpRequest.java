@@ -10,7 +10,10 @@ import java.io.InputStreamReader;
 
 
 public class HttpRequest {
+    private static final String STATUS_DELIMITER = " ";
     private static final String HEADER_DELIMITER = "";
+    private static final String PATH_QUERY_DELIMITER = "?";
+    private static final String PATH_QUERY_DELIMITER_FOR_REGEX = "\\?";
 
     private RequestMethod method;
     private String path;
@@ -32,19 +35,19 @@ public class HttpRequest {
 
     private void setMethodAndPath(BufferedReader br) throws IOException {
         String line = IOUtils.readLine(br);
-        String[] parsed = line.split(" ");
+        String[] parsed = line.split(STATUS_DELIMITER);
         method = RequestMethod.of(parsed[0]);
         path = parsed[1];
     }
 
     private void setParameter(BufferedReader br) throws IOException {
-        if (getMethod().equals(RequestMethod.GET) && path.contains("?")) {
-            String[] parsed = path.split("\\?");
+        if (getMethod().equals(RequestMethod.GET) && path.contains(PATH_QUERY_DELIMITER)) {
+            String[] parsed = path.split(PATH_QUERY_DELIMITER_FOR_REGEX);
             path = parsed[0];
             httpParameter = new HttpParameter(parsed[1]);
         }
         if (getMethod().equals(RequestMethod.POST)) {
-            int bodySize = Integer.parseInt(httpHeader.getHeader("Content-Length"));
+            int bodySize = Integer.parseInt(httpHeader.getHeader(HttpHeader.HEADER_CONTENT_LENGTH));
             httpParameter = new HttpParameter(IOUtils.readData(br, bodySize));
         }
     }
