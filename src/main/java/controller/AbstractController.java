@@ -16,9 +16,11 @@ public abstract class AbstractController implements Controller {
         try {
             if (httpRequest.getMethod() == HttpMethod.POST) {
                 doPost(httpRequest, httpResponse);
+                return;
             }
             if (httpRequest.getMethod() == HttpMethod.GET) {
                 doGet(httpRequest, httpResponse);
+                return;
             }
         } catch (UserAuthorizationException e) {
             logger.error(e.getMessage());

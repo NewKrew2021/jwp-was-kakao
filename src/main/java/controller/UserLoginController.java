@@ -10,6 +10,7 @@ public class UserLoginController extends AbstractController {
         if (UserService.isValidUser(httpRequest)) {
             logger.debug("login failed");
             httpResponse.sendRedirect("/user/login_failed.html");
+            return;
         }
         logger.debug("login success");
         httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
