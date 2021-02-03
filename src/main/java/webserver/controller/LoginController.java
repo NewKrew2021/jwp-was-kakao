@@ -1,9 +1,8 @@
 package webserver.controller;
 
 import db.DataBase;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
-import webserver.controller.AbstractController;
+import http.HttpRequest;
+import http.HttpResponse;
 
 public class LoginController extends AbstractController {
     @Override
@@ -11,9 +10,9 @@ public class LoginController extends AbstractController {
         super.doPost(httpRequest, httpResponse);
 
         boolean login = DataBase.isPossibleLogin(httpRequest.getParameter("userId"), httpRequest.getParameter("password"));
-        httpResponse.addHeader("Set-Cookie", "logined=" + login);
 
         if (login) {
+            httpResponse.login();
             httpResponse.sendRedirect("/index.html");
             return;
         }

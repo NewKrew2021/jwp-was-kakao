@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import org.springframework.http.HttpMethod;
 import utils.IOUtils;
@@ -10,11 +10,12 @@ import java.util.Map;
 
 public class HttpRequest {
 
-
-    private Map<String, String> httpHeader = new HashMap<>();
+    private HttpHeader httpHeader;
+    private HttpBody httpBody;
     private Map<String, String> parameters = new HashMap<>();
     private HttpMethod httpMethod;
     private String path;
+    private String version;
 
     public HttpRequest(InputStream in) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
@@ -22,35 +23,13 @@ public class HttpRequest {
         try {
             String line = bufferedReader.readLine();
             parseFirstLine(line);
-            parseHeader(bufferedReader);
-            parseBody(bufferedReader);
+            httpHeader = new HttpHeader(bufferedReader);
+            httpBody = new HttpBody(bufferedReader, httpHeader.getHeaderByKey("Content-Length"));
+            parameters.putAll(httpBody.getBodyParameters());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-    }
-
-    private void parseBody(BufferedReader bufferedReader) throws IOException {
-        int bodyLength = Integer.parseInt(httpHeader.getOrDefault("Content-Length" , "0"));
-
-        if( bodyLength == 0 ) {
-            return;
-        }
-
-        String body = IOUtils.readData(bufferedReader, bodyLength);
-        String[] parameters = body.split("&|=");
-        for (int i = 0; i < parameters.length; i = i + 2) {
-            this.parameters.put(parameters[i], URLDecoder.decode( parameters[i + 1], "UTF-8" ));
-        }
-    }
-
-    private void parseHeader(BufferedReader bufferedReader) throws IOException {
-        String line = bufferedReader.readLine();
-        while ( line != null && !line.equals("")) {
-            String[] currentLine = line.split(": ");
-            httpHeader.put(currentLine[0], URLDecoder.decode(currentLine[1],"UTF-8"));
-            line = bufferedReader.readLine();
-        }
     }
 
     private void parseFirstLine(String line) throws UnsupportedEncodingException {
@@ -64,7 +43,7 @@ public class HttpRequest {
             makeParameter(pathAndParameter[1].split("=|&"));
         }
 
-        httpHeader.put("Version", currentLine[2]);
+        version = currentLine[2];
     }
 
     private void makeParameter(String[] parameters) throws UnsupportedEncodingException {
@@ -82,11 +61,14 @@ public class HttpRequest {
     }
 
     public String getHeader(String key) {
-        return httpHeader.getOrDefault(key, "");
+        return httpHeader.getHeaderByKey(key);
     }
 
     public String getParameter(String key) {
         return parameters.getOrDefault(key, "");
     }
 
+    public HttpHeader getHttpHeader() {
+        return httpHeader;
+    }
 }

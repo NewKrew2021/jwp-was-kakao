@@ -1,5 +1,7 @@
 package webserver;
 
+import http.HttpRequest;
+import http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.controller.*;
@@ -30,7 +32,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = new HttpRequest(in);
-            HttpResponse httpResponse = new HttpResponse(out);
+            HttpResponse httpResponse = new HttpResponse(out, httpRequest.getHttpHeader());
             String url = httpRequest.getPath();
 
             if( controllers.containsKey(url) ) {

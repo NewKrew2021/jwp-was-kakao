@@ -7,9 +7,8 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import utils.FileIoUtils;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
-import webserver.controller.AbstractController;
+import http.HttpRequest;
+import http.HttpResponse;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

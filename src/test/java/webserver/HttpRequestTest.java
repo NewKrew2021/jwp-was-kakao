@@ -1,5 +1,6 @@
 package webserver;
 
+import http.HttpRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 
