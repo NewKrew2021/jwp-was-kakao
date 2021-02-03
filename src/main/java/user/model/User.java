@@ -33,11 +33,6 @@ public class User {
         return email;
     }
 
-    @Override
-    public String toString() {
-        return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
-    }
-
     private void checkIsValidUser() {
         if (StringUtils.isBlank(userId)) {
             throw new IllegalArgumentException("Please check userId");
@@ -63,5 +58,10 @@ public class User {
 
     public boolean same(String password) {
         return this.password.equals(password);
+    }
+
+    @Override
+    public String toString() {
+        return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
 }

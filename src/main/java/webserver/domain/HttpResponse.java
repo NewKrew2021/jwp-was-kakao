@@ -2,12 +2,10 @@ package webserver.domain;
 
 import annotation.web.ResponseMethod;
 import com.google.common.collect.Maps;
-import utils.FileIoUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -54,7 +52,7 @@ public class HttpResponse {
             }
             dos.flush();
         } catch (IOException e) {
-            throw new IllegalArgumentException("asd");
+            throw new IllegalArgumentException("Error when make header");
         }
     }
 
@@ -67,7 +65,7 @@ public class HttpResponse {
             dos.writeBytes(String.format("HTTP/1.1 %d %s\r\n",
                     responseMethod.getStatusCode(), responseMethod.getMessage()));
         } catch (IOException e) {
-            throw new IllegalArgumentException("asdfasdf");
+            throw new IllegalArgumentException("Error while make response");
         }
     }
 }
