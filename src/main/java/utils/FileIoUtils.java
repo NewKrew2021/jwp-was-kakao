@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.charset.Charset;
 
 public class FileIoUtils {
     public static byte[] loadFileFromClasspath(String filePath) throws IOException, URISyntaxException {
