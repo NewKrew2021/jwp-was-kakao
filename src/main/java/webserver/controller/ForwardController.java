@@ -1,8 +1,7 @@
-package webserver.ui;
+package webserver.controller;
 
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
-import webserver.ui.AbstractController;
 
 public class ForwardController extends AbstractController {
     @Override

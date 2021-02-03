@@ -1,10 +1,10 @@
-package user.ui;
+package user.controller;
 
 import user.service.UserService;
 import user.vo.UserCreateValue;
+import webserver.controller.AbstractController;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
-import webserver.ui.AbstractController;
 
 public class CreateUserController extends AbstractController {
     @Override

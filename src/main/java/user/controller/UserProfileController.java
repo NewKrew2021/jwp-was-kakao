@@ -1,10 +1,10 @@
-package user.ui;
+package user.controller;
 
 import user.view.UserView;
+import webserver.controller.AbstractController;
 import webserver.domain.Body;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
-import webserver.ui.AbstractController;
 
 public class UserProfileController extends AbstractController {
     @Override

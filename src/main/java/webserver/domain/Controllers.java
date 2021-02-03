@@ -1,11 +1,12 @@
 package webserver.domain;
 
 import com.google.common.collect.Maps;
-import user.ui.CreateUserController;
-import user.ui.ListUserController;
-import user.ui.LoginController;
-import user.ui.UserProfileController;
-import webserver.ui.*;
+import user.controller.CreateUserController;
+import user.controller.ListUserController;
+import user.controller.LoginController;
+import user.controller.UserProfileController;
+import webserver.controller.Controller;
+import webserver.controller.ForwardController;
 
 import java.util.Map;
 
