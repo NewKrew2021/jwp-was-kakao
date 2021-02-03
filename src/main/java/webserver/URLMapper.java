@@ -13,6 +13,7 @@ public class URLMapper {
     public static final String USER_CREATE_URL = "/user/create";
     public static final String USER_LOGIN_URL = "/user/login";
     public static final String USER_LIST_URL = "/user/list";
+    public static final String USER_LIST_HTML_URL = "/user/list.html";
 
     private static final Map<String, Controller> urlToController = new HashMap<>();
     private static final FileController defaultController = new FileController();
@@ -21,6 +22,7 @@ public class URLMapper {
         urlToController.put(USER_CREATE_URL, new UserCreateController());
         urlToController.put(USER_LOGIN_URL, new UserLoginController());
         urlToController.put(USER_LIST_URL, new UserListController());
+        urlToController.put(USER_LIST_HTML_URL, new UserListController());
     }
 
     public static Controller get(String url) {

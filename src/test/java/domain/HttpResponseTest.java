@@ -17,5 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpResponseTest {
 
-
+    @Test
+    void name() {
+        assertThat("/css/styles.css".endsWith(".css")).isTrue();
+    }
 }
