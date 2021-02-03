@@ -1,4 +1,4 @@
-package webserver;
+package webserver.domain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
+    private static final String SET_COOKIE = "Set-Cookie";
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String LOCATION = "Location";
+    private static final String HTTP_200_OK = "HTTP/1.1 200 OK \r\n";
+    private static final String HTTP_302_FOUND = "HTTP/1.1 302 Found \r\n";
+    private static final String HTTP_404_NOT_FOUND = "HTTP/1.1 404 NOT Found \r\n";
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;
@@ -22,15 +29,15 @@ public class HttpResponse {
         responseHeader = new HashMap<>();
     }
 
-    public void addHeader( String key, String value ) {
+    public void addHeader(String key, String value) {
         responseHeader.put(key, value);
     }
 
     public void sendRedirect(String url) {
         try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + responseHeader.getOrDefault("host", "http://localhost:8080") + url + " \r\n");
-            dos.writeBytes("Set-Cookie: " + responseHeader.getOrDefault("Set-Cookie", "logined=false") + "; Path=/\r\n");
+            dos.writeBytes(HTTP_302_FOUND);
+            dos.writeBytes(LOCATION + ": " + url + " \r\n");
+            dos.writeBytes(SET_COOKIE + ": " + responseHeader.get(SET_COOKIE) + "; Path=/\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
@@ -41,9 +48,9 @@ public class HttpResponse {
     public void forward(String path) {
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath(path);
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type:" + responseHeader.get("Accept") + "\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+            dos.writeBytes(HTTP_200_OK);
+            dos.writeBytes(CONTENT_TYPE + ": " + responseHeader.get(CONTENT_TYPE) + "\r\n");
+            dos.writeBytes(CONTENT_LENGTH + ": " + body.length + "\r\n");
             dos.writeBytes("\r\n");
             responseBody(body);
         } catch (IOException | URISyntaxException e) {
@@ -51,16 +58,12 @@ public class HttpResponse {
         }
     }
 
-    public void response200Header() {
-        this.response200Header(0);
-    }
-
     public void response200Header(int bodyLength) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + bodyLength + "\r\n");
-            dos.writeBytes("Set-Cookie: " + responseHeader.getOrDefault("Set-Cookie", "logined=false") + "; Path=/\r\n");
+            dos.writeBytes(HTTP_200_OK);
+            dos.writeBytes(CONTENT_TYPE + ": " + responseHeader.get(CONTENT_TYPE) + "\r\n");
+            dos.writeBytes(CONTENT_LENGTH + ": " + bodyLength + "\r\n");
+            dos.writeBytes(SET_COOKIE + ": " + responseHeader.get(SET_COOKIE) + "; Path=/\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -79,7 +82,7 @@ public class HttpResponse {
 
     public void response404() {
         try {
-            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes(HTTP_404_NOT_FOUND);
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {

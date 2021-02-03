@@ -2,6 +2,7 @@ package webserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
+import webserver.domain.HttpRequest;
 
 import java.io.*;
 

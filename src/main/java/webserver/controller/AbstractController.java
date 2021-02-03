@@ -1,16 +1,16 @@
 package webserver.controller;
 
 import org.springframework.http.HttpMethod;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import webserver.domain.HttpRequest;
+import webserver.domain.HttpResponse;
 
-public abstract class AbstractController implements Controller {
+public class AbstractController implements Controller {
 
     protected boolean login = false;
 
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (httpRequest.getHeader("Cookie").equals("logined=true")) {
+        if (httpRequest.getHeader("Cookie").contains("logined=true")) {
             httpResponse.addHeader("Set-Cookie", "logined=true");
             login = true;
         }

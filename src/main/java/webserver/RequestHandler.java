@@ -3,6 +3,8 @@ package webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.controller.*;
+import webserver.domain.HttpRequest;
+import webserver.domain.HttpResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +20,15 @@ public class RequestHandler implements Runnable {
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        initControllers();
+    }
+
+    private void initControllers() {
         controllers = new HashMap<>();
-        controllers.put("/user/create", new CreateUserController() );
-        controllers.put("/user/login" , new LoginController());
-        controllers.put("/user/list.html" , new ListUserController());
+        controllers.put("/user/create", new CreateUserController());
+        controllers.put("/user/login", new LoginController());
+        controllers.put("/user/list.html", new ListUserController());
+
     }
 
     public void run() {
@@ -31,13 +38,10 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(out);
-            String url = httpRequest.getPath();
 
-            if( controllers.containsKey(url) ) {
-                controllers.get(url).service(httpRequest,httpResponse);
-            }
+            Controller controller = controllers.getOrDefault(httpRequest.getPath(), new FowardController());
 
-            new FowardController().service(httpRequest, httpResponse);
+            controller.service(httpRequest,httpResponse);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

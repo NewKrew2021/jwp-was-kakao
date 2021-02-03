@@ -1,4 +1,4 @@
-package webserver;
+package webserver.domain;
 
 import org.springframework.http.HttpMethod;
 import utils.IOUtils;
@@ -9,6 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
+    private static final String BODY_SEPARATOR = "&|=";
+    private static final String PARAMETER_SEPARATOR = "\\?";
+    private static final String FIRST_LINE_SEPARATOR = " ";
+    private static final String HEADER_SEPARATOR = ": ";
+    private static final String DEFAULT_ENCODING = "UTF-8";
+    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String HTTP_VERSION = "Version";
 
 
     private Map<String, String> httpHeader = new HashMap<>();
@@ -18,7 +25,6 @@ public class HttpRequest {
 
     public HttpRequest(InputStream in) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-
         try {
             String line = bufferedReader.readLine();
             parseFirstLine(line);
@@ -31,45 +37,43 @@ public class HttpRequest {
     }
 
     private void parseBody(BufferedReader bufferedReader) throws IOException {
-        int bodyLength = Integer.parseInt(httpHeader.getOrDefault("Content-Length" , "0"));
-
-        if( bodyLength == 0 ) {
+        int bodyLength = Integer.parseInt(httpHeader.getOrDefault(CONTENT_LENGTH, "0"));
+        if (bodyLength == 0) {
             return;
         }
-
         String body = IOUtils.readData(bufferedReader, bodyLength);
-        String[] parameters = body.split("&|=");
+        String[] parameters = body.split(BODY_SEPARATOR);
         for (int i = 0; i < parameters.length; i = i + 2) {
-            this.parameters.put(parameters[i], URLDecoder.decode( parameters[i + 1], "UTF-8" ));
+            this.parameters.put(parameters[i], URLDecoder.decode(parameters[i + 1], DEFAULT_ENCODING));
         }
     }
 
     private void parseHeader(BufferedReader bufferedReader) throws IOException {
         String line = bufferedReader.readLine();
-        while ( line != null && !line.equals("")) {
-            String[] currentLine = line.split(": ");
-            httpHeader.put(currentLine[0], URLDecoder.decode(currentLine[1],"UTF-8"));
+        while (line != null && !line.equals("")) {
+            String[] currentLine = line.split(HEADER_SEPARATOR);
+            httpHeader.put(currentLine[0], URLDecoder.decode(currentLine[1], DEFAULT_ENCODING));
             line = bufferedReader.readLine();
         }
     }
 
     private void parseFirstLine(String line) throws UnsupportedEncodingException {
-        String[] currentLine = line.split(" ");
+        String[] currentLine = line.split(FIRST_LINE_SEPARATOR);
         httpMethod = HttpMethod.resolve(currentLine[0]);
 
-        String[] pathAndParameter = currentLine[1].split("\\?");
+        String[] pathAndParameter = currentLine[1].split(PARAMETER_SEPARATOR);
         path = pathAndParameter[0];
 
-        if( pathAndParameter.length > 1 ) {
-            makeParameter(pathAndParameter[1].split("=|&"));
+        if (pathAndParameter.length > 1) {
+            makeParameter(pathAndParameter[1].split(BODY_SEPARATOR));
         }
 
-        httpHeader.put("Version", currentLine[2]);
+        httpHeader.put(HTTP_VERSION, currentLine[2]);
     }
 
     private void makeParameter(String[] parameters) throws UnsupportedEncodingException {
         for (int i = 0; i < parameters.length; i = i + 2) {
-            this.parameters.put( parameters[i] , URLDecoder.decode( parameters[i + 1], "UTF-8" ));
+            this.parameters.put(parameters[i], URLDecoder.decode(parameters[i + 1], DEFAULT_ENCODING));
         }
     }
 
