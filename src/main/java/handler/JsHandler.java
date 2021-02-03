@@ -6,7 +6,7 @@ import web.HttpUrl;
 public class JsHandler extends FileHandler {
     @Override
     protected String getContentType() {
-        return "text/html;charset=utf-8";
+        return "application/js";
     }
 
     @Override

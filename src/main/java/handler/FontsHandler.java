@@ -6,7 +6,7 @@ import web.HttpUrl;
 public class FontsHandler extends FileHandler {
     @Override
     protected String getContentType() {
-        return "text/html;charset=utf-8";
+        return "font/opentype";
     }
 
     @Override
