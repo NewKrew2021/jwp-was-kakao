@@ -1,5 +1,6 @@
 package domain;
 
+import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
 import java.io.DataOutputStream;
@@ -10,94 +11,57 @@ import java.nio.charset.StandardCharsets;
 
 public class HttpResponse {
 
+    private final String HTTP_VERSION = "HTTP/1.1";
     private final String INDEX = "/index.html";
     private final String TEMPLATE_BASE_PATH = "./templates";
     private final String STATIC_BASE_PATH = "./static";
 
     private DataOutputStream dos;
+    private HttpHeader httpHeader;
+    private HttpStatus httpStatus;
+    private HttpBody httpBody;
 
     public HttpResponse(OutputStream out) {
         dos = new DataOutputStream(out);
+        httpHeader = new HttpHeader();
     }
 
     public void forward(String path) {
-        if(path.equals("/")) {
-            path = INDEX;
-        }
-
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath(addBasePath(path));
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + findContentType(path) + "; charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
-            dos.writeBytes("Content-Location: " + path + "\r\n");
-            dos.writeBytes("\r\n");
-            writeResponseBody(body);
-        } catch (IOException e) {
-            sendInternalServerError();
-        } catch (URISyntaxException e) {
+            httpBody = new HttpBody(body);
+
+            httpStatus = HttpStatus.OK;
+            httpHeader.addHeader("Content-Type", findContentType(path) + "; charset=utf-8");
+            httpHeader.addHeader("Content-Length", String.valueOf(httpBody.getBytesSize()));
+            httpHeader.addHeader("Content-Location", path);
+            send();
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
             sendInternalServerError();
         }
     }
 
     private String addBasePath(String path) {
-        if (path.startsWith("/css")
-                || path.startsWith("/fonts")
-                || path.startsWith("/images")
-                || path.startsWith("/js")) {
-            return STATIC_BASE_PATH + path;
+        if (path.endsWith(".html") || path.endsWith(".ico")) {
+            return TEMPLATE_BASE_PATH + path;
         }
-        return TEMPLATE_BASE_PATH + path;
+        return STATIC_BASE_PATH + path;
     }
 
+    // TODO js, font, ico
     private String findContentType(String path) {
         if (path.startsWith("/css")) {
             return "text/css";
         }
-//        if (path.startsWith("/fonts")
-//                || path.startsWith("/images")
-//                || path.startsWith("/js")) {
-//
-//        }
         return "text/html";
     }
 
     public void sendRedirect(String location) {
         try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            sendInternalServerError();
-        }
-    }
-
-    public void loginTrue() {
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + INDEX + "\r\n");
-            dos.writeBytes("Set-Cookie: logined=true; Path=/\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            sendInternalServerError();
-        }
-    }
-
-    public void loginFalse() {
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: /user/login_failed.html\r\n");
-            dos.writeBytes("Set-Cookie: logined=false; Path=/\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            sendInternalServerError();
-        }
-    }
-
-    private void writeResponseBody(byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
+            httpStatus = HttpStatus.FOUND;
+            httpHeader.addHeader("Location", location);
+            send();
         } catch (IOException e) {
             sendInternalServerError();
         }
@@ -105,25 +69,48 @@ public class HttpResponse {
 
     public void sendInternalServerError() {
         try {
-            dos.writeBytes("HTTP/1.1 500 Internal Server Error\r\n");
-            dos.writeBytes("\r\n");
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            dos.writeBytes(this.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void handleUserList(String content) {
-        byte[] body = content.getBytes();
         String path = "/user/list";
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + findContentType(path) + "; charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
-            dos.writeBytes("Content-Location: " + path + "\r\n");
-            dos.writeBytes("\r\n");
-            writeResponseBody(body);
+            httpStatus = HttpStatus.OK;
+            httpBody = new HttpBody(content);
+            httpHeader.addHeader("Content-Type", findContentType(path) + "; charset=utf-8");
+            httpHeader.addHeader("Content-Length", String.valueOf(httpBody.getBytesSize()));
+            httpHeader.addHeader("Content-Location", path);
+            send();
         } catch (IOException e) {
             sendInternalServerError();
         }
+    }
+
+    public void addHeader(String key, String value) {
+        httpHeader.addHeader(key, value);
+    }
+
+    private void send() throws IOException {
+        dos.writeBytes(HTTP_VERSION + " " + httpStatus + " \r\n");
+        dos.writeBytes(httpHeader.toString());
+        if(httpBody != null) {
+            dos.write(httpBody.getBytes(), 0, httpBody.getBytesSize());
+            dos.flush();
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(HTTP_VERSION).append(' ').append(httpStatus).append(" \r\n");
+        sb.append(httpHeader);
+        if(httpBody != null) {
+            sb.append(httpBody.toString());
+        }
+        return sb.toString();
     }
 }

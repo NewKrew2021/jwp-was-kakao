@@ -8,9 +8,17 @@ public class HttpHeader {
     private Map<String, String> headers = new HashMap<>();
     private Cookie cookie;
 
+    public HttpHeader() {
+
+    }
+
     public HttpHeader(List<String> headers) {
         setHeader(headers);
         setCookie();
+    }
+
+    public void addHeader(String key, String value) {
+        this.headers.put(key, value);
     }
 
     private void setHeader(List<String> headerStrings) {
@@ -35,4 +43,16 @@ public class HttpHeader {
         return cookie.get(key);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            sb.append(header.getKey()).append(": ").append(header.getValue()).append("\r\n");
+        }
+        if(cookie != null && !cookie.isEmpty()) {
+            sb.append(cookie);
+        }
+        sb.append("\r\n");
+        return sb.toString();
+    }
 }

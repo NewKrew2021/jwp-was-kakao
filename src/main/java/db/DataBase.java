@@ -21,4 +21,11 @@ public class DataBase {
     public static Collection<User> findAll() {
         return users.values();
     }
+
+    public static boolean login(String id, String password) {
+        if(!users.containsKey(id)) {
+            return false;
+        }
+        return users.get(id).getPassword().equals(password);
+    }
 }

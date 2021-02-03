@@ -4,7 +4,7 @@ import annotation.web.RequestMethod;
 import domain.HttpRequest;
 import domain.HttpResponse;
 
-public abstract class AbstractHandler implements Handler {
+public abstract class AbstractController implements Controller {
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
         if (httpRequest.getMethod() == RequestMethod.GET) {
             doGet(httpRequest, httpResponse);

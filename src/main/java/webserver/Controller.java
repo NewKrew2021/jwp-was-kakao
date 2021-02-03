@@ -3,7 +3,7 @@ package webserver;
 import domain.HttpRequest;
 import domain.HttpResponse;
 
-public interface Handler {
+public interface Controller {
     void service(HttpRequest httpRequest, HttpResponse httpResponse);
 }
 

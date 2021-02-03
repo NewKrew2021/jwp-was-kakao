@@ -38,17 +38,18 @@ public class RequestHandler implements Runnable {
             }
             HttpResponse httpResponse = new HttpResponse(out);
 
-            Map<String, Handler> handlerMap = new HashMap<>();
-            handlerMap.put("/user/create", new UserCreateHandler());
-            handlerMap.put("/user/login", new UserLoginHandler());
-            handlerMap.put("/user/list", new UserListHandler());
+            Map<String, Controller> handlerMap = new HashMap<>();
+            handlerMap.put("/user/create", new UserCreateController());
+            handlerMap.put("/user/login", new UserLoginController());
+            handlerMap.put("/user/list", new UserListController());
 
-            Handler handler = handlerMap.get(httpRequest.getPath());
+            Controller controller = handlerMap.get(httpRequest.getPath());
 
-            if(handler == null) {
-                handler = new FileHandler();
+            if(controller == null) {
+                controller = new FileController();
             }
-            handler.service(httpRequest, httpResponse);
+            controller.service(httpRequest, httpResponse);
+            logger.debug(httpResponse.toString());
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

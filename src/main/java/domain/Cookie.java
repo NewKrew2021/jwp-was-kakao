@@ -15,4 +15,18 @@ public class Cookie {
     public String get(String key) {
         return cookies.get(key);
     }
+
+    public boolean isEmpty() {
+        return cookies.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Cookie: ");
+        for (Map.Entry<String, String> cookie : cookies.entrySet()) {
+            sb.append(cookie.getKey()).append("=").append(cookie.getValue()).append("; ");
+        }
+        sb.append("\r\n");
+        return sb.toString();
+    }
 }

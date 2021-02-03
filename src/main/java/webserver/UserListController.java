@@ -11,12 +11,12 @@ import domain.HttpResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 
-public class UserListHandler extends AbstractHandler{
+public class UserListController extends AbstractController {
 
     @Override
     void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         if (httpRequest.getCookie("logined") == null || httpRequest.getCookie("logined").equals("false")) {
-            httpResponse.forward("/user/login.html");
+            httpResponse.sendRedirect("/user/login.html");
             return;
         }
 
@@ -25,11 +25,8 @@ public class UserListHandler extends AbstractHandler{
             loader.setPrefix("/templates");
             loader.setSuffix(".html");
             Handlebars handlebars = new Handlebars(loader);
-
             Template template = handlebars.compile("user/list");
-
             String profilePage = template.apply(DataBase.findAll());
-
             httpResponse.handleUserList(URLDecoder.decode(profilePage, "UTF-8"));
         } catch(IOException e) {
             e.printStackTrace();

@@ -5,9 +5,7 @@ import domain.HttpRequest;
 import domain.HttpResponse;
 import model.User;
 
-public class UserCreateHandler extends AbstractHandler {
-
-    final String INDEX = "/index.html";
+public class UserCreateController extends AbstractController {
 
     @Override
     void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
@@ -18,6 +16,6 @@ public class UserCreateHandler extends AbstractHandler {
     void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
         DataBase.addUser(user);
-        httpResponse.sendRedirect(INDEX);
+        httpResponse.sendRedirect(RequestHandler.BASE_URL);
     }
 }
