@@ -41,6 +41,19 @@ public class Response {
         );
     }
 
+    public static Response ofDynamicHtml(ResponseBody responseBody){
+        ResponseHeaders headers = new ResponseHeaders();
+        headers.addHeader("Content-Type", "text/html;charset=utf-8");
+        headers.addHeader("Content-Length", responseBody.getByteSize() + "");
+        return new Response(
+                HttpVersion.HTTP1_1,
+                StatusCode.OK,
+                headers,
+                responseBody
+        );
+
+    }
+
     public void addHeader(String key, String value){
         headers.addHeader(key, value);
     }

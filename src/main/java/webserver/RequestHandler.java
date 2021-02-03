@@ -43,6 +43,10 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             List<String> lines = Arrays.asList(IOUtils.readData(br, 5000).trim().split("\n"));
+            System.out.println("#####또하나의 요청");
+            for(String line: lines){
+                System.out.println(line);
+            }
             Request request = new Request(lines);
 
             Response response = Response.ofDefaultFile(new ResponseBody("No Page"));
