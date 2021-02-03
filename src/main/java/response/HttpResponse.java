@@ -20,8 +20,12 @@ public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private DataOutputStream dos;
 
-    public HttpResponse(OutputStream out) {
-        this.dos = new DataOutputStream(out);
+    private HttpResponse(DataOutputStream dos) {
+        this.dos = dos;
+    }
+
+    public static HttpResponse from(OutputStream out) {
+        return new HttpResponse(new DataOutputStream(out));
     }
 
     public void response200Header(int lengthOfBodyContent, String type) {
