@@ -10,6 +10,7 @@ public class Request {
     private final RequestHeaders headers;
     private final Map<String, String> queries;
     private final Map<String, String> bodies;
+    private final Cookies cookies;
 
     public Request(List<String> lines) {
         List<String> urlProperties = Arrays.asList(lines.get(0).split(" "));
@@ -18,11 +19,12 @@ public class Request {
         this.urlPath = makeUrlPath(urlProperties.get(1));
         this.queries = makeQueries(urlProperties.get(1));
         this.bodies = makeBodies(lines.get(lines.size() - 1));
+        this.cookies = headers.extractCookies();
     }
 
     private Map<String, String> makeBodies(String fullUrl) {
         Map<String, String> bodies = new HashMap<>();
-        if(!fullUrl.equals("")) {
+        if (!fullUrl.equals("")) {
             Arrays.asList(fullUrl.split("&"))
                     .forEach(query -> {
                         List<String> result = Arrays.asList(query.split("="));
@@ -63,11 +65,11 @@ public class Request {
         return urlPath;
     }
 
-    public String getMethod(){
+    public String getMethod() {
         return method;
     }
 
-    public Map<String, String> getQueries(){
+    public Map<String, String> getQueries() {
         return queries;
     }
 
@@ -78,11 +80,16 @@ public class Request {
     @Override
     public String toString() {
         return "Request{" +
-                "urlPath='" + urlPath + '\'' +
+                "urlPath='" + urlPath + "'\n" +
                 ", method='" + method + "'\n" +
                 ", headers=" + headers + "\n" +
                 ", queries=" + queries + "\n" +
-                ", bodies=" + bodies +
+                ", bodies=" + bodies + "\n" +
+                ", cookies=" + cookies +
                 '}';
+    }
+
+    public Cookies getCookies(){
+        return cookies;
     }
 }

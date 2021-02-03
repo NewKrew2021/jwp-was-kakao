@@ -19,6 +19,10 @@ public class RequestHeaders {
         headers.put(key, value);
     }
 
+    public Cookies extractCookies() {
+        return new Cookies(headers.get("Cookie"));
+    }
+
     @Override
     public String toString() {
         return "RequestHeaders{" +

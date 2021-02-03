@@ -57,6 +57,10 @@ public class UserController {
 
     //TODO : 예외 처리 만들어야함
     public Response list(Request request) {
+        if(!request.getCookies().getValueOf("logined").equals("true")){
+            return Response.ofRedirect("/user/login.html");
+        }
+
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
         loader.setSuffix(".html");

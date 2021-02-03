@@ -47,6 +47,7 @@ public class RequestHandler implements Runnable {
                     .map(String::trim)
                     .collect(Collectors.toList());
             Request request = new Request(lines);
+            System.out.println(request);
 
             Response response = Response.ofDefaultFile(new ResponseBody("No Page"));
 
