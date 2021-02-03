@@ -53,8 +53,18 @@ public class HttpRequest {
         this.params = HttpUtils.getParamMap(parsedUri[1]);
     }
 
-    public boolean sameRequestLine(HttpRequest httpRequest) {
-        return requestMethod.equals(httpRequest.requestMethod) && uri.equals(httpRequest.uri);
+    public boolean matchWith(HttpRequest request) {
+        if (isTemplateRequest() && request.isTemplateRequest()) {
+            return true;
+        }
+        if (isStaticRequest() && request.isStaticRequest()) {
+            return true;
+        }
+        return sameRequestLine(request);
+    }
+
+    public boolean sameRequestLine(HttpRequest request) {
+        return requestMethod.equals(request.requestMethod) && uri.equals(request.uri);
     }
 
     public boolean isTemplateRequest() {

@@ -1,6 +1,7 @@
 package http;
 
 import annotation.web.RequestMethod;
+import controller.DispatchInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,5 +59,21 @@ class HttpRequestTest {
         request = new HttpRequest(parser);
 
         assertThat(request.isStaticRequest()).isTrue();
+    }
+
+    @DisplayName("매치하는 request일 경우 true")
+    @Test
+    void matchWith() {
+        parser.parse("POST /user/create HTTP/1.1\n" +
+                "Host: localhost:8080\n" +
+                "Connection: keep-alive\n" +
+                "Content-Length: 59\n" +
+                "Content-Type: application/x-www-form-urlencoded\n" +
+                "Accept: */*\n" +
+                "\n" +
+                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+        request = new HttpRequest(parser);
+
+        assertThat(request.matchWith(DispatchInfo.UserCreate.getHttpRequest())).isTrue();
     }
 }

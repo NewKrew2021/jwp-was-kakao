@@ -19,17 +19,11 @@ public enum DispatchInfo {
         this.requestHandler = requestHandler;
     }
 
-    public Handler getRequestHandler() {
-        return requestHandler;
+    public HttpRequest getHttpRequest() {
+        return httpRequest;
     }
 
-    public boolean matchWith(HttpRequest request) {
-        if (httpRequest.isTemplateRequest() && request.isTemplateRequest()) {
-            return true;
-        }
-        if (httpRequest.isStaticRequest() && request.isStaticRequest()) {
-            return true;
-        }
-        return httpRequest.sameRequestLine(request);
+    public Handler getRequestHandler() {
+        return requestHandler;
     }
 }
