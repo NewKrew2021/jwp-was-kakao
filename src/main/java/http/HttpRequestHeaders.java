@@ -22,10 +22,6 @@ public class HttpRequestHeaders {
     }
 
     public String getHeader(String name) {
-        try {
-            return headers.get(name).getHeaderContent();
-        } catch (NullPointerException e) {
-            return null;
-        }
+        return headers.get(name).getHeaderContent();
     }
 }

@@ -9,14 +9,25 @@ import java.io.IOException;
 import java.util.Map;
 
 public class TemplateUtils {
-    public static byte[] buildPage(String path, Map<String, Object> params) throws IOException {
+    private static TemplateUtils templateUtils;
+    private Handlebars handlebars;
+
+    private TemplateUtils() {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
         loader.setSuffix(".html");
-        Handlebars handlebars = new Handlebars(loader);
+        handlebars = new Handlebars(loader);
+    }
 
+    public static TemplateUtils getInstance() {
+        if (templateUtils == null) {
+            templateUtils = new TemplateUtils();
+        }
+        return templateUtils;
+    }
+
+    public byte[] buildPage(String path, Map<String, Object> params) throws IOException {
         Template template = handlebars.compile(path);
-
         return template.apply(params).getBytes();
     }
 }

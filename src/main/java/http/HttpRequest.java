@@ -32,16 +32,16 @@ public class HttpRequest {
         return uri;
     }
 
-    public HttpRequestHeaders getRequestHeaders() {
-        return httpRequestHeaders;
-    }
-
     public String getBody() {
         return body;
     }
 
     public String getParam(String key) {
         return params.get(key);
+    }
+
+    public Cookies getCookies() {
+        return new Cookies(httpRequestHeaders.getHeader("Cookie"));
     }
 
     private void parseUri(String uri) {
