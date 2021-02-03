@@ -1,26 +1,30 @@
 package webserver;
 
-import domain.HttpRequest;
-import domain.HttpResponse;
+import webserver.controller.*;
+import webserver.model.HttpRequest;
+import webserver.model.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     public static final String BASE_URL = "http://localhost:8080/index.html";
 
-    private Socket connection;
+    private final Socket connection;
+    private final ControllerMapper controllerMapper;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        this.controllerMapper = new ControllerMapper();
     }
 
     public void run() {
@@ -31,26 +35,32 @@ public class RequestHandler implements Runnable {
         );
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+
             HttpRequest httpRequest = new HttpRequest(in);
             logger.debug(httpRequest.toString());
+
             if (httpRequest.isEmpty()) {
                 return;
             }
+
             HttpResponse httpResponse = new HttpResponse(out);
+            logger.debug(httpResponse.toString());
 
-            Map<String, Handler> handlerMap = new HashMap<>();
-            handlerMap.put("/user/create", new UserCreateHandler());
-            handlerMap.put("/user/login", new UserLoginHandler());
-            handlerMap.put("/user/list", new UserListHandler());
+            Controller controller = controllerMapper.assignController(httpRequest);
 
-            Handler handler = handlerMap.get(httpRequest.getPath());
+            controller.service(httpRequest, httpResponse);
 
-            if(handler == null) {
-                handler = new FileHandler();
-            }
-            handler.service(httpRequest, httpResponse);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+
+//        private void writeResponse(DataOutputStream dos, HttpResponse httpResponse) throws IOException {
+//            writeResponse(dos, httpResponse, StandardCharsets.UTF_8);
+//        }
+//
+//        private void writeResponse(DataOutputStream dos, HttpResponse httpResponse, Charset charset) throws IOException {
+//            dos.write(httpResponse.toString().getBytes(charset));
+//            dos.flush();
+//        }
     }
 }
