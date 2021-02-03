@@ -7,12 +7,11 @@ import webserver.HttpResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class UserLoginFailedController implements Controller {
+public class UserLoginFailedController extends AbstractController {
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
+    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + httpRequest.getPath());
         httpResponse.forward(body);
-
-
     }
+
 }

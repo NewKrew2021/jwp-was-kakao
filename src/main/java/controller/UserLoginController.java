@@ -19,7 +19,7 @@ public class UserLoginController extends AbstractController {
     private static final String FALSE = "false";
 
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
+    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         String userId = httpRequest.getParameter(USER_ID);
         String password = httpRequest.getParameter(USER_PASSWORD);
 

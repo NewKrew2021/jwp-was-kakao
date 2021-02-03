@@ -36,9 +36,7 @@ public class RequestHandler implements Runnable {
 
 
             String path = parsePath(httpRequest.getPath());
-
-            Map<String, Controller> controllers = ControllerEntity.getControllers();
-            Controller controller = controllers.get(path);
+            Controller controller = ControllerEntity.getControllers(path);
             controller.service(httpRequest, httpResponse);
 
         } catch (IOException | URISyntaxException e) {
