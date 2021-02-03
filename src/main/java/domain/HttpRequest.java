@@ -15,9 +15,9 @@ public class HttpRequest {
     public static final String HEADER_DELIMITER = ": ";
     public static final String CONTENT_LENGTH = "Content-Length";
 
-    private HttpRequestStartLine startLine;
+    private final HttpRequestStartLine startLine;
     private Map<String, String> parameters = new HashMap<>();
-    private Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
 
     public HttpRequest(BufferedReader br) throws IOException {
         startLine = HttpRequestStartLine.of(br.readLine());

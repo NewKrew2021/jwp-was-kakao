@@ -5,21 +5,24 @@ public enum ContentType {
     CSS("text/css"),
     JS("application/js"),
     ICO("image/x-icon"),
-    JPEG("image/jpeg"),
-    PLAIN("text/plain");
+    JPEG("image/jpeg");
 
-    private String mimeType;
+    private final String mimeType;
 
     ContentType(String mimeType) {
         this.mimeType = mimeType;
     }
 
-    public static String of(String url) {
-        if (url.endsWith(".html")) return HTML.mimeType;
-        if (url.endsWith(".css")) return CSS.mimeType;
-        if (url.endsWith(".js")) return JS.mimeType;
-        if (url.endsWith(".ico")) return ICO.mimeType;
-        if (url.endsWith(".jpeg")) return JPEG.mimeType;
-        return PLAIN.mimeType;
+    public static ContentType of(String url) {
+        if (url.endsWith(".css")) return CSS;
+        if (url.endsWith(".js")) return JS;
+        if (url.endsWith(".ico")) return ICO;
+        if (url.endsWith(".jpeg")) return JPEG;
+        return HTML;
+    }
+
+    @Override
+    public String toString() {
+        return mimeType;
     }
 }

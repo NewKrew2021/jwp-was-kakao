@@ -6,9 +6,9 @@ public class HttpRequestStartLine {
     public static final String LINE_DELIMITER = " ";
     public static final String PATH_DELIMITER = "?";
     public static final String PATH_DELIMETER_REGEX = "\\?";
-    private HttpMethod method;
-    private String url;
-    private String version;
+    private final HttpMethod method;
+    private final String url;
+    private final String version;
     private String parameter = "";
 
     public HttpRequestStartLine(String method, String url, String version) {

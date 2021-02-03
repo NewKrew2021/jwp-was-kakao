@@ -13,15 +13,15 @@ public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
-    private DataOutputStream dos;
+    private final DataOutputStream dos;
 
-    private Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
 
     public HttpResponse(DataOutputStream dos) {
         this.dos = dos;
     }
 
-    public void response200Header(String url, int lengthOfBodyContent) {
+    private void response200Header(String url, int lengthOfBodyContent) {
         addHeader("Content-Type", ContentType.of(url) + "; charset=utf-8");
         addHeader("Content-Length", String.valueOf(lengthOfBodyContent));
         try {
@@ -32,7 +32,7 @@ public class HttpResponse {
         }
     }
 
-    public void responseBody(byte[] body) {
+    private void responseBody(byte[] body) {
         try {
             dos.write(body, 0, body.length);
             dos.flush();
@@ -61,7 +61,16 @@ public class HttpResponse {
             response200Header(url, body.length);
             responseBody(body);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void forward(String url, byte[] body) {
+        try {
+            response200Header(url, body.length);
+            responseBody(body);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
     }
 
@@ -70,7 +79,7 @@ public class HttpResponse {
             try {
                 dos.writeBytes(key + ": " + value + "\r\n");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         });
         dos.writeBytes("\r\n");
