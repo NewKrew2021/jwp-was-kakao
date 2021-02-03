@@ -7,69 +7,53 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class HttpRequest {
+    private static final String HEADER_DELIMITER = "";
+
     private RequestMethod method;
     private String path;
-    private Map<String, String> parameters = new HashMap<>();
-    private Map<String, String> header = new HashMap<>();
+    private HttpParameter httpParameter;
+    private HttpHeader httpHeader;
     private Map<String, String> cookies = new HashMap<>();
 
     public HttpRequest(InputStream in) {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            parseHeader(bufferedReader.readLine());
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-            String line = bufferedReader.readLine();
-            while (line != null && !line.equals("")) {
-                String[] split = line.split(": ");
-                header.put(split[0], split[1]);
-                line = bufferedReader.readLine();
-            }
-
-            if(header.containsKey("Cookie")) {
-                Arrays.stream(header.get("Cookie").split("; "))
-                        .forEach(cookie -> cookies.put(cookie.split("=")[0], cookie.split("=")[1]));
-            }
-
-            if (getMethod().equals(RequestMethod.POST)) {
-                int bodySize = Integer.parseInt(header.get("Content-Length"));
-                String body = IOUtils.readData(bufferedReader, bodySize);
-                parseQueryParameter(body);
-            }
+            setMethodAndPath(br);
+            setHeader(br);
+            setParameter(br);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    public HttpRequest(RequestMethod method, String path, Map<String, String> parameters) {
-        this.method = method;
-        this.path = path;
-        this.parameters = parameters;
-    }
-
-    private void parseHeader(String request) {
-        String[] parsed = request.split(" ");
+    private void setMethodAndPath(BufferedReader br) throws IOException {
+        String line = IOUtils.readLine(br);
+        String[] parsed = line.split(" ");
         method = RequestMethod.of(parsed[0]);
-        String[] requestPath = parsed[1].split("\\?");
-        path = requestPath[0];
-        if (requestPath.length == 1) {
-            return;
-        }
-        parseQueryParameter(requestPath[1]);
+        path = parsed[1];
     }
 
-    private void parseQueryParameter(String request) {
-        Arrays.stream(request.split("&"))
-                .forEach(rawParameter -> {
-                    String[] split = rawParameter.split("=");
-                    parameters.put(split[0], split[1]);
-                });
+    private void setParameter(BufferedReader br) throws IOException {
+        if(getMethod().equals(RequestMethod.GET) && path.contains("?")) {
+            String[] parsed = path.split("\\?");
+            path = parsed[0];
+            httpParameter = new HttpParameter(parsed[1]);
+        }
+        if (getMethod().equals(RequestMethod.POST)) {
+            int bodySize = Integer.parseInt(httpHeader.getHeader("Content-Length"));
+            httpParameter = new HttpParameter(IOUtils.readData(br, bodySize));
+        }
+    }
+
+    private void setHeader(BufferedReader br) throws IOException {
+        httpHeader = new HttpHeader(IOUtils.readUntilDelimiter(br, HEADER_DELIMITER));
     }
 
     public RequestMethod getMethod() {
@@ -81,15 +65,11 @@ public class HttpRequest {
     }
 
     public String getParameter(String parameter) {
-        return parameters.get(parameter);
+        return httpParameter.get(parameter);
     }
 
     public String getCookie(String key) {
         return cookies.get(key);
-    }
-
-    public Map<String, String> getParameters() {
-        return parameters;
     }
 
     public boolean isEmpty() {
@@ -99,20 +79,6 @@ public class HttpRequest {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("HttpRequest\n").append("Method = ").append(method).append("\nPath = ").append(path).append("\n");
-        if (!parameters.isEmpty()) {
-            sb.append("Parameters[\n");
-            for (String s : parameters.keySet()) {
-                sb.append("\t").append(s).append(" : ").append(parameters.get(s)).append("\n");
-            }
-            sb.append("]\n");
-        }
-        if (!header.isEmpty()) {
-            sb.append("Header[\n");
-            for (String s : header.keySet()) {
-                sb.append("\t").append(s).append(" : ").append(header.get(s)).append("\n");
-            }
-            sb.append("]\n");
-        }
         return sb.toString();
     }
 }

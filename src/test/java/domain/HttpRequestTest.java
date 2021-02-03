@@ -21,7 +21,7 @@ public class HttpRequestTest {
             "Connection: keep-alive\n" +
             "Accept: */*\n";
 
-    String request3 = "GET /user/create HTTP/1.1\n" +
+    String request3 = "POST /user/create HTTP/1.1\n" +
             "Host: localhost:8080\n" +
             "Connection: keep-alive\n" +
             "Content-Length: 59\n" +
@@ -71,7 +71,7 @@ public class HttpRequestTest {
 
         assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
         assertThat(httpRequest.getParameter("password")).isEqualTo("password");
-        assertThat(httpRequest.getParameter("name")).isEqualTo("%EB%B0%95%EC%9E%AC%EC%84%B1");
-        assertThat(httpRequest.getParameter("email")).isEqualTo("javajigi%40slipp.net");
+        assertThat(httpRequest.getParameter("name")).isEqualTo("박재성");
+        assertThat(httpRequest.getParameter("email")).isEqualTo("javajigi@slipp.net");
     }
 }
