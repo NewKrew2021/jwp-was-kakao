@@ -1,38 +1,33 @@
 package http;
 
 import annotation.web.RequestMethod;
-import utils.HttpUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
     private RequestMethod requestMethod;
     private String uri;
-    private Map<String, String> params = new HashMap<>();
+    private Map<String, String> params;
     private HttpRequestHeaders httpRequestHeaders;
-    private String body;
+    private Map<String, String> body;
 
     public HttpRequest(RequestMethod requestMethod, String uri) {
         this.requestMethod = requestMethod;
-        parseUri(uri);
+        this.uri = uri;
     }
 
-    public HttpRequest(RequestMethod requestMethod, String uri, HttpRequestHeaders httpRequestHeaders, String body) {
+    public HttpRequest(RequestMethod requestMethod, String uri, Map<String, String> params, HttpRequestHeaders httpRequestHeaders, Map<String, String> body) {
         this(requestMethod, uri);
+        this.params = params;
         this.httpRequestHeaders = httpRequestHeaders;
         this.body = body;
-    }
-
-    public HttpRequest(HttpRequestParser parser) {
-        this(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
     }
 
     public String getUri() {
         return uri;
     }
 
-    public String getBody() {
+    public Map<String, String> getBody() {
         return body;
     }
 
@@ -42,15 +37,6 @@ public class HttpRequest {
 
     public Cookies getCookies() {
         return new Cookies(httpRequestHeaders.getHeader("Cookie"));
-    }
-
-    private void parseUri(String uri) {
-        String[] parsedUri = uri.split("\\?", 2);
-        this.uri = parsedUri[0];
-        if (parsedUri.length < 2) {
-            return;
-        }
-        this.params = HttpUtils.getParamMap(parsedUri[1]);
     }
 
     public boolean matchWith(HttpRequest request) {

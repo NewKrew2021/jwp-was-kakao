@@ -5,14 +5,13 @@ import http.Cookie;
 import http.Cookies;
 import http.HttpResponse;
 import model.User;
-import utils.HttpUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserController {
     public static Handler createUserHandler = (request) -> {
-        Map<String, String> params = HttpUtils.getParamMap(request.getBody());
+        Map<String, String> params = request.getBody();
 
         User user = new User(params.get("userId"),
                 params.get("password"),
@@ -27,7 +26,7 @@ public class UserController {
     };
 
     public static Handler loginUserHandler = (request) -> {
-        Map<String, String> params = HttpUtils.getParamMap(request.getBody());
+        Map<String, String> params = request.getBody();
 
         User user = DataBase.findUserById(params.get("userId"));
         if (user != null && user.getPassword().equals(params.get("password"))) {

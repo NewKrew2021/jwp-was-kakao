@@ -1,23 +1,22 @@
 package http;
 
 import annotation.web.RequestMethod;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.assertj.core.api.Assertions.*;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HttpRequestParserTest {
-    private HttpRequestParser parser;
-
-    @BeforeEach
-    void setUp() {
-        parser = new HttpRequestParser();
-        parser.parse("GET /user/create?userId=id&password=pw&name=jyp&email=jyp@email.com HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*");
-    }
+    private HttpRequestParser parser = new HttpRequestParser("GET /user/create?userId=id&password=pw&name=jyp&email=jyp@email.com HTTP/1.1\n" +
+            "Host: localhost:8080\n" +
+            "Connection: keep-alive\n" +
+            "Accept: */*\n" +
+            "\n" +
+            "userId=id&password=pw&name=jyp&email=jyp@email.com");
 
     @DisplayName("올바른 RequestMethod를 반환하는지 테스트")
     @Test
@@ -32,7 +31,16 @@ class HttpRequestParserTest {
     void getUri() {
         String uri = parser.getUri();
 
-        assertThat(uri).isEqualTo("/user/create?userId=id&password=pw&name=jyp&email=jyp@email.com");
+        assertThat(uri).isEqualTo("/user/create");
+    }
+
+    @DisplayName("올바른 params를 반환하는지 테스트")
+    @ParameterizedTest
+    @CsvSource({"userId,id", "password,pw", "name,jyp", "email,jyp@email.com"})
+    void getParams(String key, String value) {
+        Map<String, String> params = parser.getParams();
+
+        assertThat(params.get(key)).isEqualTo(value);
     }
 
     @DisplayName("올바른 RequestHeaders를 반환하는지 테스트")
@@ -46,18 +54,11 @@ class HttpRequestParserTest {
     }
 
     @DisplayName("올바른 body를 반환하는지 테스트")
-    @Test
-    void getBody() {
-        parser.parse("POST /user/create HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 59\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Accept: */*\n" +
-                "\n" +
-                "userId=id&password=pw&name=jyp&email=jyp@email.com");
-        String body = parser.getBody();
+    @ParameterizedTest
+    @CsvSource({"userId,id", "password,pw", "name,jyp", "email,jyp@email.com"})
+    void getBody(String key, String value) {
+        Map<String, String> body = parser.getBody();
 
-        assertThat(body).isEqualTo("userId=id&password=pw&name=jyp&email=jyp@email.com");
+        assertThat(body.get(key)).isEqualTo(value);
     }
 }

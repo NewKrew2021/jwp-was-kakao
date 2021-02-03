@@ -15,7 +15,6 @@ import utils.IOUtils;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private Socket connection;
-    private HttpRequestParser parser = new HttpRequestParser();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -26,8 +25,7 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            parser.parse(IOUtils.buildString(in));
-            HttpRequest httpRequest = new HttpRequest(parser);
+            HttpRequest httpRequest = new HttpRequestParser(IOUtils.buildString(in)).parse();
             DataOutputStream dos = new DataOutputStream(out);
             HttpResponse response = Dispatcher.dispatch(httpRequest);
             sendResponse(dos, response);
@@ -42,7 +40,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes(response.getHttpStatus() + " \r\n");
             dos.writeBytes(response.headersToString());
             dos.writeBytes("\r\n");
-            if(response.getBody() != null) {
+            if (response.getBody() != null) {
                 dos.write(response.getBody(), 0, response.getBody().length);
             }
             dos.flush();
