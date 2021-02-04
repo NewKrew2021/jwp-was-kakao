@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExecutorsTest {
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorsTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ExecutorsTest.class);
 
     private static AtomicInteger counter = new AtomicInteger(0);
 
@@ -27,14 +27,14 @@ public class ExecutorsTest {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                logger.info("Thread {}", idx);
+                log.debug("Thread {}", idx);
             });
         }
         sw.stop();
 
         es.shutdown();
         es.awaitTermination(100, TimeUnit.SECONDS);
-        logger.info("Total Elaspsed: {}", sw.getTotalTimeSeconds());
+        log.debug("Total Elaspsed: {}", sw.getTotalTimeSeconds());
     }
 }
 
