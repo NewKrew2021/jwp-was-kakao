@@ -83,35 +83,29 @@ public class HttpResponse {
     }
 
     private void response(ResponseStatus responseStatus) {
-        responseStatus.setStatus(dos);
-        writeHeader();
-        writeBody();
-    }
-
-    private void writeHeader() {
         try {
-            for (String key : headers.keySet()) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(key);
-                sb.append(KEY_VALUE_REGEX);
-                sb.append(headers.get(key));
-                sb.append(NEW_LINE_PREFIX);
-                dos.writeBytes(sb.toString());
-            }
-            dos.writeBytes(NEW_LINE_PREFIX);
+            responseStatus.setStatus(dos);
+            writeHeader();
+            writeBody();
         } catch (IOException e) {
             logger.error(e.getMessage());
             response(new Response500Status());
         }
     }
 
-    private void writeBody() {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            response(new Response500Status());
+    private void writeHeader() throws IOException {
+        for (String key : headers.keySet()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(key);
+            sb.append(KEY_VALUE_REGEX);
+            sb.append(headers.get(key));
+            sb.append(NEW_LINE_PREFIX);
+            dos.writeBytes(sb.toString());
         }
+    }
+
+    private void writeBody() throws IOException {
+        dos.write(body, 0, body.length);
+        dos.flush();
     }
 }

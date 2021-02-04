@@ -11,12 +11,8 @@ public interface ResponseStatus {
 
     Logger logger = LoggerFactory.getLogger(ResponseStatus.class);
 
-    default void setStatus(DataOutputStream dos) {
-        try {
-            writeStatus(dos);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    default void setStatus(DataOutputStream dos) throws IOException {
+        writeStatus(dos);
     }
 
     void writeStatus(DataOutputStream dos) throws IOException;
