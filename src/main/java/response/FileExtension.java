@@ -1,8 +1,9 @@
 package response;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public enum FileExtension {
 
@@ -17,7 +18,8 @@ public enum FileExtension {
     ICO(".ico", "image/x-icon", Constants.TEMPLATE),
     HTML(".html", "text/html", Constants.TEMPLATE);
 
-    private static Map<String, FileExtension> fileExtensions = new HashMap<>();
+    private static Map<String, FileExtension> fileExtensions = Arrays.stream(values())
+            .collect(Collectors.toMap(FileExtension::getExtension, Function.identity()));
 
     private String extension;
     private String contentType;
@@ -26,12 +28,6 @@ public enum FileExtension {
     private static class Constants {
         public static final String STATIC = "./static";
         public static final String TEMPLATE = "./templates";
-    }
-
-    static {
-        for(FileExtension fileExtension : FileExtension.values()){
-            fileExtensions.put(fileExtension.extension, fileExtension);
-        }
     }
 
     FileExtension(String extension, String contentType, String filePath) {
@@ -52,8 +48,8 @@ public enum FileExtension {
         return filePath;
     }
 
-    public static FileExtension getFileExtensionToExtension(String extension){
-        return Optional.of(fileExtensions.get(extension)).orElse(HTML);
+    public static FileExtension getFileExtensionToExtension(String extension) {
+        return fileExtensions.getOrDefault(extension, HTML);
     }
 
 }
