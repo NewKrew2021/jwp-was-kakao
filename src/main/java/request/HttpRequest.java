@@ -38,14 +38,14 @@ public class HttpRequest {
     public HttpRequest() {
     }
 
-    private HttpRequest(InputStream in) {
+    private HttpRequest(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         getMethodAndUrl(reader);
         headers = makeHeaders(reader);
         bodies = makeBodies(reader);
     }
 
-    public static HttpRequest of(InputStream in) {
+    public static HttpRequest of(InputStream in) throws IOException {
         return new HttpRequest(in);
     }
 
@@ -88,25 +88,19 @@ public class HttpRequest {
         }
     }
 
-    private Map<String, String> makeBodies(BufferedReader reader) {
-        try {
-            Map<String, String> bodies = new HashMap<>();
+    private Map<String, String> makeBodies(BufferedReader reader) throws IOException {
+        Map<String, String> bodies = new HashMap<>();
 
-            if (ParseUtils.containRequestUrlRegex(url)) {
-                bodies.putAll(ParseUtils.getParameters(ParseUtils.getParameterPairs(url)));
-            }
-
-            if(method.equals(HttpMethod.POST)){
-                String body = IOUtils.readData(reader, Integer.parseInt(headers.get(CONTENT_LENGTH.getHeader())));
-                bodies.putAll(ParseUtils.getParameters(body));
-            }
-
-            return bodies;
-
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            return new HashMap<>();
+        if (ParseUtils.containRequestUrlRegex(url)) {
+            bodies.putAll(ParseUtils.getParameters(ParseUtils.getParameterPairs(url)));
         }
+
+        if(method.equals(HttpMethod.POST)){
+            String body = IOUtils.readData(reader, Integer.parseInt(headers.get(CONTENT_LENGTH.getHeader())));
+            bodies.putAll(ParseUtils.getParameters(body));
+        }
+
+        return bodies;
     }
 
 
