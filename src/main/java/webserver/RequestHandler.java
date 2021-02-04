@@ -16,6 +16,7 @@ import webserver.domain.HttpResponse;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final Map<String, Controller> controllers = new HashMap<>();
+    public static final String DEFAULT_CONTROLLER = "defaultController";
 
     static {
         controllers.put("/user/create", new CreateUserController());
@@ -48,6 +49,6 @@ public class RequestHandler implements Runnable {
             controllers.get(path).service(httpRequest).sendResponse(out);
             return;
         }
-        controllers.get("defaultController").service(httpRequest).sendResponse(out);
+        controllers.get(DEFAULT_CONTROLLER).service(httpRequest).sendResponse(out);
     }
 }

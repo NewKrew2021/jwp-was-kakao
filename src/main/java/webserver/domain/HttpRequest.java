@@ -10,11 +10,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
     private static final String[] templateList = new String[]{".html", ".ico"};
+    public static final String BLANK_DELIMITER = " ";
+    public static final String HEADER_DELIMITER = ": ";
+    public static final char QUERY_STRING_QUESTION_MARK = '?';
+    public static final String QUERY_STRING_QUESTION_MARK_REGEX = "\\?";
+    public static final String PARAMETER_DELIMITER = "&";
+    public static final String PARAMETER_EQUAL_MARK = "=";
+    public static final String DEFAULT_VALUE = "";
 
     private Map<String, String> headers;
     private Map<String, String> parameters;
@@ -26,7 +32,7 @@ public class HttpRequest {
         this.headers = new HashMap<>();
         this.parameters = new HashMap<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String[] requestLine = reader.readLine().split(" ");
+        String[] requestLine = reader.readLine().split(BLANK_DELIMITER);
         String requestUrl = requestLine[1];
 
         parseParameterByQueryString(requestUrl);
@@ -42,7 +48,7 @@ public class HttpRequest {
     private void parseHeaders(BufferedReader reader) throws IOException {
         String line = reader.readLine();
         while (isValid(line)) {
-            String[] header = line.split(": ");
+            String[] header = line.split(HEADER_DELIMITER);
             this.headers.put(header[0], header[1]);
             line = reader.readLine();
         }
@@ -53,24 +59,24 @@ public class HttpRequest {
     }
 
     private void parseParameterByQueryString(String requestUrl) {
-        if (requestUrl.indexOf('?') == -1) {
+        if (requestUrl.indexOf(QUERY_STRING_QUESTION_MARK) == -1) {
             this.path = requestUrl;
             return;
         }
-        String[] urlToken = requestUrl.split("\\?");
+        String[] urlToken = requestUrl.split(QUERY_STRING_QUESTION_MARK_REGEX);
         this.path = urlToken[0];
         parseParameter(urlToken[1]);
     }
 
     private void parseParameter(String parameterString) {
-        String[] parameterToken = parameterString.split("&");
+        String[] parameterToken = parameterString.split(PARAMETER_DELIMITER);
         Arrays.stream(parameterToken)
                 .forEach(token -> {
-                    if (token.indexOf('=') == -1) {
+                    if (!token.contains(PARAMETER_EQUAL_MARK)) {
                         this.parameters.put(token, null);
                         return;
                     }
-                    String[] keyValue = token.split("=");
+                    String[] keyValue = token.split(PARAMETER_EQUAL_MARK);
                     this.parameters.put(keyValue[0], keyValue[1]);
                 });
     }
@@ -84,16 +90,16 @@ public class HttpRequest {
     }
 
     public String getHeader(String key) {
-        return headers.getOrDefault(key, "");
+        return headers.getOrDefault(key, DEFAULT_VALUE);
     }
 
     public String getParameter(String key) {
-        return parameters.getOrDefault(key, "");
+        return parameters.getOrDefault(key, DEFAULT_VALUE);
     }
 
     public String getBody() {
         if (body == null) {
-            return "";
+            return DEFAULT_VALUE;
         }
         return body;
     }
