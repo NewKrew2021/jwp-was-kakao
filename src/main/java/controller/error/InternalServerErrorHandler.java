@@ -4,9 +4,9 @@ import controller.handler.ErrorHandler;
 import model.HttpRequest;
 import model.HttpResponse;
 
-public class NoFileExceptionHandler implements ErrorHandler {
+public class InternalServerErrorHandler implements ErrorHandler {
     @Override
     public HttpResponse handle(HttpRequest request) {
-        return new HttpResponse().setStatus(404).setBody("NOT FOUND");
+        return new HttpResponse().setStatus(500).setBody("INTERNAL SERVER ERROR");
     }
 }

@@ -1,18 +1,18 @@
 package controller.error;
 
 import controller.handler.ErrorHandler;
+import exception.http.IllegalRequestException;
+import exception.user.UserInputException;
 import exception.utils.NoFileException;
-
-import java.io.IOException;
 
 public class ErrorHandlerFactory {
     public static ErrorHandler getHandler(Exception e) {
         if (e instanceof NoFileException) {
-            return new NoFileExceptionHandler();
+            return new NotFoundHandler();
         }
-        if (e instanceof IOException) {
-            return new IOExceptionHandler();
+        if (e instanceof IllegalRequestException || e instanceof UserInputException) {
+            return new BadRequestHandler();
         }
-        return new RuntimeExceptionHandler();
+        return new InternalServerErrorHandler();
     }
 }
