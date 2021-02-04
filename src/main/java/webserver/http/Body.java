@@ -39,10 +39,6 @@ public class Body {
         contentLength = body.length;
     }
 
-    private String identifyContentType(String path) {
-        return CONTENT_TYPES.get(FilenameUtils.getExtension(path));
-    }
-
     public int getContentLength() {
         return contentLength;
     }
@@ -53,6 +49,10 @@ public class Body {
 
     public byte[] getBody() {
         return body;
+    }
+
+    private String identifyContentType(String path) {
+        return CONTENT_TYPES.get(FilenameUtils.getExtension(path));
     }
 
     private byte[] getBodyFromPath(String path) {
