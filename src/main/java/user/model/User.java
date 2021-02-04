@@ -63,6 +63,6 @@ public class User {
 
     private boolean isValidEmail() {
         String pattern = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
-        return !email.matches(pattern);
+        return email.matches(pattern);
     }
 }
