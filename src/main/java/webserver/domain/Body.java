@@ -3,6 +3,7 @@ package webserver.domain;
 import org.apache.commons.io.FilenameUtils;
 import utils.FileIoUtils;
 import webserver.RequestHandler;
+import webserver.util.RootDirectory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,7 +31,7 @@ public class Body {
 
     public Body(String path) {
         try {
-            body = FileIoUtils.loadFileFromClasspath(getRootDirectory(path) + path);
+            body = FileIoUtils.loadFileFromClasspath(RootDirectory.get(path) + path);
             contentType = identifyContentType(path);
             contentLength = body.length;
         } catch (IOException | URISyntaxException e) {
@@ -42,14 +43,6 @@ public class Body {
         this.body = body;
         this.contentType = contentType;
         contentLength = body.length;
-    }
-
-    private String getRootDirectory(String path) {
-        String extension = FilenameUtils.getExtension(path);
-        if (extension.equals("html") || extension.equals("ico")) {
-            return "./templates";
-        }
-        return "./static";
     }
 
     private String identifyContentType(String path) throws IOException {
