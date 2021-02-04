@@ -1,8 +1,10 @@
 package model;
 
+import exception.utils.NoFileException;
 import model.httpinfo.HttpMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utils.FileIoUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -12,41 +14,22 @@ import java.util.Map;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class HttpRequestTest {
+    private static final String TEST_DIRECTORY = "./requests/";
     HttpRequest postRequest;
     HttpRequest getRequest;
     HttpRequest queryRequest;
 
     @BeforeEach
-    public void setUp() throws IOException {
-        String postMsg = "POST /api HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 33\n" +
-                "Accept: */*\n" +
-                "\r\n" +
-                "userId=javajigi&password=password";
-        postRequest = makeRequest(postMsg);
-
-        String getMsg = "GET /index.html HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*\n" +
-                "";
-        getRequest = makeRequest(getMsg);
-
-        String queryMsg = "GET /user/create?" +
-                "userId=jack&password=password&name=jackwon&email=jackwon%40kakaocorp.com HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*\n" +
-                "";
-        queryRequest = makeRequest(queryMsg);
+    public void setUp() throws IOException, NoFileException {
+        postRequest = makeRequest("postRequest.txt");
+        getRequest = makeRequest("getRequest.txt");
+        queryRequest = makeRequest("queryRequest.txt");
     }
 
-    private static HttpRequest makeRequest(String httpMessage) throws IOException {
-        InputStream is = new ByteArrayInputStream(httpMessage.getBytes());
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        return new HttpRequest(br, new Socket());
+    private static HttpRequest makeRequest(String directory) throws IOException, NoFileException {
+        byte[] message = FileIoUtils.loadFileFromClasspath(TEST_DIRECTORY + directory);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(message)));
+        return new HttpRequest(bufferedReader, new Socket());
     }
 
     @Test
