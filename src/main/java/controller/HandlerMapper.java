@@ -1,23 +1,22 @@
 package controller;
 
-import http.HttpRequest;
+import webserver.http.HttpRequest;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class HandlerMapper {
-    public static Controller[] list = new Controller[] {
-            new StaticController(),
-            new TemplateController(),
-            new UserController()
-    };
+    private List<Controller> list = new ArrayList<>();
 
-    public static Optional<Handler> findHandler(HttpRequest request) {
-        return Arrays.stream(list)
+    public void addController(Controller controller) {
+        list.add(controller);
+    }
+    public Optional<Handler> findHandler(HttpRequest request) {
+        return list.stream()
                 .map(it -> it.getResponsibleHandler(request))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
     }
-
 }
