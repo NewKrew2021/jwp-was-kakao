@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class HttpRequest {
-    private static final int REQUEST_LINE_CONTENTS_COUNT = 3;
+    private static final int FIRST_LINE_CONTENTS_COUNT = 3;
     private static final int NO_CONTENT = 0;
     private final RequestMethod requestMethod;
     private final String path;
@@ -20,16 +20,16 @@ public class HttpRequest {
 
     public HttpRequest(InputStream in) {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String[] token = getNextLine(br).split(" ");
+        String[] methodPathVersion = getNextLine(br).split(" ");
 
-        checkValidRequest(token);
+        checkFirstLineOfRequestIsCorrect(methodPathVersion);
 
-        String[] uri = token[1].split("\\?");
+        String[] uri = methodPathVersion[1].split("\\?");
 
-        requestMethod = RequestMethod.of(token[0]);
+        requestMethod = RequestMethod.of(methodPathVersion[0]);
         path = uri[0];
         rawQueryString = getQueryStringIfExists(uri);
-        httpVersion = token[2];
+        httpVersion = methodPathVersion[2];
 
         makeHeaders(br);
         makeParameters(rawQueryString);
@@ -94,8 +94,8 @@ public class HttpRequest {
         }
     }
 
-    private void checkValidRequest(String[] token) {
-        if (token.length != REQUEST_LINE_CONTENTS_COUNT) {
+    private void checkFirstLineOfRequestIsCorrect(String[] token) {
+        if (token.length != FIRST_LINE_CONTENTS_COUNT) {
             throw new IllegalArgumentException("Incorrect request");
         }
     }
