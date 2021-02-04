@@ -3,11 +3,12 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
-import controller.Controllers;
-import http.HttpRequest;
-import http.HttpRequestParser;
-import http.HttpResponse;
+import controller.*;
+import webserver.http.HttpRequest;
+import webserver.http.HttpRequestParser;
+import webserver.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.IOUtils;
@@ -16,9 +17,7 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-
-    private Controllers controllers = new Controllers();
-    private HttpRequestParser parser = new HttpRequestParser();
+    private ControllerMapper controllerMapper = new ControllerMapper();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -29,30 +28,23 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-
-            String request= IOUtils.buildString(in);
-            parser.parse(request);
-            HttpRequest httpRequest = new HttpRequest(parser.getRequestMethod(), parser.getUri(), parser.getRequestHeaders(), parser.getBody());
+            String request = IOUtils.buildString(in);
+            System.out.println(request);
+            HttpRequest httpRequest = HttpRequestParser.getRequest(request);
             DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse response = controllers.dispatch(httpRequest);
-            sendResponse(dos, response);
 
-        } catch (IOException | URISyntaxException e) {
-            logger.error(e.getMessage());
-        }
-    }
+            Optional<Controller> controller = controllerMapper.findController(httpRequest);
 
-    private void sendResponse(DataOutputStream dos, HttpResponse response) {
-        try {
-            dos.writeBytes(response.getHttpStatus() + " \r\n");
-            dos.writeBytes(response.headersToString());
-            dos.writeBytes("\r\n");
-            if(response.getBody() != null) {
-                dos.write(response.getBody(), 0, response.getBody().length);
+            HttpResponse response;
+            if (controller.isPresent()) {
+                response = controller.get().handleRequest(httpRequest);
+            } else {
+                response = new HttpResponse.Builder()
+                        .status("HTTP/1.1 404 Not Found")
+                        .build();
             }
-            dos.flush();
-        } catch (IOException e) {
+            response.sendResponse(dos);
+        } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }

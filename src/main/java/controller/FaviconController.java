@@ -1,24 +1,24 @@
 package controller;
 
 import annotation.web.RequestMethod;
+import utils.FileIoUtils;
 import webserver.Controller;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import utils.FileIoUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class TemplateController extends Controller {
+public class FaviconController extends Controller {
     private static final String prefix = "./templates";
 
-    public TemplateController() {
-        super(RequestMethod.GET, "");
+    public FaviconController() {
+        super(RequestMethod.GET, "/favicon.ico");
     }
 
     @Override
     public boolean canHandle(HttpRequest request) {
-        return request.getRequestMethod() == RequestMethod.GET && request.getUri().endsWith(".html");
+        return request.getRequestMethod() == requestMethod && request.getUri().equals(uri);
     }
 
     @Override

@@ -1,10 +1,35 @@
 package controller;
 
-import http.HttpResponse;
+import annotation.web.RequestMethod;
+import webserver.Controller;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
+import utils.FileIoUtils;
 
-public class StaticController {
-    public static Handler cssHandler = (request) -> new HttpResponse.Builder()
-            .setStatus("HTTP/1.1 200 OK")
-            .setCss("./static" + request.getUri())
-            .build();
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+public class StaticController extends Controller {
+    private static final String prefix = "./static";
+
+    public StaticController() {
+        super(RequestMethod.GET, "");
+    }
+
+    @Override
+    public boolean canHandle(HttpRequest request) {
+        String uri = request.getUri();
+        return request.getRequestMethod() == requestMethod
+                && (uri.startsWith("/css") || uri.startsWith("/fonts") || uri.startsWith("/images") || uri.startsWith("/js"));
+    }
+
+    @Override
+    public HttpResponse handleRequest(HttpRequest request) throws IOException, URISyntaxException {
+        String path = prefix + request.getUri();
+        return new HttpResponse.Builder()
+                .status("HTTP/1.1 200 OK")
+                .body(FileIoUtils.loadFileFromClasspath(path), FileIoUtils.getMimeType(path))
+                .build();
+    }
+
 }
