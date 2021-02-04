@@ -89,8 +89,8 @@ public class HttpRequest {
 
     private static Map<String, String> getHeaderFromRequestHeader(List<String> requestHeader) {
         Map<String, String> header = new HashMap<>();
-        for(String line: requestHeader) {
-            String[] data = line.split(": ");
+        for(String line : requestHeader) {
+            String[] data = line.split(":(\\s*)");
             header.put(data[0], data[1]);
         }
         return header;
