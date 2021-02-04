@@ -2,40 +2,51 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import utils.IOUtils;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final int KEY_INDEX = 0;
     private static final int VALUE_INDEX = 1;
-    private static final int REQUEST_LINE_INDEX = 0;
-    private static final int REMAIN_STRING_INDEX = 1;
-    private static final int PARAMETER_INDEX = 0;
-    private static final int METHOD_INDEX = 0;
-    private static final int URI_INDEX = 1;
+    private static final int METHOD_INDEX = 1;
+    private static final int URI_INDEX = 2;
+    private static final int PARAMETER_INDEX = 3;
+    private static final int HTTP_VERSION = 4;
 
-    private BufferedReader br;
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> parameters = new HashMap<>();
-    private String method;
-    private String uri;
+    private HttpMethod method;
+    private URI uri;
+    private String httpVersion;
 
     private Request(InputStream in) throws Exception {
-        br = new BufferedReader(new InputStreamReader(in));
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-        initializeHeader();
-        initializeRequest();
+        String line = br.readLine();
+        parseRequestLine(line);
+        initializeHeader(br);
+        initializeParameter(br);
     }
 
-    private void initializeHeader() throws IOException {
-        String line = br.readLine();
-        headers.put("Request-Line", getRequestLine(line));
+    private void initializeParameter(BufferedReader br) throws IOException {
+        if (headers.containsKey("Content-Length")) {
+            String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+            mapParameter(body);
+            logger.debug("body : {} ", body);
+        }
+    }
 
+    private void initializeHeader(BufferedReader br) throws IOException {
+        String line = br.readLine();
         logger.debug("request line : {}", line);
         while (!"".equals(line) && line != null) {
             line = br.readLine();
@@ -44,23 +55,16 @@ public class Request {
         }
     }
 
-    private String getRequestLine(String line) throws UnsupportedEncodingException {
-        if (line.contains("?")) {
-            String[] tokens = line.split("\\?");
-            mapParameter(tokens[REMAIN_STRING_INDEX].split(" ")[PARAMETER_INDEX]);
-            line = tokens[REQUEST_LINE_INDEX];
-        }
-        return line;
-    }
+    private void parseRequestLine(String requestLineString) throws UnsupportedEncodingException {
+        Pattern requestLinePattern = Pattern.compile("(GET|POST)\\s+([^?]+)(?:\\?(.+))?\\s+(HTTP/.+)");
+        Matcher matcher = requestLinePattern.matcher(requestLineString);
+        matcher.find();
+        method = HttpMethod.valueOf(matcher.group(METHOD_INDEX));
+        uri = URI.create(matcher.group(URI_INDEX));
+        httpVersion = matcher.group(HTTP_VERSION);
 
-    private void initializeRequest() throws IOException {
-        String[] requestLine = headers.get("Request-Line").split(" ");
-        this.method = requestLine[METHOD_INDEX];
-        this.uri = requestLine[URI_INDEX];
-        if (headers.containsKey("Content-Length")) {
-            String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-            mapParameter(body);
-            logger.debug("body : {} ", body);
+        if (matcher.group(PARAMETER_INDEX) != null) {
+            mapParameter(matcher.group(PARAMETER_INDEX));
         }
     }
 
@@ -84,12 +88,12 @@ public class Request {
         return new Request(in);
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
     public String getUri() {
-        return uri;
+        return uri.toString();
     }
 
     public String getHeader(String headerName) {

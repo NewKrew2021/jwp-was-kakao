@@ -5,13 +5,8 @@ import webserver.Response;
 
 public class DefaultController extends AbstractController {
     @Override
-    public void service(Request request, Response response) throws Exception {
-        if (request.getMethod().equals("GET")) {
-            doGet(request, response);
-        }
-        if (request.getMethod().equals("POST")) {
-            doPost(request, response);
-        }
+    public void doPost(Request request, Response response) throws Exception {
+        response.forward(request.getUri());
     }
 
     @Override

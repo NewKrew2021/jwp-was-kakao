@@ -1,6 +1,7 @@
 package webserver;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 
 import java.io.*;
 
@@ -14,7 +15,7 @@ public class ResponseTest {
         InputStream in = new FileInputStream(testDirectory + "Http_POST2.txt");
         Request request = Request.of(in);
 
-        assertEquals("POST", request.getMethod());
+        assertEquals(HttpMethod.POST, request.getMethod());
         assertEquals("/user/create", request.getUri());
         assertEquals("keep-alive", request.getHeader("Connection"));
         assertEquals("1", request.getParameter("id"));

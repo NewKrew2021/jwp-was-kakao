@@ -29,8 +29,9 @@ public class RequestHandler implements Runnable {
         controllers.put("default", new DefaultController());
     }
 
-    private Optional<Controller> getController(String uri) {
-        return Optional.ofNullable(controllers.get(uri));
+    private Controller getController(String uri) {
+        Controller controller = controllers.get(uri);
+        return controller != null ? controller : controllers.get("default");
     }
 
     public void run() {
@@ -41,7 +42,7 @@ public class RequestHandler implements Runnable {
             Request request = Request.of(in);
             Response response = Response.of(out);
 
-            Controller controller = getController(request.getUri()).orElse(controllers.get("default"));
+            Controller controller = getController(request.getUri());
             controller.service(request, response);
         } catch (Exception e) {
             logger.error(e.getMessage());

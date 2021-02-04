@@ -1,6 +1,7 @@
 package webserver;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +17,7 @@ public class RequestTest {
         InputStream in = new FileInputStream(testDirectory + "Http_POST.txt");
         Request request = Request.of(in);
 
-        assertEquals("POST", request.getMethod());
+        assertEquals(HttpMethod.POST, request.getMethod());
         assertEquals("/user/create", request.getUri());
         assertEquals("keep-alive", request.getHeader("Connection"));
         assertEquals("1234", request.getParameter("userId"));
@@ -29,7 +30,7 @@ public class RequestTest {
     void getMethodTest() throws Exception {
         InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
         Request request = Request.of(in);
-        assertEquals(request.getMethod(), "GET");
+        assertEquals(request.getMethod(), HttpMethod.GET);
     }
 
     @Test
