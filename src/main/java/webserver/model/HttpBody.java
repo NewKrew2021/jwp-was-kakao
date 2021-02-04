@@ -9,8 +9,8 @@ public class HttpBody {
 
     }
 
-    public void add(String newBody) {
-        body = body.concat(newBody);
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public String getBody() {

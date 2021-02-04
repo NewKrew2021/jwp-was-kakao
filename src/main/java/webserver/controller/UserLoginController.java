@@ -5,6 +5,7 @@ import model.User;
 import webserver.RequestHandler;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
+import webserver.model.HttpStatus;
 
 public class UserLoginController implements Controller {
 
@@ -17,7 +18,7 @@ public class UserLoginController implements Controller {
     }
 
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse service(HttpRequest httpRequest) {
         String id = httpRequest.getParameter("userId");
         String password = httpRequest.getParameter("password");
         User user = DataBase.findUserById(id);
@@ -30,8 +31,11 @@ public class UserLoginController implements Controller {
             location = LOGIN_FAIL_PATH;
         }
 
+        HttpResponse httpResponse = new HttpResponse();
+        httpResponse.setStatus(HttpStatus.FOUND);
         httpResponse.addHeader("Location", location);
         httpResponse.addCookie("logined", logined);
-        httpResponse.sendRedirect();
+
+        return httpResponse;
     }
 }

@@ -6,6 +6,6 @@ import webserver.model.HttpResponse;
 public interface Controller {
     String getPath();
 
-    void service(HttpRequest httpRequest, HttpResponse httpResponse);
+    HttpResponse service(HttpRequest httpRequest);
 }
 

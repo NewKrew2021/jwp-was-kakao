@@ -36,6 +36,8 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
+            DataOutputStream dos = new DataOutputStream(out);
+
             HttpRequest httpRequest = new HttpRequest(in);
             logger.debug(httpRequest.toString());
 
@@ -43,24 +45,25 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
-            HttpResponse httpResponse = new HttpResponse(out);
-            logger.debug(httpResponse.toString());
+//            HttpResponse httpResponse = new HttpResponse(out);
+//            logger.debug(httpResponse.toString());
 
             Controller controller = controllerMapper.assignController(httpRequest);
 
-            controller.service(httpRequest, httpResponse);
+            HttpResponse httpResponse = controller.service(httpRequest);
+
+            String responseString = httpResponse.toString();
+
+            writeString(dos, responseString);
 
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
 
-//        private void writeResponse(DataOutputStream dos, HttpResponse httpResponse) throws IOException {
-//            writeResponse(dos, httpResponse, StandardCharsets.UTF_8);
-//        }
-//
-//        private void writeResponse(DataOutputStream dos, HttpResponse httpResponse, Charset charset) throws IOException {
-//            dos.write(httpResponse.toString().getBytes(charset));
-//            dos.flush();
-//        }
+
+    }
+    private void writeString(DataOutputStream dos, String str) throws IOException {
+        dos.write(str.getBytes(StandardCharsets.UTF_8));
+        dos.flush();
     }
 }

@@ -5,6 +5,7 @@ import model.User;
 import webserver.RequestHandler;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
+import webserver.model.HttpStatus;
 
 public class UserCreateController implements Controller {
 
@@ -15,11 +16,19 @@ public class UserCreateController implements Controller {
     }
 
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
-        User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
+    public HttpResponse service(HttpRequest httpRequest) {
+        User user = new User(
+                httpRequest.getParameter("userId"),
+                httpRequest.getParameter("password"),
+                httpRequest.getParameter("name"),
+                httpRequest.getParameter("email")
+        );
         DataBase.addUser(user);
 
+        HttpResponse httpResponse = new HttpResponse();
+        httpResponse.setStatus(HttpStatus.FOUND);
         httpResponse.addHeader("Location", RequestHandler.BASE_URL);
-        httpResponse.sendRedirect();
+
+        return httpResponse;
     }
 }

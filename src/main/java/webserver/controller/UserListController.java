@@ -8,11 +8,10 @@ import db.DataBase;
 import utils.FileIoUtils;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
+import webserver.model.HttpStatus;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 public class UserListController implements Controller {
 
@@ -23,46 +22,51 @@ public class UserListController implements Controller {
     }
 
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse service(HttpRequest httpRequest) {
+        HttpResponse httpResponse = new HttpResponse();
+
         if (httpRequest.getCookie("logined") == null || httpRequest.getCookie("logined").equals("false")) {
 
 
             String body = null;
             try {
                 body = FileIoUtils.loadFileStringFromClasspath("./templates" + "/user/login.html");
-            }   catch (IOException e) {
+            } catch (IOException e) {
             } catch (URISyntaxException e) {
             }
 
+            httpResponse.setStatus(HttpStatus.OK);
             httpResponse.addHeader("Content-Type", "text/html; charset=utf-8");
             httpResponse.addHeader("Content-Length", String.valueOf(body.length()));
             httpResponse.addHeader("Content-Location", "/user/login.html");
-            httpResponse.addBody(body);
-            httpResponse.forward("/user/login.html");
-            return;
+            httpResponse.setBody(body);
+
+            return httpResponse;
         }
 
+
+        TemplateLoader loader = new ClassPathTemplateLoader();
+        loader.setPrefix("/templates");
+        loader.setSuffix(".html");
+        Handlebars handlebars = new Handlebars(loader);
+
+        Template template;
+        String profilePage = null;
         try {
-            TemplateLoader loader = new ClassPathTemplateLoader();
-            loader.setPrefix("/templates");
-            loader.setSuffix(".html");
-            Handlebars handlebars = new Handlebars(loader);
+            template = handlebars.compile("user/list");
 
-            Template template = handlebars.compile("user/list");
+            profilePage = template.apply(DataBase.findAll());
+        } catch (IOException e) {
 
-            String profilePage = template.apply(DataBase.findAll());
-
-            httpResponse.addHeader("Content-Type", findContentType(path) + "; charset=utf-8");
-            httpResponse.addHeader("Content-Length", profilePage.length() + "");
-            httpResponse.addHeader("Content-Location", path);
-            httpResponse.addBody(profilePage);
-//            httpResponse.forward(path);
-
-            httpResponse.handleUserList(profilePage);
-
-        } catch(IOException e) {
-            e.printStackTrace();
         }
+
+        httpResponse.setStatus(HttpStatus.OK);
+        httpResponse.addHeader("Content-Type", findContentType(path) + "; charset=utf-8");
+        httpResponse.addHeader("Content-Length", String.valueOf(profilePage.length()));
+        httpResponse.addHeader("Content-Location", path);
+        httpResponse.setBody(profilePage);
+
+        return httpResponse;
     }
 
     private String findContentType(String path) {

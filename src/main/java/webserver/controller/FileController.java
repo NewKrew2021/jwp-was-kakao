@@ -3,10 +3,10 @@ package webserver.controller;
 import utils.FileIoUtils;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
+import webserver.model.HttpStatus;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 
 public class FileController implements Controller {
     private final String INDEX = "/index.html";
@@ -18,7 +18,7 @@ public class FileController implements Controller {
     }
 
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse service(HttpRequest httpRequest) {
 
 
         String path = httpRequest.getPath();
@@ -33,11 +33,15 @@ public class FileController implements Controller {
         } catch (URISyntaxException e) {
         }
 
+        HttpResponse httpResponse = new HttpResponse();
+
+        httpResponse.setStatus(HttpStatus.OK);
         httpResponse.addHeader("Content-Type", findContentType(path) + "; charset=utf-8");
         httpResponse.addHeader("Content-Length", String.valueOf(body.length()));
         httpResponse.addHeader("Content-Location", path);
-        httpResponse.addBody(body);
-        httpResponse.forward(path);
+        httpResponse.setBody(body);
+
+        return httpResponse;
     }
 
     private String findContentType(String path) {
