@@ -20,13 +20,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class UserController {
+public class UserController implements Controller{
     private static final UserController instance = new UserController();
     private final Dispatcher dispatcher = Dispatcher.getInstance();
 
     private UserController() {
     }
 
+    @Override
     public void registerAll() {
         this.dispatcher.register("/user/create", "GET", this::createByGet);
         this.dispatcher.register("/user/create", "POST", this::createByPost);

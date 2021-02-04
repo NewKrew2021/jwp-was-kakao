@@ -6,13 +6,14 @@ import domain.Request;
 import domain.Response;
 import model.User;
 
-public class LoginController {
+public class LoginController implements Controller{
     private static final LoginController instance = new LoginController();
     private final Dispatcher dispatcher = Dispatcher.getInstance();
 
     private LoginController() {
     }
 
+    @Override
     public void registerAll() {
         this.dispatcher.register("/user/login", "POST", this::login);
         this.dispatcher.register("/user/logout", "GET", this::logout);
