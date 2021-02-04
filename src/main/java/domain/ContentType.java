@@ -2,7 +2,7 @@ package domain;
 
 public enum ContentType {
     HTML("text/html", ".html"),
-    CSS("text/CSS", ".css"),
+    CSS("text/css", ".css"),
     JS("application/javascript", ".js"),
     WOFF("font/woff", ".woff"),
     ICO("image/x-icon", ".ico"),

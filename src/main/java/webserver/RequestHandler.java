@@ -29,7 +29,7 @@ public class RequestHandler implements Runnable {
     private final LoginController loginController = LoginController.getInstance();
 
     public RequestHandler(Socket connectionSocket) {
-        this.connection = connectionSocket;
+        connection = connectionSocket;
         controllers.add(userController);
         controllers.add(loginController);
         controllers.forEach(Controller::registerAll);

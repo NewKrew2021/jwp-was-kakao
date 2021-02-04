@@ -36,7 +36,7 @@ public class Response {
 
     public static Response ofRedirect(String redirectUrl) {
         ResponseHeaders headers = new ResponseHeaders();
-        headers.addHeader("Content-Type", ContentType.HTML + ";charset=utf-8");
+        headers.addHeader("Content-Type", ContentType.HTML.getType() + ";charset=utf-8");
         headers.addHeader("Location", redirectUrl);
         return new Response(
                 HttpVersion.HTTP1_1,
@@ -49,7 +49,7 @@ public class Response {
 
     public static Response ofDynamicHtml(ResponseBody responseBody) {
         ResponseHeaders headers = new ResponseHeaders();
-        headers.addHeader("Content-Type", ContentType.HTML + ";charset=utf-8");
+        headers.addHeader("Content-Type", ContentType.HTML.getType() + ";charset=utf-8");
         headers.addHeader("Content-Length", responseBody.getByteSize() + "");
         return new Response(
                 HttpVersion.HTTP1_1,
