@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
+    private static final String URL_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
     private String method;
     private String path;
     private Map<String, String> headers;
@@ -27,7 +28,7 @@ public class HttpRequest {
         if (url.length > 1){
             parseArgument(url[1]);
         }
-        if (method.equals("POST")) {
+        if (method.equals("POST") && getHeader("Content-Type").equals(URL_ENCODED_CONTENT_TYPE)) {
             int contentLength = Integer.parseInt(getHeader("Content-Length"));
             String body = utils.IOUtils.readData(br, contentLength);
             parseArgument(body);
@@ -39,7 +40,7 @@ public class HttpRequest {
 
         String line;
         while((line = br.readLine()) != null && !line.equals("")){
-            String[] buf = line.split(": ");
+            String[] buf = line.replaceAll(" ", "").split(":");
             headers.put(buf[0], buf[1]);
         }
     }
