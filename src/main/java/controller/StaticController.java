@@ -18,7 +18,8 @@ public class StaticController extends Controller {
 
     @Override
     public boolean canHandle(HttpRequest request) {
-        return request.getRequestMethod() == RequestMethod.GET
+        String uri = request.getUri();
+        return request.getRequestMethod() == requestMethod
                 && (uri.startsWith("/css") || uri.startsWith("/fonts") || uri.startsWith("/images") || uri.startsWith("/js"));
     }
 
