@@ -55,7 +55,6 @@ public class UserController {
         return Response.ofRedirect("/index.html");
     }
 
-    //TODO : 예외 처리 만들어야함
     public Response list(Request request) {
         if (!request.getCookies().getValueOf("logined").equals("true")) {
             return Response.ofRedirect("/user/login.html");
