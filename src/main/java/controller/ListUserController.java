@@ -22,7 +22,7 @@ public class ListUserController extends AbstractController {
             String cookie = request.getCookie();
             if(cookie == null){
                 response.sendRedirect("http://" + request.getHost() + "/user/login.html");
-
+                return;
             }
             System.out.println(cookie);
             String login = cookie.split(";")[0].trim();
@@ -44,6 +44,7 @@ public class ListUserController extends AbstractController {
                 String userListPage = template.apply(model);
 
                 response.forwardBody(userListPage.getBytes(), "text/html; charset=utf-8");
+                return;
             }
 
             response.sendRedirect("http://" + request.getHost() + "/user/login.html");

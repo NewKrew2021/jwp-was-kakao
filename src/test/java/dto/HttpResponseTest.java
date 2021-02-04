@@ -29,7 +29,7 @@ public class HttpResponseTest {
     @Test
     public void responseCookies() throws Exception {
         HttpResponse response = new HttpResponse(createOutputStream("Http_Cookie.txt"));
-        response.addHeader("Set-Cookie", "logined=true");
+        response.setCookie("true", "/", null);
         response.sendRedirect("http://localhost:8080/index.html");
     }
 

@@ -32,6 +32,10 @@ public class HttpResponse {
         headers.put(key, value);
     }
 
+    public void setCookie(String logined, String path, String sessionId){
+        addHeader("Set-Cookie", "logined=" + logined + "; Path=" + path + (sessionId == null? "":"; " + sessionId));
+    }
+
     public String getHeaders() {
         StringBuilder message = new StringBuilder();
         message.append(status + "\r\n");
