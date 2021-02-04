@@ -3,8 +3,6 @@ package webserver;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
 import model.User;
 import utils.FileIoUtils;
 import utils.ParseUtils;
@@ -16,7 +14,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class Response {
     private DataOutputStream dos;
@@ -84,22 +81,19 @@ public class Response {
         headers.put(key, value);
     }
 
-    public void userListForward(String location) throws IOException {
-        String users = getUsers();
-        byte[] body = users.getBytes();
+    public void userListForward(String location, Collection<User> users) throws IOException {
+        byte[] body = getTemplate(location, users).getBytes();
         addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
         writeResponse200(body);
     }
 
-    private String getUsers() throws IOException {
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-        Handlebars handlebars = new Handlebars(loader);
-
-        Template template = handlebars.compile("user/list");
-        Collection<User> users = DataBase.findAll();
+    private String getTemplate(String location, Collection<User> users) throws IOException {
+        ClassPathTemplateLoader templateLoader = new ClassPathTemplateLoader();
+        templateLoader.setPrefix("/templates");
+        templateLoader.setSuffix("");
+        Handlebars handlebars = new Handlebars(templateLoader);
+        Template template = handlebars.compile(location);
         return template.apply(users);
     }
 }

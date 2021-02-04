@@ -12,8 +12,8 @@ public abstract class AbstractController implements Controller {
     private static Map<String, String> contentLocation = new HashMap<>();
 
     static {
-        contentLocation.put("ico","./templates/");
-        contentLocation.put("html","./templates/");
+        contentLocation.put("ico","./templates");
+        contentLocation.put("html","./templates");
     }
 
     protected static String getContentLocation(String content) {
