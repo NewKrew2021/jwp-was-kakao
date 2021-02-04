@@ -1,5 +1,6 @@
 package http;
 
+import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 import utils.TemplateUtils;
 
@@ -51,23 +52,27 @@ public class HttpResponse {
     }
 
     public static class Builder {
+        public static final String HTTP_VERSION = "HTTP/1.1";
+        public static final String CONTENT_TYPE = "Content-Type";
+        public static final String CONTENT_LENGTH = "Content-Length";
+        public static final String LOCATION = "Location";
         private String httpStatus;
         private Map<String, String> headers = new HashMap<>();
         private byte[] body;
         private Cookies cookies = new Cookies();
 
-        public Builder status(String httpStatus) {
-            this.httpStatus = httpStatus;
+        public Builder status(HttpStatus httpStatus) {
+            this.httpStatus = String.format("%s %s", HTTP_VERSION, httpStatus.toString());
             return this;
         }
 
         public Builder contentType(String contentType) {
-            headers.put("Content-Type", contentType);
+            headers.put(CONTENT_TYPE, contentType);
             return this;
         }
 
         public Builder contentLength(int length) {
-            headers.put("Content-Length", String.valueOf(length));
+            headers.put(CONTENT_LENGTH, String.valueOf(length));
             return this;
         }
 
@@ -82,7 +87,7 @@ public class HttpResponse {
         }
 
         public Builder redirect(String location) {
-            headers.put("Location", location);
+            headers.put(LOCATION, location);
             return this;
         }
 

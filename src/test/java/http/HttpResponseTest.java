@@ -3,6 +3,7 @@ package http;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -20,7 +21,7 @@ class HttpResponseTest {
     @BeforeEach
     void setUp() throws IOException, URISyntaxException {
         response = new HttpResponse.Builder()
-                .status("HTTP/1.1 200 OK")
+                .status(HttpStatus.OK)
                 .contentType("text/html;charset=utf-8")
                 .body("./templates/index.html")
                 .cookie(new Cookie("logined", "true"))
