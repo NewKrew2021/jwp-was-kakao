@@ -3,9 +3,9 @@ package response;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Response302Status implements ResponseStatus {
+public class Response500Status implements ResponseStatus {
 
-    private final String MESSAGE = "HTTP/1.1 302 Found \r\n";
+    private final String MESSAGE = "HTTP/1.1 500 Internal Server Error \r\n";
 
     @Override
     public void writeStatus(DataOutputStream dos) throws IOException {

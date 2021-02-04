@@ -101,6 +101,7 @@ public class HttpResponse {
             dos.writeBytes(NEW_LINE_PREFIX);
         } catch (IOException e) {
             logger.error(e.getMessage());
+            response(new Response500Status());
         }
     }
 
@@ -110,6 +111,7 @@ public class HttpResponse {
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
+            response(new Response500Status());
         }
     }
 }
