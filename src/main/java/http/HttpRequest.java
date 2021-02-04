@@ -39,26 +39,19 @@ public class HttpRequest {
         return new Cookies(httpRequestHeaders.getHeader("Cookie"));
     }
 
-    public boolean matchWith(HttpRequest request) {
-        if (isTemplateRequest() && request.isTemplateRequest()) {
-            return true;
-        }
-        if (isStaticRequest() && request.isStaticRequest()) {
-            return true;
-        }
-        return sameRequestLine(request);
+    public boolean hasSameMethod(HttpRequest request) {
+        return requestMethod.equals(request.requestMethod);
     }
 
-    public boolean sameRequestLine(HttpRequest request) {
-        return requestMethod.equals(request.requestMethod) && uri.equals(request.uri);
+    public boolean hasSameUri(HttpRequest request) {
+        return uri.equals(request.uri);
     }
 
-    public boolean isTemplateRequest() {
-        return requestMethod == RequestMethod.GET && uri.endsWith(".html");
+    public boolean startsWith(String compare) {
+        return uri.startsWith(compare);
     }
 
-    public boolean isStaticRequest() {
-        return requestMethod
-                == RequestMethod.GET && (uri.startsWith("/css") || uri.startsWith("/fonts") || uri.startsWith("/images") || uri.startsWith("/js"));
+    public boolean endsWith(String compare) {
+        return uri.endsWith(compare);
     }
 }

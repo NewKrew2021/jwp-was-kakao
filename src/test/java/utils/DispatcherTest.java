@@ -8,48 +8,39 @@ import http.HttpRequest;
 import http.HttpRequestParser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DispatcherTest {
 
-    @DisplayName("htmlHandler를 반환하는지 테스트")
-    @Test
-    void templateRequest() {
-        HttpRequest request = new HttpRequestParser("GET /index.html HTTP/1.1\n" +
+    @DisplayName("templateHandler를 반환하는지 테스트")
+    @ParameterizedTest
+    @CsvSource({"/index.html", "/favicon.ico"})
+    void templateRequest(String uri) {
+        HttpRequest request = new HttpRequestParser("GET " + uri + " HTTP/1.1\n" +
                 "Host: localhost:8080\n" +
                 "Connection: keep-alive\n" +
                 "Accept: */*").parse();
 
         Handler handler = Dispatcher.findMatchingHandlers(request);
 
-        assertThat(handler).isEqualTo(TemplateController.htmlHandler);
+        assertThat(handler).isEqualTo(TemplateController.templateHandler);
     }
 
-    @DisplayName("cssHandler를 반환하는지 테스트")
-    @Test
-    void staticRequest() {
-        HttpRequest request = new HttpRequestParser("GET /css/style.css HTTP/1.1\n" +
+    @DisplayName("staticHandler를 반환하는지 테스트")
+    @ParameterizedTest
+    @CsvSource({"/css/style.css", "/fonts/glyphicons-halflings-regular.woff", "/images/80-text.png", "/js/bootstrap.min.js"})
+    void staticRequest(String uri) {
+        HttpRequest request = new HttpRequestParser("GET " + uri + " HTTP/1.1\n" +
                 "Host: localhost:8080\n" +
                 "Accept: text/css,*/*;q=0.1\n" +
                 "Connection: keep-alive").parse();
 
         Handler handler = Dispatcher.findMatchingHandlers(request);
 
-        assertThat(handler).isEqualTo(StaticController.cssHandler);
-    }
-
-    @DisplayName("faviconHandler를 반환하는지 테스트")
-    @Test
-    void faviconRequest() {
-        HttpRequest request = new HttpRequestParser("GET /favicon.ico HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Accept: text/css,*/*;q=0.1\n" +
-                "Connection: keep-alive").parse();
-
-        Handler handler = Dispatcher.findMatchingHandlers(request);
-
-        assertThat(handler).isEqualTo(TemplateController.faviconHandler);
+        assertThat(handler).isEqualTo(StaticController.staticHandler);
     }
 
     @DisplayName("createUserHandler를 반환하는지 테스트")
