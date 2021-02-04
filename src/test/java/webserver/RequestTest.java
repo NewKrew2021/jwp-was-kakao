@@ -19,10 +19,6 @@ public class RequestTest {
         assertEquals("POST", request.getMethod());
         assertEquals("/user/create", request.getUri());
         assertEquals("keep-alive", request.getHeader("Connection"));
-        assertEquals("1234", request.getParameter("userId"));
-        assertEquals("1234", request.getParameter("password"));
-        assertEquals("박재성", request.getParameter("name"));
-        assertEquals("email@email.com", request.getParameter("email"));
     }
 
     @Test
@@ -37,6 +33,14 @@ public class RequestTest {
         InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
         Request request = Request.of(in);
         assertEquals(request.getUri(), "/index.html");
+    }
+
+    @Test
+    void getUriWithParametersTest() throws Exception {
+        InputStream in = new FileInputStream(testDirectory + "Http_GET_Simple_Value.txt");
+        Request request = Request.of(in);
+        assertEquals(request.getUri(), "/index.html");
+        assertEquals(request.getParameter("param"), "1234");
     }
 
 }

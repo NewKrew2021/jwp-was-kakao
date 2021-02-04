@@ -1,25 +1,29 @@
 package webserver;
 
+import exception.InvalidRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.IOUtils;
+import utils.ParseUtils;
 
 import java.io.*;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private static final int KEY_INDEX = 0;
     private static final int VALUE_INDEX = 1;
-    private static final int REQUEST_LINE_INDEX = 0;
-    private static final int REMAIN_STRING_INDEX = 1;
-    private static final int PARAMETER_INDEX = 0;
-    private static final int METHOD_INDEX = 0;
-    private static final int URI_INDEX = 1;
 
+    private static final int METHOD_INDEX = 1;
+    private static final int REQUEST_URI_INDEX = 2;
+    public static final int PARAMETERS_INDEX = 1;
+    public static final int URI_INDEX = 0;
+
+    private Pattern requestLinePattern = Pattern.compile("(.+) (.+) (.+)");
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> parameters = new HashMap<>();
     private String method;
@@ -32,11 +36,11 @@ public class Request {
         initializeRequest();
     }
 
-    private void initializeHeader() throws IOException {
+    private void initializeHeader() throws Exception {
         String line = br.readLine();
-        headers.put("Request-Line", getRequestLine(line));
-
         logger.debug("request line : {}", line);
+        parseRequestLine(line);
+
         while (!"".equals(line) && line != null) {
             line = br.readLine();
             mapHeader(line);
@@ -44,19 +48,24 @@ public class Request {
         }
     }
 
-    private String getRequestLine(String line) throws UnsupportedEncodingException {
-        if (line.contains("?")) {
-            String[] tokens = line.split("\\?");
-            mapParameter(tokens[REMAIN_STRING_INDEX].split(" ")[PARAMETER_INDEX]);
-            line = tokens[REQUEST_LINE_INDEX];
+    private void parseRequestLine(String line) throws Exception {
+        Matcher matches = requestLinePattern.matcher(line);
+
+        if(!matches.find()) {
+            throw new InvalidRequestException();
         }
-        return line;
+
+        this.method = matches.group(METHOD_INDEX);
+        this.uri = matches.group(REQUEST_URI_INDEX);
+
+        if (uri.contains("?")) {
+            String[] tokens = uri.split("\\?");
+            mapParameter(tokens[PARAMETERS_INDEX]);
+            uri = tokens[URI_INDEX];
+        }
     }
 
     private void initializeRequest() throws IOException {
-        String[] requestLine = headers.get("Request-Line").split(" ");
-        this.method = requestLine[METHOD_INDEX];
-        this.uri = requestLine[URI_INDEX];
         if (headers.containsKey("Content-Length")) {
             String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
             mapParameter(body);
@@ -64,19 +73,18 @@ public class Request {
         }
     }
 
-    private void mapParameter(String body) throws UnsupportedEncodingException {
-        String[] tokens = body.split("&");
-        for (String token : tokens) {
-            String[] values = token.split("=");
-            parameters.put(values[KEY_INDEX].trim(), URLDecoder.decode(values[VALUE_INDEX],
-                    java.nio.charset.StandardCharsets.UTF_8.toString()).trim());
+    private void mapParameter(String text) throws UnsupportedEncodingException {
+        for (Map.Entry<String, String> elem : ParseUtils.parseParametersByAmpersand(text).entrySet()) {
+            parameters.put(elem.getKey(), elem.getValue());
         }
     }
 
-    private void mapHeader(String line) {
-        if (!line.equals("")) {
-            String[] splitLine = line.split(":");
-            headers.put(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
+    private void mapHeader(String text) {
+        if (text.equals("")) {
+            return;
+        }
+        for (Map.Entry<String, String> elem : ParseUtils.parseParametersByColon(text).entrySet()) {
+            headers.put(elem.getKey(), elem.getValue());
         }
     }
 
