@@ -12,11 +12,9 @@ public class HandlerMapper {
     public void addController(Controller controller) {
         list.add(controller);
     }
-    public Optional<Handler> findHandler(HttpRequest request) {
+    public Optional<Controller> findController(HttpRequest request) {
         return list.stream()
-                .map(it -> it.getResponsibleHandler(request))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .filter(it -> it.canHandle(request))
                 .findFirst();
     }
 }

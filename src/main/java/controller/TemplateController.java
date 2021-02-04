@@ -5,35 +5,27 @@ import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import utils.FileIoUtils;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class TemplateController extends Controller {
     private static final String prefix = "./templates";
 
-    @Override
-    public Optional<Handler> getResponsibleHandler(HttpRequest request) {
-        if (request.getRequestMethod() == RequestMethod.GET && request.getUri().endsWith(".html")) {
-            return Optional.of(htmlHandler);
-        }
-        if (request.getRequestMethod() == RequestMethod.GET && request.getUri().equals("/favicon.ico")) {
-            return Optional.of(faviconHandler);
-        }
-        return Optional.empty();
+    public TemplateController() {
+        super(RequestMethod.GET, "");
     }
 
-    private Handler htmlHandler = (request) -> {
-        String path = prefix + request.getUri();
-        return new HttpResponse.Builder()
-                .status("HTTP/1.1 200 OK")
-                .body(FileIoUtils.loadFileFromClasspath(path), FileIoUtils.getMimeType(path))
-                .build();
-    };
+    @Override
+    public boolean canHandle(HttpRequest request) {
+        return request.getRequestMethod() == RequestMethod.GET && request.getUri().endsWith(".html");
+    }
 
-    private Handler faviconHandler = (request) -> {
+    @Override
+    public HttpResponse handleRequest(HttpRequest request) throws IOException, URISyntaxException {
         String path = prefix + request.getUri();
         return new HttpResponse.Builder()
                 .status("HTTP/1.1 200 OK")
                 .body(FileIoUtils.loadFileFromClasspath(path), FileIoUtils.getMimeType(path))
                 .build();
-    };
+    }
 }

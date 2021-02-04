@@ -1,9 +1,22 @@
 package controller;
 
-import http.HttpRequest;
+import annotation.web.RequestMethod;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public abstract class Controller {
-    abstract Optional<Handler> getResponsibleHandler(HttpRequest request);
+    protected RequestMethod requestMethod;
+    protected String uri;
+
+    protected Controller(RequestMethod requestMethod, String uri) {
+        this.requestMethod = requestMethod;
+        this.uri = uri;
+    }
+
+    public abstract boolean canHandle(HttpRequest request);
+
+    public abstract HttpResponse handleRequest(HttpRequest request) throws IOException, URISyntaxException;
 }
