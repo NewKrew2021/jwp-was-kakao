@@ -6,6 +6,8 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webserver.domain.HttpHeader;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
@@ -19,6 +21,8 @@ import java.util.Map;
 public class ListUserController extends AbstractController {
     private TemplateLoader loader;
     private Handlebars handlebars;
+    private static final Logger logger = LoggerFactory.getLogger(ListUserController.class);
+
 
     public ListUserController() {
         loader = new ClassPathTemplateLoader();
@@ -34,13 +38,13 @@ public class ListUserController extends AbstractController {
             return;
         }
         try {
-            httpResponse.forwardBody(getProfilePage());
+            httpResponse.forwardBody(getUserListPage());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
-    private String getProfilePage() throws IOException {
+    private String getUserListPage() throws IOException {
         Template template = handlebars.compile("user/list");
 
         Map<String, List<User>> users = new HashMap();
