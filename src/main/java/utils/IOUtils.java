@@ -12,6 +12,11 @@ public class IOUtils {
      * @return
      * @throws IOException
      */
+
+    private IOUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String readData(BufferedReader br, int contentLength) throws IOException {
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);

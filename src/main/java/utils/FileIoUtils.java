@@ -9,6 +9,11 @@ import java.nio.file.Paths;
 import java.nio.charset.Charset;
 
 public class FileIoUtils {
+
+    private FileIoUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static byte[] loadFileFromClasspath(String filePath) throws IOException, URISyntaxException {
         Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource(filePath).toURI());
         return Files.readAllBytes(path);
