@@ -39,6 +39,17 @@ public class HttpRequestTest {
         assertEquals("javajigi", request.getParameter("userId"));
     }
 
+    @Test
+    @DisplayName("GET 방식 파라미터가 없는경우 Request 생성 테스트")
+    public void request_GET_no_parameter() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "Http_GET2.txt"));
+        Request request = Request.of(in);
+
+        assertEquals(RequestMethod.valueOf("GET"), request.getMethod());
+        assertEquals("/user/list", request.getPath());
+        assertEquals("keep-alive", request.getHeader("Connection"));
+    }
+
 
     @Test
     @DisplayName("POST 방식 데이터 전달시 request에 path, header, parameter로 저장되어야 한다.")
