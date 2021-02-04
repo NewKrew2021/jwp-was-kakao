@@ -1,5 +1,6 @@
 package webserver.domain;
 
+import org.springframework.util.StringUtils;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -22,19 +23,19 @@ public class HttpRequest {
         this.parameters = new HashMap<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-        String[] firstLineTokens = reader.readLine().split(" ");
-        String requestUrl = firstLineTokens[1];
-        parseUrl(requestUrl);
-        readHeaders(reader);
+        String[] requestLine = reader.readLine().split(" ");
+        String requestUrl = requestLine[1];
+        parseParameterByQueryString(requestUrl);
+        parseHeaders(reader);
 
-        this.method = HttpMethod.valueOf(firstLineTokens[0]);
+        this.method = HttpMethod.valueOf(requestLine[0]);
         if (this.headers.containsKey(HttpHeader.CONTENT_LENGTH)) {
-            this.body = IOUtils.readData(reader, Integer.parseInt(this.headers.get("Content-Length")));
+            this.body = IOUtils.readData(reader, Integer.parseInt(this.headers.get(HttpHeader.CONTENT_LENGTH)));
             parseParameter(this.body);
         }
     }
 
-    private void readHeaders(BufferedReader reader) throws IOException {
+    private void parseHeaders(BufferedReader reader) throws IOException {
         String line = reader.readLine();
         while (isValid(line)) {
             String[] header = line.split(": ");
@@ -44,10 +45,10 @@ public class HttpRequest {
     }
 
     private boolean isValid(String line) {
-        return (line != null) && !"".equals(line);
+        return !StringUtils.isEmpty(line);
     }
 
-    private void parseUrl(String requestUrl) {
+    private void parseParameterByQueryString(String requestUrl) {
         if (requestUrl.indexOf('?') == -1) {
             this.path = requestUrl;
             return;
