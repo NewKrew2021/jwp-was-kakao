@@ -12,4 +12,5 @@ public class FileIoUtilsTest {
         byte[] body = FileIoUtils.loadFileFromClasspath("./templates/index.html");
         log.debug("file : {}", new String(body));
     }
+
 }
