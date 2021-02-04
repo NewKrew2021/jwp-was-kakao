@@ -14,69 +14,88 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private DataOutputStream dos;
+    private Map<String, String> header = new HashMap<>();
+    private byte[] body;
 
     public HttpResponse(OutputStream out) {
         this.dos = new DataOutputStream(out);
     }
 
-    public void response200Header(int lengthOfBodyContent, String type) {
+
+    public void addHeader(String key, String value){
+        header.put(key, value);
+    }
+
+    public void send(HttpResponseStatusCode responseStatusCode){
+        //response header
+        writeHeader(responseStatusCode);
+
+        //response body
+        writeBody();
+    }
+    private void writeHeader(HttpResponseStatusCode responseStatusCode) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/" + type + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
+            this.dos.writeBytes(responseStatusCode.getMessage() + "\r\n");
+            for (String key : this.header.keySet()) {
+                this.dos.writeBytes(key + ": " + this.header.get(key) + "\r\n");
+            }
+            this.dos.writeBytes("\r\n");
+
+        }catch (IOException e){
             logger.error(e.getMessage());
         }
     }
 
-    public void responseBody(byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
+    private void writeBody(){
+        if(body == null){
+            return;
+        }
+        try{
+            this.dos.write(body, 0, body.length);
+            this.dos.flush();
+        }catch (IOException e){
             logger.error(e.getMessage());
         }
     }
 
-    public void response302Header(String location) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: http://localhost:8080" + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    public void addContentTypeHeader(String path){
+        if(path.matches(".*\\.html")){
+            addHeader("Content-Type", "text/html;charset=utf-8");
+            return;
+        }
+        if(path.matches(".*\\.css")){
+            addHeader("Content-Type", "text/css;charset=utf-8");
+            return;
+        }
+        if(path.matches(".*\\.js")){
+            addHeader("Content-Type", "text/javascript;charset=utf-8");
+            return;
         }
     }
 
-    public void response302Header(String location, String logined) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: http://localhost:8080" + location + "\r\n");
-            dos.writeBytes("Set-Cookie: logined=" + logined + "; Path=/\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    public void addRedirectionLocationHeader(String location){
+        addHeader("Location", "http://localhost:8080" + location);
+    }
+
+    public void addContentLengthHeader(int lengthOfBodyContent){
+        addHeader("Content-Length", Integer.toString(lengthOfBodyContent));
+    }
+
+    public void addSetCookieHeader(boolean isLogined){
+        if(isLogined){
+            addHeader("Set-Cookie", "logined=true; Path=/");
         }
     }
 
-    public void responseTemplate(Collection<User> users) throws IOException {
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-        Handlebars handlebars = new Handlebars(loader);
-
-        Template template = handlebars.compile("user/list");
-        String result = template.apply(users);
-        result = IOUtils.decodeData(result);
-        byte[] body = result.getBytes("UTF-8");
-        response200Header(body.length, "html");
-        responseBody(body);
+    public void addResponseBody(byte[] body) {
+        this.body = body;
     }
 
 }

@@ -4,6 +4,7 @@ import db.DataBase;
 import model.User;
 import request.HttpRequest;
 import response.HttpResponse;
+import response.HttpResponseStatusCode;
 
 public class CreateUserController extends AbstractController {
 
@@ -18,7 +19,8 @@ public class CreateUserController extends AbstractController {
         User user = new User(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD),
                 httpRequest.getParameter(NAME), httpRequest.getParameter(EMAIL));
         DataBase.addUser(user);
-        httpResponse.response302Header(INDEX_HTML);
+        httpResponse.addRedirectionLocationHeader(INDEX_HTML);
+        httpResponse.send(HttpResponseStatusCode.FOUND);
     }
 
     @Override
@@ -26,7 +28,8 @@ public class CreateUserController extends AbstractController {
         User user = new User(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD),
                 httpRequest.getParameter(NAME), httpRequest.getParameter(EMAIL));
         DataBase.addUser(user);
-        httpResponse.response302Header(INDEX_HTML);
+        httpResponse.addRedirectionLocationHeader(INDEX_HTML);
+        httpResponse.send(HttpResponseStatusCode.FOUND);
     }
 
 }
