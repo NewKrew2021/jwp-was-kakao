@@ -6,7 +6,7 @@ import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public class UserCreateController extends AbstractController {
-    private static final String INDEX_URL = "http://localhost:8080/index.html";
+    private static final String INDEX_URL = "/index.html";
 
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {

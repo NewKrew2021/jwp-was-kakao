@@ -11,8 +11,8 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 public class UserLoginController extends AbstractController {
-    private static final String INDEX_URL = "http://localhost:8080/index.html";
-    private static final String LOGIN_FAIL_URL = "http://localhost:8080/user/login_failed.html";
+    private static final String INDEX_URL = "/index.html";
+    private static final String LOGIN_FAIL_URL = "/user/login_failed.html";
     private static final String USER_ID = "userId";
     private static final String USER_PASSWORD = "password";
     private static final String TRUE = "logined=true";

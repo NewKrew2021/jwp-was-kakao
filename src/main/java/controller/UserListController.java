@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class UserListController extends AbstractController {
-    private static final String DIRECT_LOGIN_URL = "http://localhost:8080/user/login.html";
+    private static final String DIRECT_LOGIN_URL = "/user/login.html";
     private static final String LIST_URL = "user/list";
     private static final String TEMPLATES_PREFIX = "/templates";
     private static final String HTML_SUFFIX = ".html";
