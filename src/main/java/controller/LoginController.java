@@ -18,10 +18,12 @@ public class LoginController extends AbstractController{
             session.setAttribute("USER", userSessionVO);
             response.addHeader("Set-Cookie", "logined=true; Path=/; " + session.getId());
 //            response.addHeader("Set-Cookie", "logined=true; Path=/");
-            response.sendRedirect("/index.html");
+            response.sendRedirect("http://" + request.getHost() + "/index.html");
+
         }
 
         response.addHeader("Set-Cookie", "logined=false; Path=/");
-        response.sendRedirect("/user/login_failed.html");
+        response.sendRedirect("http://" + request.getHost() + "/user/login_failed.html");
+
     }
 }

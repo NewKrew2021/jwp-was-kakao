@@ -12,11 +12,12 @@ public class HandlerMapping {
         handlerMapping.put("/user/create", new CreateUserController());
         handlerMapping.put("/user/list", new ListUserController());
         handlerMapping.put("/user/login", new LoginController());
+        handlerMapping.put("/file", new FileController());
     }
 
     public static Controller getController(String url) {
-        if (url.endsWith(".html") || url.endsWith(".css") || url.endsWith(".js")) {
-            return new FileController();
+        if (FileMapping.isFileRequest(url)) {
+            return handlerMapping.get("/file");
         }
 
         return handlerMapping.get(url);

@@ -22,7 +22,7 @@ public class HttpRequest {
             String line = br.readLine();
             setStartLine(line);
             while (!"".equals((line = br.readLine()))) {
-                headers.put(line.split(":")[0], line.split(":")[1].trim());
+                headers.put(line.split(":")[0], line.substring(line.indexOf(":") + 1).trim());
             }
 
             if (getContentLength() != 0) {
@@ -82,17 +82,17 @@ public class HttpRequest {
 
     public String getCookie(){
         return headers.get("Cookie");
-
     }
 
     public String getHeader(String param){
         return headers.get(param);
-
     }
 
     public String getParameter(String key) {
         return params.get(key);
+    }
 
-
+    public String getHost(){
+        return headers.get("Host");
     }
 }

@@ -2,10 +2,13 @@ package dto;
 
 
 import utils.FileIoUtils;
+import webserver.FileMapping;
+import webserver.HttpStatusMessage;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,80 +18,18 @@ public class HttpResponse {
     private Map<String, String> headers = new HashMap<>();
     private byte[] body = new byte[0];
 
-    public void setBody(byte[] body, String contentType) {
-        this.body = body;
-        this.headers.put("Content-Type", contentType + ";charset=utf-8");
-        this.headers.put("Content-Length", "" + body.length);
-    }
-
-    public HttpResponse(byte[] body) {
-        setBody(body, "");
-    }
-
-    public HttpResponse(String status, byte[] body) {
-        this(body);
-        this.status = status;
-    }
-
     public HttpResponse(OutputStream out) {
         this.out = out;
     }
 
+    public void setBody(byte[] body, String contentType) {
+        this.body = body;
+        this.headers.put("Content-Type", contentType);
+        this.headers.put("Content-Length", "" + body.length);
+    }
+
     public void addHeader(String key, String value) {
         headers.put(key, value);
-    }
-
-    public void forward(String path) {
-        try {
-            if (path.endsWith(".html")) {
-                forwardBody(FileIoUtils.loadFileFromClasspath("templates/" + path), "text/html");
-            }
-
-            if (path.endsWith(".css")) {
-                forwardBody(FileIoUtils.loadFileFromClasspath("static/" + path), "text/css");
-            }
-
-            if (path.endsWith(".js")) {
-                forwardBody(FileIoUtils.loadFileFromClasspath("static/" + path), "text/javascript");
-            }
-        } catch (Exception e) {
-            internalServerError();
-        }
-    }
-
-    public void forwardBody(byte[] body, String contentType) {
-        setBody(body, contentType);
-        ok();
-    }
-
-    public void ok() {
-        this.status = "HTTP/1.1 200 ok";
-
-        sendHttpResponse();
-    }
-
-    public void internalServerError() {
-        this.status = "HTTP/1.1 500 INTERNAL SERVER ERROR";
-
-        sendHttpResponse();
-    }
-
-    public void notFound() {
-        this.status = "HTTP/1.1 404 NOT FOUND";
-
-        sendHttpResponse();
-    }
-
-    public void badRequest() {
-        this.status = "HTTP/1.1 400 BAD REQUEST";
-
-        sendHttpResponse();
-    }
-
-    public void sendRedirect(String path) {
-        this.status = "HTTP/1.1 302 Found";
-        addHeader("Location", "http://localhost:8080" + path);
-        sendHttpResponse();
     }
 
     public String getHeaders() {
@@ -107,6 +48,30 @@ public class HttpResponse {
         return body;
     }
 
+    public void forward(String path) {
+        try {
+            forwardBody(FileIoUtils.loadFileFromClasspath(FileMapping.getFileURL(path)), FileMapping.getContentType(path));
+
+        } catch (IOException e) {
+            badRequest();
+        } catch(URISyntaxException e){
+            badRequest();
+        } catch(Exception e){
+            internalServerError();
+        }
+    }
+
+    public void forwardBody(byte[] body, String contentType) {
+        setBody(body, contentType);
+        ok();
+    }
+
+    public void sendRedirect(String location) {
+        this.status = HttpStatusMessage.redirect;
+        addHeader("Location", location);
+        sendHttpResponse();
+    }
+
     private void sendHttpResponse() {
         try {
             DataOutputStream dos = new DataOutputStream(out);
@@ -116,5 +81,29 @@ public class HttpResponse {
         } catch (IOException e) {
 
         }
+    }
+
+    public void ok() {
+        this.status = HttpStatusMessage.ok;
+
+        sendHttpResponse();
+    }
+
+    public void badRequest() {
+        this.status = HttpStatusMessage.badRequest;
+
+        sendHttpResponse();
+    }
+
+    public void notFound() {
+        this.status = HttpStatusMessage.notFount;
+
+        sendHttpResponse();
+    }
+
+    public void internalServerError() {
+        this.status = HttpStatusMessage.internalServerError;
+
+        sendHttpResponse();
     }
 }
