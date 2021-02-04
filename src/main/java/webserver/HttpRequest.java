@@ -15,6 +15,7 @@ public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     private static final String NOT_EXIST_MESSAGE = "(이)가 존재하지 않습니다.";
+    private static final String CONTENT_LENGTH = "Content-Length";
 
     private final HttpMethod httpMethod;
     private final String path;
@@ -39,7 +40,7 @@ public class HttpRequest {
             List<String> requestHeader = readRequestHeader(br);
             Map<String, String> header = getHeaderFromRequestHeader(requestHeader);
 
-            int contentLength = header.containsKey("Content-Length") ? Integer.parseInt(header.get("Content-Length")) : 0;
+            int contentLength = header.containsKey(CONTENT_LENGTH) ? Integer.parseInt(header.get(CONTENT_LENGTH)) : 0;
             String requestBody = readRequestBody(br, contentLength);
             parameters.putAll(getParametersFromRequestBody(requestBody));
             return new HttpRequest(httpMethod, path, header, parameters);
@@ -79,7 +80,7 @@ public class HttpRequest {
     private static List<String> readRequestHeader(BufferedReader br) throws IOException {
         List<String> header = new ArrayList<>();
         String line = br.readLine();
-        while (line != null && !"".equals(line)) {
+        while (line != null && !line.isEmpty()) {
             header.add(line);
             line = br.readLine();
         }

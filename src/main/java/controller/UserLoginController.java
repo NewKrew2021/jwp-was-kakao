@@ -16,8 +16,4 @@ public class UserLoginController extends AbstractController {
         httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
         httpResponse.sendRedirect("/index.html");
     }
-
-    @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-    }
 }
