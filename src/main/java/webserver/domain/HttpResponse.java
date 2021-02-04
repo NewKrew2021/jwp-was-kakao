@@ -17,8 +17,8 @@ public class HttpResponse {
     private static final String TEMPLATE_PREFIX = "templates";
     private static final String STATIC_PREFIX = "static";
 
-    DataOutputStream dos;
-    Map<String, String> headers;
+    private DataOutputStream dos;
+    private Map<String, String> headers;
 
     public HttpResponse(OutputStream out) {
         dos = new DataOutputStream(out);
