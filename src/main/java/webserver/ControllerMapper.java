@@ -1,12 +1,13 @@
-package controller;
+package webserver;
 
+import webserver.Controller;
 import webserver.http.HttpRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class HandlerMapper {
+public class ControllerMapper {
     private List<Controller> list = new ArrayList<>();
 
     public void addController(Controller controller) {

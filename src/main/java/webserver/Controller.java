@@ -1,4 +1,4 @@
-package controller;
+package webserver;
 
 import annotation.web.RequestMethod;
 import webserver.http.HttpRequest;

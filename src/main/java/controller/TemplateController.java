@@ -1,6 +1,7 @@
 package controller;
 
 import annotation.web.RequestMethod;
+import webserver.Controller;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import utils.FileIoUtils;
