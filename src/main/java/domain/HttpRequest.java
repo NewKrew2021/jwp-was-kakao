@@ -1,6 +1,9 @@
 package domain;
 
 import annotation.web.RequestMethod;
+import exception.ExceptionHandler;
+import exception.HttpRequestFormatException;
+import exception.HttpRequestInputException;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -28,7 +31,9 @@ public class HttpRequest {
             setHeader(br);
             setParameter(br);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.getInstance().handle(new HttpRequestInputException());
+        } catch (NullPointerException e) {
+            ExceptionHandler.getInstance().handle(new HttpRequestFormatException());
         }
 
     }

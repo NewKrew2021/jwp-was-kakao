@@ -1,5 +1,8 @@
 package domain;
 
+import exception.ExceptionHandler;
+import exception.FileIOException;
+import exception.HttpResponseOutputException;
 import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
@@ -46,9 +49,10 @@ public class HttpResponse {
             httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(httpBody.getBytesSize()));
             httpHeader.addHeader(HEADER_CONTENT_LOCATION, path);
             send();
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-            sendInternalServerError();
+        } catch (IOException e) {
+            ExceptionHandler.getInstance().handle(new FileIOException(addBasePath(path)));
+        } catch (URISyntaxException e) {
+            ExceptionHandler.getInstance().handle(e);
         }
     }
 
@@ -69,28 +73,24 @@ public class HttpResponse {
     }
 
     public void forwardBody(String path, String content) {
-        try {
-            httpStatus = HttpStatus.OK;
-            httpBody = new HttpBody(content);
-            setContentType(path);
-            httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(httpBody.getBytesSize()));
-            httpHeader.addHeader(HEADER_CONTENT_LOCATION, path);
-            send();
-        } catch (IOException e) {
-            sendInternalServerError();
-        }
+        httpStatus = HttpStatus.OK;
+        httpBody = new HttpBody(content);
+        setContentType(path);
+        httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(httpBody.getBytesSize()));
+        httpHeader.addHeader(HEADER_CONTENT_LOCATION, path);
+        send();
     }
 
     public void sendRedirect(String location) {
-        try {
-            httpStatus = HttpStatus.FOUND;
-            httpHeader.addHeader(HEADER_LOCATION, location);
-            send();
-        } catch (IOException e) {
-            sendInternalServerError();
-        }
+        httpStatus = HttpStatus.FOUND;
+        httpHeader.addHeader(HEADER_LOCATION, location);
+        send();
     }
 
+    public void send(HttpStatus status) {
+        httpStatus = status;
+        send();
+    }
     public void sendInternalServerError() {
         try {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -104,12 +104,16 @@ public class HttpResponse {
         httpHeader.addHeader(HEADER_SET_COOKIE, String.format(SET_COOKIE_VALUE_FORMAT, key, value, path));
     }
 
-    private void send() throws IOException {
-        dos.writeBytes(HTTP_VERSION + " " + httpStatus + " \r\n");
-        dos.writeBytes(httpHeader.toString());
-        if(httpBody != null) {
-            dos.write(httpBody.getBytes(), 0, httpBody.getBytesSize());
-            dos.flush();
+    private void send() {
+        try {
+            dos.writeBytes(HTTP_VERSION + " " + httpStatus + " \r\n");
+            dos.writeBytes(httpHeader.toString());
+            if (httpBody != null) {
+                dos.write(httpBody.getBytes(), 0, httpBody.getBytesSize());
+                dos.flush();
+            }
+        } catch(IOException e) {
+            ExceptionHandler.getInstance().handle(new HttpResponseOutputException());
         }
     }
 

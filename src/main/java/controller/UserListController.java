@@ -7,6 +7,8 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
+import exception.ExceptionHandler;
+import exception.FileIOException;
 import webserver.URLMapper;
 
 import java.io.IOException;
@@ -38,7 +40,7 @@ public class UserListController extends AbstractController {
             Template template = handlebars.compile("user/list");
             profilePage = template.apply(DataBase.findAll());
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionHandler.getInstance().handle(new FileIOException(URLMapper.USER_LIST_URL));
         }
 
         return profilePage;

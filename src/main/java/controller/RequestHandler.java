@@ -2,6 +2,7 @@ package controller;
 
 import domain.HttpRequest;
 import domain.HttpResponse;
+import exception.ExceptionHandler;
 import webserver.URLMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,8 @@ public class RequestHandler implements Runnable {
         );
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+            ExceptionHandler.getInstance().setOutputStream(out);
+
             HttpRequest httpRequest = new HttpRequest(in);
             logger.debug(httpRequest.toString());
             HttpResponse httpResponse = new HttpResponse(out);
