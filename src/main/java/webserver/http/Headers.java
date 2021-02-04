@@ -21,6 +21,10 @@ public class Headers {
     }
 
     public void saveHeader(String key, String value) {
+        if (value.isEmpty()) {
+            return;
+        }
+
         String normKey = normalize(key);
 
         List<String> keyValues = headers.getOrDefault(normKey, new LinkedList<>());
