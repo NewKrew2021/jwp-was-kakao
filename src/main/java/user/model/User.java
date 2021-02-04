@@ -55,12 +55,12 @@ public class User {
             throw new IllegalArgumentException("Please check name");
         }
 
-        if (isInvalidEmail()) {
+        if (!isValidEmail()) {
             throw new IllegalArgumentException("Please check email");
         }
     }
 
-    private boolean isInvalidEmail() {
+    private boolean isValidEmail() {
         String pattern = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
         return !email.matches(pattern);
     }

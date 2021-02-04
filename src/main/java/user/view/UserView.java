@@ -4,43 +4,50 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
-import user.service.UserService;
+import db.DataBase;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class UserView {
-    private static final TemplateLoader loader;
+    private static final Template LIST_TEMPLATE;
+    private static final Template PROFILE_TEMPLATE;
 
     static {
-        loader = new ClassPathTemplateLoader();
+        TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
         loader.setSuffix(".html");
+
+        Handlebars handlebars = new Handlebars(loader);
+        PROFILE_TEMPLATE = registerNewTemplate(handlebars, "/user/profile");
+
+        handlebars.registerHelper("inc", (value, options) -> (int) value + 1);
+        LIST_TEMPLATE = registerNewTemplate(handlebars, "/user/list");
     }
 
     public static byte[] getUserListHtml() {
-        Handlebars handlebars = new Handlebars(loader);
-        handlebars.registerHelper("inc", (value, options) -> (int) value + 1);
-
-        try {
-            Template template = handlebars.compile("user/list");
-            String userList = template.apply(UserService.findAll());
-
-            return userList.getBytes();
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not compile list.html template");
-        }
+        return getTemplateWithContentsApplied(LIST_TEMPLATE, DataBase.findAll());
     }
 
     public static byte[] getUserProfileHtml(String userId) {
-        Handlebars handlebars = new Handlebars(loader);
+        return getTemplateWithContentsApplied(PROFILE_TEMPLATE, DataBase.findUserById(userId));
+    }
 
+    private static Template registerNewTemplate(Handlebars handlebars, String templatePath) {
         try {
-            Template template = handlebars.compile("user/profile");
-            String userProfile = template.apply(UserService.findById(userId));
-
-            return userProfile.getBytes();
+            return handlebars.compile(templatePath);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not compile profile.html template");
+            throw new NoSuchElementException(String.format("Could not find template with path: %s\n%s",
+                    templatePath, e.getMessage()));
+        }
+    }
+
+    private static byte[] getTemplateWithContentsApplied(Template template, Object content) {
+        try {
+            return template.apply(content)
+                    .getBytes();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Could not compile template");
         }
     }
 }

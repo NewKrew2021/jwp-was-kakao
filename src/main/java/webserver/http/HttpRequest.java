@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class HttpRequest {
+    private static final int REQUEST_LINE_CONTENTS_COUNT = 3;
+    private static final String DEFAULT_CONTENT_LENGTH = "0";
     private final RequestMethod requestMethod;
     private final String path;
     private final String httpVersion;
@@ -75,7 +77,7 @@ public class HttpRequest {
 
     private String getBodyData(BufferedReader br) {
         try {
-            int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", "0"));
+            int contentLength = Integer.parseInt(headers.getOrDefault("Content-Length", DEFAULT_CONTENT_LENGTH));
             return IOUtils.readData(br, contentLength);
         } catch (IOException e) {
             throw new IllegalArgumentException(e.getMessage() + "\nError while reading body data");
@@ -100,7 +102,7 @@ public class HttpRequest {
     }
 
     private void checkValidRequest(String[] token) {
-        if (token.length < 3) {
+        if (token.length != REQUEST_LINE_CONTENTS_COUNT) {
             throw new IllegalArgumentException("Incorrect request");
         }
     }

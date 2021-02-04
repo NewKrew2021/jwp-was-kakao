@@ -28,14 +28,22 @@ public class ManualRequestMapping implements RequestMapping {
 
     @Override
     public Controller getController(String path) {
-        if (path.endsWith(".html") || path.endsWith("favicon.ico")) {
+        if (isTemplateOrFavicon(path)) {
             return forwardController;
         }
 
-        if (path.matches("\\.\\w+$")) {
+        if (isFile(path)) {
             return staticController;
         }
 
         return controllers.getOrDefault(path.toLowerCase(), defaultController);
+    }
+
+    private boolean isTemplateOrFavicon(String path) {
+        return path.endsWith(".html") || path.endsWith("favicon.ico");
+    }
+
+    private boolean isFile(String path) {
+        return path.matches("\\.\\w+$");
     }
 }

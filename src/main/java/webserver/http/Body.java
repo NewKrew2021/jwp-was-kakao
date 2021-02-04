@@ -8,7 +8,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 
 public class Body {
-    private static final HashMap<String, String> contentTypes = new HashMap<String, String>() {{
+    private static final HashMap<String, String> CONTENT_TYPES = new HashMap<>() {{
         put("html", "text/html");
         put("js", "text/javascript");
         put("xml", "text/xml");
@@ -44,7 +44,7 @@ public class Body {
     }
 
     private String identifyContentType(String path) throws IOException {
-        return contentTypes.get(FilenameUtils.getExtension(path));
+        return CONTENT_TYPES.get(FilenameUtils.getExtension(path));
     }
 
     public int getContentLength() {
