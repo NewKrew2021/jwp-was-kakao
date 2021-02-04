@@ -1,8 +1,10 @@
 package utils;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,5 +33,10 @@ public class IOUtils {
             return URLDecoder.decode(line, "UTF-8");
         }
         return null;
+    }
+
+    public static void writeString(DataOutputStream dos, String str) throws IOException {
+        dos.write(str.getBytes(StandardCharsets.UTF_8));
+        dos.flush();
     }
 }

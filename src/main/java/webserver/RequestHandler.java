@@ -2,6 +2,7 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.IOUtils;
 import webserver.controller.Controller;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
@@ -37,21 +38,19 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-            HttpRequest httpRequest = new HttpRequest(in);
-            logger.debug(httpRequest.toString());
+            HttpRequest request = new HttpRequest(in);
+            logger.debug(request.toString());
 
-            if (httpRequest.isEmpty()) {
+            if (request.isEmpty()) {
                 return;
             }
 
-            Controller controller = controllerMapper.assignController(httpRequest);
+            Controller controller = controllerMapper.assignController(request);
 
-            HttpResponse httpResponse = controller.service(httpRequest);
+            HttpResponse response = controller.service(request);
+            logger.debug(response.toString());
 
-            String responseString = httpResponse.toString();
-            logger.debug(httpResponse.toString());
-
-            writeString(dos, responseString);
+            writeResponse(dos, response);
 
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -60,8 +59,7 @@ public class RequestHandler implements Runnable {
 
     }
 
-    private void writeString(DataOutputStream dos, String str) throws IOException {
-        dos.write(str.getBytes(StandardCharsets.UTF_8));
-        dos.flush();
+    private void writeResponse(DataOutputStream dos, HttpResponse response) throws IOException {
+        IOUtils.writeString(dos, response.toString());
     }
 }
