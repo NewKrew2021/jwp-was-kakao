@@ -1,6 +1,6 @@
-package webserver.controller;
+package application.controller;
 
-import service.UserService;
+import application.user.UserService;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 

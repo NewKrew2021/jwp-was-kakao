@@ -1,4 +1,4 @@
-package service;
+package application.user;
 
 import db.DataBase;
 import model.User;

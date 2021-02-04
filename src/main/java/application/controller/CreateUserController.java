@@ -1,7 +1,7 @@
-package webserver.controller;
+package application.controller;
 
+import application.user.UserService;
 import model.User;
-import service.UserService;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 

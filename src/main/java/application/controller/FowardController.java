@@ -1,4 +1,4 @@
-package webserver.controller;
+package application.controller;
 
 import utils.FileIoUtils;
 import webserver.domain.ContentTypes;
