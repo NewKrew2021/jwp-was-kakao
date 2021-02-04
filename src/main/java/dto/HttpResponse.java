@@ -32,8 +32,8 @@ public class HttpResponse {
         headers.put(key, value);
     }
 
-    public void setCookie(String logined, String path, String sessionId){
-        addHeader("Set-Cookie", "logined=" + logined + "; Path=" + path + (sessionId == null? "":"; " + sessionId));
+    public void setCookie(String logined, String path, String sessionId) {
+        addHeader("Set-Cookie", "logined=" + logined + "; Path=" + path + (sessionId == null ? "" : "; " + sessionId));
     }
 
     public String getHeaders() {
@@ -58,9 +58,9 @@ public class HttpResponse {
 
         } catch (IOException e) {
             badRequest();
-        } catch(URISyntaxException e){
+        } catch (URISyntaxException e) {
             badRequest();
-        } catch(Exception e){
+        } catch (Exception e) {
             internalServerError();
         }
     }

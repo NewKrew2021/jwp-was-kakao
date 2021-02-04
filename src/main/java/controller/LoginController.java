@@ -8,7 +8,7 @@ import vo.UserSessionVO;
 import webserver.HttpServletRequest;
 import webserver.HttpSession;
 
-public class LoginController extends AbstractController{
+public class LoginController extends AbstractController {
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
         User user = DataBase.findUserById(request.getParams().get("userId"));

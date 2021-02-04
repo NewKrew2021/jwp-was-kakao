@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
 public class RequestHandler implements Runnable {
@@ -29,7 +28,7 @@ public class RequestHandler implements Runnable {
             HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
             Controller controller = HandlerMapping.getController(request.getPath());
-            if(controller == null){
+            if (controller == null) {
                 response.notFound();
                 return;
             }

@@ -20,7 +20,7 @@ public class ListUserController extends AbstractController {
     public void doGet(HttpRequest request, HttpResponse response) {
         try {
             String cookie = request.getCookie();
-            if(cookie == null){
+            if (cookie == null) {
                 response.sendRedirect("http://" + request.getHost() + "/user/login.html");
                 return;
             }
@@ -49,7 +49,7 @@ public class ListUserController extends AbstractController {
 
             response.sendRedirect("http://" + request.getHost() + "/user/login.html");
 
-        } catch(Exception e){
+        } catch (Exception e) {
             response.internalServerError();
         }
     }

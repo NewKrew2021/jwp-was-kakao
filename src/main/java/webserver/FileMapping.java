@@ -1,7 +1,6 @@
 package webserver;
 
 import model.File;
-import utils.FileIoUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +24,12 @@ public class FileMapping {
         return file.getLocation() + path;
     }
 
-    public static String getContentType(String path){
+    public static String getContentType(String path) {
         File file = findFile(path);
         return file.getContentType();
     }
 
-    public static File findFile(String path){
+    public static File findFile(String path) {
         String key = fileExtension.keySet().stream()
                 .filter(extension -> path.endsWith(extension))
                 .findFirst()

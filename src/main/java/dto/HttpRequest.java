@@ -29,7 +29,7 @@ public class HttpRequest {
                 setBody(IOUtils.readData(br, getContentLength()));
             }
 
-        } catch (IOException e){
+        } catch (IOException e) {
             throw new IOException("Http request를 읽는 과정에서 exception이 발생하였습니다.");
         }
     }
@@ -41,7 +41,7 @@ public class HttpRequest {
 
         String[] url = firstLineTokens[1].split("\\?");
         path = url[0];
-        if(url.length != 1) {
+        if (url.length != 1) {
             String[] queries = url[1].split("&");
             for (String q : queries) {
                 String key = q.split("=")[0];
@@ -63,8 +63,8 @@ public class HttpRequest {
         return params;
     }
 
-    private int getContentLength(){
-        if(headers.containsKey("Content-Length")){
+    private int getContentLength() {
+        if (headers.containsKey("Content-Length")) {
             return Integer.parseInt(headers.get("Content-Length"));
         }
 
@@ -80,11 +80,11 @@ public class HttpRequest {
         }
     }
 
-    public String getCookie(){
+    public String getCookie() {
         return headers.get("Cookie");
     }
 
-    public String getHeader(String param){
+    public String getHeader(String param) {
         return headers.get(param);
     }
 
@@ -92,7 +92,7 @@ public class HttpRequest {
         return params.get(key);
     }
 
-    public String getHost(){
+    public String getHost() {
         return headers.get("Host");
     }
 }
