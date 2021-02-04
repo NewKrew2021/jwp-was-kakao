@@ -73,6 +73,10 @@ public class HttpRequest {
         }
     }
 
+    public boolean isLogined() {
+        return httpHeader.get("Cookie").contains("logined=true");
+    }
+
     public HttpMethod getMethod() {
         return httpMethod;
     }

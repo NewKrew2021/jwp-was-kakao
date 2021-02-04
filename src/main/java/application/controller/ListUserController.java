@@ -1,18 +1,16 @@
-package webserver.controller;
+package application.controller;
 
+import application.user.UserService;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import model.User;
-import service.UserService;
-import utils.FileIoUtils;
 import webserver.domain.ContentTypes;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ public class ListUserController extends AbstractController {
 
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (!isPossibleAccessUserList(httpRequest.getPath())) {
+        if (!httpRequest.isLogined()) {
             httpResponse.sendRedirect("/user/login.html");
             return;
         }
@@ -38,14 +36,6 @@ public class ListUserController extends AbstractController {
 
     }
 
-    private boolean isPossibleAccessUserList(String path) {
-        try {
-            return login && FileIoUtils.isExistFile("./templates" + path);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     private byte[] makeUserListBody(String path) throws IOException {
         TemplateLoader loader = new ClassPathTemplateLoader();
