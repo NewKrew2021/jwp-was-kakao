@@ -4,13 +4,14 @@ import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 
 public abstract class AbstractController implements Controller {
+
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
-        switch (httpRequest.getMethod()) {
-            case "GET":
+        switch (httpRequest.getRequestMethod()) {
+            case GET:
                 doGet(httpRequest, httpResponse);
                 break;
-            case "POST":
+            case POST:
                 doPost(httpRequest, httpResponse);
                 break;
         }

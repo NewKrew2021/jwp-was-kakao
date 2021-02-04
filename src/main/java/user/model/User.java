@@ -3,6 +3,7 @@ package user.model;
 import com.github.jknack.handlebars.internal.lang3.StringUtils;
 
 public class User {
+    private static final String EMAIL_PATTERN = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
     private String userId;
     private String password;
     private String name;
@@ -52,7 +53,7 @@ public class User {
     }
 
     private boolean isInvalidEmail() {
-        String pattern = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
+        String pattern = EMAIL_PATTERN;
         return !email.matches(pattern);
     }
 
