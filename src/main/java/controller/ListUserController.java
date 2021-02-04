@@ -20,9 +20,13 @@ public class ListUserController extends AbstractController {
     public void doGet(HttpRequest request, HttpResponse response) {
         try {
             String cookie = request.getCookie();
-//            String login = cookie.split(";")[0].trim();
+            if(cookie == null){
+                response.sendRedirect("/user/login.html");
+            }
+            System.out.println(cookie);
+            String login = cookie.split(";")[0].trim();
 //            String sessionId = cookie.split(";")[1].trim();
-            if (cookie.equals("logined=true")) {
+            if (login.equals("logined=true")) {
                 Map<String, Object> model = new HashMap<>();
 
                 List<User> users = new ArrayList<>(DataBase.findAll());

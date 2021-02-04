@@ -81,23 +81,18 @@ public class HttpRequest {
     }
 
     public String getCookie(){
-        if(headers.containsKey("Cookie")){
-            return headers.get("Cookie");
-        }
-        return "logined=false";
+        return headers.get("Cookie");
+
     }
 
     public String getHeader(String param){
-        if(headers.containsKey(param)){
-            return headers.get(param);
-        }
-        return "";
+        return headers.get(param);
+
     }
 
     public String getParameter(String key) {
-        if (params.containsKey(key)) {
-            return params.get(key);
-        }
-        return "";
+        return params.get(key);
+
+
     }
 }

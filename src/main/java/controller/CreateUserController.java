@@ -22,7 +22,9 @@ public class CreateUserController extends AbstractController{
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
+        if(userId == null || password == null || name == null || email == null){
+            response.badRequest();
+        }
         DataBase.addUser(new User(userId, password, name, email));
         response.sendRedirect("/index.html");
     }

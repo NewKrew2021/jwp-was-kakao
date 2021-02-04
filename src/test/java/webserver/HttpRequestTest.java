@@ -97,7 +97,11 @@ public class HttpRequestTest {
         HttpEntity<String> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl, request, String.class);
-        assertThat(response.getHeaders().get("Set-Cookie").get(0)).isEqualTo("logined=true; Path=/");
+        String[] cookie = response.getHeaders().get("Set-Cookie").get(0).split(";");
+        String logined = cookie[0].trim();
+        String path = cookie[1].trim();
+        assertThat(logined).isEqualTo("logined=true");
+        assertThat(path).isEqualTo("Path=/");
     }
 
     @Test
