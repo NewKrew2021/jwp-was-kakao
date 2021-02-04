@@ -26,11 +26,11 @@ public class HttpRequest {
 
     public static HttpRequest from(BufferedReader br) throws IOException {
         HttpRequestStartLine startLine = HttpRequestStartLine.of(br.readLine());
-        if (!startLine.hasParameter()) {
-            return new HttpRequest(startLine, null, null);
+        Map<String, String> params = new HashMap<>();
+        if (startLine.hasParameter()) {
+            params = KeyValueTokenizer.of(startLine.getParameter());
         }
 
-        Map<String, String> params = KeyValueTokenizer.of(startLine.getParameter());
         Map<String, String> headers = new HashMap<>();
         String headerLine;
         while ((headerLine = br.readLine()) != null && !headerLine.isEmpty()) {
