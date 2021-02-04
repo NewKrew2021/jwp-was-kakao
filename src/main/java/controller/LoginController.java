@@ -1,6 +1,7 @@
 package controller;
 
 import db.DataBase;
+import exception.NotDefinedMethodException;
 import model.LoginUser;
 import model.User;
 import webserver.Request;
@@ -8,13 +9,8 @@ import webserver.Response;
 
 public class LoginController extends AbstractController {
     @Override
-    public void service(Request request, Response response) throws Exception {
-        if (request.getMethod().equals("GET")) {
-            doGet(request, response);
-        }
-        if (request.getMethod().equals("POST")) {
-            doPost(request, response);
-        }
+    public void doGet(Request request, Response response) throws Exception {
+        throw new NotDefinedMethodException();
     }
 
     @Override
