@@ -2,14 +2,13 @@ package controller;
 
 import controller.handler.SecuredHandler;
 import db.DataBase;
-import model.HttpMethod;
-import model.HttpRequest;
-import model.HttpResponse;
-import model.User;
+import db.Session;
+import model.*;
 import view.View;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 public class UserController extends Controller {
     {
@@ -38,9 +37,11 @@ public class UserController extends Controller {
         User user = DataBase.findUserById(bodyParsed.get("userId"));
 
         if (user == null) {
-            return new HttpResponse().setCookie("logined=false").redirect("/user/login_failed.html");
+            return new HttpResponse().redirect("/user/login_failed.html");
         }
-        return new HttpResponse().setCookie("logined=true").redirect("/index.html");
+        HttpSession session = Session.newSession();
+        session.setAttribute("userId", bodyParsed.get("userId"));
+        return new HttpResponse().setCookie("session=" + session.getId()).redirect("/index.html");
     }
 
     public HttpResponse handleUserList(HttpRequest request) throws IOException {
@@ -49,6 +50,10 @@ public class UserController extends Controller {
     }
 
     public HttpResponse handleLogout(HttpRequest request) {
-        return new HttpResponse().setCookie("logined=false").redirect("/index.html");
+        String cookieValue = request.getCookie("session");
+        if (cookieValue != null) {
+            Session.invalidateSession(UUID.fromString(cookieValue));
+        }
+        return new HttpResponse().redirect("/index.html");
     }
 }

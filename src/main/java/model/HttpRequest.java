@@ -1,6 +1,5 @@
 package model;
 
-import exception.http.IllegalHeaderException;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -15,6 +14,7 @@ import java.util.Map;
 public class HttpRequest {
     private final Map<String, String> headerMap = new HashMap<>();
     private final Map<String, String> queryParameterMap = new HashMap<>();
+    private final Map<String, String> cookieMap = new HashMap<>();
 
     private String remoteAddress;
     private HttpMethod method;
@@ -31,6 +31,7 @@ public class HttpRequest {
         setStartLine(line);
         setHeader(br);
         setBody(br);
+        setCookie();
         setRemoteAddress(connection);
     }
 
@@ -55,6 +56,17 @@ public class HttpRequest {
     private void setBody(BufferedReader br) throws IOException {
         while (br.ready()) {
             body = IOUtils.readData(br, Integer.parseInt(headerMap.get("Content-Length")));
+        }
+    }
+
+    public void setCookie() {
+        String cookieHeader = getHeader("Cookie");
+        if (cookieHeader != null) {
+            String[] cookies = cookieHeader.split(";");
+            Arrays.stream(cookies).forEach((cookie) -> {
+                String[] args = cookie.split("=", 2);
+                cookieMap.put(args[0].trim(), args[1].trim());
+            });
         }
     }
 
@@ -112,16 +124,16 @@ public class HttpRequest {
         return headerMap;
     }
 
-    public String getHeader(String key){
-        String header = headerMap.get(key);
-        if (header == null) {
-            throw new IllegalHeaderException();
-        }
-        return header;
+    public String getHeader(String key) {
+        return headerMap.get(key);
     }
 
     public String getBody() {
         return body;
+    }
+
+    public String getCookie(String cookieParam) {
+        return cookieMap.get(cookieParam);
     }
 
     public String getRemoteAddress() {
@@ -136,18 +148,6 @@ public class HttpRequest {
             parsedBody.put(args[0].trim(), args[1].trim());
         });
         return parsedBody;
-    }
-
-    public String getCookie(String cookieParam){
-        Map<String, String> parsedCookie = new HashMap<>();
-        String cookieHeader = getHeader("Cookie");
-
-        String[] cookies = cookieHeader.split(";");
-        Arrays.stream(cookies).forEach((cookie) -> {
-           String[] args = cookie.split("=", 2);
-           parsedCookie.put(args[0].trim(), args[1].trim());
-        });
-        return parsedCookie.get(cookieParam);
     }
 
     public Map<String, String> getQueryParameterMap() {
