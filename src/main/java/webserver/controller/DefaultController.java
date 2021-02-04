@@ -10,4 +10,9 @@ public class DefaultController extends AbstractController {
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.sendStatus(ResponseStatus.NOT_FOUND);
     }
+
+    @Override
+    public boolean supports(String path) {
+        return true;
+    }
 }

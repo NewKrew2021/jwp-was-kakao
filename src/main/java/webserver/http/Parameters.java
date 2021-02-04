@@ -17,6 +17,10 @@ public class Parameters {
     }
 
     public void saveParameter(String parameterValue) {
+        if (parameterValue.isEmpty()) {
+            return;
+        }
+
         String[] parameterAndValue = parameterValue.split("=");
         String key = parameterAndValue[0];
         String value = parameterAndValue[1];

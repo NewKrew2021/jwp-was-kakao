@@ -6,7 +6,7 @@ import webserver.http.AbstractController;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 
-public class LoginController extends AbstractController {
+public class UserLoginController extends AbstractController {
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         User user = UserService.findById(httpRequest.getParameter("userId"));
@@ -18,5 +18,10 @@ public class LoginController extends AbstractController {
 
         httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
         httpResponse.sendRedirect("/index.html");
+    }
+
+    @Override
+    public boolean supports(String path) {
+        return path.endsWith("/user/login");
     }
 }

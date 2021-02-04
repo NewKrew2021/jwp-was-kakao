@@ -22,4 +22,8 @@ public abstract class AbstractController implements Controller {
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.sendStatus(ResponseStatus.METHOD_NOT_ALLOWED);
     }
+
+    public boolean supports(String path) {
+        return false;
+    }
 }

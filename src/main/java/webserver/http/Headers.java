@@ -2,27 +2,50 @@ package webserver.http;
 
 import com.google.common.collect.Maps;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Headers {
     private final Map<String, List<String>> headers = Maps.newHashMap();
 
     public void saveHeader(String headerValue) {
+        if (headerValue.isEmpty()) {
+            return;
+        }
+
         String[] headerAndValue = headerValue.split(": ");
-        String key = headerAndValue[0].trim().toLowerCase();
-        String value = headerAndValue[1].trim().toLowerCase();
+        saveHeader(headerAndValue[0], headerAndValue[1]);
+    }
 
-        List<String> keyValues = headers.getOrDefault(key, new LinkedList<>());
-        keyValues.add(value);
+    public void saveHeader(String key, String value) {
+        String normKey = normalize(key);
 
-        headers.put(key, keyValues);
+        List<String> keyValues = headers.getOrDefault(normKey, new LinkedList<>());
+        keyValues.add(value.trim());
+
+        headers.put(normKey, keyValues);
+    }
+
+    public String getProcessedHeaders() {
+        return headers.keySet()
+                .stream()
+                .map(key -> {
+                    String normKey = normalize(key);
+                    return String.format("%s: %s", normKey, get(normKey));
+                })
+                .collect(Collectors.joining("\r\n"));
     }
 
     public String get(String header) {
-        return Optional.ofNullable(headers.get(header))
-                .orElseGet(Collections::emptyList)
+        return headers.getOrDefault(normalize(header), Collections.emptyList())
                 .stream()
                 .collect(Collectors.joining("; "));
+    }
+
+    private String normalize(String value) {
+        return value.trim().toLowerCase();
     }
 }

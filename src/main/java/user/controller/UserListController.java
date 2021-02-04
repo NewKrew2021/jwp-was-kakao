@@ -6,7 +6,7 @@ import webserver.http.Body;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 
-public class ListUserController extends AbstractController {
+public class UserListController extends AbstractController {
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         if (isLogin(httpRequest.getHeader("Cookie"))) {
@@ -15,6 +15,11 @@ public class ListUserController extends AbstractController {
         }
 
         httpResponse.sendRedirect("/index.html");
+    }
+    
+    @Override
+    public boolean supports(String path) {
+        return path.endsWith("/user/list");
     }
 
     private boolean isLogin(String cookie) {

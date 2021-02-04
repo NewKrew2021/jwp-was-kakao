@@ -53,7 +53,7 @@ public class HttpResponseTest {
 
     private void assertRedirectLocation(String lines, String expected) {
         assertThat(lines.contains("302 Found")).isTrue();
-        assertThat(lines.contains("Location: " + expected)).isTrue();
+        assertThat(lines.contains("location: " + expected)).isTrue();
     }
 
     private OutputStream createOutputStream(String filename) throws FileNotFoundException {

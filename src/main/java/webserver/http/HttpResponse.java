@@ -1,17 +1,14 @@
 package webserver.http;
 
 import annotation.web.ResponseStatus;
-import com.google.common.collect.Maps;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HttpResponse {
-    private final Map<String, String> headers = Maps.newHashMap();
+    private final Headers headers = new Headers();
     private final DataOutputStream dos;
 
     public HttpResponse(OutputStream os) {
@@ -19,7 +16,7 @@ public class HttpResponse {
     }
 
     public void addHeader(String key, String value) {
-        headers.put(key, value);
+        headers.saveHeader(key, value);
     }
 
     public void forward(String templatePath) {
@@ -41,6 +38,11 @@ public class HttpResponse {
     public void sendStatus(ResponseStatus status) {
         makeResponse(status);
         processHeadersAndSend();
+    }
+
+    public void sendStatusWithBody(ResponseStatus status, Body body) {
+        makeResponse(status);
+        processHeadersAndSendWithBody(body);
     }
 
     private void makeResponse(ResponseStatus responseStatus) {
@@ -73,10 +75,7 @@ public class HttpResponse {
     }
 
     private String processHeaders() {
-        return headers.keySet()
-                .stream()
-                .map(key -> String.format("%s: %s", key, headers.get(key)))
-                .collect(Collectors.joining("\r\n"));
+        return headers.getProcessedHeaders();
     }
 
     private void writeToOutputStream(byte[] content) {

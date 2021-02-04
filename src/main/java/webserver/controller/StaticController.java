@@ -11,4 +11,10 @@ public class StaticController extends AbstractController {
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.forward(STATICS_DIRECTORY + httpRequest.getPath());
     }
+
+    @Override
+    public boolean supports(String path) {
+        boolean isFile = path.matches("\\.\\w+$");
+        return isFile;
+    }
 }

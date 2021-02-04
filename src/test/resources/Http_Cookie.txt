@@ -1,4 +1,4 @@
 HTTP/1.1 302 Found
-Set-Cookie: logined=true; Path=/
-Location: /index.html
+set-cookie: logined=true; Path=/
+location: /index.html
 

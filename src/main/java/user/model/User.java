@@ -1,6 +1,7 @@
 package user.model;
 
 import com.github.jknack.handlebars.internal.lang3.StringUtils;
+import user.exceptions.IllegalUserValuesException;
 
 public class User {
     private final String userId;
@@ -44,19 +45,19 @@ public class User {
 
     private void checkIsValidUser() {
         if (StringUtils.isBlank(userId)) {
-            throw new IllegalArgumentException("Please check userId");
+            throw new IllegalUserValuesException("Please check userId");
         }
 
         if (StringUtils.isBlank(password)) {
-            throw new IllegalArgumentException("Please check password");
+            throw new IllegalUserValuesException("Please check password");
         }
 
         if (StringUtils.isBlank(name)) {
-            throw new IllegalArgumentException("Please check name");
+            throw new IllegalUserValuesException("Please check name");
         }
 
         if (!isValidEmail()) {
-            throw new IllegalArgumentException("Please check email");
+            throw new IllegalUserValuesException("Please check email");
         }
     }
 

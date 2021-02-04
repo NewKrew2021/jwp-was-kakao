@@ -11,4 +11,9 @@ public class ForwardController extends AbstractController {
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.forward(TEMPLATES_DIRECTORY + httpRequest.getPath());
     }
+
+    @Override
+    public boolean supports(String path) {
+        return path.endsWith(".html") || path.endsWith("favicon.ico");
+    }
 }

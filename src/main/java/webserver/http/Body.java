@@ -28,13 +28,9 @@ public class Body {
     private final byte[] body;
 
     public Body(String path) {
-        try {
-            body = FileIoUtils.loadFileFromClasspath(path);
-            contentType = identifyContentType(path);
-            contentLength = body.length;
-        } catch (IOException | URISyntaxException e) {
-            throw new IllegalArgumentException("Path for body is not correct");
-        }
+        body = getBodyFromPath(path);
+        contentType = identifyContentType(path);
+        contentLength = body.length;
     }
 
     public Body(byte[] body, String contentType) {
@@ -43,7 +39,7 @@ public class Body {
         contentLength = body.length;
     }
 
-    private String identifyContentType(String path) throws IOException {
+    private String identifyContentType(String path) {
         return CONTENT_TYPES.get(FilenameUtils.getExtension(path));
     }
 
@@ -57,5 +53,13 @@ public class Body {
 
     public byte[] getBody() {
         return body;
+    }
+
+    private byte[] getBodyFromPath(String path) {
+        try {
+            return FileIoUtils.loadFileFromClasspath(path);
+        } catch (IOException | URISyntaxException e) {
+            throw new IllegalArgumentException("Path for body is not correct");
+        }
     }
 }

@@ -47,7 +47,8 @@ public class UserView {
             return template.apply(content)
                     .getBytes();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not compile template");
+            throw new IllegalArgumentException(String.format("Could not apply contents to template\n%s",
+                    e.getMessage()));
         }
     }
 }

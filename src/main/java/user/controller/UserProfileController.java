@@ -12,4 +12,9 @@ public class UserProfileController extends AbstractController {
         byte[] html = UserView.getUserProfileHtml(httpRequest.getParameter("userId"));
         httpResponse.forwardBody(new Body(html, "text/html"));
     }
+
+    @Override
+    public boolean supports(String path) {
+        return path.endsWith("/user/profile");
+    }
 }
