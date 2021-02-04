@@ -24,23 +24,17 @@ public class IOUtils {
         }
     }
 
-    public static List<String> readUntilEmptyLine(BufferedReader in) {
-        List<String> texts = new ArrayList<>();
-
+    public static List<String> readUntilEmptyLine(BufferedReader bufferedReader) {
         try {
-            readUntilEmptyLine(in, texts);
+            List<String> texts = new ArrayList<>();
+            String text = bufferedReader.readLine();
+            while (text != null && !text.trim().isEmpty()) {
+                texts.add(text);
+                text = bufferedReader.readLine();
+            }
+            return texts;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
-        }
-
-        return texts;
-    }
-
-    private static void readUntilEmptyLine(BufferedReader bufferedReader, List<String> texts) throws IOException {
-        String text = bufferedReader.readLine();
-        while (text != null && !text.trim().isEmpty()) {
-            texts.add(text);
-            text = bufferedReader.readLine();
         }
     }
 }
