@@ -47,7 +47,7 @@ public class Request {
 
     private void parsePath(String path) {
         String[] token = path.split(" ");
-        this.method =RequestMethod.stringToRequestMethod(token[0]);
+        this.method =RequestMethod.valueOf(token[0]);
         String[] pathToken = token[1].split("\\?");
         this.path = pathToken[0];
         if (pathToken.length > 1) {

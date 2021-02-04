@@ -31,7 +31,7 @@ public class HttpRequestTest {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_GET.txt"));
         Request request = new Request(in);
 
-        assertEquals(RequestMethod.GET, request.getMethod());
+        assertEquals(RequestMethod.valueOf("GET"), request.getMethod());
         assertEquals("/user/create", request.getPath());
         assertEquals("keep-alive", request.getHeader("Connection"));
         assertEquals("javajigi", request.getParameter("userId"));
@@ -43,7 +43,7 @@ public class HttpRequestTest {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_POST.txt"));
         Request request = new Request(in);
 
-        assertEquals(RequestMethod.POST, request.getMethod());
+        assertEquals(RequestMethod.valueOf("POST"), request.getMethod());
         assertEquals("/user/create", request.getPath());
         assertEquals("keep-alive", request.getHeader("Connection"));
         assertEquals("javajigi", request.getParameter("userId"));
@@ -54,7 +54,7 @@ public class HttpRequestTest {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_POST2.txt"));
         Request request = new Request(in);
 
-        assertEquals(RequestMethod.POST, request.getMethod());
+        assertEquals(RequestMethod.valueOf("POST"), request.getMethod());
         assertEquals("/user/create", request.getPath());
         assertEquals("keep-alive", request.getHeader("Connection"));
         assertEquals("1", request.getParameter("id"));
