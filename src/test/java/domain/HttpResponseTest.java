@@ -3,7 +3,10 @@ package domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +17,6 @@ class HttpResponseTest {
     @Test
     @DisplayName("html 리스폰스 포워드 테스트")
     public void responseForward() throws Exception {
-        // Http_Forward.txt 결과는 응답 body에 index.html이 포함되어 있어야 한다.
         HttpResponse response = new HttpResponse(new DataOutputStream(createOutputStream("Http_Forward.txt")));
         response.forward("./templates/index.html");
         assertThat(response.getHeaders().get("Content-Type")).isEqualTo("text/html; charset=utf-8");
