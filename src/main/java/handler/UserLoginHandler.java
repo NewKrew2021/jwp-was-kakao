@@ -15,14 +15,14 @@ public class UserLoginHandler implements HttpServlet {
 
         return DataBase.findUserById(parameters.get("userId"))
                 .filter(user -> user.isSamePassword(parameters.get("password")))
-                .map(user -> getResponse("/index.html", "logined=true; Path=/"))
-                .orElseGet(() -> getResponse("/user/login_failed.html", "logined=false; Path=/"));
+                .map(user -> getResponse("/index.html", HttpCookies.logined()))
+                .orElseGet(() -> getResponse("/user/login_failed.html", HttpCookies.notLogined()));
     }
 
-    private HttpResponse getResponse(String location, String cookie) {
+    private HttpResponse getResponse(String location, HttpCookies cookie) {
         HttpResponse httpResponse = HttpResponse.of(HttpStatus.FOUND);
         httpResponse.addHeader(HttpHeaders.LOCATION, location);
-        httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookie);
+        httpResponse.setCookie(cookie);
         return httpResponse;
     }
 

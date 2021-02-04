@@ -4,17 +4,14 @@ import db.DataBase;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
-import web.HttpHeaders;
-import web.HttpRequest;
-import web.HttpResponse;
-import web.HttpUrl;
+import web.*;
 import webserver.HttpServlet;
 
 public class UserListHandler implements HttpServlet {
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
-        String cookie = httpRequest.getHttpHeaders().get("Cookie");
-        if (cookie == null || !cookie.equals("logined=true")) {
+        HttpCookies cookie = HttpCookies.from(httpRequest.getHttpHeaders().get(HttpHeaders.COOKIE));
+        if (cookie.isLogined()) {
             HttpResponse httpResponse = HttpResponse.of(HttpStatus.FOUND);
             httpResponse.addHeader(HttpHeaders.LOCATION, "/user/login.html");
             return httpResponse;
@@ -31,7 +28,6 @@ public class UserListHandler implements HttpServlet {
 
     @Override
     public boolean isSupport(HttpRequest httpRequest) {
-        HttpUrl httpUrl = httpRequest.getHttpUrl();
-        return httpUrl.hasSameUrl("/user/list") && httpRequest.hasSameMethod(HttpMethod.GET);
+        return httpRequest.getHttpUrl().hasSameUrl("/user/list") && httpRequest.hasSameMethod(HttpMethod.GET);
     }
 }
