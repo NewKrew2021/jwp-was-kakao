@@ -104,6 +104,12 @@ public class HttpRequest {
         return body;
     }
 
+    public boolean containsCookie(String cookie) {
+        return this.headers
+                .get(HttpHeader.COOKIE)
+                .contains(cookie);
+    }
+
     public boolean isTemplate() {
         return Arrays.stream(templateList).anyMatch(str -> path.contains(str));
     }

@@ -3,7 +3,6 @@ package webserver.controller;
 import db.DataBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.domain.HttpHeader;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 import webserver.domain.HttpStatusCode;
@@ -16,7 +15,7 @@ public class ListUserController extends AbstractController {
 
     @Override
     public HttpResponse doGet(HttpRequest httpRequest) throws Exception {
-        if (!isLogin(httpRequest.getHeader(HttpHeader.COOKIE))) {
+        if (!httpRequest.containsCookie("logined=true")) {
             return new HttpResponse.Builder()
                     .status(HttpStatusCode.FOUND)
                     .redirect("/user/login.html")
@@ -29,9 +28,5 @@ public class ListUserController extends AbstractController {
                 .contentType("text/html;charset=utf-8")
                 .body(httpRequest.getPath(), users)
                 .build();
-    }
-
-    private boolean isLogin(String loginCookie) {
-        return loginCookie.contains("logined=true");
     }
 }
