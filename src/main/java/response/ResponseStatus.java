@@ -1,16 +1,23 @@
 package response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 public interface ResponseStatus {
 
-    /*
-    default void responseStatus(DataOutputStream dos) {
-        setStatus(dos);
+    Logger logger = LoggerFactory.getLogger(ResponseStatus.class);
+
+    default void setStatus(DataOutputStream dos) {
+        try {
+            writeStatus(dos);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
     }
-    */
 
-    void setStatus(DataOutputStream dos);
-
+    void writeStatus(DataOutputStream dos) throws IOException;
 }
