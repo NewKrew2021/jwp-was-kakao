@@ -1,7 +1,7 @@
 package controller;
 
 import controller.error.ErrorHandlerFactory;
-import controller.handler.Handler;
+import controller.handler.ErrorHandler;
 import exception.http.CannotHandleException;
 import exception.utils.NoFileException;
 import model.HttpRequest;
@@ -34,31 +34,25 @@ public class ControllerDispatcher {
             List<Controller> selectedControllers = controllers.stream()
                     .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
                     .collect(Collectors.toList());
-            handleRequest(out, httpRequest, selectedControllers);
+            HttpResponse response = handleRequest(httpRequest, selectedControllers);
+            response.ok(new DataOutputStream(out));
+            log.info("{} {}", httpRequest.getRemoteAddress(), response.getStartLine());
         } catch (IOException e) {
             log.error("{} {}", e.getMessage(), e.getStackTrace());
         }
     }
 
-    private static void handleRequest(OutputStream out, HttpRequest httpRequest, List<Controller> controllers) {
+    private static HttpResponse handleRequest(HttpRequest httpRequest, List<Controller> controllers) {
         try {
-            HttpResponse response = tryControllers(httpRequest, controllers);
-            response.ok(new DataOutputStream(out));
-            log.info("{} {}", httpRequest.getRemoteAddress(), response.getStartLine());
+            return tryControllers(httpRequest, controllers);
         } catch (NoFileException | IOException | RuntimeException e) {
-            handleError(out, httpRequest, e);
+            return handleError(httpRequest, e);
         }
     }
 
-    private static void handleError(OutputStream out, HttpRequest httpRequest, Exception e) {
-        Handler errorHandler = ErrorHandlerFactory.getHandler(e);
-        try {
-            HttpResponse response = errorHandler.handle(httpRequest);
-            response.ok(new DataOutputStream(out));
-            log.warn(e.getMessage());
-        } catch (Exception handleError) {
-            log.error("{} {}", handleError.getMessage(), handleError.getStackTrace());
-        }
+    private static HttpResponse handleError(HttpRequest httpRequest, Exception e) {
+        ErrorHandler errorHandler = ErrorHandlerFactory.getHandler(e);
+        return errorHandler.handle(httpRequest);
     }
 
     private static HttpResponse tryControllers(HttpRequest httpRequest, List<Controller> controllers)

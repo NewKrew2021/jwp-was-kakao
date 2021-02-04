@@ -1,13 +1,12 @@
 package controller.error;
 
-import controller.handler.Handler;
-import exception.utils.NoFileException;
+import controller.handler.ErrorHandler;
 import model.HttpRequest;
 import model.HttpResponse;
 
-public class IOExceptionHandler implements Handler {
+public class IOExceptionHandler implements ErrorHandler {
     @Override
-    public HttpResponse handle(HttpRequest request) throws NoFileException {
-        return new HttpResponse().setStatus(500).sendFile("./templates", "/500.html");
+    public HttpResponse handle(HttpRequest request) {
+        return new HttpResponse().setStatus(500).setBody("INTERNAL SERVER ERROR");
     }
 }

@@ -6,6 +6,7 @@ import utils.FileIoUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,11 @@ public class HttpResponse {
 
     public HttpResponse setCookie(String cookie) {
         headers.put("Set-Cookie", cookie + "; Path=/; HttpOnly");
+        return this;
+    }
+
+    public HttpResponse setBody(String body) {
+        this.body = body.getBytes(StandardCharsets.UTF_8);
         return this;
     }
 
@@ -78,25 +84,25 @@ public class HttpResponse {
     }
 
     public void ok(DataOutputStream dos) throws IOException {
-        setStartLine(dos);
-        setHeader(dos);
-        setBody(dos);
+        writeStartLine(dos);
+        writeHeader(dos);
+        writeBody(dos);
         dos.flush();
     }
 
-    private void setStartLine(DataOutputStream dos) throws IOException {
+    private void writeStartLine(DataOutputStream dos) throws IOException {
         dos.writeBytes(startLine);
         dos.writeBytes("\r\n");
     }
 
-    private void setHeader(DataOutputStream dos) throws IOException {
+    private void writeHeader(DataOutputStream dos) throws IOException {
         for (Map.Entry<String, String> header : headers.entrySet()) {
             dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
         }
         dos.writeBytes("\r\n");
     }
 
-    private void setBody(DataOutputStream dos) throws IOException {
+    private void writeBody(DataOutputStream dos) throws IOException {
         if (body != null && body.length != 0)
             dos.write(body, 0, body.length);
     }

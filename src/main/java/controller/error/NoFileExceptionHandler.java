@@ -1,13 +1,12 @@
 package controller.error;
 
-import controller.handler.Handler;
-import exception.utils.NoFileException;
+import controller.handler.ErrorHandler;
 import model.HttpRequest;
 import model.HttpResponse;
 
-public class NoFileExceptionHandler implements Handler {
+public class NoFileExceptionHandler implements ErrorHandler {
     @Override
-    public HttpResponse handle(HttpRequest request) throws NoFileException {
-        return new HttpResponse().setStatus(404).sendFile("./templates", "/404.html");
+    public HttpResponse handle(HttpRequest request) {
+        return new HttpResponse().setStatus(404).setBody("NOT FOUND");
     }
 }

@@ -14,7 +14,7 @@ public class HttpResponseTest {
 
     @Test
     void responseTest() {
-        HttpResponse response = HttpResponse.of(new DataOutputStream(new ByteArrayOutputStream()));
+        HttpResponse response = new HttpResponse();
         response.setCookie("logined=true").redirect("/path");
 
         Map<String, String> expected = new HashMap<>();
@@ -26,7 +26,7 @@ public class HttpResponseTest {
 
     @Test
     void responseWithBodyTest() throws NoFileException {
-        HttpResponse response = HttpResponse.of(new DataOutputStream(new ByteArrayOutputStream()));
+        HttpResponse response = new HttpResponse();
         response.forward("./template", "/testhtml.html");
 
         Map<String, String> expected = new HashMap<>();

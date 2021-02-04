@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class HttpRequestTest {
     private static HttpRequest makeRequest(String httpMessage) throws IOException {
         InputStream is = new ByteArrayInputStream(httpMessage.getBytes());
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        return new HttpRequest(br);
+        return new HttpRequest(br, new Socket());
     }
 
     @Test
