@@ -1,6 +1,7 @@
 package controller;
 
 import db.DataBase;
+import http.Body;
 import http.Cookie;
 import http.Cookies;
 import http.HttpResponse;
@@ -23,12 +24,12 @@ public class UserController {
     public static final String USERS = "users";
 
     public static Handler createUserHandler = (request) -> {
-        Map<String, String> params = request.getBody();
+        Body body = request.getBody();
 
-        User user = new User(params.get(USER_ID),
-                params.get(PASSWORD),
-                params.get(NAME),
-                params.get(EMAIL));
+        User user = new User(body.get(USER_ID),
+                body.get(PASSWORD),
+                body.get(NAME),
+                body.get(EMAIL));
         DataBase.addUser(user);
 
         return new HttpResponse.Builder()
@@ -39,9 +40,9 @@ public class UserController {
 
     public static Handler loginUserHandler = (request) -> {
         try {
-            Map<String, String> params = request.getBody();
-            User user = DataBase.findUserById(params.get(USER_ID));
-            user.verifyPassword(params.get(PASSWORD));
+            Body body = request.getBody();
+            User user = DataBase.findUserById(body.get(USER_ID));
+            user.verifyPassword(body.get(PASSWORD));
 
             Cookie cookie = new Cookie(LOGINED, "true");
             cookie.setPath("/");

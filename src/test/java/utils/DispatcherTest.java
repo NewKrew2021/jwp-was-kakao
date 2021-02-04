@@ -11,18 +11,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DispatcherTest {
+    public static final String PATH = "./src/test/resources/";
 
     @DisplayName("templateHandler를 반환하는지 테스트")
     @ParameterizedTest
-    @CsvSource({"/index.html", "/favicon.ico"})
-    void templateRequest(String uri) {
-        HttpRequest request = new HttpRequestParser("GET " + uri + " HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*").parse();
+    @CsvSource({"index-html.txt", "favicon-ico.txt"})
+    void templateRequest(String path) throws IOException {
+        HttpRequest request = new HttpRequestParser(IOUtils.readRequest(new FileInputStream(PATH + path))).parse();
 
         Handler handler = Dispatcher.findMatchingHandlers(request);
 
@@ -31,12 +32,9 @@ class DispatcherTest {
 
     @DisplayName("staticHandler를 반환하는지 테스트")
     @ParameterizedTest
-    @CsvSource({"/css/style.css", "/fonts/glyphicons-halflings-regular.woff", "/images/80-text.png", "/js/bootstrap.min.js"})
-    void staticRequest(String uri) {
-        HttpRequest request = new HttpRequestParser("GET " + uri + " HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Accept: text/css,*/*;q=0.1\n" +
-                "Connection: keep-alive").parse();
+    @CsvSource({"css.txt", "fonts.txt", "images.txt", "js.txt"})
+    void staticRequest(String path) throws IOException {
+        HttpRequest request = new HttpRequestParser(IOUtils.readRequest(new FileInputStream(PATH + path))).parse();
 
         Handler handler = Dispatcher.findMatchingHandlers(request);
 
@@ -45,15 +43,8 @@ class DispatcherTest {
 
     @DisplayName("createUserHandler를 반환하는지 테스트")
     @Test
-    void userCreateRequest() {
-        HttpRequest request = new HttpRequestParser("POST /user/create HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 59\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Accept: */*\n" +
-                "\n" +
-                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").parse();
+    void userCreateRequest() throws IOException {
+        HttpRequest request = new HttpRequestParser(IOUtils.readRequest(new FileInputStream(PATH + "post-user-create.txt"))).parse();
 
         Handler handler = Dispatcher.findMatchingHandlers(request);
 

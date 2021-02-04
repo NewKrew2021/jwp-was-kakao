@@ -2,21 +2,19 @@ package http;
 
 import annotation.web.RequestMethod;
 
-import java.util.Map;
-
 public class HttpRequest {
     private RequestMethod requestMethod;
     private String uri;
-    private Map<String, String> params;
+    private Params params;
     private HttpRequestHeaders httpRequestHeaders;
-    private Map<String, String> body;
+    private Body body;
 
     public HttpRequest(RequestMethod requestMethod, String uri) {
         this.requestMethod = requestMethod;
         this.uri = uri;
     }
 
-    public HttpRequest(RequestMethod requestMethod, String uri, Map<String, String> params, HttpRequestHeaders httpRequestHeaders, Map<String, String> body) {
+    public HttpRequest(RequestMethod requestMethod, String uri, Params params, HttpRequestHeaders httpRequestHeaders, Body body) {
         this(requestMethod, uri);
         this.params = params;
         this.httpRequestHeaders = httpRequestHeaders;
@@ -27,12 +25,12 @@ public class HttpRequest {
         return uri;
     }
 
-    public Map<String, String> getBody() {
-        return body;
-    }
-
     public String getParam(String key) {
         return params.get(key);
+    }
+
+    public Body getBody() {
+        return body;
     }
 
     public Cookies getCookies() {

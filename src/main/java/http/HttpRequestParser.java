@@ -31,19 +31,19 @@ public class HttpRequestParser {
         return parsedUri[0];
     }
 
-    Map<String, String> getParams() {
-        return getParamMap(parsedUri);
+    Params getParams() {
+        return new Params(getParams(parsedUri));
     }
 
     HttpRequestHeaders getRequestHeaders() {
         return HttpRequestHeaders.of(parsedHead[1]);
     }
 
-    Map<String, String> getBody() {
-        return getParamMap(parsedRequest);
+    Body getBody() {
+        return new Body(getParams(parsedRequest));
     }
 
-    Map<String, String> getParamMap(String[] parsedData) {
+    Map<String, String> getParams(String[] parsedData) {
         Map<String, String> params = new HashMap<>();
         if (parsedData.length > 1) {
             Arrays.stream(parsedData[1].split("&"))

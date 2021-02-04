@@ -7,18 +7,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import utils.IOUtils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class HttpRequestTest {
+    public static final String PATH = "./src/test/resources/";
     private HttpRequest request;
 
     @BeforeEach
-    void setUp() {
-        request = new HttpRequestParser("GET /user/create?userId=id&password=pw&name=jyp&email=jyp@email.com HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*").parse();
+    void setUp() throws IOException {
+        request = new HttpRequestParser(IOUtils.readRequest(new FileInputStream(PATH + "get-user-create.txt"))).parse();
     }
 
     @DisplayName("올바른 파라미터를 반환하는지 테스트")
