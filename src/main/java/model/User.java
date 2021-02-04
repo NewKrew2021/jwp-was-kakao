@@ -1,5 +1,6 @@
 package model;
 
+
 public class User {
     private String userId;
     private String password;
@@ -33,4 +34,5 @@ public class User {
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
+
 }

@@ -25,4 +25,5 @@ public class HandlebarsTest {
         String profilePage = template.apply(user);
         log.debug("ProfilePage : {}", profilePage);
     }
+
 }
