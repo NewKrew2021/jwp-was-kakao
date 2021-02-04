@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -19,18 +18,18 @@ public class RequestHandler implements Runnable {
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        initalizeController();
+        initializeController();
     }
 
-    private void initalizeController() {
+    private void initializeController() {
         controllers.put("/user/create", new CreateUserController());
         controllers.put("/user/list.html", new ListUserController());
         controllers.put("/user/login", new LoginController());
         controllers.put("default", new DefaultController());
     }
 
-    private Optional<Controller> getController(String uri) {
-        return Optional.ofNullable(controllers.get(uri));
+    private Controller getController(String uri) {
+        return controllers.getOrDefault(uri, controllers.get("default"));
     }
 
     public void run() {
@@ -41,7 +40,7 @@ public class RequestHandler implements Runnable {
             Request request = Request.of(in);
             Response response = Response.of(out);
 
-            Controller controller = getController(request.getUri()).orElse(controllers.get("default"));
+            Controller controller = getController(request.getUri());
             controller.service(request, response);
         } catch (Exception e) {
             logger.error(e.getMessage());

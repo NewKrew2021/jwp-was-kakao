@@ -15,15 +15,12 @@ import java.util.regex.Pattern;
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private static final int KEY_INDEX = 0;
-    private static final int VALUE_INDEX = 1;
-
     private static final int METHOD_INDEX = 1;
     private static final int REQUEST_URI_INDEX = 2;
     public static final int PARAMETERS_INDEX = 1;
     public static final int URI_INDEX = 0;
 
-    private Pattern requestLinePattern = Pattern.compile("(.+) (.+) (.+)");
+    private Pattern requestLinePattern = Pattern.compile("(GET|POST) (.+) (.+)");
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> parameters = new HashMap<>();
     private String method;
@@ -50,14 +47,12 @@ public class Request {
 
     private void parseRequestLine(String line) throws Exception {
         Matcher matches = requestLinePattern.matcher(line);
-
         if(!matches.find()) {
             throw new InvalidRequestException();
         }
 
         this.method = matches.group(METHOD_INDEX);
         this.uri = matches.group(REQUEST_URI_INDEX);
-
         if (uri.contains("?")) {
             String[] tokens = uri.split("\\?");
             mapParameter(tokens[PARAMETERS_INDEX]);

@@ -27,4 +27,9 @@ public class ParseUtils {
         results.put(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
         return results;
     }
+
+    public static String parseExtension(String content) {
+        String[] arr = content.split("\\.");
+        return arr[arr.length - 1];
+    }
 }

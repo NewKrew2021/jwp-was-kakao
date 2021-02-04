@@ -9,7 +9,7 @@ public class ListUserController extends AbstractController {
     public void doGet(Request request, Response response) throws Exception {
         if (request.getHeader("Cookie") != null &&
                 request.getHeader("Cookie").contains("logined=true")) {
-            response.userListForward(request.getUri());
+            response.userListForward(getContentLocation(request.getUri()));
             return;
         }
         response.sendRedirect("/user/login.html");

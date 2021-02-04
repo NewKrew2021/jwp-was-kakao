@@ -8,7 +8,7 @@ public class DefaultController extends AbstractController {
 
     @Override
     public void doGet(Request request, Response response) throws Exception {
-        response.forward(request.getUri());
+        response.forward(getContentLocation(request.getUri()));
     }
 
     @Override

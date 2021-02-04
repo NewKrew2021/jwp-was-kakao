@@ -7,6 +7,7 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import utils.FileIoUtils;
+import utils.ParseUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,7 +22,6 @@ public class Response {
     private DataOutputStream dos;
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> contentType = new HashMap<>();
-    private Map<String, String> contentLocation = new HashMap<>();
 
     private Response(OutputStream out) {
         dos = new DataOutputStream(out);
@@ -45,39 +45,24 @@ public class Response {
         contentType.put("ttf", "application/x-font-ttf");
         contentType.put("woff", "application/font-woff");
         contentType.put("woff2", "application/font-woff2");
-
-        contentLocation.put("ico", "./templates/");
-        contentLocation.put("html", "./templates/");
     }
 
-    private Optional<String> getContentType(String extension) {
-        return Optional.ofNullable(contentType.get(extension));
-    }
-
-    private Optional<String> getContentLocation(String extension) {
-        return Optional.ofNullable(contentLocation.get(extension));
+    private String getContentType(String extension) {
+        return contentType.getOrDefault(extension, "text/html");
     }
 
     public void forward(String location) throws IOException, URISyntaxException {
-        byte[] body = FileIoUtils.loadFileFromClasspath(getContentLocation(getExtension(location))
-                .orElse("./static/") + location);
+        byte[] body = FileIoUtils
+                .loadFileFromClasspath(location);
+        addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
-
         writeResponse200(body);
-    }
-
-    private String getExtension(String location) {
-        String[] arr = location.split("\\.");
-        String extension = arr[arr.length - 1];
-        String contentType = getContentType(extension).orElse("text/html");
-        addHeader("Content-Type", contentType + ";charset=utf-8");
-        return extension;
     }
 
     private void writeResponse200(byte[] body) throws IOException {
         dos.writeBytes("HTTP/1.1 200 OK\r\n");
         for (Map.Entry<String, String> header : headers.entrySet()) {
-            dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
+            dos.writeBytes(header.getKey() + " : " + header.getValue() + "\r\n");
         }
         dos.writeBytes("\r\n");
         dos.write(body, 0, body.length);
@@ -100,10 +85,9 @@ public class Response {
     }
 
     public void userListForward(String location) throws IOException {
-        getExtension(location);
-
         String users = getUsers();
         byte[] body = users.getBytes();
+        addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
         writeResponse200(body);
     }
@@ -116,7 +100,6 @@ public class Response {
 
         Template template = handlebars.compile("user/list");
         Collection<User> users = DataBase.findAll();
-
         return template.apply(users);
     }
 }
