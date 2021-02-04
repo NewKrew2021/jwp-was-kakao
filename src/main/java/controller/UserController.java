@@ -5,6 +5,7 @@ import db.DataBase;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
+import service.UserService;
 import view.View;
 
 import java.io.IOException;
@@ -20,24 +21,15 @@ public class UserController extends Controller {
         putHandler("/logout", "GET", new SecuredHandler(this::handleLogout));
     }
 
-    public void handleCreate(HttpRequest request, OutputStream out) throws IOException {
-        Map<String, String> bodyParsed = request.getParsedBody();
-        User user = new User(
-                bodyParsed.get("userId"),
-                bodyParsed.get("password"),
-                bodyParsed.get("name"),
-                bodyParsed.get("email")
-        );
-        DataBase.addUser(user);
+    private UserService userService = new UserService();
 
+    public void handleCreate(HttpRequest request, OutputStream out) {
+        userService.addUser(request.getParsedBody());
         HttpResponse.of(out).sendRedirect("/index.html");
     }
 
-    public void handleLogin(HttpRequest request, OutputStream out) throws IOException {
-        Map<String, String> bodyParsed = request.getParsedBody();
-        User user = DataBase.findUserById(bodyParsed.get("userId"));
-
-        if (user == null) {
+    public void handleLogin(HttpRequest request, OutputStream out) {
+        if (!userService.login(request.getParsedBody())) {
             HttpResponse.of(out).setCookie("logined=false").sendRedirect("/user/login_failed.html");
             return;
         }
@@ -45,7 +37,7 @@ public class UserController extends Controller {
     }
 
     public void handleUserList(HttpRequest request, OutputStream out) throws IOException {
-        byte[] body = View.getUsersView(DataBase.findAll(), "/user/list");
+        byte[] body = View.getUsersView(userService.findAll(), "/user/list");
         HttpResponse.of(out).sendView(body);
     }
 
