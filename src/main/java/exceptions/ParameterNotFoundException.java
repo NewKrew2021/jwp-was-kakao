@@ -6,4 +6,5 @@ public class ParameterNotFoundException extends RuntimeException {
     public ParameterNotFoundException() {
         super(PARAMETER_NOT_FOUND_MESSAGE);
     }
+    
 }

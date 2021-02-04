@@ -6,4 +6,5 @@ public class InvalidRequestException extends RuntimeException{
     public InvalidRequestException() {
         super(INVALID_REQUEST_MEESSAGE);
     }
+
 }

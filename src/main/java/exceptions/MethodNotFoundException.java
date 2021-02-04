@@ -6,4 +6,5 @@ public class MethodNotFoundException extends RuntimeException {
     public MethodNotFoundException() {
         super(METHOD_NOT_FOUND_MESSAGE);
     }
+
 }

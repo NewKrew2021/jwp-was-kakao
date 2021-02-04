@@ -1,6 +1,7 @@
 package webserver;
 
 import controller.Controller;
+import exceptions.ResponseCreateFailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import request.HttpRequest;
@@ -31,6 +32,7 @@ public class RequestHandler implements Runnable {
             controller.service(httpRequest, httpResponse);
         } catch (IOException e) {
             logger.error(e.getMessage());
+            throw new ResponseCreateFailException();
         }
     }
 

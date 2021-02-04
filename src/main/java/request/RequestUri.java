@@ -26,14 +26,11 @@ public class RequestUri {
     public static RequestUri from(String line) {
         String[] splitLine = line.split(" ");
         Optional<String> queryString = extractParams(splitLine[URI_INDEX_IN_LINE]);
-        if (queryString.isPresent()) {
-            return new RequestUri(getMethodType(splitLine[METHOD_INDEX_IN_LINE])
-                    , extractPath(splitLine[URI_INDEX_IN_LINE])
-                    , requestStringToMap(queryString.get()));
-        }
-        return new RequestUri(getMethodType(splitLine[METHOD_INDEX_IN_LINE])
+        return queryString.map(s -> new RequestUri(getMethodType(splitLine[METHOD_INDEX_IN_LINE])
                 , extractPath(splitLine[URI_INDEX_IN_LINE])
-                , new HashMap<>());
+                , requestStringToMap(s))).orElseGet(() -> new RequestUri(getMethodType(splitLine[METHOD_INDEX_IN_LINE])
+                , extractPath(splitLine[URI_INDEX_IN_LINE])
+                , new HashMap<>()));
     }
 
     private static RequestMethod getMethodType(String line) {

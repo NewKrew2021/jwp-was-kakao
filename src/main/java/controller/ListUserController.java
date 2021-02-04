@@ -1,6 +1,7 @@
 package controller;
 
 import db.DataBase;
+import exceptions.TemplateApplyFailException;
 import request.HttpRequest;
 import response.HttpResponse;
 
@@ -19,6 +20,7 @@ public class ListUserController extends AbstractController {
                 httpResponse.responseTemplate(DataBase.findAll());
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new TemplateApplyFailException();
             }
             return;
         }
