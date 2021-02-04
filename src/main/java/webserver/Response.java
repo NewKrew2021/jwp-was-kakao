@@ -1,8 +1,5 @@
 package webserver;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import model.User;
 import utils.FileIoUtils;
 import utils.ParseUtils;
@@ -82,18 +79,9 @@ public class Response {
     }
 
     public void userListForward(String location, Collection<User> users) throws IOException {
-        byte[] body = getTemplate(location, users).getBytes();
+        byte[] body = FileIoUtils.loadCompiledFileFromClassPath(location, users);
         addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
         writeResponse200(body);
-    }
-
-    private String getTemplate(String location, Collection<User> users) throws IOException {
-        ClassPathTemplateLoader templateLoader = new ClassPathTemplateLoader();
-        templateLoader.setPrefix("/templates");
-        templateLoader.setSuffix("");
-        Handlebars handlebars = new Handlebars(templateLoader);
-        Template template = handlebars.compile(location);
-        return template.apply(users);
     }
 }
