@@ -4,12 +4,13 @@ import db.DataBase;
 import exception.NotDefinedMethodException;
 import webserver.Request;
 import webserver.Response;
+import webserver.Session;
 
 public class ListUserController extends AbstractController {
     @Override
     public void doGet(Request request, Response response) throws Exception {
-        if (request.getHeader("Cookie") != null &&
-                request.getHeader("Cookie").contains("logined=true")) {
+        Session session = request.getSession();
+        if (session != null && (Boolean) session.getAttribute("logined")) {
             response.userListForward(request.getUri(), DataBase.findAll());
             return;
         }

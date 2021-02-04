@@ -26,9 +26,11 @@ public class Request {
     private String method;
     private String uri;
     private BufferedReader br;
+    private Cookie cookie;
 
     private Request(InputStream in) throws Exception {
         br = new BufferedReader(new InputStreamReader(in));
+        cookie = null;
         initializeHeader();
         initializeRequest();
     }
@@ -50,7 +52,6 @@ public class Request {
         if(!matches.find()) {
             throw new InvalidRequestException();
         }
-
         this.method = matches.group(METHOD_INDEX);
         this.uri = matches.group(REQUEST_URI_INDEX);
         if (uri.contains("?")) {
@@ -78,9 +79,12 @@ public class Request {
         if (text.equals("")) {
             return;
         }
-        for (Map.Entry<String, String> elem : ParseUtils.parseParametersByColon(text).entrySet()) {
-            headers.put(elem.getKey(), elem.getValue());
+        Map.Entry<String, String> elem = ParseUtils.parseParametersByColon(text);
+        if(elem.getKey().equals("Cookie")) {
+            cookie = new Cookie(elem.getValue());
+            return;
         }
+        headers.put(elem.getKey(), elem.getValue());
     }
 
     public static Request of(InputStream in) throws Exception {
@@ -105,5 +109,14 @@ public class Request {
 
     public Map<String, String> getParameters() {
         return this.parameters;
+    }
+
+    public Cookie getCookie() { return cookie; }
+
+    public Session getSession() {
+        if(cookie == null) {
+            return null;
+        }
+        return SessionStorage.getSession(cookie.getValue());
     }
 }

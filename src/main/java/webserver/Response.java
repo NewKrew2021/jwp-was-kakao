@@ -78,6 +78,10 @@ public class Response {
         headers.put(key, value);
     }
 
+    public void addCookie(Cookie cookie) {
+        headers.put("Set-Cookie", cookie.toString());
+    }
+
     public void userListForward(String location, Collection<User> users) throws IOException {
         byte[] body = FileIoUtils.loadCompiledFileFromClassPath(location, users);
         addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");

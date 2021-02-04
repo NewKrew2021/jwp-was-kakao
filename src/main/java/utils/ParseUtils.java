@@ -2,6 +2,7 @@ package utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,11 +22,16 @@ public class ParseUtils {
         return results;
     }
 
-    public static Map<String, String> parseParametersByColon(String line) {
-        Map<String, String> results = new HashMap<>();
+    public static Map.Entry<String, String> parseParametersByColon(String line) {
         String[] splitLine = line.split(":");
-        results.put(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
-        return results;
+        return new AbstractMap
+                .SimpleEntry<String, String>(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
+    }
+
+    public static Map.Entry<String, String> parseParametersByEqual(String line) {
+        String[] splitLine = line.split("=");
+        return new AbstractMap
+                .SimpleEntry<String, String>(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
     }
 
     public static String parseExtension(String content) {

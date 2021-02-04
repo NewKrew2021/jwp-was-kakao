@@ -23,13 +23,13 @@ public class ParseUtilsTest {
         String text = "key1 : value1";
         String text2 = " key2 :value2 ";
 
-        Map<String,String> results = ParseUtils.parseParametersByColon(text);
-        assertThat(results.get("key1")).isNotNull();
-        assertThat(results.get("key1")).isEqualTo("value1");
+        Map.Entry<String,String> results = ParseUtils.parseParametersByColon(text);
+        assertThat(results).isNotNull();
+        assertThat(results.getKey()).isEqualTo("key1");
+        assertThat(results.getValue()).isEqualTo("value1");
 
         results = ParseUtils.parseParametersByColon(text2);
-        assertThat(results.get("key2")).isNotNull();
-        assertThat(results.get("key2")).isEqualTo("value2");
-
+        assertThat(results.getKey()).isEqualTo("key2");
+        assertThat(results.getValue()).isEqualTo("value2");
     }
 }

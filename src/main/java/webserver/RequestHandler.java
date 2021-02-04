@@ -35,11 +35,9 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             Request request = Request.of(in);
             Response response = Response.of(out);
-
             Controller controller = getController(request.getUri());
             controller.service(request, response);
         } catch (Exception e) {
