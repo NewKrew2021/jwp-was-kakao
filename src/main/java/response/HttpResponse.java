@@ -3,6 +3,7 @@ package response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import utils.ParseUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -38,32 +39,9 @@ public class HttpResponse {
 
     public void forward(String path) throws IOException, URISyntaxException {
         try {
-            if (path.endsWith(".css")) {
-                body = FileIoUtils.loadFileFromClasspath("./static" + path);
-                headers.put("Content-Type", "text/css");
-            } else if (path.endsWith(".js")) {
-                body = FileIoUtils.loadFileFromClasspath("./static" + path);
-                headers.put("Content-Type", "application/js");
-            } else if (path.endsWith(".png")) {
-                body = FileIoUtils.loadFileFromClasspath("./static" + path);
-                headers.put("Content-Type", "image/png");
-            } else if (path.endsWith(".eot")) {
-                body = FileIoUtils.loadFileFromClasspath("./static" + path);
-                headers.put("Content-Type", "application/vnd.ms-fontobject");
-            } else if (path.endsWith(".svg")) {
-                body = FileIoUtils.loadFileFromClasspath("./static" + path);
-                headers.put("Content-Type", "image/svg+xml");
-            } else if (path.endsWith(".ttf")) {
-                body = FileIoUtils.loadFileFromClasspath("./static" + path);
-                headers.put("Content-Type", "application/octet-stream");
-            } else if (path.endsWith(".woff") || path.endsWith(".woff2")) {
-                body = FileIoUtils.loadFileFromClasspath("./static" + path);
-                headers.put("Content-Type", "application/font-woff");
-            } else {
-                body = FileIoUtils.loadFileFromClasspath("./templates" + path);
-                headers.put("Content-Type", "text/html");
-            }
-
+            FileExtension fileExtension = FileExtension.getFileExtensionToExtension(ParseUtils.getExtension(path));
+            body = FileIoUtils.loadFileFromClasspath(fileExtension.getFilePath() + path);
+            headers.put("Content-Type", fileExtension.getContentType());
             headers.put("Content-Length", String.valueOf(body.length));
             response(new Response200Status());
         } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
@@ -72,7 +50,7 @@ public class HttpResponse {
         }
     }
 
-    public void sendRedirect(String path) throws IOException, URISyntaxException {
+    public void sendRedirect(String path) {
         try {
             headers.put("Location", path);
             response(new Response302Status());

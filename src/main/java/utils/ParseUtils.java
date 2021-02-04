@@ -2,6 +2,7 @@ package utils;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ParseUtils {
@@ -11,6 +12,7 @@ public class ParseUtils {
     private static final String REQUEST_URL_REGEX = "\\?";
     private static final String PARAMETER_PAIR_REGEX = "&";
     private static final String PARAMETER_KEY_VALUE_REGEX = "=";
+    private static final String EXTENSION_REGEX = ".";
 
     public static String parseHeaderValue(String header) {
         return header.substring(header.indexOf(HEADER_REGEX) + 1).trim();
@@ -40,5 +42,15 @@ public class ParseUtils {
 
     public static boolean containRequestUrlRegex(String url){
         return url.contains(REQUEST_URL_REGEX);
+    }
+
+    public static String getExtension(String path) {
+        int index = path.lastIndexOf(EXTENSION_REGEX);
+
+        if(index == -1) {
+            return "";
+        }
+
+        return path.substring(index);
     }
 }
