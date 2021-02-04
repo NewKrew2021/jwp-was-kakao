@@ -1,8 +1,8 @@
 package request;
 
 import annotation.web.RequestMethod;
-import exceptions.HeaderNotFoundException;
-import exceptions.ParameterNotFoundException;
+import exception.HeaderNotFoundException;
+import exception.ParameterNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
@@ -50,19 +50,25 @@ public class HttpRequest {
 
     private static HttpSession setSession(RequestHeader requestHeader) {
         HttpSession httpSession;
-        String sessionId = requestHeader.getCookies()
-                .stream()
-                .filter(cookie -> cookie.getName().equals(SESSION_ID))
-                .map(Cookie::getValue).findFirst()
-                .orElse(null);
+        String sessionId = getSessionId(requestHeader);
+
         if (SessionHandler.getSession(sessionId).isPresent()) {
             httpSession = SessionHandler.getSession(sessionId).get();
             setCookieOnSession(httpSession, requestHeader.getCookies());
             return httpSession;
         }
+
         httpSession = SessionHandler.getSession(SessionHandler.createSession()).get();
         setCookieOnSession(httpSession, requestHeader.getCookies());
         return httpSession;
+    }
+
+    private static String getSessionId(RequestHeader requestHeader) {
+        return requestHeader.getCookies()
+                .stream()
+                .filter(cookie -> cookie.getName().equals(SESSION_ID))
+                .map(Cookie::getValue).findFirst()
+                .orElse(null);
     }
 
     private static void setCookieOnSession(HttpSession httpSession, List<Cookie> Cookies) {

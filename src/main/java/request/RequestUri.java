@@ -1,8 +1,8 @@
 package request;
 
 import annotation.web.RequestMethod;
-import exceptions.InvalidRequestLineException;
-import exceptions.MethodNotFoundException;
+import exception.InvalidRequestLineException;
+import exception.MethodNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;

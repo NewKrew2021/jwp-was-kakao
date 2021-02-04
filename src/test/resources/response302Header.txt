@@ -1,4 +1,0 @@
-HTTP/1.1 302 Found 
-Location: http://localhost:8080/user/login.html
-Set-Cookie: logined=false; Path=/
-

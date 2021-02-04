@@ -1,4 +1,4 @@
-package exceptions;
+package exception;
 
 public class InvalidRequestException extends RuntimeException{
     private static String INVALID_REQUEST_MESSAGE = "잘못된 요청 입니다.";

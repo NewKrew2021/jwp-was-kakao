@@ -1,7 +1,7 @@
 package webserver;
 
 import controller.Controller;
-import exceptions.ResponseCreateFailException;
+import exception.ResponseCreateFailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import request.HttpRequest;
