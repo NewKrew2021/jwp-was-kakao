@@ -17,7 +17,7 @@ public class FileIoUtils {
             Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource(filePath).toURI());
             return Files.readAllBytes(path);
         } catch (Exception e) {
-            throw new NoFileException();
+            throw new NoFileException(filePath);
         }
     }
 }
