@@ -1,8 +1,8 @@
 package controller;
 
 import annotation.web.RequestMethod;
-import http.HttpRequest;
-import http.HttpResponse;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
 import utils.FileIoUtils;
 
 import java.util.Optional;
@@ -20,7 +20,7 @@ public class StaticController extends Controller {
         return Optional.empty();
     }
 
-    public static Handler cssHandler = (request) -> {
+    private Handler cssHandler = (request) -> {
         String path = prefix + request.getUri();
         return new HttpResponse.Builder()
                 .status("HTTP/1.1 200 OK")

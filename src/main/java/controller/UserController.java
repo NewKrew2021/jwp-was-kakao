@@ -1,8 +1,8 @@
 package controller;
 
 import annotation.web.RequestMethod;
-import http.HttpRequest;
-import http.HttpResponse;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
 import model.User;
 import db.DataBase;
 import utils.FileIoUtils;
@@ -29,7 +29,7 @@ public class UserController extends Controller {
         return Optional.empty();
     }
 
-    public static Handler createUserHandler = (request) -> {
+    private Handler createUserHandler = (request) -> {
         Map<String, String> params = HttpUtils.getParamMap(request.getBody());
 
         User user = new User(params.get("userId"),
@@ -44,7 +44,7 @@ public class UserController extends Controller {
                 .build();
     };
 
-    public static Handler loginUserHandler = (request) -> {
+    private Handler loginUserHandler = (request) -> {
         Map<String, String> params = HttpUtils.getParamMap(request.getBody());
 
         User user = DataBase.findUserById(params.get("userId"));
@@ -62,7 +62,7 @@ public class UserController extends Controller {
                 .build();
     };
 
-    public static Handler listUserHandler = (request) -> {
+    private Handler listUserHandler = (request) -> {
         String logined = request.getRequestHeaders().getHeader("Cookie");
 
         if ("logined=true".equals(logined)) {

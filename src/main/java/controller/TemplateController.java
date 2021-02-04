@@ -1,8 +1,8 @@
 package controller;
 
 import annotation.web.RequestMethod;
-import http.HttpRequest;
-import http.HttpResponse;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
 import utils.FileIoUtils;
 
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class TemplateController extends Controller {
         return Optional.empty();
     }
 
-    public static Handler htmlHandler = (request) -> {
+    private Handler htmlHandler = (request) -> {
         String path = prefix + request.getUri();
         return new HttpResponse.Builder()
                 .status("HTTP/1.1 200 OK")
@@ -29,7 +29,7 @@ public class TemplateController extends Controller {
                 .build();
     };
 
-    public static Handler faviconHandler = (request) -> {
+    private Handler faviconHandler = (request) -> {
         String path = prefix + request.getUri();
         return new HttpResponse.Builder()
                 .status("HTTP/1.1 200 OK")
