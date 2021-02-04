@@ -1,9 +1,7 @@
-package http;
+package webserver.http;
 
 import annotation.web.RequestMethod;
-import utils.HttpUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
