@@ -15,9 +15,27 @@ public class HttpRequest {
     private final Map<String, String> params = new HashMap<>();
     private final Map<String, String> headers = new HashMap<>();
 
-    private void setRequest(String message) {
-        String[] lines = message.split("\n");
-        String[] firstLineTokens = lines[0].split(" ");
+
+    public HttpRequest(InputStream in) throws IOException {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String line = br.readLine();
+            setStartLine(line);
+            while (!"".equals((line = br.readLine()))) {
+                headers.put(line.split(":")[0], line.split(":")[1].trim());
+            }
+
+            if (getContentLength() != 0) {
+                setBody(IOUtils.readData(br, getContentLength()));
+            }
+
+        } catch (IOException e){
+            throw new IOException("Http request를 읽는 과정에서 exception이 발생하였습니다.");
+        }
+    }
+
+    private void setStartLine(String line) {
+        String[] firstLineTokens = line.split(" ");
 
         method = firstLineTokens[0];
 
@@ -30,29 +48,6 @@ public class HttpRequest {
                 String value = q.split("=")[1];
                 params.put(key, value);
             }
-        }
-
-        for(int i = 1; i < lines.length ; i++){
-            headers.put(lines[i].split(":")[0], lines[i].split(":")[1].trim());
-        }
-    }
-
-    public HttpRequest(InputStream in) throws IOException {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String lines = "";
-            String line;
-            while (!"".equals((line = br.readLine()))) {
-                lines += line + "\n";
-            }
-            setRequest(lines);
-
-            if (getContentLength() != 0) {
-                setBody(IOUtils.readData(br, getContentLength()));
-            }
-
-        } catch (IOException e){
-            throw new IOException("Http request를 읽는 과정에서 exception이 발생하였습니다.");
         }
     }
 

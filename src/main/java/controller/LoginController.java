@@ -13,8 +13,8 @@ public class LoginController extends AbstractController{
         User user = DataBase.findUserById(request.getParams().get("userId"));
         if (user != null && user.getPassword().equals(request.getParams().get("password"))) {
             HttpSession session = HttpServletRequest.getSession();
-            response.addHeader("Set-Cookie", session.getId() + "; Path=/");
-//            response.addHeader("Set-Cookie", "logined=true; Path=/");
+//            response.addHeader("Set-Cookie", session.getId() + "; Path=/");
+            response.addHeader("Set-Cookie", "logined=true; Path=/");
             response.sendRedirect("/index.html");
         }
 
