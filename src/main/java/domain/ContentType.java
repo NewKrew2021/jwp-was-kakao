@@ -39,7 +39,7 @@ public enum ContentType {
     }
 
     private static String extractExtension(String url) {
-        return url.substring(url.lastIndexOf('.')).toUpperCase();
+        return url.substring(url.lastIndexOf('.') + 1).toUpperCase();
     }
 
     public String getMimeType() {
