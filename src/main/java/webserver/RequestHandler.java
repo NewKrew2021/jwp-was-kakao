@@ -16,19 +16,18 @@ import java.util.Map;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private Socket connection;
-    private Map<String, Controller> controllers;
+    private static Map<String, Controller> controllers;
 
-    public RequestHandler(Socket connectionSocket) {
-        this.connection = connectionSocket;
-        initControllers();
-    }
-
-    private void initControllers() {
+    static {
         controllers = new HashMap<>();
         controllers.put("/user/create", new CreateUserController());
         controllers.put("/user/login", new LoginController());
         controllers.put("/user/list.html", new ListUserController());
 
+    }
+
+    public RequestHandler(Socket connectionSocket) {
+        this.connection = connectionSocket;
     }
 
     public void run() {
