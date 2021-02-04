@@ -6,12 +6,12 @@ import model.Response;
 
 public abstract class AbstractController implements Controller {
     @Override
-    public void service(Request request, Response response){
-        if(request.getMethod().equals(RequestMethod.GET)){
-            doGet(request,response);
+    public void service(Request request, Response response) {
+        if (request.getMethod().equals(RequestMethod.GET)) {
+            doGet(request, response);
         }
-        if(request.getMethod().equals(RequestMethod.POST)){
-            doPost(request,response);
+        if (request.getMethod().equals(RequestMethod.POST)) {
+            doPost(request, response);
         }
     }
 

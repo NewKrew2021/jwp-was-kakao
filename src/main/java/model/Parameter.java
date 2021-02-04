@@ -5,25 +5,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Parameter {
-    private Map<String, String> parameter ;
+    private Map<String, String> parameter;
 
-    public Parameter(Map<String, String> parameter){
-        this.parameter= parameter;
+    public Parameter(Map<String, String> parameter) {
+        this.parameter = parameter;
     }
 
-    public Parameter(){
-        this.parameter= new HashMap<>();
+    public Parameter() {
+        this.parameter = new HashMap<>();
     }
 
-    public void merge(Parameter parameter){
+    public void merge(Parameter parameter) {
         this.parameter.putAll(parameter.parameter);
     }
 
-    public String get(String key){
+    public String get(String key) {
         return parameter.get(key);
     }
 
-    public Map<String,String> getAllParameter(){
+    public Map<String, String> getAllParameter() {
         return Collections.unmodifiableMap(parameter);
     }
 }

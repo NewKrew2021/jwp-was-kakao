@@ -35,12 +35,12 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void requestMapper(Request request,Response response) throws IOException, URISyntaxException {
-        if(ControllerMapper.get(request.getPath()) == null) {
+    private void requestMapper(Request request, Response response) throws IOException, URISyntaxException {
+        if (ControllerMapper.get(request.getPath()) == null) {
             response.forward(request.getPath());
             return;
         }
-        ControllerMapper.get(request.getPath()).service(request,response);
+        ControllerMapper.get(request.getPath()).service(request, response);
     }
 
 }

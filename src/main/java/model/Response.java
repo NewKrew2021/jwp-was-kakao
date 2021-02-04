@@ -11,13 +11,13 @@ public class Response {
     private DataOutputStream dos;
     private Body body;
 
-    public Response(OutputStream out){
+    public Response(OutputStream out) {
         dos = new DataOutputStream(out);
         header = new ResponseHeader();
-        body=new Body();
+        body = new Body();
     }
 
-    public void addHeader(String key, String value){
+    public void addHeader(String key, String value) {
         this.header.addHeader(key, value);
     }
 
@@ -32,18 +32,18 @@ public class Response {
         }
     }
 
-    private void addContentType(String path){
-        if(path.contains(".html")){
-            this.body.setBody(FileIoUtils.loadFileFromClasspath("templates"+path));
-            header.addHeader("Content-Type","text/html");
+    private void addContentType(String path) {
+        if (path.contains(".html")) {
+            this.body.setBody(FileIoUtils.loadFileFromClasspath("templates" + path));
+            header.addHeader("Content-Type", "text/html");
         }
-        if(path.contains(".css")){
-            this.body.setBody(FileIoUtils.loadFileFromClasspath("static"+path));
-            header.addHeader("Content-Type","text/css");
+        if (path.contains(".css")) {
+            this.body.setBody(FileIoUtils.loadFileFromClasspath("static" + path));
+            header.addHeader("Content-Type", "text/css");
         }
-        if(path.contains(".js")){
-            this.body.setBody(FileIoUtils.loadFileFromClasspath("static"+path));
-            header.addHeader("Content-Type","application/javascript");
+        if (path.contains(".js")) {
+            this.body.setBody(FileIoUtils.loadFileFromClasspath("static" + path));
+            header.addHeader("Content-Type", "application/javascript");
         }
     }
 
@@ -59,7 +59,7 @@ public class Response {
     }
 
     private void response200Header(int lengthOfBodyContent) {
-        StringBuilder response=new StringBuilder();
+        StringBuilder response = new StringBuilder();
         response.append("HTTP/1.1 200 OK \r\n");
         response.append(header.toString());
         response.append("Content-Length: " + lengthOfBodyContent + "\r\n");
@@ -72,20 +72,20 @@ public class Response {
         }
     }
 
-    public void sendRedirect(String path){
+    public void sendRedirect(String path) {
         response302Header(path);
     }
 
     private void response302Header(String redirectUrl) {
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.1 302 Found \r\n");
-        response.append("Location: http://localhost:8080"+redirectUrl+"\r\n");
+        response.append("Location: http://localhost:8080" + redirectUrl + "\r\n");
         response.append(header.toString());
         response.append("\r\n");
         try {
             dos.write(response.toString().getBytes());
             dos.flush();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -6,23 +6,23 @@ import java.util.Map;
 public class ResponseHeader {
     private Map<String, String> header;
 
-    public ResponseHeader(){
+    public ResponseHeader() {
         this.header = new HashMap<>();
     }
 
-    public void addHeader(String key, String value){
+    public void addHeader(String key, String value) {
         this.header.put(key, value);
     }
 
-    public String get(String key){
+    public String get(String key) {
         return header.get(key);
     }
 
     @Override
     public String toString() {
-        StringBuilder headerString=new StringBuilder();
+        StringBuilder headerString = new StringBuilder();
         for (String key : header.keySet()) {
-            headerString.append(key+": "+header.get(key)+"\r\n");
+            headerString.append(key + ": " + header.get(key) + "\r\n");
         }
         return headerString.toString();
     }

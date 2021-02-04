@@ -17,13 +17,13 @@ public class Request {
     private static final Logger logger = LoggerFactory.getLogger(Request.class);
     private RequestMethod method;
     private String path;
-    private Parameter parameter=new Parameter();
+    private Parameter parameter = new Parameter();
     private RequestHeader requestHeader;
 
     public Request(InputStream in) throws IOException {
-        InputStreamReader reader= new InputStreamReader(in);
+        InputStreamReader reader = new InputStreamReader(in);
         BufferedReader br = new BufferedReader(reader);
-        String requestLine=br.readLine();
+        String requestLine = br.readLine();
         logger.debug("####HTTP Request Header 출력");
         parsePath(requestLine);
         requestLine = br.readLine();
@@ -31,14 +31,14 @@ public class Request {
     }
 
     private void parseRequest(BufferedReader br, String requestLine) throws IOException {
-        Map<String, String> header=new HashMap<>();
-        while (requestLine !=null&&!requestLine.equals("")){
+        Map<String, String> header = new HashMap<>();
+        while (requestLine != null && !requestLine.equals("")) {
             logger.debug(requestLine);
-            String[] token= requestLine.split("\\: ");
-            header.put(token[0],token[1]);
+            String[] token = requestLine.split("\\: ");
+            header.put(token[0], token[1]);
             requestLine = br.readLine();
         }
-        if(this.method.equals(RequestMethod.POST)){
+        if (this.method.equals(RequestMethod.POST)) {
             int contentLength = Integer.parseInt(header.get("Content-Length"));
             parameter.merge(new Parameter(parseParams(IOUtils.readData(br, contentLength))));
         }
@@ -47,7 +47,7 @@ public class Request {
 
     private void parsePath(String path) {
         String[] token = path.split(" ");
-        this.method =RequestMethod.valueOf(token[0]);
+        this.method = RequestMethod.valueOf(token[0]);
         String[] pathToken = token[1].split("\\?");
         this.path = pathToken[0];
         if (pathToken.length > 1) {
@@ -73,7 +73,7 @@ public class Request {
         return parameter.get(key);
     }
 
-    public Map<String, String> getAllParameter(){
+    public Map<String, String> getAllParameter() {
         return parameter.getAllParameter();
     }
 
@@ -85,8 +85,8 @@ public class Request {
         return requestHeader.get(key);
     }
 
-    public boolean isLogin(){
-        String cookie= Optional.ofNullable(requestHeader.get("Cookie")).orElse("logined=false");
+    public boolean isLogin() {
+        String cookie = Optional.ofNullable(requestHeader.get("Cookie")).orElse("logined=false");
         return cookie.equals("logined=true");
     }
 }
