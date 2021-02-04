@@ -34,7 +34,6 @@ public class RequestHandlerTest {
 
         Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource("./templates/index.html").toURI());
         byte[] bytes = Files.readAllBytes(path);
-
         assertThat(response.getBody()).isEqualTo(new String(bytes));
     }
 
@@ -81,7 +80,7 @@ public class RequestHandlerTest {
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("http://localhost:8080/index.html");
+        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("/index.html");
     }
 
     @DisplayName("로그인 실패")
@@ -109,6 +108,6 @@ public class RequestHandlerTest {
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
-        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("http://localhost:8080/user/login_failed.html");
+        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("/user/login_failed.html");
     }
 }
