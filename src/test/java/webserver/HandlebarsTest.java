@@ -23,7 +23,6 @@ public class HandlebarsTest {
 
         User user2 = new User("javajigi", "password", "자바지기", "javajigi@gmail.com");
         String profilePage = template.apply(user2);
-        System.out.println(profilePage);
         log.debug("ProfilePage : {}", profilePage);
     }
 }

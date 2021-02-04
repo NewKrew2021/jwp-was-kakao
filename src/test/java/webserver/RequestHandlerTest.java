@@ -2,6 +2,8 @@ package webserver;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
@@ -13,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class RequestHandlerTest {
+    private static final Logger logger = LoggerFactory.getLogger(HandlebarsTest.class);
+
     @Test
     @DisplayName("GET edu.nextstep.camp")
     void request_resttemplate() {
@@ -144,7 +148,7 @@ public class RequestHandlerTest {
 
     private void printResponse(ResponseEntity<String> response) {
         response.getHeaders().keySet().forEach(it -> {
-            System.out.println(it + ": " + response.getHeaders().get(it));
+            logger.debug(it + ": " + response.getHeaders().get(it));
         });
     }
 }
