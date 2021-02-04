@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
+import model.Cookie;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
@@ -16,11 +17,11 @@ public class UserListController extends AbstractController {
     private static final String LIST_URL = "user/list";
     private static final String TEMPLATES_PREFIX = "/templates";
     private static final String HTML_SUFFIX = ".html";
-    private static final String LOGIN_SUCCESS = "logined=true";
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        if(!isLogin(httpRequest.getHeader("Cookie"))){
+        Cookie cookie = new Cookie(httpRequest);
+        if(!cookie.isLogin()){
             httpResponse.sendRedirect(DIRECT_LOGIN_URL);
             return;
         }
@@ -29,10 +30,6 @@ public class UserListController extends AbstractController {
         byte[] body = html.getBytes(StandardCharsets.UTF_8);
         httpResponse.forward(body);
 
-    }
-
-    private boolean isLogin(String loginCookie) {
-        return loginCookie != null && loginCookie.equals(LOGIN_SUCCESS) ;
     }
 
     private String parseHtml() throws IOException {
