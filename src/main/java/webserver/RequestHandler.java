@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+import controller.*;
 import webserver.http.HttpRequest;
 import webserver.http.HttpRequestParser;
 import webserver.http.HttpResponse;
@@ -28,18 +29,23 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             String request = IOUtils.buildString(in);
+            System.out.println(request);
             HttpRequest httpRequest = HttpRequestParser.getRequest(request);
             DataOutputStream dos = new DataOutputStream(out);
 
             Optional<Controller> controller = controllerMapper.findController(httpRequest);
 
+            HttpResponse response;
             if (controller.isPresent()) {
-                HttpResponse response = controller.get().handleRequest(httpRequest);
-                response.sendResponse(dos);
+                response = controller.get().handleRequest(httpRequest);
+            } else {
+                response = new HttpResponse.Builder()
+                        .status("HTTP/1.1 404 Not Found")
+                        .build();
             }
+            response.sendResponse(dos);
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
     }
-
 }
