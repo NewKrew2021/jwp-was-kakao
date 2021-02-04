@@ -27,7 +27,7 @@ public class HttpResponse {
     }
 
     private void response200Header(String url, int lengthOfBodyContent) {
-        addHeader(CONTENT_TYPE, ContentType.of(url) + "; " + CHARSET_UTF_8);
+        addHeader(CONTENT_TYPE, ContentType.of(url).getMimeType() + "; " + CHARSET_UTF_8);
         addHeader(CONTENT_LENGTH, String.valueOf(lengthOfBodyContent));
         try {
             dos.writeBytes(HTTP_1_1_200_OK);
