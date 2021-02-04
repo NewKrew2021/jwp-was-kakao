@@ -1,14 +1,21 @@
 package webserver;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-
+import model.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+
 public class WebServer {
+    public static final Map<String, HttpSession> sessions;
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
+    static {
+        sessions = new HashMap<>();
+    }
 
     public static void main(String args[]) throws Exception {
         int port = 0;
