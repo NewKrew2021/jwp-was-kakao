@@ -116,4 +116,6 @@ public class HttpResponse {
     public String getStartLine() {
         return startLine;
     }
+
+    public byte[] getBody(){ return body; }
 }
