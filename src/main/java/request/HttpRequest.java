@@ -15,9 +15,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static common.HttpHeaders.CONTENT_LENGTH;
+
 public class HttpRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+
+    private final String REQUEST_FIRST_LINE_REGEX = " ";
+    private final String DEFAULT_LINE = "";
+    private final int METHOD_INDEX = 0;
+    private final int URL_INDEX = 1;
+    private final int VERSION_INDEX = 2;
 
     private HttpMethod method;
     private String url;
@@ -50,10 +58,10 @@ public class HttpRequest {
     }
 
     private void getMethodAndUrl(BufferedReader reader) {
-        String[] lines = readLine(reader).split(" ");
-        method = HttpMethod.of(lines[0]);
-        url = lines[1];
-        version = lines[2];
+        String[] lines = readLine(reader).split(REQUEST_FIRST_LINE_REGEX);
+        method = HttpMethod.of(lines[METHOD_INDEX]);
+        url = lines[URL_INDEX];
+        version = lines[VERSION_INDEX];
         path = ParseUtils.getUrlPath(url);
     }
 
@@ -76,7 +84,7 @@ public class HttpRequest {
             return line;
         } catch (IOException e) {
             logger.error(e.getMessage());
-            return "";
+            return DEFAULT_LINE;
         }
     }
 
@@ -89,7 +97,7 @@ public class HttpRequest {
             }
 
             if(method.equals(HttpMethod.POST)){
-                String body = IOUtils.readData(reader, Integer.parseInt(headers.get("Content-Length")));
+                String body = IOUtils.readData(reader, Integer.parseInt(headers.get(CONTENT_LENGTH.getHeader())));
                 bodies.putAll(ParseUtils.getParameters(body));
             }
 

@@ -12,6 +12,8 @@ import java.nio.file.FileSystemNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static common.HttpHeaders.*;
+
 public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
@@ -41,8 +43,8 @@ public class HttpResponse {
         try {
             FileExtension fileExtension = FileExtension.getFileExtensionToExtension(ParseUtils.getExtension(path));
             body = FileIoUtils.loadFileFromClasspath(fileExtension.getFilePath() + path);
-            headers.put("Content-Type", fileExtension.getContentType());
-            headers.put("Content-Length", String.valueOf(body.length));
+            headers.put(CONTENT_TYPE.getHeader(), fileExtension.getContentType());
+            headers.put(CONTENT_LENGTH.getHeader(), String.valueOf(body.length));
             response(new Response200Status());
         } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
             logger.error(fsnfe.getMessage());
@@ -52,7 +54,7 @@ public class HttpResponse {
 
     public void sendRedirect(String path) {
         try {
-            headers.put("Location", path);
+            headers.put(LOCATION.getHeader(), path);
             response(new Response302Status());
         } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
             logger.error(fsnfe.getMessage());
@@ -63,7 +65,7 @@ public class HttpResponse {
     public void responseBody(byte[] body) {
         try {
             this.body = body;
-            headers.put("Content-Length", String.valueOf(body.length));
+            headers.put(CONTENT_LENGTH.getHeader(), String.valueOf(body.length));
             response(new Response200Status());
         } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
             logger.error(fsnfe.getMessage());

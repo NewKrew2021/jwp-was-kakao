@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import static common.HttpHeaders.SET_COOKIE;
+
 public class LoginController extends AbstractController {
 
     @Override
@@ -17,12 +19,12 @@ public class LoginController extends AbstractController {
         User user = DataBase.findUserById(parameters.get("userId"));
 
         if (!checkValidUser(user, parameters.get("password"))) {
-            response.addHeader("Set-Cookie", "logined=false");
+            response.addHeader(SET_COOKIE.getHeader(), "logined=false");
             response.sendRedirect("/user/login_failed.html");
             return;
         }
 
-        response.addHeader("Set-Cookie", "logined=true; Path=/");
+        response.addHeader(SET_COOKIE.getHeader(), "logined=true; Path=/");
         response.sendRedirect("/index.html");
     }
 

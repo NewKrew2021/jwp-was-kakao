@@ -16,11 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static common.HttpHeaders.COOKIE;
+
 public class ListUserController extends AbstractController {
 
     @Override
     protected void doGet(HttpRequest request, HttpResponse response) throws IOException, URISyntaxException {
-        if(!isLogin(request.getHeaders().get("Cookie"))){
+        if(!isLogin(request.getHeaders().get(COOKIE.getHeader()))){
             response.sendRedirect("/user/login.html");
             return;
         }
