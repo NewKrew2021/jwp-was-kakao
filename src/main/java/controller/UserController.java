@@ -38,10 +38,11 @@ public class UserController {
     };
 
     public static Handler loginUserHandler = (request) -> {
-        Map<String, String> params = request.getBody();
+        try {
+            Map<String, String> params = request.getBody();
+            User user = DataBase.findUserById(params.get(USER_ID));
+            user.verifyPassword(params.get(PASSWORD));
 
-        User user = DataBase.findUserById(params.get(USER_ID));
-        if (user != null && user.getPassword().equals(params.get(PASSWORD))) {
             Cookie cookie = new Cookie(LOGINED, "true");
             cookie.setPath("/");
 
@@ -50,11 +51,12 @@ public class UserController {
                     .redirect(INDEX_HTML)
                     .cookie(cookie)
                     .build();
+        } catch (NullPointerException e) {
+            return new HttpResponse.Builder()
+                    .status(HttpStatus.FOUND)
+                    .redirect(LOGIN_FAILED_HTML)
+                    .build();
         }
-        return new HttpResponse.Builder()
-                .status(HttpStatus.FOUND)
-                .redirect(LOGIN_FAILED_HTML)
-                .build();
     };
 
     public static Handler listUserHandler = (request) -> {
