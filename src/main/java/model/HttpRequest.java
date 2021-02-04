@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpRequest {
-    private final static List<String> acceptedMethod = Arrays.asList("GET", "POST", "PUT", "DELETE");
-
     private final Map<String, String> headerMap = new HashMap<>();
     private final Map<String, String> queryParameterMap = new HashMap<>();
 
@@ -82,7 +80,7 @@ public class HttpRequest {
     }
 
     private static void validateStartLine(String[] startLine) throws IOException {
-        if (startLine.length != 3 || !acceptedMethod.contains(startLine[0]) || !startLine[1].startsWith("/")) {
+        if (startLine.length != 3 || !HttpMethod.valueOf(startLine[0]).name().equals(startLine[0]) || !startLine[1].startsWith("/")) {
             throw new IOException();
         }
     }
