@@ -1,14 +1,23 @@
 package request;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import utils.IOUtils;
 import utils.ParseUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpRequest {
 
-    private final String URL = "url";
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     private HttpMethod method;
     private String url;
@@ -16,48 +25,82 @@ public class HttpRequest {
     private String path;
 
     private Map<String, String> headers;
-    private Map<String, String> bodys;
+    private Map<String, String> bodies;
 
     public HttpRequest() {
     }
 
-    private HttpRequest(List<String> requestLines) {
-        headers = new HashMap<>();
-        bodys = new HashMap<>();
-        getMethodAndUrl(requestLines.get(0));
-        getHeaders(requestLines);
-//        getBody(requestLines);
+    private HttpRequest(InputStream in) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        getMethodAndUrl(reader);
+        headers = makeHeaders(reader);
+        bodies = makeBodies(reader);
     }
 
-    public static HttpRequest of(List<String> requestLines) {
-        return new HttpRequest(requestLines);
+    public static HttpRequest of(InputStream in) {
+        return new HttpRequest(in);
     }
 
-    public void parseGetMethodBody() {
-        if(ParseUtils.containRequestUrlRegex(url)) {
-            bodys = ParseUtils.getParameters(ParseUtils.getParameterPairs(url));
-        }
-    }
-
-    private void getHeaders(List<String> lines) {
-        lines.stream()
+    private Map<String, String> makeHeaders(BufferedReader reader) {
+        List<String> lines = readLines(reader);
+        return lines.stream()
                 .skip(1)
                 .limit(lines.size() - 2)
-                .forEach(line -> headers.put(ParseUtils.parseHeaderKey(line), ParseUtils.parseHeaderValue(line)));
+                .collect(Collectors.toMap(ParseUtils::parseHeaderKey,ParseUtils::parseHeaderValue));
     }
 
-
-    private void getMethodAndUrl(String line) {
-        String[] lines = line.split(" ");
+    private void getMethodAndUrl(BufferedReader reader) {
+        String[] lines = readLine(reader).split(" ");
         method = HttpMethod.of(lines[0]);
         url = lines[1];
         version = lines[2];
         path = ParseUtils.getUrlPath(url);
     }
 
-    public void parsePostMethodBody(String body){
-        bodys = ParseUtils.getParameters(body);
+    private List<String> readLines(BufferedReader reader) {
+        List<String> lines = new ArrayList<>();
+        lines.add(readLine(reader));
+
+        while(lines.get(lines.size() - 1) != null &&
+                !lines.get(lines.size() - 1).isEmpty()){
+            lines.add(readLine(reader));
+        }
+
+        return lines;
     }
+
+    private String readLine(BufferedReader reader) {
+        try {
+            String line = reader.readLine();
+            logger.debug(line);
+            return line;
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return "";
+        }
+    }
+
+    private Map<String, String> makeBodies(BufferedReader reader) {
+        try {
+            Map<String, String> bodies = new HashMap<>();
+
+            if (ParseUtils.containRequestUrlRegex(url)) {
+                bodies.putAll(ParseUtils.getParameters(ParseUtils.getParameterPairs(url)));
+            }
+
+            if(method.equals(HttpMethod.POST)){
+                String body = IOUtils.readData(reader, Integer.parseInt(headers.get("Content-Length")));
+                bodies.putAll(ParseUtils.getParameters(body));
+            }
+
+            return bodies;
+
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
 
     public HttpMethod getMethod() {
         return method;
@@ -71,10 +114,6 @@ public class HttpRequest {
         return path;
     }
 
-    public String getURL() {
-        return URL;
-    }
-
     public String getVersion() {
         return version;
     }
@@ -83,7 +122,7 @@ public class HttpRequest {
         return headers;
     }
 
-    public Map<String, String> getBodys() {
-        return bodys;
+    public Map<String, String> getBodies() {
+        return bodies;
     }
 }
