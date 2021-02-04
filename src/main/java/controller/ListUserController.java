@@ -19,8 +19,10 @@ public class ListUserController extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
         try {
-            if (request.getCookie().equals("logined=true")) {
-
+            String cookie = request.getCookie();
+            String login = cookie.split(";")[0].trim();
+            String sessionId = cookie.split(";")[1].trim();
+            if (login.equals("logined=true")) {
                 Map<String, Object> model = new HashMap<>();
 
                 List<User> users = new ArrayList<>(DataBase.findAll());
