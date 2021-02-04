@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,12 +30,12 @@ public abstract class Controller {
         return path.startsWith(basePath);
     }
 
-    public HttpResponse handle(HttpRequest request, OutputStream out) throws NoFileException, IOException {
+    public HttpResponse handle(HttpRequest request) throws NoFileException, IOException {
         for (Map.Entry<PathInfo, Handler> entry : handlers.entrySet()) {
             log.debug("matching {} with controller {}", request.getPath(), entry.getKey().getPath());
             if (request.getPath().matches(entry.getKey().getPath())) {
                 log.debug("handling {} with controller {}", request.getPath(), entry.getKey().getPath());
-                return entry.getValue().handle(request, out);
+                return entry.getValue().handle(request);
             }
         }
         return null;
