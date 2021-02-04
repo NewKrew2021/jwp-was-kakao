@@ -12,7 +12,6 @@ import utils.FileIoUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
@@ -20,33 +19,14 @@ public class HttpResponse {
     private static final String PROTOCOL = "HTTP/1.1";
 
     private final DataOutputStream dos;
-    private final Map<String, String> headers = new HashMap<>();
 
     private int status;
     private String startLine;
     private byte[] body;
 
-    private static final Map<String, String> contentType = new HashMap<>();
-
-    static {
-        contentType.put(".js", "text/js");
-        contentType.put(".html", "text/html");
-        contentType.put(".css", "text/css");
-        contentType.put(".woff", "application/font-woff");
-        contentType.put(".ttf", "application/x-font-ttf");
-        contentType.put(".ico", "image/x-icon");
-    }
-
-    private static final Map<Integer, String> httpStatusCode = new HashMap<>();
-    static {
-        httpStatusCode.put(200, "OK");
-        httpStatusCode.put(201, "CREATED");
-        httpStatusCode.put(302, "FOUND");
-        httpStatusCode.put(400, "BAD REQUEST");
-        httpStatusCode.put(401, "Unauthorized");
-        httpStatusCode.put(404, "NOT FOUND");
-        httpStatusCode.put(500, "INTERNAL SERVER ERROR");
-    }
+    private final HttpHeader httpHeader = new HttpHeader();
+    private final ContentType contentType = new ContentType();
+    private final HttpStatus httpStatus = new HttpStatus();
 
     private HttpResponse(DataOutputStream dos) {
         this.dos = dos;
@@ -57,23 +37,23 @@ public class HttpResponse {
     }
 
     public HttpResponse setStatus(int statusCode) {
-        if (httpStatusCode.get(statusCode) == null)
+        if (httpStatus.get(statusCode) == null)
             throw new IllegalStatusCodeException();
 
         status = statusCode;
         startLine = String.join(" ", PROTOCOL,
-                String.valueOf(statusCode), httpStatusCode.get(statusCode));
+                String.valueOf(statusCode), httpStatus.get(statusCode));
 
         return this;
     }
 
     public HttpResponse setHeader(String key, String value) {
-        headers.put(key, value);
+        httpHeader.put(key, value);
         return this;
     }
 
     public HttpResponse setCookie(String cookie) {
-        headers.put("Set-Cookie", cookie + "; Path=/; HttpOnly");
+        httpHeader.put("Set-Cookie", cookie + "; Path=/; HttpOnly");
         return this;
     }
 
@@ -81,7 +61,7 @@ public class HttpResponse {
         if (status != 201 && status / 100 != 3)
             throw new IllegalLocationException();
 
-        headers.put("Location", url);
+        httpHeader.put("Location", url);
         return this;
     }
 
@@ -112,7 +92,7 @@ public class HttpResponse {
             dos.writeBytes(startLine);
             dos.writeBytes("\r\n");
 
-            for (Map.Entry<String, String> header : headers.entrySet()) {
+            for (Map.Entry<String, String> header : httpHeader.entrySet()) {
                 dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
             }
             dos.writeBytes("\r\n");
@@ -151,7 +131,7 @@ public class HttpResponse {
     }
 
     public Map<String, String> getHeaders() {
-        return headers;
+        return httpHeader.getHeader();
     }
 
     public String getStartLine() {
