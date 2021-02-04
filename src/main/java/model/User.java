@@ -37,7 +37,7 @@ public class User {
         }
     }
 
-    private boolean isEmpty(String str) {
+    private static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
 
