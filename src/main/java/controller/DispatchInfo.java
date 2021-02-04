@@ -12,7 +12,8 @@ public enum DispatchInfo {
     Static(new HttpRequest(RequestMethod.GET, "/css"), StaticController.staticHandler),
     UserCreate(new HttpRequest(RequestMethod.POST, "/user/create"), UserController.createUserHandler),
     UserLogin(new HttpRequest(RequestMethod.POST, "/user/login"), UserController.loginUserHandler),
-    UserList(new HttpRequest(RequestMethod.GET, "/user/list"), UserController.listUserHandler);
+    UserList(new HttpRequest(RequestMethod.GET, "/user/list"), UserController.listUserHandler),
+    UserLogout(new HttpRequest(RequestMethod.GET, "/user/logout"), UserController.logoutUserHandler);
 
     private HttpRequest httpRequest;
     private Handler requestHandler;

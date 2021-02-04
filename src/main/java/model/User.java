@@ -21,9 +21,13 @@ public class User {
         return name;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public void verifyPassword(String password) {
         if (!this.password.equals(password)) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
     }
 
