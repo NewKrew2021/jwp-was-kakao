@@ -2,11 +2,9 @@ package request;
 
 import annotation.web.RequestMethod;
 import exceptions.HeaderNotFoundException;
-import exceptions.ParameterNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +48,7 @@ public class HttpRequest {
         if (requestUri.getUriValue(key).isPresent()) {
             return requestUri.getUriValue(key).get();
         }
-        throw new ParameterNotFoundException();
+        return null;
     }
 
     public String getHeader(String key) {

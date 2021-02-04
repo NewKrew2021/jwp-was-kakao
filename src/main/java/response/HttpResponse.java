@@ -28,6 +28,7 @@ public class HttpResponse {
     private static final String CSS_TYPE = "text/css;charset=utf-8";
     private static final String JS_TYPE = "text/javascript;charset=utf-8";
     private DataOutputStream dos;
+    private HttpResponseStatusCode httpResponseStatusCode;
     private Map<String, String> header = new HashMap<>();
     private byte[] body;
 
@@ -40,16 +41,20 @@ public class HttpResponse {
         header.put(key, value);
     }
 
-    public void send(HttpResponseStatusCode responseStatusCode){
+    public HttpResponse send(HttpResponseStatusCode responseStatusCode){
+        this.httpResponseStatusCode = responseStatusCode;
+        return this;
+    }
+    public void build(){
         //response header
-        writeHeader(responseStatusCode);
+        writeHeader();
 
         //response body
         writeBody();
     }
-    private void writeHeader(HttpResponseStatusCode responseStatusCode) {
+    private void writeHeader() {
         try {
-            this.dos.writeBytes(responseStatusCode.getMessage() + "\r\n");
+            this.dos.writeBytes(this.httpResponseStatusCode.getMessage() + "\r\n");
             for (String key : this.header.keySet()) {
                 this.dos.writeBytes(key + ": " + this.header.get(key) + "\r\n");
             }
@@ -72,37 +77,44 @@ public class HttpResponse {
         }
     }
 
-    public void addContentTypeHeader(String path){
+    public HttpResponse addContentTypeHeader(String path){
         if(path.matches(".*\\.html")){
             addHeader(CONTENT_TYPE, HTML_TYPE);
-            return;
+            return this;
         }
         if(path.matches(".*\\.css")){
             addHeader(CONTENT_TYPE, CSS_TYPE);
-            return;
+            return this;
         }
         if(path.matches(".*\\.js")){
             addHeader(CONTENT_TYPE, JS_TYPE);
-            return;
+            return this;
         }
+        return this;
     }
 
-    public void addRedirectionLocationHeader(String location){
-        addHeader(LOCATION, "http://localhost:8080" + location);
+    public HttpResponse addRedirectionLocationHeader(String location){
+        addHeader(LOCATION,  location);
+        return this;
     }
 
-    public void addContentLengthHeader(int lengthOfBodyContent){
+    public HttpResponse addContentLengthHeader(int lengthOfBodyContent){
         addHeader(CONTENT_LENGTH, Integer.toString(lengthOfBodyContent));
+        return this;
     }
 
-    public void addSetCookieHeader(boolean isLogined){
+    public HttpResponse addSetCookieHeader(boolean isLogined){
         if(isLogined){
             addHeader(SET_COOKIE, "logined=true; Path=/");
+            return this;
         }
+        addHeader(SET_COOKIE, "logined=false; Path=/");
+        return this;
     }
 
-    public void addResponseBody(byte[] body) {
+    public HttpResponse addResponseBody(byte[] body) {
         this.body = body;
+        return this;
     }
 
 }

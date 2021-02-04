@@ -4,7 +4,9 @@ import exceptions.InvalidResponseStatusCodeException;
 
 public enum HttpResponseStatusCode {
     OK(200, "HTTP/1.1 200 OK "),
-    FOUND(302, "HTTP/1.1 302 Found ");
+    FOUND(302, "HTTP/1.1 302 Found "),
+    BAD_REQUEST(400, "HTTP/1.1 400 Bad Request "),
+    NOT_FOUND(404, "HTTP/1.1 404 Not-Found ");
 
     private int code;
     private String message;
@@ -20,6 +22,12 @@ public enum HttpResponseStatusCode {
         }
         if(code == 302){
             return FOUND;
+        }
+        if(code == 400){
+            return BAD_REQUEST;
+        }
+        if(code == 404){
+            return NOT_FOUND;
         }
         throw new InvalidResponseStatusCodeException();
     }

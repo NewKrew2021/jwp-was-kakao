@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import request.HttpRequest;
 import response.HttpResponse;
+import response.HttpResponseStatusCode;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,8 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
     private ControllerHandler controllers = new ControllerHandler();
+    private HttpRequest httpRequest;
+    private HttpResponse httpResponse;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -25,11 +28,14 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = HttpRequest.from(in);
-            HttpResponse httpResponse = new HttpResponse(out);
+            this.httpRequest = HttpRequest.from(in);
+            this.httpResponse = new HttpResponse(out);
             Controller controller = controllers.getController(httpRequest.getPath());
             controller.service(httpRequest, httpResponse);
         } catch (IOException e) {
+            this.httpResponse
+                    .send(HttpResponseStatusCode.BAD_REQUEST)
+                    .build();
             logger.error(e.getMessage());
         }
     }

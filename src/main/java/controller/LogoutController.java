@@ -9,9 +9,11 @@ public class LogoutController extends AbstractController {
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        httpResponse.addRedirectionLocationHeader(INDEX_HTML);
-        httpResponse.addSetCookieHeader(false);
-        httpResponse.send(HttpResponseStatusCode.FOUND);
+        httpResponse
+                .addRedirectionLocationHeader(INDEX_HTML)
+                .addSetCookieHeader(false)
+                .send(HttpResponseStatusCode.FOUND)
+                .build();
     }
 
 }

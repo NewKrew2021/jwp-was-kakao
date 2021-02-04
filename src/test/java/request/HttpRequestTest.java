@@ -1,12 +1,18 @@
 package request;
 
 import annotation.web.RequestMethod;
+import controller.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import requestTextForTest.FilePathName;
+import response.HttpResponse;
+import response.HttpResponseStatusCode;
+import responseTextForTest.ResponseFilePathName;
+import webserver.ControllerHandler;
 
 import java.io.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpRequestTest {
@@ -43,5 +49,65 @@ public class HttpRequestTest {
         assertEquals("javajigi", request.getParameter("userId"));
         assertEquals("1", request.getParameter("id"));
     }
+
+    @DisplayName("회원가입 후에 login 진행후 응답값으로 쿠키 헤더 가 true로 포함되어 있")
+    @Test
+    public void 로그인후_응답_쿠키값_테스트() throws IOException{
+        //회원가입
+        HttpResponse response1 = new HttpResponse( new ByteArrayOutputStream());
+
+        HttpRequest request1 = HttpRequest.from(new FileInputStream(FilePathName.POST_HTTP_CREATE_USER_REQUEST));
+
+        ControllerHandler controllers = new ControllerHandler();
+        Controller controller1 = controllers.getController(request1.getPath());
+        controller1.service(request1, response1);
+
+
+        //로그인
+        File resultFile = new File(ResponseFilePathName.RESPONSE_RESULT);
+        OutputStream outputStream = new FileOutputStream(resultFile);
+        HttpResponse response2 = new HttpResponse(outputStream);
+
+        FileInputStream fileInputStream = new FileInputStream(FilePathName.POST_HTTP_LOGIN_REQUEST);
+        HttpRequest request2 = HttpRequest.from(fileInputStream);
+
+        Controller controller = controllers.getController(request2.getPath());
+        controller.service(request2, response2);
+
+        InputStreamReader resultInputStreamReader = new FileReader(resultFile);
+        BufferedReader br = new BufferedReader(resultInputStreamReader);
+        StringBuilder resultResponse = null;
+        String tmp;
+        while(!(tmp = br.readLine()).equals("")){
+            resultResponse = (resultResponse == null ? new StringBuilder("null") : resultResponse).append(tmp);
+        }
+        assertThat(resultResponse).contains("Set-Cookie: logined=true; Path=/");
+    }
+
+    @DisplayName("리소스 파일을 요청시에 정상응답 코드를 받는다")
+    @Test
+    public void 리소스_파일_정상응답_테스트() throws IOException {
+        File resultFile = new File(ResponseFilePathName.RESPONSE_RESULT);
+        OutputStream outputStream = new FileOutputStream(resultFile);
+        HttpResponse response = new HttpResponse(outputStream);
+
+        FileInputStream fileInputStream = new FileInputStream(FilePathName.GET_HTTP_STATIC_FILE_REQUEST);
+        HttpRequest request = HttpRequest.from(fileInputStream);
+
+        ControllerHandler controllers = new ControllerHandler();
+        Controller controller = controllers.getController(request.getPath());
+        controller.service(request, response);
+
+        InputStreamReader resultInputStreamReader = new FileReader(resultFile);
+        BufferedReader br = new BufferedReader(resultInputStreamReader);
+        StringBuilder resultResponse = null;
+        String tmp;
+        while(!(tmp = br.readLine()).equals("")){
+            resultResponse = (resultResponse == null ? new StringBuilder("null") : resultResponse).append(tmp);
+        }
+        assertThat(resultResponse).contains("HTTP/1.1 200 OK");
+    }
+
+
 
 }

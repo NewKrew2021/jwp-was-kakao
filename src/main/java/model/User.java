@@ -1,6 +1,5 @@
 package model;
 
-
 public class User {
     private String userId;
     private String password;
@@ -12,6 +11,10 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public boolean isSamePassword(String password){
+        return this.password.equals(password);
     }
 
     public String getUserId() {
