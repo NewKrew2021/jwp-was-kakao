@@ -22,17 +22,11 @@ public class Session {
 
     public static HttpSession findSession(UUID sessionId) {
         log.debug("find session {}", sessionId);
-        HttpSession session = sessionStorage.get(sessionId);
-        return session;
+        return sessionStorage.get(sessionId);
     }
 
     public static void invalidateSession(UUID sessionId) {
         log.debug("invalidating session {}", sessionId);
         sessionStorage.remove(sessionId);
-    }
-
-    public static boolean exists(UUID sessionId) {
-        log.debug("check session {} {}", sessionId, sessionStorage.get(sessionId));
-        return sessionStorage.get(sessionId) != null;
     }
 }

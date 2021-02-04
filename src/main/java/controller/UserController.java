@@ -1,14 +1,12 @@
 package controller;
 
 import controller.handler.SecuredHandler;
-import db.DataBase;
-import db.Session;
-import model.*;
-import view.View;
+import model.HttpMethod;
+import model.HttpRequest;
+import model.HttpResponse;
+import service.UserService;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.UUID;
 
 public class UserController extends Controller {
     {
@@ -20,40 +18,18 @@ public class UserController extends Controller {
     }
 
     public HttpResponse handleCreate(HttpRequest request) {
-        Map<String, String> bodyParsed = request.getParsedBody();
-        User user = new User(
-                bodyParsed.get("userId"),
-                bodyParsed.get("password"),
-                bodyParsed.get("name"),
-                bodyParsed.get("email")
-        );
-        DataBase.addUser(user);
-
-        return new HttpResponse().redirect("/index.html");
+        return UserService.createUser(request);
     }
 
     public HttpResponse handleLogin(HttpRequest request) {
-        Map<String, String> bodyParsed = request.getParsedBody();
-        User user = DataBase.findUserById(bodyParsed.get("userId"));
-
-        if (user == null) {
-            return new HttpResponse().redirect("/user/login_failed.html");
-        }
-        HttpSession session = Session.newSession();
-        session.setAttribute("userId", bodyParsed.get("userId"));
-        return new HttpResponse().setCookie("session=" + session.getId()).redirect("/index.html");
+        return UserService.userLogin(request);
     }
 
     public HttpResponse handleUserList(HttpRequest request) throws IOException {
-        byte[] body = View.getUsersView(DataBase.findAll(), "/user/list");
-        return new HttpResponse().view(body);
+        return UserService.getUserList(request);
     }
 
     public HttpResponse handleLogout(HttpRequest request) {
-        String cookieValue = request.getCookie("session");
-        if (cookieValue != null) {
-            Session.invalidateSession(UUID.fromString(cookieValue));
-        }
-        return new HttpResponse().redirect("/index.html");
+        return UserService.userLogout(request);
     }
 }

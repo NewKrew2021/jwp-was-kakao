@@ -31,15 +31,18 @@ public class ControllerDispatcher {
     public static void dispatch(Socket connection) {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = new HttpRequest(in, connection);
-            List<Controller> selectedControllers = controllers.stream()
-                    .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
-                    .collect(Collectors.toList());
-            HttpResponse response = handleRequest(httpRequest, selectedControllers);
+            HttpResponse response = handleRequest(httpRequest, selectControllers(httpRequest));
             response.ok(new DataOutputStream(out));
             log.info("{} {}", httpRequest.getRemoteAddress(), response.getStartLine());
         } catch (IOException e) {
             log.error("{} {}", e.getMessage(), e.getStackTrace());
         }
+    }
+
+    private static List<Controller> selectControllers(HttpRequest httpRequest) {
+        return controllers.stream()
+                .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
+                .collect(Collectors.toList());
     }
 
     private static HttpResponse handleRequest(HttpRequest httpRequest, List<Controller> controllers) {
