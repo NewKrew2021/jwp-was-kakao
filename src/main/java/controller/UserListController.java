@@ -8,12 +8,8 @@ import db.DataBase;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UserListController extends AbstractController {
     private static final String DIRECT_LOGIN_URL = "http://localhost:8080/user/login.html";
