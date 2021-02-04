@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.in;
 
 public class HttpRequestTest {
     HttpRequest postRequest;
@@ -16,34 +17,18 @@ public class HttpRequestTest {
 
     @BeforeEach
     public void setUp() throws IOException{
-        String postMsg = "POST /api HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 33\n" +
-                "Accept: */*\n" +
-                "\r\n" +
-                "userId=javajigi&password=password";
+        InputStream postMsg = new FileInputStream("./src/test/resources/postRequest");
         postRequest = makeRequest(postMsg);
 
-        String getMsg = "GET /index.html HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*\n" +
-                "";
+        InputStream getMsg = new FileInputStream("./src/test/resources/getRequest");
         getRequest = makeRequest(getMsg);
 
-        String queryMsg = "GET /user/create?" +
-                "userId=jack&password=password&name=jackwon&email=jackwon%40kakaocorp.com HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*\n" +
-                "";
+        InputStream queryMsg = new FileInputStream("./src/test/resources/queryRequest");
         queryRequest = makeRequest(queryMsg);
     }
 
-    private static HttpRequest makeRequest(String httpMessage) throws IOException {
-        InputStream is = new ByteArrayInputStream(httpMessage.getBytes());
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+    private static HttpRequest makeRequest(InputStream inputStream) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         return new HttpRequest(br);
     }
 
