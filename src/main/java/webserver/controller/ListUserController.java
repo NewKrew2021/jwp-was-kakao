@@ -4,8 +4,8 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
 import model.User;
+import service.UserService;
 import utils.FileIoUtils;
 import webserver.domain.ContentTypes;
 import webserver.domain.HttpRequest;
@@ -53,7 +53,7 @@ public class ListUserController extends AbstractController {
         loader.setSuffix("");
         Handlebars handlebars = new Handlebars(loader);
         Template template = handlebars.compile(path);
-        List<User> users = new ArrayList<>(DataBase.findAll());
+        List<User> users = new ArrayList<>(UserService.getAllUser());
         return template.apply(users).getBytes(StandardCharsets.UTF_8);
     }
 

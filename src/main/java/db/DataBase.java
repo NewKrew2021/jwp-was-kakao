@@ -22,11 +22,4 @@ public class DataBase {
         return users.values();
     }
 
-    public static boolean isPossibleLogin(String userId, String password) {
-        if (users.containsKey(userId)) {
-            User user = users.get(userId);
-            return user.getPassword().equals(password);
-        }
-        return false;
-    }
 }
