@@ -1,9 +1,9 @@
 package controller;
 
 import controller.handler.SecuredHandler;
-import model.HttpMethod;
 import model.HttpRequest;
 import model.HttpResponse;
+import model.httpinfo.HttpMethod;
 import service.UserService;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class UserController extends Controller {
     }
 
     public HttpResponse handleUserList(HttpRequest request) throws IOException {
-        return UserService.getUserList(request);
+        return UserService.getUserList();
     }
 
     public HttpResponse handleLogout(HttpRequest request) {

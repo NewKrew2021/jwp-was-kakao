@@ -2,10 +2,7 @@ package service;
 
 import db.DataBase;
 import db.Session;
-import model.HttpRequest;
-import model.HttpResponse;
-import model.HttpSession;
-import model.User;
+import model.*;
 import view.View;
 
 import java.io.IOException;
@@ -13,6 +10,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class UserService {
+
+
     public static HttpResponse createUser(HttpRequest request) {
         Map<String, String> bodyParsed = request.getParsedBody();
         User user = new User(
@@ -22,7 +21,7 @@ public class UserService {
                 bodyParsed.get("email")
         );
         DataBase.addUser(user);
-        return new HttpResponse().redirect("/index.html");
+        return new HttpResponse().redirect(Constant.INDEX_HTML);
     }
 
     public static HttpResponse userLogin(HttpRequest request) {
@@ -30,23 +29,23 @@ public class UserService {
         User user = DataBase.findUserById(bodyParsed.get("userId"));
 
         if (user == null) {
-            return new HttpResponse().redirect("/user/login_failed.html");
+            return new HttpResponse().redirect(Constant.USER_LOGIN_FAILED_HTML);
         }
         HttpSession session = Session.newSession();
         session.setAttribute("userId", bodyParsed.get("userId"));
-        return new HttpResponse().setCookie("session=" + session.getId()).redirect("/index.html");
+        return new HttpResponse().setCookie(Constant.SESSION_NAME + "=" + session.getId()).redirect(Constant.INDEX_HTML);
     }
 
-    public static HttpResponse getUserList(HttpRequest request) throws IOException {
-        byte[] body = View.getUsersView(DataBase.findAll(), "/user/list");
+    public static HttpResponse getUserList() throws IOException {
+        byte[] body = View.getUsersView(DataBase.findAll(), Constant.USER_LIST_URI);
         return new HttpResponse().view(body);
     }
 
     public static HttpResponse userLogout(HttpRequest request) {
-        String cookieValue = request.getCookie("session");
+        String cookieValue = request.getCookie(Constant.SESSION_NAME);
         if (cookieValue != null) {
             Session.invalidateSession(UUID.fromString(cookieValue));
         }
-        return new HttpResponse().redirect("/index.html");
+        return new HttpResponse().redirect(Constant.INDEX_HTML);
     }
 }

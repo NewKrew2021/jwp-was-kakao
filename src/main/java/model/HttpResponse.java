@@ -2,6 +2,8 @@ package model;
 
 import exception.http.IllegalLocationException;
 import exception.utils.NoFileException;
+import model.httpinfo.ContentType;
+import model.httpinfo.HttpStatusMessage;
 import utils.FileIoUtils;
 
 import java.io.DataOutputStream;

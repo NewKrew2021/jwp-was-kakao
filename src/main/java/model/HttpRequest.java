@@ -1,5 +1,7 @@
 package model;
 
+import model.httpinfo.HttpMethod;
+import model.httpinfo.IpHeader;
 import utils.IOUtils;
 
 import java.io.BufferedReader;

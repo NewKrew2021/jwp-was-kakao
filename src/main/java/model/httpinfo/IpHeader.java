@@ -1,4 +1,4 @@
-package model;
+package model.httpinfo;
 
 public class IpHeader {
     public static final String[] headers = {

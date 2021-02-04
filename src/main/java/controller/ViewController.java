@@ -1,9 +1,10 @@
 package controller;
 
 import exception.utils.NoFileException;
-import model.HttpMethod;
+import model.Constant;
 import model.HttpRequest;
 import model.HttpResponse;
+import model.httpinfo.HttpMethod;
 
 public class ViewController extends Controller {
 
@@ -17,11 +18,11 @@ public class ViewController extends Controller {
     }
 
     public HttpResponse handleFile(HttpRequest request) throws NoFileException {
-        return new HttpResponse().forward("./static", request.getPath());
+        return new HttpResponse().forward(Constant.STATIC_PATH, request.getPath());
     }
 
     public HttpResponse handleView(HttpRequest request) throws NoFileException {
-        return new HttpResponse().forward("./templates",
-                (request.getPath().equals("/") ? "/index.html" : request.getPath()));
+        return new HttpResponse().forward(Constant.TEMPLATES_PATH,
+                (request.getPath().equals("/") ? Constant.INDEX_HTML : request.getPath()));
     }
 }

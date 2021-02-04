@@ -2,10 +2,10 @@ package controller;
 
 import controller.handler.Handler;
 import exception.utils.NoFileException;
-import model.HttpMethod;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.PathInfo;
+import model.httpinfo.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

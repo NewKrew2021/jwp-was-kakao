@@ -1,5 +1,7 @@
 package model;
 
+import model.httpinfo.HttpMethod;
+
 import java.util.Objects;
 
 public class PathInfo {

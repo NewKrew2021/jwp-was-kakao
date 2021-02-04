@@ -1,4 +1,4 @@
-package model;
+package model.httpinfo;
 
 import exception.http.IllegalExtensionException;
 
