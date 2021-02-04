@@ -20,7 +20,6 @@ public class ListUserController extends AbstractController {
 
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        super.doGet(httpRequest, httpResponse);
         if (!isPossibleAccessUserList(httpRequest.getPath())) {
             httpResponse.sendRedirect(USER_LOGIN_URL);
             return;

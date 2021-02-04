@@ -9,8 +9,6 @@ import java.net.URISyntaxException;
 public class FowardController extends AbstractController {
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        super.doGet(httpRequest, httpResponse);
-
         if (isExistFile("./static" + httpRequest.getPath())) {
             httpResponse.forwardStatic("./static" + httpRequest.getPath());
             return;
