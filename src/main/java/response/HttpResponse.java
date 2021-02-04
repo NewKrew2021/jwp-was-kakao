@@ -53,33 +53,17 @@ public class HttpResponse {
     }
 
     public void sendRedirect(String path) {
-        try {
-            headers.put(LOCATION.getHeader(), path);
-            response(new Response302Status());
-        } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
-            logger.error(fsnfe.getMessage());
-            response(new Response404Status());
-        }
+        headers.put(LOCATION.getHeader(), path);
+        response(new Response302Status());
     }
 
     public void responseBody(byte[] body) {
-        try {
-            this.body = body;
-            headers.put(CONTENT_LENGTH.getHeader(), String.valueOf(body.length));
-            response(new Response200Status());
-        } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
-            logger.error(fsnfe.getMessage());
-            response(new Response404Status());
-        }
+        headers.put(CONTENT_LENGTH.getHeader(), String.valueOf(body.length));
+        response(new Response200Status());
     }
 
     public void badRequest() {
-        try {
-            response(new Response400Status());
-        } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
-            logger.error(fsnfe.getMessage());
-            response(new Response404Status());
-        }
+        response(new Response400Status());
     }
 
     private void response(ResponseStatus responseStatus) {
