@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 import request.HttpMethod;
 import request.HttpRequest;
 import response.HttpResponse;
-import response.Response200Header;
-import response.Response302Header;
-import utils.IOUtils;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -42,16 +42,14 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             HttpRequest httpRequest = HttpRequest.of(in);
-            HttpResponse httpResponse = HttpResponse.of();
+            HttpResponse httpResponse = HttpResponse.of(dos);
 
 
             if (httpRequest.getMethod().equals(HttpMethod.GET)) {
                 if (httpRequest.getPath().equals("/user/list")) {
                     String cookie = httpRequest.getHeaders().get("Cookie");
                     if (cookie == null || !cookie.contains("logined=true")) {
-                        httpResponse.addHeader("Location", "/user/login.html");
-                        httpResponse.addHeader("body", "");
-                        httpResponse.response(dos, new Response302Header());
+                        httpResponse.sendRedirect("/user/login.html");
                         return;
                     }
 
@@ -68,8 +66,7 @@ public class RequestHandler implements Runnable {
 
                     String profilePage = template.apply(parameters);
 
-                    httpResponse.addHeader("body", profilePage);
-                    httpResponse.response(dos, new Response302Header());
+                    httpResponse.responseBody(profilePage.getBytes());
                     return;
                 }
             }
@@ -79,9 +76,7 @@ public class RequestHandler implements Runnable {
                 if (httpRequest.getPath().equals("/user/create")) {
                     User user = User.mapOf(httpRequest.getBodies());
                     DataBase.addUser(user);
-                    httpResponse.addHeader("Location", "/index.html");
-                    httpResponse.addHeader("body", "");
-                    httpResponse.response(dos, new Response302Header());
+                    httpResponse.sendRedirect("/index.html");
                     return;
                 }
 
@@ -89,22 +84,17 @@ public class RequestHandler implements Runnable {
                     Map<String, String> parameters = httpRequest.getBodies();
                     User user = DataBase.findUserById(parameters.get("userId"));
                     if (user == null || !user.getPassword().equals(parameters.get("password"))) {
-                        httpResponse.addHeader("Location", "/user/login_failed.html");
                         httpResponse.addHeader("Set-Cookie", "logined=false");
+                        httpResponse.sendRedirect("/user/login_failed.html");
                     } else {
-                        httpResponse.addHeader("Location", "/index.html");
                         httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
+                        httpResponse.sendRedirect("/index.html");
                     }
-                    httpResponse.addHeader("body", "");
-                    httpResponse.response(dos, new Response302Header());
                     return;
                 }
             }
 
-            httpResponse.addHeader("path", httpRequest.getPath());
-            httpResponse.addHeader("body", "");
-
-            httpResponse.response(dos, new Response200Header());
+            httpResponse.forward(httpRequest.getPath());
 
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
