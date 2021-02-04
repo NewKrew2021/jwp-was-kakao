@@ -1,6 +1,7 @@
 package model;
 
 import exception.http.IllegalHeaderException;
+import exception.http.IllegalHttpRequestException;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -48,13 +49,13 @@ public class HttpRequest {
         }
     }
 
-    private void validateHeaderLine(String[] headerLine) throws IOException {
+    private void validateHeaderLine(String[] headerLine) {
         if (headerLine.length < 2) {
-            throw new IOException();
+            throw new IllegalHeaderException();
         }
     }
 
-    private void setStartLine(String line) throws IOException {
+    private void setStartLine(String line) {
         String[] startLine = line.split(" ");
         validateStartLine(startLine);
         method = startLine[0];
@@ -79,9 +80,9 @@ public class HttpRequest {
         });
     }
 
-    private static void validateStartLine(String[] startLine) throws IOException {
+    private static void validateStartLine(String[] startLine) {
         if (startLine.length != 3 || !HttpMethod.valueOf(startLine[0]).name().equals(startLine[0]) || !startLine[1].startsWith("/")) {
-            throw new IOException();
+            throw new IllegalHttpRequestException();
         }
     }
 

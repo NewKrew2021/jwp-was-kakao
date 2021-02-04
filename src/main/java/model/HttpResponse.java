@@ -1,6 +1,7 @@
 package model;
 
 import exception.http.IllegalExtensionException;
+import exception.http.IllegalHttpRequestException;
 import exception.http.IllegalLocationException;
 import exception.http.IllegalStatusCodeException;
 import exception.utils.NoFileException;
@@ -85,7 +86,11 @@ public class HttpResponse {
     }
 
     public HttpResponse sendFile(String basePath, String path) throws NoFileException {
-        body = FileIoUtils.loadFileFromClasspath(basePath + path);
+        try {
+            body = FileIoUtils.loadFileFromClasspath(basePath + path);
+        }catch (NoFileException e){
+            throw new NoFileException(path);
+        }
 
         String extension = path.substring(path.lastIndexOf("."));
         if (contentType.get(extension) == null)
@@ -102,38 +107,47 @@ public class HttpResponse {
         setHeader("Content-Length", String.valueOf(body.length));
     }
 
-    public void ok() throws IOException {
-        dos.writeBytes(startLine);
-        dos.writeBytes("\r\n");
+    public void ok() {
+        try {
+            dos.writeBytes(startLine);
+            dos.writeBytes("\r\n");
 
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
+            }
+            dos.writeBytes("\r\n");
+
+            if (body != null && body.length != 0)
+                dos.write(body, 0, body.length);
+
+            dos.flush();
+            log.info("{}", startLine);
+        }catch (IOException e){
+            throw new IllegalHttpRequestException();
         }
-        dos.writeBytes("\r\n");
-
-        if (body != null && body.length != 0)
-            dos.write(body, 0, body.length);
-
-        dos.flush();
-        log.info("{}", startLine);
     }
 
-    public void sendView(byte[] body) throws IOException {
+    public void sendView(byte[] body) {
         setStatus(200);
         sendHtml(body);
         ok();
     }
 
-    public void sendRedirect(String url) throws IOException {
+    public void sendRedirect(String url) {
         setStatus(302);
         setLocation(url);
         ok();
     }
 
-    public void forward(String basePath, String path) throws NoFileException, IOException {
-        setStatus(200);
-        sendFile(basePath, path);
-        ok();
+    public void forward(String basePath, String path) throws NoFileException {
+        try{
+            setStatus(200);
+            sendFile(basePath, path);
+            ok();
+        }catch (NoFileException e){
+            throw new NoFileException(path);
+        }
+
     }
 
     public Map<String, String> getHeaders() {
