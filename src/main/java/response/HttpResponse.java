@@ -93,7 +93,16 @@ public class HttpResponse {
         }
     }
 
-    public void response(ResponseStatus responseStatus) {
+    public void badRequest() {
+        try {
+            response(new Response400Status());
+        } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
+            logger.error(fsnfe.getMessage());
+            response(new Response404Status());
+        }
+    }
+
+    private void response(ResponseStatus responseStatus) {
         responseStatus.setStatus(dos);
         writeHeader();
         writeBody();
