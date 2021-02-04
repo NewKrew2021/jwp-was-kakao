@@ -1,17 +1,40 @@
 package controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.ResourceLoader;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public class UserListController extends AbstractController {
+    private static final Logger logger = LoggerFactory.getLogger(UserListController.class);
+    private static final String PATH = "/user/list";
+
+    private static UserListController instance;
+
+    private UserListController() {
+    }
+
+    public static UserListController getInstance() {
+        if (instance == null) {
+            instance = new UserListController();
+        }
+        return instance;
+    }
+
+    @Override
+    public boolean match(String path) {
+        return PATH.equals(path);
+    }
+
     @Override
     public String getPath() {
-        return "/user/list";
+        return PATH;
     }
 
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+        // There is no matching action, so it does nothing.
     }
 
     @Override
