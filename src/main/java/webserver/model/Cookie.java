@@ -2,16 +2,17 @@ package webserver.model;
 
 import utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Cookie {
-    private static final String COOKIE_DELIMITER = "=";
-    private static final String COOKIE_STRING_DELIMITER = "; ";
-    private static final String NEW_LINE = "\r\n";
-    private static final String COOKIE_END_WITH = "; Path=/";
-    private static final String COOKIE_START_WITH = "Set-Cookie: ";
+    public static final String COOKIE_DELIMITER = "=";
+    public static final String COOKIE_STRING_DELIMITER = "; ";
+    public static final String COOKIE_END_WITH = "; Path=/";
+    public static final String COOKIE_START_WITH = "Set-Cookie: ";
+    public static final String LOGINED = "logined";
+    public static final String LOGINED_TRUE = "true";
+    public static final String LOGINED_FALSE = "false";
 
     private Map<String, String> cookies = new HashMap<>();
 
@@ -39,11 +40,11 @@ public class Cookie {
         }
 
         String cookieString = StringUtils.concatThree(
-                    COOKIE_START_WITH,
-                    String.join(COOKIE_DELIMITER, key, cookies.get(key)),
-                    COOKIE_END_WITH
-            );
-        return cookieString.concat(NEW_LINE);
+                COOKIE_START_WITH,
+                String.join(COOKIE_DELIMITER, key, cookies.get(key)),
+                COOKIE_END_WITH
+        );
+        return cookieString.concat(StringUtils.NEW_LINE);
     }
 
     public String toString() {
@@ -55,7 +56,7 @@ public class Cookie {
                     String.join(COOKIE_DELIMITER, entry.getKey(), entry.getValue()),
                     COOKIE_END_WITH
             );
-            str = StringUtils.concatThree(str, cookieString, NEW_LINE);
+            str = StringUtils.concatThree(str, cookieString, StringUtils.NEW_LINE);
         }
 
         return str;

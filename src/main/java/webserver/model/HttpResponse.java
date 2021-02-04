@@ -3,8 +3,7 @@ package webserver.model;
 import utils.StringUtils;
 
 public class HttpResponse {
-    private static final String HTTP_VERSION = "HTTP/1.1";
-    private static final String WHITE_SPACE = " ";
+    public static final String HTTP_VERSION = "HTTP/1.1";
 
     private HttpStatus status;
     private HttpHeader header;
@@ -24,13 +23,17 @@ public class HttpResponse {
         header.addCookie(key, value);
     }
 
+    public void setStatus(HttpStatus status) {
+        this.status = status;
+    }
+
     public void setBody(String body) {
         this.body.setBody(body);
     }
 
     public String toString() {
         String startString = String.join(
-                WHITE_SPACE,
+                StringUtils.WHITE_SPACE,
                 HTTP_VERSION,
                 String.valueOf(status.getCode()),
                 status.getMessage()
@@ -41,9 +44,5 @@ public class HttpResponse {
 
 
         return startString + StringUtils.NEW_LINE + headerString + StringUtils.NEW_LINE + bodyString;
-    }
-
-    public void setStatus(HttpStatus status) {
-        this.status = status;
     }
 }

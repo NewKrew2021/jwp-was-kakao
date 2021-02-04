@@ -1,6 +1,7 @@
 package webserver.model;
 
 import utils.IOUtils;
+import utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.InputStreamReader;
 
 
 public class HttpRequest {
-    private static final String HEADER_DELIMITER = "";
+
 
     private HttpMethod method;
     private String path;
@@ -26,7 +27,7 @@ public class HttpRequest {
 
     private void setMethodAndPath(BufferedReader br) throws IOException {
         String line = IOUtils.readLine(br);
-        String[] parsed = line.split(" ");
+        String[] parsed = line.split(StringUtils.WHITE_SPACE);
         method = HttpMethod.of(parsed[0]);
         path = parsed[1];
     }
@@ -38,13 +39,13 @@ public class HttpRequest {
             parameter = new Parameter(parsed[1]);
         }
         if (getMethod().equals(HttpMethod.POST)) {
-            int bodySize = Integer.parseInt(header.getHeader("Content-Length"));
+            int bodySize = Integer.parseInt(header.getHeader(HttpHeader.CONTENT_LENGTH));
             parameter = new Parameter(IOUtils.readData(br, bodySize));
         }
     }
 
     private void setHeader(BufferedReader br) throws IOException {
-        header = new HttpHeader(IOUtils.readUntilDelimiter(br, HEADER_DELIMITER));
+        header = new HttpHeader(IOUtils.readUntilDelimiter(br, HttpHeader.HEADER_END_WITH));
     }
 
     public HttpMethod getMethod() {

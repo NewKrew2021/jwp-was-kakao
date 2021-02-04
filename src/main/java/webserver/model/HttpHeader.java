@@ -1,6 +1,5 @@
 package webserver.model;
 
-import org.checkerframework.checker.units.qual.C;
 import utils.StringUtils;
 
 import java.util.HashMap;
@@ -8,9 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpHeader {
-    private static final String HEADER_DELIMITER = ": ";
-    private static final String NEW_LINE = "\r\n";
-    
+    public static final String HEADER_DELIMITER = ": ";
+    public static final String HEADER_END_WITH = "";
+
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String CONTENT_LOCATION = "Content-Location";
+    public static final String LOCATION = "Location";
+    public static final String COOKIE = "Cookie";
+
     private Map<String, String> headers = new HashMap<>();
     private Cookie cookie = new Cookie();
 
@@ -32,15 +37,15 @@ public class HttpHeader {
     }
 
     private void setHeader(List<String> headerStrings) {
-        for(String headerString : headerStrings) {
+        for (String headerString : headerStrings) {
             headers.put(headerString.split(HEADER_DELIMITER)[0], headerString.split(HEADER_DELIMITER)[1]);
         }
     }
 
     private void setCookie() {
-        if(headers.containsKey("Cookie")) {
-            cookie = new Cookie(headers.get("Cookie"));
-            headers.remove("Cookie");
+        if (headers.containsKey(COOKIE)) {
+            cookie = new Cookie(headers.get(COOKIE));
+            headers.remove(COOKIE);
         }
     }
 
@@ -48,9 +53,6 @@ public class HttpHeader {
         return headers.get(key);
     }
 
-    public List<String> getHeaders() {
-        return (List<String>) headers.values();
-    }
 
     public String getCookie(String key) {
         return cookie.get(key);
@@ -62,11 +64,7 @@ public class HttpHeader {
         }
 
         String headerString = String.join(HEADER_DELIMITER, key, headers.get(key));
-        return headerString.concat(NEW_LINE);
-    }
-
-    public String toStringCookie(String key) {
-        return cookie.toString(key);
+        return headerString.concat(StringUtils.NEW_LINE);
     }
 
     public String toString() {
@@ -74,9 +72,9 @@ public class HttpHeader {
 
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             String headerString = String.join(HEADER_DELIMITER, entry.getKey(), entry.getValue());
-            str = StringUtils.concatThree(str, headerString, NEW_LINE);
+            str = StringUtils.concatThree(str, headerString, StringUtils.NEW_LINE);
         }
-        str = StringUtils.concatThree(str, cookie.toString(), NEW_LINE);
+        str = StringUtils.concatThree(str, cookie.toString(), StringUtils.NEW_LINE);
         return str;
     }
 }

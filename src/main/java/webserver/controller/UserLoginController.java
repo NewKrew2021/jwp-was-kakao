@@ -2,14 +2,11 @@ package webserver.controller;
 
 import db.DataBase;
 import model.User;
+import utils.FileIoUtils;
 import webserver.RequestHandler;
-import webserver.model.HttpRequest;
-import webserver.model.HttpResponse;
-import webserver.model.HttpStatus;
+import webserver.model.*;
 
 public class UserLoginController implements Controller {
-
-    private static final String LOGIN_FAIL_PATH = "/user/login_failed.html";
 
     private static final String path = "/user/login";
 
@@ -19,22 +16,22 @@ public class UserLoginController implements Controller {
 
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
-        String id = httpRequest.getParameter("userId");
-        String password = httpRequest.getParameter("password");
+        String id = httpRequest.getParameter(Parameter.USERID);
+        String password = httpRequest.getParameter(Parameter.PASSWORD);
         User user = DataBase.findUserById(id);
 
-        String logined = "true";
+        String logined = Cookie.LOGINED_TRUE;
         String location = RequestHandler.BASE_URL;
 
         if (user == null || !user.getPassword().equals(password)) {
-            logined = "false";
-            location = LOGIN_FAIL_PATH;
+            logined = Cookie.LOGINED_FALSE;
+            location = FileIoUtils.LOGIN_FAIL_PATH;
         }
 
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.FOUND);
-        httpResponse.addHeader("Location", location);
-        httpResponse.addCookie("logined", logined);
+        httpResponse.addHeader(HttpHeader.LOCATION, location);
+        httpResponse.addCookie(Cookie.LOGINED, logined);
 
         return httpResponse;
     }

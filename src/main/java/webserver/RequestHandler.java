@@ -1,17 +1,16 @@
 package webserver;
 
-import webserver.controller.*;
-import webserver.model.HttpRequest;
-import webserver.model.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.controller.Controller;
+import webserver.model.HttpRequest;
+import webserver.model.HttpResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
@@ -45,14 +44,12 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
-//            HttpResponse httpResponse = new HttpResponse(out);
-//            logger.debug(httpResponse.toString());
-
             Controller controller = controllerMapper.assignController(httpRequest);
 
             HttpResponse httpResponse = controller.service(httpRequest);
 
             String responseString = httpResponse.toString();
+            logger.debug(httpResponse.toString());
 
             writeString(dos, responseString);
 
@@ -62,6 +59,7 @@ public class RequestHandler implements Runnable {
 
 
     }
+
     private void writeString(DataOutputStream dos, String str) throws IOException {
         dos.write(str.getBytes(StandardCharsets.UTF_8));
         dos.flush();

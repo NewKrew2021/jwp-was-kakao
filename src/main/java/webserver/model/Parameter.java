@@ -5,12 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Parameter {
+    public static final String USERID = "userId";
+    public static final String PASSWORD = "password";
+    public static final String NAME = "name";
+    public static final String EMAIL = "email";
 
-    private Map<String, String> parameters;
+    private Map<String, String> parameters = new HashMap<>();
 
     public Parameter(String parameterString) {
-        this.parameters = new HashMap<>();
-        Arrays.stream(parameterString.split("&"))
+        Arrays.stream(
+                parameterString.split("&"))
                 .forEach(rawParameter -> {
                     String[] split = rawParameter.split("=");
                     this.parameters.put(split[0], split[1]);

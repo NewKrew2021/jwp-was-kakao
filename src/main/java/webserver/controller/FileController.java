@@ -1,6 +1,7 @@
 package webserver.controller;
 
 import utils.FileIoUtils;
+import webserver.model.HttpHeader;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
 import webserver.model.HttpStatus;
@@ -9,36 +10,35 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class FileController implements Controller {
-    private final String INDEX = "/index.html";
-    private final String TEMPLATE_BASE_PATH = "./templates";
-    private final String STATIC_BASE_PATH = "./static";
+
 
     public String getPath() {
         return null;
     }
+
 
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
 
 
         String path = httpRequest.getPath();
-        if(path.equals("/")) {
-            path = INDEX;
+        if (path.equals(FileIoUtils.BASE_PATH)) {
+            path = FileIoUtils.INDEX_PATH;
         }
 
         String body = null;
         try {
             body = FileIoUtils.loadFileStringFromClasspath(addBasePath(path));
-        }   catch (IOException e) {
+        } catch (IOException e) {
         } catch (URISyntaxException e) {
         }
 
         HttpResponse httpResponse = new HttpResponse();
 
         httpResponse.setStatus(HttpStatus.OK);
-        httpResponse.addHeader("Content-Type", findContentType(path) + "; charset=utf-8");
-        httpResponse.addHeader("Content-Length", String.valueOf(body.length()));
-        httpResponse.addHeader("Content-Location", path);
+        httpResponse.addHeader(HttpHeader.CONTENT_TYPE, findContentType(path) + "; charset=utf-8");
+        httpResponse.addHeader(HttpHeader.CONTENT_LENGTH, String.valueOf(body.length()));
+        httpResponse.addHeader(HttpHeader.CONTENT_LOCATION, path);
         httpResponse.setBody(body);
 
         return httpResponse;
@@ -61,8 +61,8 @@ public class FileController implements Controller {
                 || path.startsWith("/fonts")
                 || path.startsWith("/images")
                 || path.startsWith("/js")) {
-            return STATIC_BASE_PATH + path;
+            return FileIoUtils.STATIC_PATH + path;
         }
-        return TEMPLATE_BASE_PATH + path;
+        return FileIoUtils.TEMPLATES_PATH + path;
     }
 }

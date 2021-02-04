@@ -1,6 +1,5 @@
 package webserver.model;
 
-
 import java.util.Arrays;
 
 public enum HttpMethod {

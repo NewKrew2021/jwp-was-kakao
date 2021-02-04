@@ -3,10 +3,9 @@ package webserver.model;
 import utils.StringUtils;
 
 public class HttpBody {
-    String body = "";
+    String body;
 
     public HttpBody() {
-
     }
 
     public void setBody(String body) {

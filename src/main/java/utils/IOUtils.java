@@ -14,7 +14,7 @@ public class IOUtils {
     }
 
     public static List<String> readUntilDelimiter(BufferedReader br, String delimiter) throws IOException {
-        List<String> lines  = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
 
         String line = readLine(br);
         while (line != null && !line.equals(delimiter)) {
@@ -27,7 +27,7 @@ public class IOUtils {
 
     public static String readLine(BufferedReader br) throws IOException {
         String line = br.readLine();
-        if(line != null) {
+        if (line != null) {
             return URLDecoder.decode(line, "UTF-8");
         }
         return null;
