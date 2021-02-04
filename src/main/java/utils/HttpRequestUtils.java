@@ -22,11 +22,11 @@ public class HttpRequestUtils {
     }
 
     public static Optional<String> extractParams(String uri) {
-        String[] tmp = uri.split(PARAMETER_START_REGEX);
-        if (tmp.length < MINIMUM_LENGTH_OF_PARAM_EXIST) {
+        String[] splitLine = uri.split(PARAMETER_START_REGEX);
+        if (splitLine.length < MINIMUM_LENGTH_OF_PARAM_EXIST) {
             return Optional.empty();
         }
-        return Optional.of(tmp[PARAMS_INDEX_IN_URI]);
+        return Optional.of(splitLine[PARAMS_INDEX_IN_URI]);
     }
 
     public static Map<String, String> requestStringToMap(String line) {
@@ -34,13 +34,13 @@ public class HttpRequestUtils {
         String[] splitString = line.split(DISTINGUISH_REGEX);
         for (String pair : splitString) {
             String[] splitPair = pair.split(EQUALS_REGEX);
-            isInvalidRequest(splitPair);
+            validatePairExist(splitPair);
             result.put(splitPair[KEY_INDEX], splitPair[VALUE_INDEX]);
         }
         return result;
     }
 
-    private static void isInvalidRequest(String[] splitPair) {
+    private static void validatePairExist(String[] splitPair) {
         if(splitPair.length < MINIMUM_LENGTH_OF_PARAM_EXIST) {
             throw new InvalidRequestException();
         }
