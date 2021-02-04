@@ -1,5 +1,7 @@
 package webserver.domain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import utils.IOUtils;
 
@@ -10,8 +12,11 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpRequest {
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+
     private Map<String, String> headers;
     private Map<String, String> parameters;
     private String body;
@@ -22,9 +27,9 @@ public class HttpRequest {
         this.headers = new HashMap<>();
         this.parameters = new HashMap<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
         String[] requestLine = reader.readLine().split(" ");
         String requestUrl = requestLine[1];
+
         parseParameterByQueryString(requestUrl);
         parseHeaders(reader);
 

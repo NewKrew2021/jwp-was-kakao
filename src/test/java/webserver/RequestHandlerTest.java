@@ -1,5 +1,6 @@
 package webserver;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -8,8 +9,7 @@ import org.springframework.http.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Objects;
+import webserver.domain.HandlebarsTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -41,7 +41,8 @@ public class RequestHandlerTest {
     void request_resttemplate_요구사항2() {
         RestTemplate restTemplate = new RestTemplate();
         String resourceUrl = "http://localhost:8080";
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + "/user/form.html", String.class);
+        String url = "/user/form.html";
+        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + url, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         printResponse(response);
     }

@@ -1,4 +1,4 @@
-package webserver;
+package webserver.domain;
 
 import org.junit.jupiter.api.Test;
 import webserver.domain.HttpMethod;
