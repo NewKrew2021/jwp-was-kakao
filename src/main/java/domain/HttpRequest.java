@@ -11,52 +11,63 @@ import java.util.Map;
 
 public class HttpRequest {
 
-    public static final String NO_KEY = "No Key";
     public static final String HEADER_DELIMITER = ": ";
     public static final String CONTENT_LENGTH = "Content-Length";
 
-    private final HttpRequestStartLine startLine;
-    private final Map<String, String> headers = new HashMap<>();
-    private Map<String, String> parameters = new HashMap<>();
+    private final HttpRequestStartLine httpRequestStartLine;
+    private final HttpHeaders httpHeaders;
+    private final HttpParameters httpParameters;
 
-    public HttpRequest(BufferedReader br) throws IOException {
-        startLine = HttpRequestStartLine.of(br.readLine());
-        if (startLine.hasParameter()) {
-            parameters = KeyValueTokenizer.of(startLine.getParameter());
+    private HttpRequest(HttpRequestStartLine startLine, HttpHeaders httpHeaders, HttpParameters httpParameters) {
+        this.httpRequestStartLine = startLine;
+        this.httpHeaders = httpHeaders;
+        this.httpParameters = httpParameters;
+    }
+
+    public static HttpRequest from(BufferedReader br) throws IOException {
+        HttpRequestStartLine startLine = HttpRequestStartLine.of(br.readLine());
+        if (!startLine.hasParameter()) {
+            return new HttpRequest(startLine, null, null);
         }
 
+        Map<String, String> params = KeyValueTokenizer.of(startLine.getParameter());
+        Map<String, String> headers = new HashMap<>();
         String headerLine;
         while ((headerLine = br.readLine()) != null && !headerLine.isEmpty()) {
-            addHeader(headerLine);
+            addHeader(headers, headerLine);
         }
 
         if (headers.containsKey(CONTENT_LENGTH)) {
-            parameters.putAll(KeyValueTokenizer.of(IOUtils.readData(br, Integer.parseInt(headers.get(CONTENT_LENGTH)))));
+            params.putAll(KeyValueTokenizer.of(IOUtils.readData(br, Integer.parseInt(headers.get(CONTENT_LENGTH)))));
         }
+
+        HttpHeaders httpHeaders = new HttpHeaders(headers);
+        HttpParameters httpParameters = new HttpParameters(params);
+        return new HttpRequest(startLine, httpHeaders, httpParameters);
     }
 
-    private void addHeader(String line) {
+    private static void addHeader(Map<String, String> headers, String line) {
         String[] header = line.split(HEADER_DELIMITER);
         headers.put(header[0], header[1]);
     }
 
     public String getHeader(String key) {
-        return headers.getOrDefault(key, NO_KEY);
+        return httpHeaders.getHeader(key);
     }
 
     public String getParameter(String key) {
-        return parameters.getOrDefault(key, NO_KEY);
+        return httpParameters.getParameter(key);
     }
 
     public HttpMethod getMethod() {
-        return startLine.getMethod();
+        return httpRequestStartLine.getMethod();
     }
 
     public String getUrl() {
-        return startLine.getUrl();
+        return httpRequestStartLine.getUrl();
     }
 
     public Map<String, String> getParameters() {
-        return parameters;
+        return httpParameters.getParams();
     }
 }

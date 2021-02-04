@@ -1,8 +1,8 @@
 package model;
 
+import domain.HttpRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.HttpRequest;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +21,7 @@ class UserTest {
 
         InputStream stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         try {
-            HttpRequest httpRequest = new HttpRequest(new BufferedReader(new InputStreamReader(stream)));
+            HttpRequest httpRequest = HttpRequest.from(new BufferedReader(new InputStreamReader(stream)));
             User user = new User(httpRequest.getParameters());
             assertThat(user.getUserId()).isEqualTo("javajigi");
             assertThat(user.getPassword()).isEqualTo("password");
