@@ -1,4 +1,4 @@
-package webserver.controller;
+package controller;
 
 import utils.FileIoUtils;
 import http.HttpRequest;

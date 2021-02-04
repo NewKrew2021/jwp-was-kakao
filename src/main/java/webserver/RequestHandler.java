@@ -1,10 +1,10 @@
 package webserver;
 
+import controller.*;
 import http.HttpRequest;
 import http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.controller.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +19,12 @@ public class RequestHandler implements Runnable {
     private Map<String, Controller> controllers;
 
     public RequestHandler(Socket connectionSocket) {
-        this.connection = connectionSocket;
+        connection = connectionSocket;
         controllers = new HashMap<>();
+        AllocateUrlAtControllers();
+    }
+
+    private void AllocateUrlAtControllers() {
         controllers.put("/user/create", new CreateUserController() );
         controllers.put("/user/login" , new LoginController());
         controllers.put("/user/list.html" , new ListUserController());

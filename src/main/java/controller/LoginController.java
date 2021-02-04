@@ -1,10 +1,13 @@
-package webserver.controller;
+package controller;
 
 import db.DataBase;
 import http.HttpRequest;
 import http.HttpResponse;
 
 public class LoginController extends AbstractController {
+
+
+
     @Override
     protected void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         super.doPost(httpRequest, httpResponse);
@@ -13,10 +16,10 @@ public class LoginController extends AbstractController {
 
         if (login) {
             httpResponse.login();
-            httpResponse.sendRedirect("/index.html");
+            httpResponse.sendRedirect(INDEX_HTML);
             return;
         }
 
-        httpResponse.sendRedirect("/user/login_failed.html");
+        httpResponse.sendRedirect(LOGIN_FAIL_PAGE);
     }
 }

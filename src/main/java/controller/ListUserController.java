@@ -1,4 +1,4 @@
-package webserver.controller;
+package controller;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListUserController extends AbstractController {
+
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         super.doGet(httpRequest, httpResponse);
         if (!isPossibleAccessUserList(httpRequest.getPath())) {
-            httpResponse.sendRedirect("/user/login.html");
+            httpResponse.sendRedirect(USER_LOGIN_URL);
             return;
         }
 
