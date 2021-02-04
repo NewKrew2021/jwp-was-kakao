@@ -31,12 +31,12 @@ public class HttpResponse {
     }
 
     public void sendRedirect(String url) {
-        addHeader("Location", "http://localhost:8080" + url);
+        addHeader("Location", url);
         response302Header();
     }
 
-    public void setCookie(String cookie){
-        addHeader("Set-Cookie", "logined=" + cookie + "; Path=/");
+    public void setCookie(String cookie, String scope){
+        addHeader("Set-Cookie", cookie + scope);
     }
 
     private void response200Header() {

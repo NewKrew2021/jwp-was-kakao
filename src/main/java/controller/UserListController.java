@@ -16,15 +16,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserListController extends AbstractController {
-    private static final String LOGIN_URL = "/user/login.html";
-    private static final String LIST_URL = "/user/list";
+    private static final String DIRECT_LOGIN_URL = "http://localhost:8080/user/login.html";
+    private static final String LIST_URL = "user/list";
     private static final String TEMPLATES_PREFIX = "/templates";
     private static final String HTML_SUFFIX = ".html";
+    private static final String LOGIN_SUCCESS = "logined=true";
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         if(!isLogin(httpRequest.getHeader("Cookie"))){
-            httpResponse.sendRedirect(LOGIN_URL);
+            httpResponse.sendRedirect(DIRECT_LOGIN_URL);
             return;
         }
 
@@ -35,11 +36,7 @@ public class UserListController extends AbstractController {
     }
 
     private boolean isLogin(String loginCookie) {
-        try{
-            return Boolean.parseBoolean(loginCookie.split("=")[1]);
-        } catch (NullPointerException e){
-            return false;
-        }
+        return loginCookie != null && loginCookie.equals(LOGIN_SUCCESS) ;
     }
 
     private String parseHtml() throws IOException {
