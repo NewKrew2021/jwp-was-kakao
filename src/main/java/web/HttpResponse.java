@@ -30,15 +30,15 @@ public class HttpResponse {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(HTTP_1_1).append(httpStatus.value()).append(" ").append(httpStatus.getReasonPhrase()).append(IOUtils.NEW_LINE);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(HTTP_1_1).append(httpStatus.value()).append(" ").append(httpStatus.getReasonPhrase()).append(IOUtils.NEW_LINE);
         if (!httpHeaders.isEmpty()) {
-            sb.append(httpHeaders);
+            stringBuilder.append(httpHeaders);
         }
         if (!httpBody.equals(HttpBody.empty())) {
-            sb.append(IOUtils.NEW_LINE).append(httpBody.getBody()).append(IOUtils.NEW_LINE);
+            stringBuilder.append(IOUtils.NEW_LINE).append(httpBody.getBody()).append(IOUtils.NEW_LINE);
         }
 
-        return sb.toString();
+        return stringBuilder.toString();
     }
 }

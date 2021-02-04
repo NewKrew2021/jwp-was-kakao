@@ -27,12 +27,12 @@ public class HttpRequest {
     }
 
     public static HttpRequest of(InputStream in) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        List<String> lines = IOUtils.readUntilEmptyLine(br);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+        List<String> lines = IOUtils.readUntilEmptyLine(bufferedReader);
         String[] startLine = lines.get(START_LINE).split(START_LINE_DELIMITER);
         HttpHeaders httpHeaders = HttpHeaders.of(lines.subList(START_LINE + 1, lines.size()));
 
-        return new HttpRequest(HttpMethod.valueOf(startLine[METHOD]), httpHeaders, HttpUrl.of(startLine[URL]), HttpBody.of(httpHeaders, br));
+        return new HttpRequest(HttpMethod.valueOf(startLine[METHOD]), httpHeaders, HttpUrl.of(startLine[URL]), HttpBody.of(httpHeaders, bufferedReader));
     }
 
     public boolean hasSameMethod(HttpMethod httpMethod) {

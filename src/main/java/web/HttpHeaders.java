@@ -49,10 +49,10 @@ public class HttpHeaders {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         for (Map.Entry<String, String> entry : headers.entrySet()) {
-            sb.append(entry.getKey()).append(DELIMITER).append(entry.getValue()).append(IOUtils.NEW_LINE);
+            stringBuilder.append(entry.getKey()).append(DELIMITER).append(entry.getValue()).append(IOUtils.NEW_LINE);
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 }

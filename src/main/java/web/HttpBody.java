@@ -14,13 +14,13 @@ public class HttpBody {
         this.body = body;
     }
 
-    public static HttpBody of(HttpHeaders httpHeaders, BufferedReader br) {
+    public static HttpBody of(HttpHeaders httpHeaders, BufferedReader bufferedReader) {
         String contentLength = httpHeaders.get(HttpHeaders.CONTENT_LENGTH);
         if (contentLength == null) {
             return HttpBody.empty();
         }
 
-        String body = IOUtils.readData(br, Integer.parseInt(contentLength));
+        String body = IOUtils.readData(bufferedReader, Integer.parseInt(contentLength));
         String contentType = httpHeaders.get(HttpHeaders.CONTENT_TYPE);
 
         if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(contentType)) {

@@ -14,10 +14,10 @@ public class IOUtils {
      * @return
      * @throws IOException
      */
-    public static String readData(BufferedReader br, int contentLength) {
+    public static String readData(BufferedReader bufferedReader, int contentLength) {
         try {
             char[] body = new char[contentLength];
-            br.read(body, 0, contentLength);
+            bufferedReader.read(body, 0, contentLength);
             return String.copyValueOf(body);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
