@@ -98,6 +98,6 @@ public class Request {
 
     public boolean isLogin() {
         String cookie = Optional.ofNullable(requestHeader.get("Cookie")).orElse("logined=false");
-        return cookie.equals("logined=true");
+        return cookie.contains("logined=true");
     }
 }
