@@ -1,4 +1,4 @@
-package domain;
+package http;
 
 public enum ContentType {
     HTML("text/html", ".html"),

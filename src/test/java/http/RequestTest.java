@@ -1,6 +1,6 @@
-package domain;
+package http;
 
-import org.assertj.core.data.MapEntry;
+import http.request.Request;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

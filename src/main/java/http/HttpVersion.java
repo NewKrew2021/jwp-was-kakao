@@ -1,4 +1,4 @@
-package domain;
+package http;
 
 public enum HttpVersion {
     HTTP1_1("1.1"), HTTP2("2");

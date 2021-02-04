@@ -1,9 +1,8 @@
 package controller;
 
 import db.DataBase;
-import domain.Dispatcher;
-import domain.Request;
-import domain.Response;
+import http.request.Request;
+import http.response.Response;
 import model.User;
 
 public class LoginController {

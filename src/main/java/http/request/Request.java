@@ -1,4 +1,6 @@
-package domain;
+package http.request;
+
+import http.Cookies;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

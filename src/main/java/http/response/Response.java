@@ -1,4 +1,6 @@
-package domain;
+package http.response;
+
+import http.*;
 
 import java.nio.charset.StandardCharsets;
 

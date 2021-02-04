@@ -1,4 +1,7 @@
-package domain;
+package controller;
+
+import http.request.Request;
+import http.response.Response;
 
 import java.util.HashMap;
 import java.util.Map;

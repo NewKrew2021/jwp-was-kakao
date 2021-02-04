@@ -1,8 +1,8 @@
 package utils;
 
-import domain.ContentType;
-import domain.Response;
-import domain.ResponseBody;
+import http.ContentType;
+import http.response.Response;
+import http.response.ResponseBody;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

@@ -1,4 +1,6 @@
-package domain;
+package http.request;
+
+import http.Cookies;
 
 import java.util.HashMap;
 import java.util.List;

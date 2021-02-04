@@ -1,4 +1,4 @@
-package domain;
+package http;
 
 public enum StatusCode {
     OK(200, "OK"), FOUND(302, "Found");

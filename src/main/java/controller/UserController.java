@@ -5,10 +5,9 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
-import domain.Dispatcher;
-import domain.Request;
-import domain.Response;
-import domain.ResponseBody;
+import http.request.Request;
+import http.response.Response;
+import http.response.ResponseBody;
 import model.User;
 
 import java.util.ArrayList;
