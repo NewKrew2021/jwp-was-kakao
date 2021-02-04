@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class Parameters {
+    private static final int SHOULD_CONTAIN_ONLY_KEY_AND_VALUE = 2;
     private static final String EMPTY_PARAMETER = "";
     private final Map<String, String> parameters = Maps.newHashMap();
 
@@ -17,11 +18,11 @@ public class Parameters {
     }
 
     public void saveParameter(String parameterValue) {
-        if (parameterValue.isEmpty()) {
+        String[] parameterAndValue = parameterValue.split("=");
+        if (!isValidParameter(parameterAndValue)) {
             return;
         }
 
-        String[] parameterAndValue = parameterValue.split("=");
         String key = parameterAndValue[0];
         String value = parameterAndValue[1];
 
@@ -30,5 +31,10 @@ public class Parameters {
 
     public String get(String parameter) {
         return parameters.getOrDefault(parameter, EMPTY_PARAMETER);
+    }
+
+    private boolean isValidParameter(String[] parameterAndValue) {
+        return parameterAndValue.length == SHOULD_CONTAIN_ONLY_KEY_AND_VALUE
+                && !parameterAndValue[1].isEmpty();
     }
 }
