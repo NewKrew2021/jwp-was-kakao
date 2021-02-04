@@ -1,8 +1,8 @@
 package controller;
 
 import exception.utils.NoFileException;
-import model.HttpRequest;
-import model.HttpResponse;
+import model.request.HttpRequest;
+import model.response.HttpResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,12 +18,12 @@ public class ViewController extends Controller {
         putHandler("/.*", "GET", this::handleView);
     }
 
-    public void handleFile(HttpRequest request, OutputStream out) throws NoFileException, IOException {
-        HttpResponse.of(out).forward("./static", request.getPath());
+    public void handleFile(HttpRequest request, HttpResponse response) throws NoFileException, IOException {
+        response.forward("./static", request.getPath());
     }
 
-    public void handleView(HttpRequest request, OutputStream out) throws NoFileException, IOException {
-        HttpResponse.of(out).forward("./templates",
+    public void handleView(HttpRequest request, HttpResponse response) throws NoFileException, IOException {
+        response.forward("./templates",
                 (request.getPath().equals("/") ? "/index.html" : request.getPath()));
     }
 }

@@ -1,4 +1,4 @@
-package model;
+package model.response;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -3,7 +3,8 @@ package controller;
 import controller.error.ErrorHandlerFactory;
 import controller.handler.Handler;
 import exception.utils.NoFileException;
-import model.HttpRequest;
+import model.request.HttpRequest;
+import model.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
@@ -27,24 +28,25 @@ public class ControllerManager {
     public static void runControllers(Socket connection) {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = new HttpRequest(in);
+            HttpResponse httpResponse = HttpResponse.of(out);
             List<Controller> selectedControllers = controllers.stream()
                     .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
                     .collect(Collectors.toList());
-            handleRequest(out, httpRequest, selectedControllers);
+            handleRequest(httpRequest, httpResponse, selectedControllers);
         } catch (IOException e) {
             log.error("{} {}", e.getMessage(), e.getStackTrace());
         }
     }
 
-    private static void handleRequest(OutputStream out, HttpRequest httpRequest, List<Controller> controllers) {
+    private static void handleRequest(HttpRequest httpRequest, HttpResponse httpResponse, List<Controller> controllers) {
         try {
             for (Controller controller : controllers) {
-                if (controller.handle(httpRequest, out)) return;
+                if (controller.handle(httpRequest, httpResponse)) return;
             }
         } catch (NoFileException | IOException | RuntimeException e) {
             Handler errorHandler = ErrorHandlerFactory.getHandler(e);
             try {
-                errorHandler.handle(httpRequest, out);
+                errorHandler.handle(httpRequest, httpResponse);
                 log.warn(e.getMessage());
             } catch (Exception handleError) {
                 log.error("{} {}", handleError.getMessage(), handleError.getStackTrace());

@@ -1,12 +1,12 @@
 package controller.handler;
 
 import exception.utils.NoFileException;
-import model.HttpRequest;
+import model.request.HttpRequest;
+import model.response.HttpResponse;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 @FunctionalInterface
 public interface Handler {
-    void handle(HttpRequest request, OutputStream out) throws NoFileException, IOException;
+    void handle(HttpRequest request, HttpResponse response) throws NoFileException, IOException;
 }

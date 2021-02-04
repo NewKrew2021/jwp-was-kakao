@@ -1,6 +1,7 @@
 package model;
 
 import exception.utils.NoFileException;
+import model.response.HttpResponse;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;

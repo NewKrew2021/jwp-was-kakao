@@ -1,16 +1,13 @@
 package controller;
 
 import controller.handler.SecuredHandler;
-import db.DataBase;
-import model.HttpRequest;
-import model.HttpResponse;
-import model.User;
+import model.request.HttpRequest;
+import model.response.HttpResponse;
 import service.UserService;
 import view.View;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 
 public class UserController extends Controller {
     {
@@ -23,25 +20,25 @@ public class UserController extends Controller {
 
     private UserService userService = new UserService();
 
-    public void handleCreate(HttpRequest request, OutputStream out) {
+    public void handleCreate(HttpRequest request, HttpResponse response) {
         userService.addUser(request.getParsedBody());
-        HttpResponse.of(out).sendRedirect("/index.html");
+        response.sendRedirect("/index.html");
     }
 
-    public void handleLogin(HttpRequest request, OutputStream out) {
+    public void handleLogin(HttpRequest request, HttpResponse response) {
         if (!userService.login(request.getParsedBody())) {
-            HttpResponse.of(out).setCookie("logined=false").sendRedirect("/user/login_failed.html");
+            response.setCookie("logined=false").sendRedirect("/user/login_failed.html");
             return;
         }
-        HttpResponse.of(out).setCookie("logined=true").sendRedirect("/index.html");
+        response.setCookie("logined=true").sendRedirect("/index.html");
     }
 
-    public void handleUserList(HttpRequest request, OutputStream out) throws IOException {
+    public void handleUserList(HttpRequest request, HttpResponse response) throws IOException {
         byte[] body = View.getUsersView(userService.findAll(), "/user/list");
-        HttpResponse.of(out).sendView(body);
+        response.sendView(body);
     }
 
-    public void handleLogout(HttpRequest request, OutputStream out) throws IOException {
-        HttpResponse.of(out).setCookie("logined=false").sendRedirect("/index.html");
+    public void handleLogout(HttpRequest request, HttpResponse response) throws IOException {
+        response.setCookie("logined=false").sendRedirect("/index.html");
     }
 }

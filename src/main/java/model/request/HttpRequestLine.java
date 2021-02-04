@@ -1,6 +1,7 @@
-package model;
+package model.request;
 
 import exception.http.IllegalHttpRequestException;
+import model.HttpMethod;
 
 import java.util.Arrays;
 import java.util.HashMap;
