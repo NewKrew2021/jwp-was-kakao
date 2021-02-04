@@ -3,6 +3,7 @@ package dto;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class HttpRequest {
         }
     }
 
-    public HttpRequest(InputStream in){
+    public HttpRequest(InputStream in) throws IOException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String lines = "";
@@ -50,8 +51,8 @@ public class HttpRequest {
                 setBody(IOUtils.readData(br, getContentLength()));
             }
 
-        } catch (Exception e){
-
+        } catch (IOException e){
+            throw new IOException("Http request를 읽는 과정에서 exception이 발생하였습니다.");
         }
     }
 
