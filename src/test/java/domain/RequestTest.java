@@ -17,6 +17,8 @@ public class RequestTest {
             , "Host: localhost:8080"
             , "Connection: keep-alive"
             , "Accept: */*"
+            , ""
+            , ""
     );
 
     @DisplayName("urlPath 확인")
