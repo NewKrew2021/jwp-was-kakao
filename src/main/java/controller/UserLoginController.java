@@ -20,6 +20,12 @@ public class UserLoginController extends AbstractController {
     private static final String SCOPE = "; Path=/";
 
     @Override
+    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
+        byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + httpRequest.getPath());
+        httpResponse.forward(body);
+    }
+
+    @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         String userId = httpRequest.getParameter(USER_ID);
         String password = httpRequest.getParameter(USER_PASSWORD);

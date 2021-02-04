@@ -27,19 +27,14 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
             HttpRequest httpRequest = new HttpRequest(br);
             HttpResponse httpResponse = new HttpResponse(new DataOutputStream(out));
             httpResponse.addHeader("Content-Type", getContentType(httpRequest));
 
-
-            String path = parsePath(httpRequest.getPath());
-
-            Controller controller = ControllerEntity.getControllers(path);
+            Controller controller = ControllerEntity.getControllers(httpRequest.getPath());
             controller.service(httpRequest, httpResponse);
-
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
@@ -47,16 +42,7 @@ public class RequestHandler implements Runnable {
 
     
     private String getContentType(HttpRequest httpRequest) {
-        return httpRequest.getHeader("Accept").split(",")[0] + ";charset=utf-8";
-    }
-
-    private String parsePath(String path) {
-        String prefix = path.split("/")[1];
-
-        if (prefix.equals("js") || prefix.equals("css") || prefix.equals("fonts")){
-            return "/" + prefix;
-        }
-        return path;
+        return httpRequest.getHeader("Accept").split(",")[0];
     }
     
 }
