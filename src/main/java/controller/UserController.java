@@ -5,6 +5,7 @@ import http.HttpRequest;
 import http.HttpResponse;
 import model.User;
 import db.DataBase;
+import utils.FileIoUtils;
 import utils.HttpUtils;
 import utils.TemplateUtils;
 
@@ -38,8 +39,8 @@ public class UserController extends Controller {
         DataBase.addUser(user);
 
         return new HttpResponse.Builder()
-                .setStatus("HTTP/1.1 302 Found")
-                .setRedirect("/index.html")
+                .status("HTTP/1.1 302 Found")
+                .redirect("/index.html")
                 .build();
     };
 
@@ -49,15 +50,15 @@ public class UserController extends Controller {
         User user = DataBase.findUserById(params.get("userId"));
         if (user != null && user.getPassword().equals(params.get("password"))) {
             return new HttpResponse.Builder()
-                    .setStatus("HTTP/1.1 302 Found")
-                    .setRedirect("/index.html")
-                    .setHeader("Set-Cookie", "logined=true; Path=/")
+                    .status("HTTP/1.1 302 Found")
+                    .redirect("/index.html")
+                    .header("Set-Cookie", "logined=true; Path=/")
                     .build();
         }
         return new HttpResponse.Builder()
-                .setStatus("HTTP/1.1 302 Found")
-                .setRedirect("/user/login_failed.html")
-                .setHeader("Set-Cookie", "logined=false; Path=/")
+                .status("HTTP/1.1 302 Found")
+                .redirect("/user/login_failed.html")
+                .header("Set-Cookie", "logined=false; Path=/")
                 .build();
     };
 
@@ -69,13 +70,15 @@ public class UserController extends Controller {
             params.put("users", DataBase.findAll());
 
             return new HttpResponse.Builder()
-                    .setStatus("HTTP/1.1 200 OK")
-                    .setHtml(TemplateUtils.buildPage(request.getUri(), params))
+                    .status("HTTP/1.1 200 OK")
+                    .body(TemplateUtils.buildPage(request.getUri(), params),
+                            FileIoUtils.getMimeType("./templates/index.html")
+                    )
                     .build();
         }
         return new HttpResponse.Builder()
-                .setStatus("HTTP/1.1 302 Found")
-                .setRedirect("/user/login.html")
+                .status("HTTP/1.1 302 Found")
+                .redirect("/user/login.html")
                 .build();
     };
 

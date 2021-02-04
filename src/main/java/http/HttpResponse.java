@@ -22,10 +22,6 @@ public class HttpResponse {
         return httpStatus;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
     public byte[] getBody() {
         return body;
     }
@@ -33,7 +29,7 @@ public class HttpResponse {
     public String headersToString() {
         StringBuilder sb = new StringBuilder();
         headers.keySet().forEach(key -> {
-            sb.append(key +": " + headers.get(key) + " \r\n");
+            sb.append(key + ": " + headers.get(key) + " \r\n");
         });
         return sb.toString();
     }
@@ -43,39 +39,25 @@ public class HttpResponse {
         private Map<String, String> headers = new HashMap<>();
         private byte[] body;
 
-        public Builder setStatus(String httpStatus) {
+        public Builder status(String httpStatus) {
             this.httpStatus = httpStatus;
             return this;
         }
 
-        public Builder setHtml(String path) throws IOException, URISyntaxException {
-            this.body = FileIoUtils.loadFileFromClasspath(path);
-            headers.put("Content-Type", "text/html;charset=utf-8");
-            headers.put("Content-Length", String.valueOf(body.length));
-            return this;
-        }
-
-        public Builder setHtml(byte[] body) {
+        public Builder body(byte[] body, String mimeType) throws IOException, URISyntaxException {
             this.body = body;
-            headers.put("Content-Type", "text/html;charset=utf-8");
+            headers.put("Content-Type", mimeType);
             headers.put("Content-Length", String.valueOf(body.length));
             return this;
         }
 
-        public Builder setCss(String path) throws IOException, URISyntaxException {
-            this.body = FileIoUtils.loadFileFromClasspath(path);
-            headers.put("Content-Type", "text/css;charset=utf-8");
-            headers.put("Content-Length", String.valueOf(body.length));
-            return this;
-        }
-
-        public Builder setRedirect(String location) {
-            headers.put("Location", location);
-            return this;
-        }
-
-        public Builder setHeader(String key, String value) {
+        public Builder header(String key, String value) {
             headers.put(key, value);
+            return this;
+        }
+
+        public Builder redirect(String location) {
+            headers.put("Location", location);
             return this;
         }
 

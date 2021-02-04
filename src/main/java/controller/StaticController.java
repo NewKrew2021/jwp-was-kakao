@@ -3,10 +3,12 @@ package controller;
 import annotation.web.RequestMethod;
 import http.HttpRequest;
 import http.HttpResponse;
+import utils.FileIoUtils;
 
 import java.util.Optional;
 
 public class StaticController extends Controller {
+    private static final String prefix = "./static";
 
     @Override
     public Optional<Handler> getResponsibleHandler(HttpRequest request) {
@@ -18,8 +20,11 @@ public class StaticController extends Controller {
         return Optional.empty();
     }
 
-    public static Handler cssHandler = (request) -> new HttpResponse.Builder()
-            .setStatus("HTTP/1.1 200 OK")
-            .setCss("./static" + request.getUri())
-            .build();
+    public static Handler cssHandler = (request) -> {
+        String path = prefix + request.getUri();
+        return new HttpResponse.Builder()
+                .status("HTTP/1.1 200 OK")
+                .body(FileIoUtils.loadFileFromClasspath(path), FileIoUtils.getMimeType(path))
+                .build();
+    };
 }

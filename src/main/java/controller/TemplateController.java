@@ -3,10 +3,12 @@ package controller;
 import annotation.web.RequestMethod;
 import http.HttpRequest;
 import http.HttpResponse;
+import utils.FileIoUtils;
 
 import java.util.Optional;
 
 public class TemplateController extends Controller {
+    private static final String prefix = "./templates";
 
     @Override
     public Optional<Handler> getResponsibleHandler(HttpRequest request) {
@@ -19,13 +21,19 @@ public class TemplateController extends Controller {
         return Optional.empty();
     }
 
-    public static Handler htmlHandler = (request) -> new HttpResponse.Builder()
-            .setStatus("HTTP/1.1 200 OK")
-            .setHtml("./templates" + request.getUri())
-            .build();
+    public static Handler htmlHandler = (request) -> {
+        String path = prefix + request.getUri();
+        return new HttpResponse.Builder()
+                .status("HTTP/1.1 200 OK")
+                .body(FileIoUtils.loadFileFromClasspath(path), FileIoUtils.getMimeType(path))
+                .build();
+    };
 
-    public static Handler faviconHandler = (request) -> new HttpResponse.Builder()
-            .setStatus("HTTP/1.1 200 OK")
-            .setCss("./templates" + request.getUri())
-            .build();
+    public static Handler faviconHandler = (request) -> {
+        String path = prefix + request.getUri();
+        return new HttpResponse.Builder()
+                .status("HTTP/1.1 200 OK")
+                .body(FileIoUtils.loadFileFromClasspath(path), FileIoUtils.getMimeType(path))
+                .build();
+    };
 }
