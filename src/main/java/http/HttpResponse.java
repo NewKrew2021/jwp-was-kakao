@@ -1,13 +1,17 @@
 package http;
 
-import utils.FileIoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
+
     private String httpStatus;
     private Map<String, String> headers;
     private byte[] body;
@@ -18,15 +22,21 @@ public class HttpResponse {
         this.body = body;
     }
 
-    public String getHttpStatus() {
-        return httpStatus;
+    public void sendResponse(DataOutputStream dos) {
+        try {
+            dos.writeBytes(httpStatus + " \r\n");
+            dos.writeBytes(headersToString());
+            dos.writeBytes("\r\n");
+            if (body != null) {
+                dos.write(body, 0, body.length);
+            }
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
     }
 
-    public byte[] getBody() {
-        return body;
-    }
-
-    public String headersToString() {
+    private String headersToString() {
         StringBuilder sb = new StringBuilder();
         headers.keySet().forEach(key -> {
             sb.append(key + ": " + headers.get(key) + " \r\n");
