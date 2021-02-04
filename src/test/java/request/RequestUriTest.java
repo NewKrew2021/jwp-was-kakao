@@ -17,17 +17,17 @@ public class RequestUriTest {
 
     @BeforeEach
     public void setup() {
-        String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n";
+        String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1";
         requestUri = RequestUri.from(line);
     }
 
     @DisplayName("request line의 유효성을 검사한다.")
     @Test
     public void 유효성_테스트() {
-        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET /user/create HATP/1.1\n"));
-        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET /user/create       HTTP/1.1\n"));
-        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET /user/createHTTP/1.1\n"));
-        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET /user/create HTTP/1.1"));
+        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET /user/create HATP/1.1"));
+        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET /user/create       HTTP/1.1"));
+        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET /user/createHTTP/1.1"));
+        assertThrows(InvalidRequestLineException.class, () -> RequestUri.from("GET/user/create HTTP/1.1"));
     }
 
     @DisplayName("주어진 첫 라인에서 메서드를 추출하여 getRequestMethod 로 이를 반환한다.")

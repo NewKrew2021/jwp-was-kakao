@@ -16,7 +16,7 @@ public class RequestUri {
 
     private static final int METHOD_INDEX_IN_LINE = 0;
     private static final int URI_INDEX_IN_LINE = 1;
-    private static final String REQUEST_LINE_PATTERN = "\\S+ /\\S+ HTTP/1.1\n";
+    private static final String REQUEST_LINE_PATTERN = "\\S+ /\\S+ HTTP/1.1";
 
     private RequestMethod requestMethod;
     private String path;

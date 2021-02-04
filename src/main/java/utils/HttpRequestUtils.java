@@ -41,7 +41,7 @@ public class HttpRequestUtils {
     }
 
     private static void validatePairExist(String[] splitPair) {
-        if(splitPair.length < MINIMUM_LENGTH_OF_PARAM_EXIST) {
+        if (splitPair.length < MINIMUM_LENGTH_OF_PARAM_EXIST) {
             throw new InvalidRequestException();
         }
     }
