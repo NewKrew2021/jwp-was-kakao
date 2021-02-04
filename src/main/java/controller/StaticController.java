@@ -14,8 +14,9 @@ public class StaticController extends AbstractController {
     private static final String STATIC_FILE_PATH = "src/main/resources/static";
     private static final String TEMPLATES_PATH_PREFIX = "./templates";
     private static final String STATIC_PATH_PREFIX = "./static";
+
     private static final String HTML = "html";
-    public static final String CSS = "css";
+    private static final String CSS = "css";
 
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
@@ -25,14 +26,13 @@ public class StaticController extends AbstractController {
         if (fileExist(STATIC_FILE_PATH, httpRequest.getPath())) {
             makeResponse(STATIC_PATH_PREFIX, httpRequest.getPath(), httpResponse, CSS);
         }
-
     }
 
-    private boolean fileExist(String filePath, String uri) {
+    private static boolean fileExist(String filePath, String uri) {
         return new File(filePath + uri).exists();
     }
 
-    private void makeResponse(String filePathPrefix, String uri, HttpResponse httpResponse, String type) {
+    private static void makeResponse(String filePathPrefix, String uri, HttpResponse httpResponse, String type) {
         byte[] body = new byte[0];
         try {
             body = FileIoUtils.loadFileFromClasspath(filePathPrefix + uri);
