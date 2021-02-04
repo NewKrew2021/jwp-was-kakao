@@ -22,7 +22,7 @@ public class HttpResponse {
     private final static String ACCEPT = "Accept";
     private final static String HOST = "Host";
     private final static String ENCODING = "text/html;charset=utf-8";
-    private final static String HTTP = "Http://";
+    private final static String HTTP = "http://";
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;

@@ -1,5 +1,7 @@
 package webserver;
 
+import http.HttpHeader;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.*;
@@ -13,16 +15,32 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RequestHandlerTest {
-    @Test
-    void request_resttemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        String resourceUrl = "https://edu.nextstep.camp";
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + "/c/4YUvqn9V", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+    private RestTemplate restTemplate;
+    private HttpEntity<MultiValueMap<String, String>> request;
+    private String resourceUrl = "http://localhost:8080";
+    private HttpHeaders headers;
+
+
+    @BeforeEach
+    void setUp() {
+        restTemplate = new RestTemplate();
+
+        headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
+
+        postMap.add("userId" , "abc");
+        postMap.add("password" , "1234");
+        postMap.add("name" , "def");
+        postMap.add("email" , "abc@email.com");
+        request = new HttpEntity<>(postMap, headers);
     }
 
     @DisplayName("/index.html로 접근시 index.html을 잘읽어오는지 확인")
@@ -41,17 +59,7 @@ public class RequestHandlerTest {
     @DisplayName("회원가입")
     @Test
     void request_user_create() throws IOException, URISyntaxException {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "1234");
-        postMap.add("name" , "def");
-        postMap.add("email" , "abc@email.com");
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
 
-        String resourceUrl = "http://localhost:8080";
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
     }
@@ -59,26 +67,14 @@ public class RequestHandlerTest {
     @DisplayName("로그인 성공")
     @Test
     void request_user_login() throws IOException, URISyntaxException {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
+
         MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
         postMap.add("userId" , "abc");
         postMap.add("password" , "1234");
-        postMap.add("name" , "def");
-        postMap.add("email" , "abc@email.com");
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+        HttpEntity<MultiValueMap<String, String>> compareRequest = new HttpEntity<>(postMap, headers);
 
-        String resourceUrl = "http://localhost:8080";
-        restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
-
-        postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "1234");
-        request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
-
-        resourceUrl = "http://localhost:8080";
-        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", compareRequest, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         assertThat(response.getHeaders().getLocation().toString()).isEqualTo("http://localhost:8080/index.html");
@@ -87,26 +83,13 @@ public class RequestHandlerTest {
     @DisplayName("로그인 실패")
     @Test
     void request_user_login_fail() throws IOException, URISyntaxException {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
         MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
         postMap.add("userId" , "abc");
-        postMap.add("password" , "1234");
-        postMap.add("name" , "def");
-        postMap.add("email" , "abc@email.com");
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+        postMap.add("password" , "5678");
+        HttpEntity<MultiValueMap<String, String>> compareRequest = new HttpEntity<>(postMap, headers);
 
-        String resourceUrl = "http://localhost:8080";
-        restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
-
-        postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "12345");
-        request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
-
-        resourceUrl = "http://localhost:8080";
-        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", compareRequest, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         assertThat(response.getHeaders().getLocation().toString()).isEqualTo("http://localhost:8080/user/login_failed.html");
