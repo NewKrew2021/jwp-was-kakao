@@ -5,6 +5,7 @@ import utils.IOUtils;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,6 +90,27 @@ public class HttpRequest {
             return headers.get("Cookie");
         }
         return "logined=false";
+    }
+
+    private Map<String, String> getCookies(){
+        Map<String, String> cookies = new HashMap<>();
+        if(headers.containsKey("Cookie")){
+            String cookiesString = headers.get("Cookie");
+            Arrays.stream(cookiesString.split("; ")).forEach(keyAndValue -> {
+                String key = keyAndValue.split("=")[0];
+                String value = keyAndValue.split("=")[1];
+                cookies.put(key, value);
+            });
+        }
+        return cookies;
+    }
+
+    public boolean hasSessionId(){
+        return getCookies().containsKey("sessionId");
+    }
+
+    public String getSessionId(){
+        return getCookies().get("sessionId");
     }
 
     public String getHeader(String param){

@@ -27,6 +27,15 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
+
+            if(request.hasSessionId() &&
+                    WebServer.sessions.containsKey(request.getSessionId())){
+                response.addHeader("Set-Cookie", "logined=true; Path=/");
+            } else {
+                response.addHeader("Set-Cookie", "logined=false; Path=/");
+            }
+
+            //
             Controller controller = HandlerMapping.getController(request.getPath());
             if(controller == null){
                 response.notFound();
