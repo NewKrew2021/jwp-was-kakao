@@ -2,7 +2,7 @@ package controller;
 
 import request.HttpRequest;
 import response.HttpResponse;
-import service.Service;
+import service.UserService;
 
 public class CreateUserController extends AbstractController {
 
@@ -15,7 +15,7 @@ public class CreateUserController extends AbstractController {
 
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        Service.createUser(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD),
+        UserService.createUser(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD),
                 httpRequest.getParameter(NAME), httpRequest.getParameter(EMAIL));
         httpResponse.response302Header(INDEX_PAGE);
     }

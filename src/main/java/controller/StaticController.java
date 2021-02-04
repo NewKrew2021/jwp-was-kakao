@@ -33,9 +33,8 @@ public class StaticController extends AbstractController {
     }
 
     private static void makeResponse(String filePathPrefix, String uri, HttpResponse httpResponse, String type) {
-        byte[] body = new byte[0];
         try {
-            body = FileIoUtils.loadFileFromClasspath(filePathPrefix + uri);
+            byte[] body = FileIoUtils.loadFileFromClasspath(filePathPrefix + uri);
             httpResponse.response200Header(body.length, type);
             httpResponse.responseBody(body);
         } catch (IOException | URISyntaxException e) {

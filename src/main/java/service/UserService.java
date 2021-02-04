@@ -6,7 +6,7 @@ import model.User;
 import java.util.Collection;
 import java.util.Optional;
 
-public class Service {
+public class UserService {
 
     public static void createUser(String userId, String password, String name, String email) {
         User user = new User(userId, password, name, email);

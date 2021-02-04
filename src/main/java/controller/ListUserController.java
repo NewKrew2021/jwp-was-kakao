@@ -3,7 +3,7 @@ package controller;
 import exceptions.TemplateApplyFailException;
 import request.HttpRequest;
 import response.HttpResponse;
-import service.Service;
+import service.UserService;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ public class ListUserController extends AbstractController {
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         if (httpRequest.isLogined()) {
             try {
-                httpResponse.responseTemplate(Service.findAllUser());
+                httpResponse.responseTemplate(UserService.findAllUser());
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new TemplateApplyFailException();

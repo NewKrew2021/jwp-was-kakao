@@ -2,7 +2,7 @@ package controller;
 
 import request.HttpRequest;
 import response.HttpResponse;
-import service.Service;
+import service.UserService;
 
 public class LoginController extends AbstractController {
 
@@ -17,7 +17,7 @@ public class LoginController extends AbstractController {
 
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (Service.isLoginSuccess(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD))) {
+        if (UserService.isLoginSuccess(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD))) {
             httpResponse.response302Header(INDEX_PAGE, TRUE);
             return;
         }
