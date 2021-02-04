@@ -1,12 +1,10 @@
 package request;
 
 import utils.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-
 import static utils.HttpRequestUtils.requestStringToMap;
 
 public class RequestBody {

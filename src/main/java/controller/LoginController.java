@@ -5,7 +5,6 @@ import model.User;
 import request.HttpRequest;
 import response.HttpResponse;
 import response.HttpResponseStatusCode;
-
 import java.util.Optional;
 
 public class LoginController extends AbstractController {
@@ -27,7 +26,6 @@ public class LoginController extends AbstractController {
             return;
         }
         httpResponse.addRedirectionLocationHeader(LOGIN_FAIL_PAGE);
-        httpResponse.addSetCookieHeader(false);
         httpResponse.send(HttpResponseStatusCode.FOUND);
     }
 

@@ -10,12 +10,9 @@ import request.HttpRequest;
 import response.HttpResponse;
 import response.HttpResponseStatusCode;
 import utils.IOUtils;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-
-
 
 public class ListUserController extends AbstractController {
 
@@ -33,11 +30,10 @@ public class ListUserController extends AbstractController {
             return;
         }
         httpResponse.addRedirectionLocationHeader(LOGIN_PAGE);
-        httpResponse.addSetCookieHeader(false);
         httpResponse.send(HttpResponseStatusCode.FOUND);
     }
 
-    private byte[] makeListUserTemplate() throws IOException{
+    private byte[] makeListUserTemplate() throws IOException {
         Collection<User> users = DataBase.findAll();
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");

@@ -20,6 +20,13 @@ import java.util.Map;
 public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String LOCATION = "Location";
+    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String SET_COOKIE = "Set-Cookie";
+    private static final String HTML_TYPE = "text/html;charset=utf-8";
+    private static final String CSS_TYPE = "text/css;charset=utf-8";
+    private static final String JS_TYPE = "text/javascript;charset=utf-8";
     private DataOutputStream dos;
     private Map<String, String> header = new HashMap<>();
     private byte[] body;
@@ -67,30 +74,30 @@ public class HttpResponse {
 
     public void addContentTypeHeader(String path){
         if(path.matches(".*\\.html")){
-            addHeader("Content-Type", "text/html;charset=utf-8");
+            addHeader(CONTENT_TYPE, HTML_TYPE);
             return;
         }
         if(path.matches(".*\\.css")){
-            addHeader("Content-Type", "text/css;charset=utf-8");
+            addHeader(CONTENT_TYPE, CSS_TYPE);
             return;
         }
         if(path.matches(".*\\.js")){
-            addHeader("Content-Type", "text/javascript;charset=utf-8");
+            addHeader(CONTENT_TYPE, JS_TYPE);
             return;
         }
     }
 
     public void addRedirectionLocationHeader(String location){
-        addHeader("Location", "http://localhost:8080" + location);
+        addHeader(LOCATION, "http://localhost:8080" + location);
     }
 
     public void addContentLengthHeader(int lengthOfBodyContent){
-        addHeader("Content-Length", Integer.toString(lengthOfBodyContent));
+        addHeader(CONTENT_LENGTH, Integer.toString(lengthOfBodyContent));
     }
 
     public void addSetCookieHeader(boolean isLogined){
         if(isLogined){
-            addHeader("Set-Cookie", "logined=true; Path=/");
+            addHeader(SET_COOKIE, "logined=true; Path=/");
         }
     }
 

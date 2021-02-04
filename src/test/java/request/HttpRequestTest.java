@@ -3,8 +3,9 @@ package request;
 import annotation.web.RequestMethod;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
+import requestTextForTest.FilePathName;
+
+import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,20 +15,10 @@ public class HttpRequestTest {
     @Test
     public void request_POST() throws Exception {
         //given
-        String requestString = "POST /user/create HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 46\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Accept: */*\n" +
-                "\n" +
-                "userId=javajigi&password=password&name=JaeSung";
-
-        byte[] data = requestString.getBytes(StandardCharsets.UTF_8);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+        InputStream in = new FileInputStream(FilePathName.POST_HTTP_CREATE_USER_REQUEST);
 
         //when
-        HttpRequest request = HttpRequest.from(inputStream);
+        HttpRequest request = HttpRequest.from(in);
 
         //then
         assertEquals(RequestMethod.POST, request.getMethod());
@@ -40,20 +31,10 @@ public class HttpRequestTest {
     @Test
     public void request_POST_2() throws Exception {
         //given
-        String requestString = "POST /user/create?id=1 HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 46\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Accept: */*\n" +
-                "\n" +
-                "userId=javajigi&password=password&name=JaeSung";
-
-        byte[] data = requestString.getBytes(StandardCharsets.UTF_8);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+        InputStream in = new FileInputStream(FilePathName.POST_HTTP_CREATE_USER_REQUEST);
 
         //when
-        HttpRequest request = HttpRequest.from(inputStream);
+        HttpRequest request = HttpRequest.from(in);
 
         //then
         assertEquals(RequestMethod.POST, request.getMethod());

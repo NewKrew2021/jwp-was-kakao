@@ -4,7 +4,9 @@ import annotation.web.RequestMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import requestTextForTest.FilePathName;
 
+import java.io.*;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,9 +16,10 @@ public class RequestUriTest {
     private RequestUri requestUri;
 
     @BeforeEach
-    public void setup() {
-        String line = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\n";
-        requestUri = RequestUri.from(line);
+    public void setup() throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(FilePathName.GET_HTTP_CREATE_USER_REQUEST_URI);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fileInputStream));
+        requestUri = RequestUri.from(br.readLine());
     }
 
     @DisplayName("주어진 첫 라인에서 메서드를 추출하여 getRequestMethod 로 이를 반환한다.")

@@ -6,13 +6,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import requestTextForTest.FilePathName;
 import webserver.RequestHandler;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,16 +22,8 @@ public class RequestHeaderTest {
     @DisplayName("")
     @BeforeAll
     public static void setup() throws IOException {
-        String header = "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 59\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Accept: */*\n" +
-                "\n";
-
-        byte[] data = header.getBytes(StandardCharsets.UTF_8);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        FileInputStream fileInputStream = new FileInputStream(FilePathName.HTTP_REQUEST_HEADER);
+        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
         BufferedReader br = new BufferedReader(inputStreamReader);
         requestHeader = RequestHeader.of(br, logger);
     }

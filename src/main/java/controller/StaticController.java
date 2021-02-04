@@ -4,7 +4,6 @@ import request.HttpRequest;
 import response.HttpResponse;
 import response.HttpResponseStatusCode;
 import utils.FileIoUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,7 +23,6 @@ public class StaticController extends AbstractController {
         if (fileExist(STATIC_FILE_PATH, httpRequest.getPath())) {
             makeResponse(STATIC_PATH_PREFIX, httpRequest.getPath(), httpResponse);
         }
-
     }
 
     private boolean fileExist(String filePath, String uri) {
