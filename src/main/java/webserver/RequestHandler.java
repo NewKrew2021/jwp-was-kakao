@@ -23,7 +23,7 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
-    public synchronized void run() {
+    public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
