@@ -16,7 +16,7 @@ public class HttpRequestTest {
     HttpRequest queryRequest;
 
     @BeforeEach
-    public void setUp() throws IOException{
+    public void setUp() throws IOException {
         String postMsg = "POST /api HTTP/1.1\n" +
                 "Host: localhost:8080\n" +
                 "Connection: keep-alive\n" +

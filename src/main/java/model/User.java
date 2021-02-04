@@ -19,14 +19,14 @@ public class User {
     }
 
     private String validatePw(String password) {
-        if(!password.matches("^[\\w]{1,30}$")){
+        if (!password.matches("^[\\w]{1,30}$")) {
             throw new WrongPasswordException();
         }
         return password;
     }
 
     private String validateId(String userId) {
-        if(!userId.matches("^[\\w]{1,30}$"))
+        if (!userId.matches("^[\\w]{1,30}$"))
             throw new WrongIdException();
         return userId;
     }
@@ -39,7 +39,7 @@ public class User {
     }
 
     private String validateEmail(String email) {
-        if(!email.matches("^[\\w]{1,30}@[\\w]{1,30}.[\\w]{1,30}$")){
+        if (!email.matches("^[\\w]{1,30}@[\\w]{1,30}.[\\w]{1,30}$")) {
             throw new WrongEmailException();
         }
         return email;

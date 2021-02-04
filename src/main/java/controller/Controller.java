@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class Controller {
-    private static final Logger log = LoggerFactory.getLogger( Controller.class );
+    private static final Logger log = LoggerFactory.getLogger(Controller.class);
     protected final Map<PathInfo, Handler> handlers = new LinkedHashMap<>();
     protected String basePath = "";
 
