@@ -22,14 +22,13 @@ public class ListUserController extends AbstractController {
                     .redirect("/user/login.html")
                     .build();
         }
-        HashMap<String,Object> users = new HashMap<>();
-        users.put("users",new ArrayList<>(DataBase.findAll()));
+        HashMap<String, Object> users = new HashMap<>();
+        users.put("users", new ArrayList<>(DataBase.findAll()));
         return new HttpResponse.Builder()
                 .status(HttpStatusCode.OK)
                 .contentType("text/html;charset=utf-8")
-                .body(httpRequest.getPath(),users)
+                .body(httpRequest.getPath(), users)
                 .build();
-
     }
 
     private boolean isLogin(String loginCookie) {
