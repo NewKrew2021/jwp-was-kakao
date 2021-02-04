@@ -26,8 +26,8 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            Request request = new Request(in);
-            Response response = new Response(out);
+            Request request = Request.of(in);
+            Response response = Response.of(out);
             requestMapper(request, response);
 
         } catch (IOException | URISyntaxException e) {

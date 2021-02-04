@@ -31,7 +31,7 @@ public class HttpRequestTest {
     @DisplayName("GET 방식 데이터 전달시 request에 path, header, parameter로 저장되어야 한다.")
     public void request_GET() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_GET.txt"));
-        Request request = new Request(in);
+        Request request = Request.of(in);
 
         assertEquals(RequestMethod.valueOf("GET"), request.getMethod());
         assertEquals("/user/create", request.getPath());
@@ -44,7 +44,7 @@ public class HttpRequestTest {
     @DisplayName("POST 방식 데이터 전달시 request에 path, header, parameter로 저장되어야 한다.")
     public void request_POST() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_POST.txt"));
-        Request request = new Request(in);
+        Request request = Request.of(in);
 
         assertEquals(RequestMethod.valueOf("POST"), request.getMethod());
         assertEquals("/user/create", request.getPath());
@@ -56,7 +56,7 @@ public class HttpRequestTest {
     @DisplayName("POST 방식으로 데이터를 전달할 때 body를 통한 데이터 전달뿐만 아니라 Query String을 활용한 데이터 전달도 지원해야 한다.")
     public void request_POST_with_querystring() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_POST2.txt"));
-        Request request = new Request(in);
+        Request request = Request.of(in);
 
         assertEquals(RequestMethod.valueOf("POST"), request.getMethod());
         assertEquals("/user/create", request.getPath());

@@ -17,46 +17,58 @@ public class Request {
     private static final Logger logger = LoggerFactory.getLogger(Request.class);
     private RequestMethod method;
     private String path;
-    private Parameter parameter = new Parameter();
+    private Parameter parameter;
     private RequestHeader requestHeader;
 
-    public Request(InputStream in) throws IOException {
-        InputStreamReader reader = new InputStreamReader(in);
-        BufferedReader br = new BufferedReader(reader);
-        String requestLine = br.readLine();
-        logger.debug("####HTTP Request Header 출력");
-        parsePath(requestLine);
-        requestLine = br.readLine();
-        parseRequest(br, requestLine);
+    public Request(RequestMethod method, String path, Parameter parameter, RequestHeader requestHeader) {
+        this.method = method;
+        this.path = path;
+        this.parameter = parameter;
+        this.requestHeader = requestHeader;
     }
 
-    private void parseRequest(BufferedReader br, String requestLine) throws IOException {
+    public static Request of(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+        String[] split = br.readLine().split(" ");
+
+        RequestMethod method = RequestMethod.valueOf(split[0]);
+
+        String[] splitPath = split[1].split("\\?");
+        String paramString = splitPath.length > 1 ? splitPath[1] : "";
+
+        Map<String, String> parameter = parseParams(paramString);
+
+        RequestHeader header = new RequestHeader(parseHeader(br));
+
+        if(method.equals(RequestMethod.POST)){
+            parameter.putAll(parseBody(br, header));
+        }
+
+        return new Request(method, splitPath[0], new Parameter(parameter), header);
+    }
+
+    private static Map<String, String> parseHeader(BufferedReader br) throws IOException {
         Map<String, String> header = new HashMap<>();
-        while (requestLine != null && !requestLine.equals("")) {
-            logger.debug(requestLine);
-            String[] token = requestLine.split("\\: ");
+        String curr = br.readLine();
+        while (curr != null && !curr.equals("")) {
+            String[] token = curr.split("\\: ");
             header.put(token[0], token[1]);
-            requestLine = br.readLine();
+            curr = br.readLine();
         }
-        if (this.method.equals(RequestMethod.POST)) {
-            int contentLength = Integer.parseInt(header.get("Content-Length"));
-            parameter.merge(new Parameter(parseParams(IOUtils.readData(br, contentLength))));
-        }
-        requestHeader = new RequestHeader(header);
+        return header;
     }
 
-    private void parsePath(String path) {
-        String[] token = path.split(" ");
-        this.method = RequestMethod.valueOf(token[0]);
-        String[] pathToken = token[1].split("\\?");
-        this.path = pathToken[0];
-        if (pathToken.length > 1) {
-            this.parameter = new Parameter(parseParams(pathToken[1]));
-        }
+    private static Map<String, String> parseBody(BufferedReader br, RequestHeader header) throws IOException {
+        int contentLength = Integer.parseInt(header.get("Content-Length"));
+        return parseParams(IOUtils.readData(br, contentLength));
     }
 
-    private Map<String, String> parseParams(String paramString) {
+    private static Map<String, String> parseParams(String paramString) {
         Map<String, String> map = new HashMap<>();
+        if(!paramString.contains("=")){
+            return map;
+        }
         for (String path : paramString.split("\\&")) {
             String[] temp = path.split("=");
             map.put(temp[0], temp[1]);
@@ -67,7 +79,6 @@ public class Request {
     public RequestMethod getMethod() {
         return method;
     }
-
 
     public String getParameter(String key) {
         return parameter.get(key);

@@ -11,10 +11,14 @@ public class Response {
     private DataOutputStream dos;
     private Body body;
 
-    public Response(OutputStream out) {
-        dos = new DataOutputStream(out);
-        header = new ResponseHeader();
-        body = new Body();
+    public Response(ResponseHeader header, DataOutputStream dos, Body body) {
+        this.header = header;
+        this.dos = dos;
+        this.body = body;
+    }
+
+    public static Response of(OutputStream out) {
+        return new Response(new ResponseHeader(), new DataOutputStream(out), new Body());
     }
 
     public void addHeader(String key, String value) {
