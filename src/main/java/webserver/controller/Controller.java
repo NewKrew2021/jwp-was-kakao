@@ -4,5 +4,5 @@ import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 
 public interface Controller {
-    void service(HttpRequest request, HttpResponse response);
+    HttpResponse service(HttpRequest request);
 }

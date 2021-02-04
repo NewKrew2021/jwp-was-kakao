@@ -3,43 +3,44 @@ package webserver.controller;
 import webserver.domain.HttpMethod;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
+import webserver.domain.HttpStatusCode;
 
 public abstract class AbstractController implements Controller {
 
-    public void service(HttpRequest request, HttpResponse response) {
+    public HttpResponse service(HttpRequest request) {
         try {
-            methodMapping(request, response);
+            return methodMapping(request);
         } catch (Exception e) {
-            response.send501NotImplemented();
+            return new HttpResponse.Builder().status(HttpStatusCode.INTERNAL_SERVER_ERROR).build();
         }
-        response.send405BadMethod();
     }
 
-    private void methodMapping(HttpRequest request, HttpResponse response) throws Exception {
+    private HttpResponse methodMapping(HttpRequest request) throws Exception {
         if (request.getMethod() == HttpMethod.GET) {
-            doGet(request, response);
+            return doGet(request);
         } else if (request.getMethod() == HttpMethod.POST) {
-            doPost(request, response);
+            return doPost(request);
         } else if (request.getMethod() == HttpMethod.PUT) {
-            doPut(request, response);
+            return doPut(request);
         } else if (request.getMethod() == HttpMethod.DELETE) {
-            doDelete(request, response);
+            return doDelete(request);
         }
+        return new HttpResponse.Builder().status(HttpStatusCode.METHOD_NOT_ALLOWED).build();
     }
 
-    public void doPost(HttpRequest request, HttpResponse response) throws Exception {
-        response.send405BadMethod();
+    public HttpResponse doPost(HttpRequest request) throws Exception {
+        return new HttpResponse.Builder().status(HttpStatusCode.METHOD_NOT_ALLOWED).build();
     }
 
-    public void doGet(HttpRequest request, HttpResponse response) throws Exception {
-        response.send405BadMethod();
+    public HttpResponse doGet(HttpRequest request) throws Exception {
+        return new HttpResponse.Builder().status(HttpStatusCode.METHOD_NOT_ALLOWED).build();
     }
 
-    public void doPut(HttpRequest request, HttpResponse response) throws Exception {
-        response.send405BadMethod();
+    public HttpResponse doPut(HttpRequest request) throws Exception {
+        return new HttpResponse.Builder().status(HttpStatusCode.METHOD_NOT_ALLOWED).build();
     }
 
-    public void doDelete(HttpRequest request, HttpResponse response) throws Exception {
-        response.send405BadMethod();
+    public HttpResponse doDelete(HttpRequest request) throws Exception {
+        return new HttpResponse.Builder().status(HttpStatusCode.METHOD_NOT_ALLOWED).build();
     }
 }

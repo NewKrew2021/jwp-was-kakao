@@ -3,122 +3,101 @@ package webserver.domain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
-import webserver.RequestHandler;
+import utils.TemplateUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
-    private static final String TEMPLATE_PREFIX = "templates";
-    private static final String STATIC_PREFIX = "static";
 
-    private DataOutputStream dos;
+    private HttpStatusCode httpStatusCode;
     private Map<String, String> headers;
+    private List<Cookie> cookies;
+    private byte[] body;
 
-    public HttpResponse(OutputStream out) {
-        dos = new DataOutputStream(out);
-        headers = new HashMap<>();
+    public HttpResponse(HttpStatusCode httpStatusCode, Map<String, String> headers, List<Cookie> cookies, byte[] body) {
+        this.httpStatusCode = httpStatusCode;
+        this.headers = headers;
+        this.cookies = cookies;
+        this.body = body;
     }
 
-    public void addHeader(String key, String value) {
-        headers.put(key, value);
-    }
-
-    public void forward(String path) throws IOException, URISyntaxException {
-        if(isTemplate(path)){
-            byte[] response = readFile(path);
-            response200Header(response.length);
-            responseBody(response);
-        }
-        byte[] response = readFile(path);
-        responseStaticHeader(response.length);
-        responseBody(response);
-    }
-
-    private void responseStaticHeader(int contentLength) throws IOException{
-        dos.writeBytes("HTTP/1.1 200 OK \r\n");
-        dos.writeBytes(String.format("%s: %s\r\n", "Content-Type", "text/css;charset=utf-8"));
-        dos.writeBytes(String.format("%s: %s\r\n", "Content-Length", contentLength));
+    public void sendResponse(OutputStream out) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+        dos.writeBytes("HTTP/1.1 " + httpStatusCode.getPhrase() + " \r\n");
+        dos.writeBytes(headersList());
         dos.writeBytes("\r\n");
-    }
-
-    private boolean isTemplate(String path) {
-        return path.endsWith(".html") || path.endsWith(".ico");
-    }
-
-    public void forwardBody(String body) {
-        byte[] response = body.getBytes();
-        response200Header(response.length);
-        responseBody(response);
-    }
-
-    public void sendRedirect(String location) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 REDIRECTED\r\n");
-            printHeader();
-            dos.writeBytes(HttpHeader.LOCATION + ": " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        if (this.body != null) {
+            dos.write(this.body, 0, this.body.length);
         }
+        dos.flush();
     }
 
-    public void send405BadMethod() {
-        try {
-            dos.writeBytes("HTTP/1.1 405 Method Not Allowed\r\n");
-            printHeader();
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private String headersList() {
+        StringBuilder sb = new StringBuilder();
+        headers.keySet().forEach(key -> sb.append(key)
+                .append(": ")
+                .append(headers.get(key))
+                .append("\r\n"));
+
+        cookies.forEach(cookie -> sb.append(HttpHeader.SET_COOKIE)
+                .append(": ")
+                .append(cookie.toString())
+                .append("\r\n"));
+        return sb.toString();
     }
 
-    public void send501NotImplemented() {
-        try {
-            dos.writeBytes("HTTP/1.1 501 Not Implemented\r\n");
-            printHeader();
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+    public static class Builder {
+        private HttpStatusCode httpStatusCode;
+        private Map<String, String> headers = new HashMap<>();
+        private List<Cookie> cookies = new ArrayList<>();
+        private byte[] body;
 
-    private void response200Header(int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            printHeader();
-            dos.writeBytes(HttpHeader.CONTENT_TYPE + ": text/html;charset=utf-8\r\n");
-            dos.writeBytes(HttpHeader.CONTENT_LENGTH + ": " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        public Builder status(HttpStatusCode httpStatusCode) {
+            this.httpStatusCode = httpStatusCode;
+            return this;
         }
-    }
 
-    private void responseBody(byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+        public Builder body(String path) throws IOException, URISyntaxException {
+            this.body = FileIoUtils.loadFileFromClasspath(path);
+            headers.put(HttpHeader.CONTENT_LENGTH, String.valueOf(this.body.length));
 
-    private void printHeader() throws IOException {
-        for (String key : headers.keySet()) {
-            dos.writeBytes(String.format("%s: %s\r\n", key, headers.get(key)));
+            return this;
         }
-    }
 
-    private byte[] readFile(String path) throws IOException, URISyntaxException {
-        if (isTemplate(path)) {
-            return FileIoUtils.loadFileFromClasspath(TEMPLATE_PREFIX + path);
+        public Builder body(String path, Map<String, Object> parameter) throws IOException {
+            this.body = TemplateUtils.getTemplatePage(path, parameter);
+            logger.debug(new String(body));
+            headers.put(HttpHeader.CONTENT_LENGTH, String.valueOf(this.body.length));
+            return this;
         }
-        return FileIoUtils.loadFileFromClasspath(STATIC_PREFIX + path);
+
+        public Builder cookie(Cookie cookie) {
+            this.cookies.add(cookie);
+            return this;
+        }
+
+        public Builder header(String key, String value) {
+            this.headers.put(key, value);
+            return this;
+        }
+
+        public Builder contentType(String value) {
+            this.headers.put(HttpHeader.CONTENT_TYPE, value);
+            return this;
+        }
+
+        public Builder redirect(String path) {
+            this.headers.put(HttpHeader.LOCATION, path);
+            return this;
+        }
+
+        public HttpResponse build() {
+            return new HttpResponse(httpStatusCode, headers, cookies, body);
+        }
     }
 }

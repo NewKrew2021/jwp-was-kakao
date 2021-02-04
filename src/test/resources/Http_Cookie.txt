@@ -1,4 +1,4 @@
-HTTP/1.1 302 REDIRECTED
-Set-Cookie: logined=true
+HTTP/1.1 200 OK 
 Location: /index.html
+Set-Cookie: logined=true; null=null
 

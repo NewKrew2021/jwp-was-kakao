@@ -4,10 +4,11 @@ import db.DataBase;
 import model.User;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
+import webserver.domain.HttpStatusCode;
 
 public class CreateUserController extends AbstractController {
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
+    public HttpResponse doPost(HttpRequest httpRequest) throws Exception {
         User user = new User(
                 httpRequest.getParameter("userId"),
                 httpRequest.getParameter("password"),
@@ -15,6 +16,9 @@ public class CreateUserController extends AbstractController {
                 httpRequest.getParameter("email")
         );
         DataBase.addUser(user);
-        httpResponse.sendRedirect("/index.html");
+        return new HttpResponse.Builder()
+                .status(HttpStatusCode.FOUND)
+                .redirect("/index.html")
+                .build();
     }
 }

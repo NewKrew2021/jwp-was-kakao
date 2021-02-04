@@ -1,6 +1,8 @@
 package webserver.domain;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import webserver.WebServer;
 import webserver.domain.HttpMethod;
 import webserver.domain.HttpRequest;
 
@@ -12,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HttpRequestTest {
     private String testDirectory = "src/test/resources/";
+
 
     @Test
     public void request_GET() throws Exception {

@@ -2,20 +2,23 @@ package webserver.controller;
 
 import db.DataBase;
 import model.User;
-import webserver.domain.HttpHeader;
-import webserver.domain.HttpRequest;
-import webserver.domain.HttpResponse;
+import webserver.domain.*;
 
 public class LoginController extends AbstractController {
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
+    public HttpResponse doPost(HttpRequest httpRequest) throws Exception {
         User findUser = DataBase.findUserById(httpRequest.getParameter("userId"));
         if (findUser == null || !findUser.isValidPassword(httpRequest.getParameter("password"))) {
-            httpResponse.addHeader(HttpHeader.SET_COOKIE, "logined=false; Path=/");
-            httpResponse.sendRedirect("/user/login_failed.html");
-            return;
+            return new HttpResponse.Builder()
+                    .status(HttpStatusCode.FOUND)
+                    .redirect("/user/login_failed.html")
+                    .cookie(new Cookie("logined", "false", "Path", "/"))
+                    .build();
         }
-        httpResponse.addHeader(HttpHeader.SET_COOKIE, "logined=true; Path=/");
-        httpResponse.sendRedirect("/index.html");
+        return new HttpResponse.Builder()
+                .status(HttpStatusCode.FOUND)
+                .redirect("/index.html")
+                .cookie(new Cookie("logined", "true", "Path", "/"))
+                .build();
     }
 }

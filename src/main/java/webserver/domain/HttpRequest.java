@@ -9,13 +9,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
+    private static final String[] templateList = new String[]{".html", ".ico"};
 
     private Map<String, String> headers;
     private Map<String, String> parameters;
@@ -97,5 +96,9 @@ public class HttpRequest {
             return "";
         }
         return body;
+    }
+
+    public boolean isTemplate() {
+        return Arrays.stream(templateList).anyMatch(str -> path.contains(str));
     }
 }

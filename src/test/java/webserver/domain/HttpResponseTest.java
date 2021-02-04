@@ -1,6 +1,7 @@
 package webserver.domain;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import webserver.domain.HttpResponse;
 
 import java.io.File;
@@ -13,27 +14,30 @@ public class HttpResponseTest {
 
     @Test
     public void responseForward() throws Exception {
-        HttpResponse response = new HttpResponse(createOutputStream("Http_Forward.txt"));
-        response.forward("/index.html");
-    }
-
-    @Test
-    public void responseForwardBody() throws Exception {
-        HttpResponse response = new HttpResponse(createOutputStream("Http_ForwardBody.txt"));
-        response.forwardBody("Hello World");
+        new HttpResponse.Builder()
+                .status(HttpStatusCode.OK)
+                .body("templates/index.html")
+                .build()
+                .sendResponse(createOutputStream("Http_Forward.txt"));
     }
 
     @Test
     public void responseRedirect() throws Exception {
-        HttpResponse response = new HttpResponse(createOutputStream("Http_Redirect.txt"));
-        response.sendRedirect("/index.html");
+        new HttpResponse.Builder()
+                .status(HttpStatusCode.FOUND)
+                .redirect("/index.html")
+                .build()
+                .sendResponse(createOutputStream("Http_Redirect.txt"));
     }
 
     @Test
     public void responseCookies() throws Exception {
-        HttpResponse response = new HttpResponse(createOutputStream("Http_Cookie.txt"));
-        response.addHeader("Set-Cookie", "logined=true");
-        response.sendRedirect("/index.html");
+        new HttpResponse.Builder()
+                .status(HttpStatusCode.FOUND)
+                .cookie(new Cookie("logined","true"))
+                .redirect("/index.html")
+                .build()
+                .sendResponse(createOutputStream("Http_Cookie.txt"));
     }
 
     private OutputStream createOutputStream(String filename) throws FileNotFoundException {

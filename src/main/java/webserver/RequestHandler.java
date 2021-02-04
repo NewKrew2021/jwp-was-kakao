@@ -9,10 +9,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.controller.Controller;
-import webserver.controller.CreateUserController;
-import webserver.controller.ListUserController;
-import webserver.controller.LoginController;
+import webserver.controller.*;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 
@@ -24,6 +21,7 @@ public class RequestHandler implements Runnable {
         controllers.put("/user/create", new CreateUserController());
         controllers.put("/user/login", new LoginController());
         controllers.put("/user/list", new ListUserController());
+        controllers.put("defaultController", new DefaultController());
     }
 
     private Socket connection;
@@ -45,12 +43,11 @@ public class RequestHandler implements Runnable {
 
     private void control(InputStream in, OutputStream out) throws IOException, URISyntaxException {
         HttpRequest httpRequest = new HttpRequest(in);
-        HttpResponse httpResponse = new HttpResponse(out);
         String path = httpRequest.getPath();
         if (controllers.containsKey(path)) {
-            controllers.get(path).service(httpRequest, httpResponse);
+            controllers.get(path).service(httpRequest).sendResponse(out);
             return;
         }
-        httpResponse.forward(path);
+        controllers.get("defaultController").service(httpRequest).sendResponse(out);
     }
 }
