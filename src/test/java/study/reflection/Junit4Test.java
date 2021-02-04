@@ -1,12 +1,12 @@
 package study.reflection;
 
 public class Junit4Test {
-    @next.reflection.MyTest
+    //    @next.reflection.MyTest
     public void one() throws Exception {
         System.out.println("Running Test1");
     }
 
-    @next.reflection.MyTest
+    //    @next.reflection.MyTest
     public void two() throws Exception {
         System.out.println("Running Test2");
     }

@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class HandlebarsTest {
     private static final Logger log = LoggerFactory.getLogger(HandlebarsTest.class);
 
@@ -19,10 +23,17 @@ public class HandlebarsTest {
         loader.setSuffix(".html");
         Handlebars handlebars = new Handlebars(loader);
 
-        Template template = handlebars.compile("user/profile");
+        Template template = handlebars.compile("user/list");
 
-        User user = new User("javajigi", "password", "자바지기", "javajigi@gmail.com");
-        String profilePage = template.apply(user);
-        log.debug("ProfilePage : {}", profilePage);
+        User user1 = new User("yuni", "passyuni", "윤대승", "dsyun96@kakao.com");
+        User user2 = new User("corby", "passcorby", "김범준", "skyblue300a@kakao.com");
+        String userList = template.apply(Arrays.asList(user1, user2));
+        log.debug("ProfilePage : {}", userList);
+
+        assertThat(userList).contains("yuni");
+        assertThat(userList).contains("윤대승");
+        assertThat(userList).contains("dsyun96");
+        assertThat(userList).contains("corby");
+        assertThat(userList).contains("skyblue");
     }
 }
