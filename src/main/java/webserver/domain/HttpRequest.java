@@ -23,17 +23,13 @@ public class HttpRequest {
     private HttpMethod httpMethod;
     private String path;
 
-    public HttpRequest(InputStream in) {
+    public HttpRequest(InputStream in) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        try {
-            String line = bufferedReader.readLine();
-            parseFirstLine(line);
-            parseHeader(bufferedReader);
-            parseBody(bufferedReader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+        String line = bufferedReader.readLine();
+        parseFirstLine(line);
+        parseHeader(bufferedReader);
+        parseBody(bufferedReader);
     }
 
     private void parseBody(BufferedReader bufferedReader) throws IOException {
