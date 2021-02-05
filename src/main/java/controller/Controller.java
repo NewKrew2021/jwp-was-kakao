@@ -1,8 +1,8 @@
 package controller;
 
-import webserver.Request;
-import webserver.Response;
+import http.HttpRequest;
+import http.HttpResponse;
 
 public interface Controller {
-    void service(Request request, Response response) throws Exception;
+    void service(HttpRequest request, HttpResponse response) throws Exception;
 }

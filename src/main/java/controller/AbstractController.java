@@ -1,9 +1,9 @@
 package controller;
 
+import http.HttpRequest;
+import http.HttpResponse;
 import model.MimeType;
 import org.springframework.http.HttpMethod;
-import webserver.Request;
-import webserver.Response;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public abstract class AbstractController implements Controller {
     }
 
     @Override
-    public void service(Request request, Response response) throws Exception {
+    public void service(HttpRequest request, HttpResponse response) throws Exception {
         if (request.getMethod().equals(HttpMethod.GET)) {
             doGet(request, response);
         }
@@ -30,7 +30,7 @@ public abstract class AbstractController implements Controller {
         }
     }
 
-    public abstract void doPost(Request request, Response response) throws Exception;
+    public abstract void doPost(HttpRequest request, HttpResponse response) throws Exception;
 
-    public abstract void doGet(Request request, Response response) throws Exception;
+    public abstract void doGet(HttpRequest request, HttpResponse response) throws Exception;
 }

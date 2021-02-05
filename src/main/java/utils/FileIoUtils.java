@@ -23,6 +23,7 @@ public class FileIoUtils {
     public static byte[] loadCompiledFileFromClassPath(String filePath, Collection<User> users) throws IOException {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
+        loader.setSuffix("");
         Handlebars handlebars = new Handlebars(loader);
 
         Template template = handlebars.compile(filePath);

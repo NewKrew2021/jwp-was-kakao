@@ -1,10 +1,11 @@
-package webserver;
+package http;
 
 import model.MimeType;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
+import webserver.RequestHandler;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,21 +14,22 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Response {
+public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final DataOutputStream dos;
     private final Map<String, String> headers = new HashMap<>();
 
-    private Response(OutputStream out) {
+    private HttpResponse(OutputStream out) {
         dos = new DataOutputStream(out);
     }
 
-    public static Response of(OutputStream dos) {
-        return new Response(dos);
+    public static HttpResponse of(OutputStream dos) {
+        return new HttpResponse(dos);
     }
 
     public void addHeader(String key, String value) {
+        logger.debug("key {}, value {}", key, value);
         headers.put(key, value);
     }
 

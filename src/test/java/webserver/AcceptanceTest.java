@@ -1,6 +1,7 @@
 package webserver;
 
 import db.DataBase;
+import http.HttpRequest;
 import model.User;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ public class AcceptanceTest {
     void addUser() throws Exception {
         String testDirectory = "./src/test/resources/";
         InputStream in = new FileInputStream(testDirectory + "Http_GET_Value.txt");
-        Request request = Request.of(in);
+        HttpRequest request = HttpRequest.of(in);
         User user = User.of(request.getParameters());
         DataBase.addUser(user);
 

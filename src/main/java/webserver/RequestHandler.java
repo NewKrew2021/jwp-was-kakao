@@ -1,6 +1,8 @@
 package webserver;
 
 import controller.*;
+import http.HttpRequest;
+import http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +40,8 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            Request request = Request.of(in);
-            Response response = Response.of(out);
+            HttpRequest request = HttpRequest.of(in);
+            HttpResponse response = HttpResponse.of(out);
 
             Controller controller = getController(request.getUri());
             controller.service(request, response);

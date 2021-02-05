@@ -1,17 +1,17 @@
 package controller;
 
 import exception.NotDefinedMethodException;
-import webserver.Request;
-import webserver.Response;
+import http.HttpRequest;
+import http.HttpResponse;
 
 public class DefaultController extends AbstractController {
     @Override
-    public void doPost(Request request, Response response) throws Exception {
+    public void doPost(HttpRequest request, HttpResponse response) throws Exception {
         throw new NotDefinedMethodException();
     }
 
     @Override
-    public void doGet(Request request, Response response) throws Exception {
+    public void doGet(HttpRequest request, HttpResponse response) throws Exception {
         response.forward(getContentLocation(request.getUri()));
     }
 }

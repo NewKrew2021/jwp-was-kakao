@@ -2,27 +2,34 @@ package controller;
 
 import db.DataBase;
 import exception.NotDefinedMethodException;
+import http.*;
 import model.LoginUser;
 import model.User;
-import webserver.Request;
-import webserver.Response;
 
 public class LoginController extends AbstractController {
     @Override
-    public void doPost(Request request, Response response) throws Exception {
+    public void doPost(HttpRequest request, HttpResponse response) throws Exception {
         LoginUser loginUser = LoginUser.of(request.getParameters());
         User user = DataBase.findUserById(loginUser.getUserId());
+
+
+        String httpSessionId = request.getCookie("sessionId").getValue();
+        HttpSession httpSession = httpSessionId == null ?
+                HttpSessionStorage.createHttpSession() : HttpSessionStorage.getHttpSession(httpSessionId);
+        response.addHeader("Set-Cookie", Cookie.of("sessionId", httpSession.getId(), "/").toString());
+
         if (user != null && user.validate(loginUser)) {
-            response.addHeader("Set-Cookie", "logined=true; path=/");
+            httpSession.setAttribute("logined", true);
             response.sendRedirect("/index.html");
             return;
         }
-        response.addHeader("Set-Cookie", "logined=false; path=/");
+
+        httpSession.setAttribute("logined", false);
         response.sendRedirect("/user/login_failed.html");
     }
 
     @Override
-    public void doGet(Request request, Response response) throws Exception {
+    public void doGet(HttpRequest request, HttpResponse response) throws Exception {
         throw new NotDefinedMethodException();
     }
 }

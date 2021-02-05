@@ -1,49 +1,56 @@
-package webserver;
+package http;
 
-import exception.InvalidRequestLineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import utils.IOUtils;
 import utils.ParseUtils;
+import webserver.RequestHandler;
 
 import java.io.*;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class Request {
+public class HttpRequest {
+    public static final String REQUEST_LINE_PATTERN = "(GET|POST)\\s+([^?]+)(?:\\?(.+))?\\s+(HTTP/.+)";
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final int METHOD = 1;
     private static final int REQUEST_URI = 2;
     private static final int PARAMETER = 3;
     private static final int HTTP_VERSION = 4;
-
     private final Map<String, String> headers = new HashMap<>();
     private final Map<String, String> parameters = new HashMap<>();
+    private final Map<String, Cookie> cookies = new HashMap<>();
     private HttpMethod method;
     private URI uri;
     private String httpVersion;
 
-    private Request(InputStream in) throws Exception {
+    private HttpRequest(InputStream in) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
         initializeRequestLine(br);
         initializeHeader(br);
         initializeParameter(br);
+        initializeCookie();
     }
 
-    public static Request of(InputStream in) throws Exception {
-        return new Request(in);
+    public static HttpRequest of(InputStream in) throws Exception {
+        return new HttpRequest(in);
+    }
+
+    private void initializeCookie() {
+        if (headers.containsKey("Cookie")) {
+            mapCookie(headers.get("Cookie"));
+        }
     }
 
     private void initializeRequestLine(BufferedReader br) throws Exception {
         String requestLine = br.readLine();
         logger.debug("request line : {}", requestLine);
 
-        Matcher matcher = parseRequestLine(requestLine);
+        Matcher matcher = ParseUtils.getMatcher(REQUEST_LINE_PATTERN, requestLine);
 
         method = HttpMethod.valueOf(matcher.group(METHOD));
         uri = URI.create(matcher.group(REQUEST_URI));
@@ -52,16 +59,6 @@ public class Request {
         if (matcher.group(PARAMETER) != null) {
             mapParameter(matcher.group(PARAMETER));
         }
-    }
-
-    private Matcher parseRequestLine(String requestLine) throws InvalidRequestLineException {
-        Pattern requestLinePattern = Pattern.compile("(GET|POST)\\s+([^?]+)(?:\\?(.+))?\\s+(HTTP/.+)");
-        Matcher matcher = requestLinePattern.matcher(requestLine);
-
-        if (!matcher.find()) {
-            throw new InvalidRequestLineException();
-        }
-        return matcher;
     }
 
     private void initializeParameter(BufferedReader br) throws IOException {
@@ -93,6 +90,11 @@ public class Request {
         }
     }
 
+    private void mapCookie(String cookieText) {
+        ParseUtils.parseCookie(cookieText)
+                .forEach((key, value) -> cookies.put(key, Cookie.of(key, value, "/")));
+    }
+
     public HttpMethod getMethod() {
         return method;
     }
@@ -106,10 +108,14 @@ public class Request {
     }
 
     public String getParameter(String parameter) {
-        return this.parameters.get(parameter);
+        return parameters.get(parameter);
     }
 
     public Map<String, String> getParameters() {
-        return this.parameters;
+        return parameters;
+    }
+
+    public Cookie getCookie(String key) {
+        return cookies.getOrDefault(key, Cookie.of());
     }
 }
