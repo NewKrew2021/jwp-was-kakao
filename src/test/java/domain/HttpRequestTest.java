@@ -1,6 +1,6 @@
-package webserver;
+package domain;
 
-import domain.HttpRequest;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -14,6 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpRequestTest {
+    private static final String TEST_DIRECTORY = "./src/test/resources/";
+
     @Test
     void request_resttemplate() {
         RestTemplate restTemplate = new RestTemplate();
@@ -22,11 +24,9 @@ public class HttpRequestTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
-    private String testDirectory = "./src/test/resources/";
-
     @Test
     public void request_POST() throws Exception {
-        InputStream in = new FileInputStream(testDirectory + "Http_POST.txt");
+        InputStream in = new FileInputStream(TEST_DIRECTORY + "create_user_sample.txt");
         HttpRequest request = HttpRequest.from(in);
 
         assertEquals(HttpMethod.POST, request.getMethod());
