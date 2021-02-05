@@ -1,7 +1,11 @@
 package utils;
 
+import model.Resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,13 +13,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ResourceLoaderTest {
     @DisplayName("templates폴더에 있는 리소스의 url이 주어지면, 해당 리소스를 불러온다.")
     @Test
-    void getBytes() {
+    void getBytes() throws IOException, URISyntaxException {
         // given
         String url = "/user/list.html";
-        byte[] expected = FileIoUtils.loadFileFromClasspath("./templates/user/list.html");
+        byte[] bytes = FileIoUtils.loadFileFromClasspath("./templates/user/list.html");
+        Resource expected = Resource.of(bytes, "html");
 
         // when
-        byte[] actual = ResourceLoader.getBytes(url);
+        Resource actual = ResourceLoader.getResource(url);
 
         // then
         assertThat(actual).isEqualTo(expected);
@@ -23,13 +28,14 @@ class ResourceLoaderTest {
 
     @DisplayName("static폴더에 있는 리소스의 url이 주어지면, 해당 리소스를 불러온다.")
     @Test
-    void getBytes2() {
+    void getBytes2() throws IOException, URISyntaxException {
         // given
         String url = "/js/scripts.js";
-        byte[] expected = FileIoUtils.loadFileFromClasspath("./static/js/scripts.js");
+        byte[] bytes = FileIoUtils.loadFileFromClasspath("./static/js/scripts.js");
+        Resource expected = Resource.of(bytes, "js");
 
         // when
-        byte[] actual = ResourceLoader.getBytes(url);
+        Resource actual = ResourceLoader.getResource(url);
 
         // then
         assertThat(actual).isEqualTo(expected);
