@@ -27,7 +27,7 @@ public class HttpRequest {
         if (url.length > 1) {
             parseArgument(url[1]);
         }
-        if (method == HttpMethod.POST) {
+        if (hasBody()) {
             int contentLength = Integer.parseInt(getHeader("Content-Length"));
             String body = utils.IOUtils.readData(br, contentLength);
             parseArgument(body);
@@ -50,6 +50,19 @@ public class HttpRequest {
             String[] parameter = argument.split("=");
             parameters.put(parameter[0], java.net.URLDecoder.decode(parameter[1], "UTF-8"));
         }
+    }
+
+    private boolean hasBody() {
+        if (HttpMethod.GET.equals(method)) {
+            return false;
+        }
+        if (getHeader("Content-Length") == null) {
+            return false;
+        }
+        if (Integer.parseInt(getHeader("Content-Length")) == 0) {
+            return false;
+        }
+        return true;
     }
 
     public HttpMethod getMethod() {
