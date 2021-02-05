@@ -2,6 +2,7 @@ package domain;
 
 import annotation.web.RequestMethod;
 import exception.ExceptionHandler;
+import exception.HeaderNotFoundException;
 import exception.HttpRequestFormatException;
 import exception.HttpRequestInputException;
 import utils.IOUtils;
@@ -23,7 +24,7 @@ public class HttpRequest {
     private HttpParameter httpParameter;
     private HttpHeader httpHeader;
 
-    public HttpRequest(InputStream in) {
+    public HttpRequest(InputStream in) throws HttpRequestInputException, HttpRequestFormatException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
@@ -31,21 +32,28 @@ public class HttpRequest {
             setHeader(br);
             setParameter(br);
         } catch (IOException e) {
-            ExceptionHandler.getInstance().handle(new HttpRequestInputException());
-        } catch (NullPointerException e) {
-            ExceptionHandler.getInstance().handle(new HttpRequestFormatException());
+            throw new HttpRequestInputException();
+        } catch (NullPointerException | HeaderNotFoundException e) {
+            throw new HttpRequestFormatException();
         }
-
     }
 
-    private void setMethodAndPath(BufferedReader br) throws IOException {
+    private void setMethodAndPath(BufferedReader br) throws IOException, HttpRequestFormatException {
         String line = IOUtils.readLine(br);
         String[] parsed = line.split(STATUS_DELIMITER);
+        validateStatusLine(parsed);
+
         method = RequestMethod.of(parsed[0]);
         path = parsed[1];
     }
 
-    private void setParameter(BufferedReader br) throws IOException {
+    private void validateStatusLine(String[] parsed) throws HttpRequestFormatException {
+        if(parsed.length != 2) {
+            throw new HttpRequestFormatException();
+        }
+    }
+
+    private void setParameter(BufferedReader br) throws IOException, HeaderNotFoundException {
         if (getMethod().equals(RequestMethod.GET) && path.contains(PATH_QUERY_DELIMITER)) {
             String[] parsed = path.split(PATH_QUERY_DELIMITER_FOR_REGEX);
             path = parsed[0];
@@ -75,10 +83,6 @@ public class HttpRequest {
 
     public String getCookie(String key) {
         return httpHeader.getCookie(key);
-    }
-
-    public boolean isEmpty() {
-        return path == null;
     }
 
     @Override

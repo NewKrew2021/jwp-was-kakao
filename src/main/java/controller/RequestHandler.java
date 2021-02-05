@@ -34,8 +34,9 @@ public class RequestHandler implements Runnable {
                 connection.getPort()
         );
 
+        ExceptionHandler exceptionHandler = null;
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            ExceptionHandler.getInstance().setOutputStream(out);
+            exceptionHandler = new ExceptionHandler(out);
 
             HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(out);
@@ -45,7 +46,7 @@ public class RequestHandler implements Runnable {
             logger.debug(httpRequest.toString());
             logger.debug(httpResponse.toString());
         } catch (Exception e) {
-            ExceptionHandler.getInstance().handle(e);
+            exceptionHandler.handle(e);
         }
     }
 

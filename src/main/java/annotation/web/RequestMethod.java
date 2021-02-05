@@ -1,5 +1,7 @@
 package annotation.web;
 
+import exception.HttpRequestFormatException;
+
 import java.util.Arrays;
 
 public enum RequestMethod {
@@ -23,6 +25,6 @@ public enum RequestMethod {
         return Arrays.stream(RequestMethod.values())
                 .filter(requestMethod -> requestMethod.value.equals(method))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(HttpRequestFormatException::new);
     }
 }

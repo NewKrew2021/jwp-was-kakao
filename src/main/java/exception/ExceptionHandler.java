@@ -13,54 +13,38 @@ import java.util.*;
 public class ExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private static ExceptionHandler exceptionHandler;
+    private Map<Class, HttpStatus> exceptionToStatus = new HashMap<>();
 
-    private OutputStream outputStream;
-    private Map<Class, ExceptionFunction> exceptionToFunction;
+    private final OutputStream outputStream;
 
-    private ExceptionHandler() {
-        exceptionToFunction = new HashMap<>();
-        exceptionToFunction.put(NoSuchFileException.class, this::sendNotFound);
-        exceptionToFunction.put(FileIOException.class, this::sendInternalServerError);
-        exceptionToFunction.put(HttpRequestInputException.class, this::sendInternalServerError);
-        exceptionToFunction.put(HttpResponseOutputException.class, this::sendInternalServerError);
-        exceptionToFunction.put(URISyntaxException.class, this::sendBadRequest);
-        exceptionToFunction.put(HttpRequestFormatException.class, this::sendBadRequest);
-    }
-
-    public static ExceptionHandler getInstance() {
-        if(exceptionHandler == null) {
-            exceptionHandler = new ExceptionHandler();
-        }
-        return exceptionHandler;
+    public ExceptionHandler(OutputStream outputStream) {
+        this.outputStream = outputStream;
+        exceptionToStatus.put(NoSuchFileException.class, HttpStatus.NOT_FOUND);
+        exceptionToStatus.put(FileIOException.class, HttpStatus.INTERNAL_SERVER_ERROR);
+        exceptionToStatus.put(HttpRequestInputException.class, HttpStatus.INTERNAL_SERVER_ERROR);
+        exceptionToStatus.put(HttpResponseOutputException.class, HttpStatus.INTERNAL_SERVER_ERROR);
+        exceptionToStatus.put(URISyntaxException.class, HttpStatus.BAD_REQUEST);
+        exceptionToStatus.put(HttpRequestFormatException.class, HttpStatus.BAD_REQUEST);
+        exceptionToStatus.put(UnsupportedMethodException.class, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     public void handle(Exception e) {
         printStackTrace(e);
+        HttpStatus exceptionStatus = exceptionToStatus.get(e.getClass());
+        if(exceptionStatus == null) {
+            exceptionStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
         try {
-            exceptionToFunction.get(e.getClass()).sendResponse();
+            sendResponse(exceptionStatus);
         } catch (HttpResponseOutputException httpResponseOutputException) {
             httpResponseOutputException.printStackTrace();
         }
     }
 
-    public void setOutputStream(OutputStream outputStream) {
-        this.outputStream = outputStream;
-    }
-
-    private void sendNotFound() throws HttpResponseOutputException {
+    private void sendResponse(HttpStatus httpStatus) throws HttpResponseOutputException {
         HttpResponse httpResponse = new HttpResponse(outputStream);
-        httpResponse.send(HttpStatus.NOT_FOUND);
-    }
-
-    private void sendBadRequest() throws HttpResponseOutputException {
-        HttpResponse httpResponse = new HttpResponse(outputStream);
-        httpResponse.send(HttpStatus.BAD_REQUEST);
-    }
-
-    private void sendInternalServerError() throws HttpResponseOutputException {
-        HttpResponse httpResponse = new HttpResponse(outputStream);
-        httpResponse.send(HttpStatus.INTERNAL_SERVER_ERROR);
+        httpResponse.send(httpStatus);
     }
 
     private static void printStackTrace(Exception e) {

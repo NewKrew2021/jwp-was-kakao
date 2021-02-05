@@ -1,5 +1,7 @@
 package domain;
 
+import exception.HeaderNotFoundException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,10 @@ public class HttpHeader {
         }
     }
 
-    public String getHeader(String key) {
+    public String getHeader(String key) throws HeaderNotFoundException {
+        if(!headers.containsKey(key)) {
+            throw new HeaderNotFoundException();
+        }
         return headers.get(key);
     }
 

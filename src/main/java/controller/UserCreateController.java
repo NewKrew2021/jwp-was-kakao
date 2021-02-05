@@ -12,6 +12,7 @@ public class UserCreateController extends AbstractController {
     private static final String INDEX_URL = "/index.html";
     private static final String USER_CREATE_URL = "/user/create";
 
+    //Todo Parameter에 값이 없을 경우 예외 처리
     @Override
     void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         doPost(httpRequest, httpResponse);

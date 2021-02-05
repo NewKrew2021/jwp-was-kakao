@@ -3,6 +3,7 @@ package domain;
 import exception.ExceptionHandler;
 import exception.FileIOException;
 import exception.HttpResponseOutputException;
+import exception.NoSuchFileException;
 import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
@@ -39,7 +40,7 @@ public class HttpResponse {
         httpHeader = new HttpHeader();
     }
 
-    public void forward(String path) throws FileIOException, URISyntaxException {
+    public void forward(String path) throws FileIOException, URISyntaxException, NoSuchFileException {
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath(addBasePath(path));
             httpBody = new HttpBody(body);

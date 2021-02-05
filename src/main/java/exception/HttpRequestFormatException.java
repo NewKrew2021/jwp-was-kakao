@@ -1,6 +1,6 @@
 package exception;
 
-public class HttpRequestFormatException extends RuntimeException {
+public class HttpRequestFormatException extends Exception {
     public HttpRequestFormatException() {
         super();
     }

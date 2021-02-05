@@ -1,6 +1,6 @@
 package exception;
 
-public class NoSuchFileException extends RuntimeException {
+public class NoSuchFileException extends Exception {
     public NoSuchFileException() {
         super();
     }
