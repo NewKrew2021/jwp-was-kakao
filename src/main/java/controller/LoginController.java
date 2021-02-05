@@ -11,6 +11,17 @@ import java.util.UUID;
 
 public class LoginController extends AbstractController {
 
+    private LoginController() {
+    }
+
+    public static LoginController getInstance() {
+        return LoginController.LazyHolder.INSTANCE;
+    }
+
+    private static class LazyHolder {
+        private static final LoginController INSTANCE = new LoginController();
+    }
+
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
     }

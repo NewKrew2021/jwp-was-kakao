@@ -18,6 +18,17 @@ import java.util.Map;
 
 public class ListUserController extends AbstractController {
 
+    private ListUserController() {
+    }
+
+    public static ListUserController getInstance() {
+        return ListUserController.LazyHolder.INSTANCE;
+    }
+
+    private static class LazyHolder {
+        private static final ListUserController INSTANCE = new ListUserController();
+    }
+
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
         try {

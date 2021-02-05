@@ -10,9 +10,19 @@ import java.net.URLDecoder;
 
 public class CreateUserController extends AbstractController {
 
+    private CreateUserController() {
+    }
+
+    public static CreateUserController getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
+    private static class LazyHolder {
+        private static final CreateUserController INSTANCE = new CreateUserController();
+    }
+
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
-
     }
 
     @Override

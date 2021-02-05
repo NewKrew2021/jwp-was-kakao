@@ -27,11 +27,14 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
-            Controller controller = HandlerMapping.getController(request.getPath());
-            if (controller == null) {
+            UrlControllerMapper urlControllerMapper = UrlControllerMapper.of(request.getPath());
+
+            if (urlControllerMapper.isNotFound()) {
                 response.notFound();
                 return;
             }
+
+            Controller controller = urlControllerMapper.getController();
             controller.service(request, response);
         } catch (IOException e) {
             logger.error(e.getMessage());

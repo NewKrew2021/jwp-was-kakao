@@ -1,11 +1,11 @@
 package http.session;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HttpSessions {
 
-    private static final Map<String, HttpSession> sessions = new HashMap<>();
+    private static final Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
     public static void add(HttpSession httpSession) {
         sessions.put(httpSession.getId(), httpSession);
