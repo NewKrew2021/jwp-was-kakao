@@ -30,7 +30,7 @@ public class CreateUserController extends AbstractController {
             response.sendRedirect("/index.html");
         }
         logger.debug("가입에 성공하지 못한 경우");
-        response.sendRedirect("/user/form.html");
+        response.sendRedirect("/user/create_failed.html");
     }
 
     @Override
