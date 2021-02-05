@@ -1,8 +1,5 @@
 package webserver.domain;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
-
 public enum HttpStatusCode {
 
     OK(200, "OK"),
@@ -15,19 +12,19 @@ public enum HttpStatusCode {
     CONFLICT(409, "Conflict"),
     INTERNAL_SERVER_ERROR(500, "Internal Server Error");
 
-    private final int value;
+    private final int statusCode;
 
     private final String reasonPhrase;
 
 
-    HttpStatusCode(int value, String reasonPhrase) {
-        this.value = value;
+    HttpStatusCode(int statusCode, String reasonPhrase) {
+        this.statusCode = statusCode;
         this.reasonPhrase = reasonPhrase;
     }
 
 
     public int value() {
-        return this.value;
+        return this.statusCode;
     }
 
     public String getReasonPhrase() {
@@ -35,6 +32,6 @@ public enum HttpStatusCode {
     }
 
     public String getPhrase() {
-        return this.value + " " + this.reasonPhrase;
+        return this.statusCode + " " + this.reasonPhrase;
     }
 }
