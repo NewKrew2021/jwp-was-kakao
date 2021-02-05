@@ -1,6 +1,7 @@
 package service;
 
 import db.DataBase;
+import dto.UserDto;
 import model.User;
 import request.HttpSession;
 import webserver.SessionHandler;
@@ -12,8 +13,8 @@ public class UserService {
     public static final String LOGINED = "logined";
     public static final String TRUE = "true";
 
-    public static void createUser(String userId, String password, String name, String email) {
-        User user = new User(userId, password, name, email);
+    public static void createUser(UserDto userDto) {
+        User user = new User(userDto.getUserId(), userDto.getPassword(), userDto.getName(), userDto.getEmail());
         DataBase.addUser(user);
     }
 
