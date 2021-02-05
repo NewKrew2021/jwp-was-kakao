@@ -23,12 +23,13 @@ class ControllerMapperTest {
         map.put("/user/create", UserCreateController.getInstance());
         map.put("/user/login", UserLoginController.getInstance());
         map.put("/user/list", UserListController.getInstance());
+        map.put("/user/list.html", UserListController.getInstance());
         return Collections.unmodifiableMap(map);
     }
 
     @DisplayName("경로가 주어지면 해당 경로를 처리하는 컨트롤러를 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"/user/create", "/user/login", "/user/list"})
+    @ValueSource(strings = {"/user/create", "/user/login", "/user/list", "/user/list.html"})
     void getController(String path) {
         // given
         Controller expected = answer.get(path);

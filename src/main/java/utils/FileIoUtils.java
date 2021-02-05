@@ -1,66 +1,51 @@
 package utils;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import exception.NotExistException;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FileIoUtils {
-    private static final String RESOURCES_PATH = "/resources";
-    private static final String DOT = ".";
-    private static final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(FileIoUtils.class.getClassLoader());
-
     private FileIoUtils() {
     }
 
-    public static byte[] loadFileFromClasspath(String filePath) {
+    public static byte[] loadFileFromClasspath(String filePath) throws IOException, URISyntaxException {
         URL resource = FileIoUtils.class.getClassLoader().getResource(filePath);
         if (resource == null) {
-            throw new RuntimeException(filePath + "이(가) 존재하지 않습니다.");
+            throw new NotExistException(filePath + "이(가) 존재하지 않습니다.");
         }
 
-        try {
-            Path path = Paths.get(resource.toURI());
-            return Files.readAllBytes(path);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        Path path = Paths.get(resource.toURI());
+        return Files.readAllBytes(path);
     }
 
-    public static List<String> getResources(String filePath) {
-        Resource[] resources;
-        try {
-            resources = resolver.getResources(filePath + "/**");
+    public static boolean hasSameContents(String filePath1, String filePath2) {
+        List<String> file1 = readFile(filePath1);
+        List<String> file2 = readFile(filePath2);
+        return file1.size() == file2.size() && file1.containsAll(file2);
+    }
+
+    private static List<String> readFile(String filePath) {
+        List<String> lines = new ArrayList<>();
+        File file = new File(filePath);
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = br.readLine();
+            while (line != null) {
+                lines.add(line);
+                line = br.readLine();
+            }
         } catch (IOException e) {
-            throw new RuntimeException("파일을 불러올 수 없습니다.");
+            e.printStackTrace();
         }
-        return Arrays.stream(resources)
-                .map(FileIoUtils::getFile)
-                .filter(file -> !file.isDirectory())
-                .map(FileIoUtils::getPath)
-                .collect(Collectors.toList());
-    }
-
-    private static File getFile(Resource resource) {
-        try {
-            return resource.getFile();
-        } catch (IOException e) {
-            throw new RuntimeException("파일을 불러올 수 없습니다.");
-        }
-    }
-
-    private static String getPath(File file) {
-        String path = file.getPath();
-        int idx = path.lastIndexOf(RESOURCES_PATH);
-        return DOT + path.substring(idx + RESOURCES_PATH.length());
+        return lines;
     }
 }
