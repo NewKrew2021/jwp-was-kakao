@@ -1,9 +1,6 @@
 package service.controller;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
+import framework.common.TemplateEngine;
 import framework.request.HttpRequest;
 import framework.response.HttpResponse;
 import service.db.DataBase;
@@ -26,19 +23,11 @@ public class ListUserController extends AbstractController {
             return;
         }
 
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-        Handlebars handlebars = new Handlebars(loader);
-
-        Template template = handlebars.compile("user/list");
-
         Map<String, List> parameters = new HashMap<>();
         List<User> users = new ArrayList<>(DataBase.findAll());
         parameters.put("users", users);
 
-        String profilePage = template.apply(parameters);
-
+        String profilePage = TemplateEngine.apply("user/list", parameters);
         response.responseBody(profilePage.getBytes());
     }
 
