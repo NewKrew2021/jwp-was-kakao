@@ -33,6 +33,7 @@ public class ExceptionHandler implements HttpServlet {
             response.setBody(e.getMessage());
             return response;
         } catch (Exception e) {
+            e.printStackTrace();
             return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

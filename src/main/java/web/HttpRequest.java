@@ -18,6 +18,7 @@ public class HttpRequest {
     private final HttpHeaders httpHeaders;
     private final HttpUrl httpUrl;
     private final HttpBody httpBody;
+    private HttpSession httpSession;
 
     private HttpRequest(HttpMethod httpMethod, HttpHeaders httpHeaders, HttpUrl httpUrl, HttpBody httpBody) {
         this.httpMethod = httpMethod;
@@ -49,5 +50,13 @@ public class HttpRequest {
 
     public HttpBody getHttpBody() {
         return httpBody;
+    }
+
+    public HttpSession getHttpSession() {
+        return httpSession;
+    }
+
+    public void setHttpSession(HttpSession httpSession) {
+        this.httpSession = httpSession;
     }
 }
