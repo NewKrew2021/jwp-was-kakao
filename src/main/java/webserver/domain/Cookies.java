@@ -13,6 +13,10 @@ public class Cookies {
 
     private Map<String, Cookie> cookies;
 
+    public Cookies() {
+        cookies = new HashMap<>();
+    }
+
     public Cookies(String cookiesString) {
         cookies = new HashMap<>();
         Arrays.stream(cookiesString.trim().split(";")).forEach(str -> {
@@ -25,6 +29,10 @@ public class Cookies {
 
     public Cookie getCookie(String name) {
         return cookies.get(name);
+    }
+
+    public void addCookie(Cookie cookie) {
+        cookies.put(cookie.getName(), cookie);
     }
 
     @Override
