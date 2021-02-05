@@ -1,5 +1,6 @@
 package controller;
 
+import exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.UserService;
@@ -33,19 +34,20 @@ public class UserCreateController extends AbstractController {
     }
 
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse doPost(HttpRequest request) {
         UserService.insert(
-                httpRequest.getParameter("userId"),
-                httpRequest.getParameter("password"),
-                httpRequest.getParameter("name"),
-                httpRequest.getParameter("email")
+                request.getParameter("userId"),
+                request.getParameter("password"),
+                request.getParameter("name"),
+                request.getParameter("email")
         );
-        logger.debug("create user success");
-        httpResponse.sendRedirect("/");
+        logger.debug("[ID: {}] 회원가입 성공", request.getParameter("userId"));
+        return HttpResponse.redirect("/");
     }
 
     @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse doGet(HttpRequest request) {
         // There is no matching action, so it does nothing.
+        throw new NotFoundException("요청에 매칭되는 동작이 없습니다.");
     }
 }

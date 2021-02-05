@@ -1,5 +1,6 @@
 package controller;
 
+import exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.UserService;
@@ -34,20 +35,22 @@ public class UserLoginController extends AbstractController {
     }
 
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        String userId = httpRequest.getParameter("userId");
-        String password = httpRequest.getParameter("password");
+    public HttpResponse doPost(HttpRequest request) {
+        String userId = request.getParameter("userId");
+        String password = request.getParameter("password");
         if (UserService.isInValidUser(userId, password)) {
-            logger.debug("login failed");
-            httpResponse.sendRedirect("/user/login_failed.html");
+            logger.debug("[ID: {}] 유효하지 않은 사용자입니다.", userId);
+            return HttpResponse.redirect("/user/login_failed.html");
         }
-        logger.debug("login success");
-        httpResponse.addHeader("Set-Cookie", "logined=true; Path=/");
-        httpResponse.sendRedirect("/");
+        logger.debug("[ID: {}] 로그인 성공", userId);
+        HttpResponse response = HttpResponse.redirect("/");
+        response.addHeader("Set-Cookie", "logined=true; Path=/");
+        return response;
     }
 
     @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse doGet(HttpRequest request) {
         // There is no matching action, so it does nothing.
+        throw new NotFoundException("요청에 매칭되는 동작이 없습니다.");
     }
 }

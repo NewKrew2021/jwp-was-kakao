@@ -3,16 +3,15 @@ package webserver;
 import controller.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import view.InputView;
+import view.OutputView;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
 public class RequestHandler implements Runnable {
-    static final String HTTP_VERSION_NAME = "HTTP/1.1";
-
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final Socket connection;
@@ -26,19 +25,30 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = HttpRequest.from(in);
-            httpRequest.logRequestHeader();
-
-            DataOutputStream dos = new DataOutputStream(out);
-            HttpResponse httpResponse = new HttpResponse(dos);
-
-            ControllerMapper controllerMapper = ControllerMapper.getInstance();
-            Controller controller = controllerMapper.getController(httpRequest.getPath());
-            controller.service(httpRequest, httpResponse);
-
-            httpResponse.writeResponse();
+            handle(in, out);
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private void handle(InputStream in, OutputStream out) throws IOException {
+        InputView inputView = InputView.from(in);
+        OutputView outputView = OutputView.from(out);
+        try {
+            HttpRequest request = inputView.getHttpRequest();
+            request.logRequestMessage();
+
+            ControllerMapper mapper = ControllerMapper.getInstance();
+            Controller controller = mapper.getController(request.getPath());
+
+            HttpResponse response = controller.service(request);
+            response.logResponseHeader();
+            outputView.write(response);
+        } catch (Exception exception) {
+            logger.error(exception.getMessage());
+            HttpResponse response = ExceptionHandler.handle(exception);
+            response.logResponseHeader();
+            outputView.write(response);
         }
     }
 }

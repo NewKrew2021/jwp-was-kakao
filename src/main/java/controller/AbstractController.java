@@ -1,28 +1,27 @@
 package controller;
 
+import exception.NotExistException;
 import webserver.HttpMethod;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public abstract class AbstractController implements Controller {
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (httpRequest.getMethod() == HttpMethod.POST) {
-            doPost(httpRequest, httpResponse);
-            return;
+    public HttpResponse service(HttpRequest request) {
+        if (request.getMethod() == HttpMethod.POST) {
+            return doPost(request);
         }
-        if (httpRequest.getMethod() == HttpMethod.GET) {
-            doGet(httpRequest, httpResponse);
-            return;
+        if (request.getMethod() == HttpMethod.GET) {
+            return doGet(request);
         }
-        httpResponse.badRequest();
+        throw new NotExistException("요청에 매칭되는 동작이 없습니다.");
     }
 
     public abstract boolean match(String path);
 
     public abstract String getPath();
 
-    public abstract void doPost(HttpRequest httpRequest, HttpResponse httpResponse);
+    public abstract HttpResponse doPost(HttpRequest request);
 
-    public abstract void doGet(HttpRequest httpRequest, HttpResponse httpResponse);
+    public abstract HttpResponse doGet(HttpRequest request);
 }

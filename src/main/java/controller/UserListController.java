@@ -1,14 +1,19 @@
 package controller;
 
+import exception.NotFoundException;
+import exception.UnauthorizedException;
+import model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import utils.ResourceLoader;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
 public class UserListController extends AbstractController {
     private static final Logger logger = LoggerFactory.getLogger(UserListController.class);
-    private static final String PATH = "/user/list";
+    private static final String PATH = "/user/list*/**";
 
     private static UserListController instance;
 
@@ -24,7 +29,8 @@ public class UserListController extends AbstractController {
 
     @Override
     public boolean match(String path) {
-        return PATH.equals(path);
+        PathMatcher matcher = new AntPathMatcher();
+        return matcher.match(PATH, path);
     }
 
     @Override
@@ -33,29 +39,29 @@ public class UserListController extends AbstractController {
     }
 
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse doPost(HttpRequest request) {
         // There is no matching action, so it does nothing.
+        throw new NotFoundException("요청에 매칭되는 동작이 없습니다.");
     }
 
     @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse doGet(HttpRequest request) {
         try {
-            validate(httpRequest);
-            byte[] page = ResourceLoader.getDynamicPage("user/list");
-            logger.debug("Succeeded in loading user-list page");
-            httpResponse.forwardBody(page);
+            validate(request);
+            Resource resource = ResourceLoader.getDynamicPage("user/list");
+            logger.debug("사용자 목록 페이지 로딩 성공");
+            return HttpResponse.ok(resource);
         } catch (RuntimeException e) {
-            logger.debug(e.getMessage());
-            httpResponse.sendRedirect("/user/login.html");
+            logger.error(e.getMessage());
+            return HttpResponse.redirect("/user/login.html");
         }
     }
 
-    private void validate(HttpRequest httpRequest) {
-        String cookie = httpRequest.getHeader("Cookie");
+    private void validate(HttpRequest request) {
+        String cookie = request.getHeader("Cookie");
         if (!isLogined(cookie)) {
             String message = "비로그인 사용자입니다.";
-            logger.error(message);
-            throw new RuntimeException(message);
+            throw new UnauthorizedException(message);
         }
     }
 

@@ -1,5 +1,7 @@
 package controller;
 
+import exception.NotFoundException;
+import model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ResourceLoader;
@@ -33,30 +35,16 @@ public class ResourceController extends AbstractController {
     }
 
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public HttpResponse doPost(HttpRequest request) {
         // There is no matching action, so it does nothing.
+        throw new NotFoundException("요청에 매칭되는 동작이 없습니다.");
     }
 
     @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        String path = httpRequest.getPath();
-        if (!isResource(path)) {
-            logger.debug(path + " is not resource");
-            httpResponse.badRequest();
-            return;
-        }
-
-        byte[] body = ResourceLoader.getBytes(path);
-        logger.debug("Succeeded in loading " + path);
-        String contentType = httpRequest.getHeader("Accept")
-                .split(";")[0]
-                .split(",")[0];
-        httpResponse.addHeader("Content-Type", contentType);
-        httpResponse.forwardBody(body);
-    }
-
-    private boolean isResource(String path) {
-        int idx = path.lastIndexOf('.');
-        return idx != -1 && idx < path.length() - 1;
+    public HttpResponse doGet(HttpRequest request) {
+        String path = request.getPath();
+        Resource resource = ResourceLoader.getResource(path);
+        logger.debug("{} 로딩 성공", path);
+        return HttpResponse.ok(resource);
     }
 }
