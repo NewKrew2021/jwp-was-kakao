@@ -1,6 +1,7 @@
 package webserver;
 
 import controller.*;
+import exception.DuplicateException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ public class ControllerMapper {
 
     private void validate(List<AbstractController> controllers) {
         if (!allPathsAreUnique(controllers)) {
-            throw new RuntimeException("중복된 경로를 갖는 컨트롤러가 존재합니다.");
+            throw new DuplicateException("중복된 경로를 갖는 컨트롤러가 존재합니다.");
         }
     }
 
