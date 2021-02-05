@@ -5,8 +5,8 @@ import dto.HttpRequest;
 import dto.HttpResponse;
 import model.User;
 import vo.UserSessionVO;
-import webserver.SessionStorage;
 import webserver.HttpSession;
+import webserver.SessionStorage;
 
 public class LoginController extends AbstractController {
     @Override
@@ -16,11 +16,10 @@ public class LoginController extends AbstractController {
             UserSessionVO userSessionVO = new UserSessionVO(user);
             HttpSession session = SessionStorage.getSession();
             session.setAttribute("USER", userSessionVO);
-            response.setCookie("true", "/", session.getId());
+            response.setCookie("/", session.getId());
             response.sendRedirect("/index.html");
 
         }
-        response.setCookie("false", "/", null);
         response.sendRedirect("/user/login_failed.html");
 
     }

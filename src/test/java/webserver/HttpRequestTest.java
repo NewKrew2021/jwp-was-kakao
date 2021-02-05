@@ -74,13 +74,9 @@ public class HttpRequestTest {
     @Test
     void loginFailTest() {
         RestTemplate restTemplate = new RestTemplate();
-        String resourceUrl = "http://localhost:" + port + "/user/login";
-        HttpHeaders headers = new HttpHeaders();
-        String body = "userId=javagigi&password=p";
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl, request, String.class);
-        assertThat(response.getHeaders().get("Set-Cookie").get(0)).isEqualTo("logined=false; Path=/");
+        String body = "userId=javajigi&password=p";
+        ResponseEntity<String> response = 로그인_요청(restTemplate, body);
+        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("/user/login_failed.html");
     }
 
     @Test
@@ -89,19 +85,16 @@ public class HttpRequestTest {
         String createBody = "userId=javajigi&password=p&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         회원가입_요청(restTemplate, createBody);
 
+        String body = "userId=javajigi&password=p";
+        ResponseEntity<String> response = 로그인_요청(restTemplate, body);
+        assertThat(response.getHeaders().getLocation().toString()).isEqualTo("/index.html");
+    }
+
+    public ResponseEntity<String> 로그인_요청(RestTemplate restTemplate, String body) {
         String resourceUrl = "http://localhost:" + port + "/user/login";
         HttpHeaders headers = new HttpHeaders();
-
-
-        String body = "userId=javajigi&password=p";
         HttpEntity<String> request = new HttpEntity<>(body, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl, request, String.class);
-        String[] cookie = response.getHeaders().get("Set-Cookie").get(0).split(";");
-        String logined = cookie[0].trim();
-        String path = cookie[1].trim();
-        assertThat(logined).isEqualTo("logined=true");
-        assertThat(path).isEqualTo("Path=/");
+        return restTemplate.postForEntity(resourceUrl, request, String.class);
     }
 
     @Test
@@ -112,10 +105,13 @@ public class HttpRequestTest {
         String createBody2 = "userId=nono2&password=p&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         회원가입_요청(restTemplate, createBody2);
 
+        String body = "userId=nono2&password=p";
+        ResponseEntity<String> login_response = 로그인_요청(restTemplate, body);
+
+        String sessionId = login_response.getHeaders().getFirst(HttpHeaders.SET_COOKIE).split(";")[1].split("=")[1];
         String resourceUrl = "http://localhost:" + port + "/user/list";
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Cookie", "logined=true");
-
+        headers.set("Cookie", "logined=true; " + sessionId);
         HttpEntity<String> request = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
@@ -130,7 +126,6 @@ public class HttpRequestTest {
 
         String resourceUrl = "http://localhost:" + port + "/user/list";
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Cookie", "logined=false");
         HttpEntity<String> request = new HttpEntity<>(headers);
         ResponseEntity<String> response = new RestTemplate().exchange(resourceUrl, HttpMethod.GET, request, String.class);
 

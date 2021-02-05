@@ -8,6 +8,7 @@ import db.DataBase;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import model.User;
+import webserver.SessionStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,13 +22,13 @@ public class ListUserController extends AbstractController {
         try {
             String cookie = request.getCookie();
             if (cookie == null) {
-                response.sendRedirect( "/user/login.html");
+                response.sendRedirect("/user/login.html");
                 return;
             }
             System.out.println(cookie);
             String login = cookie.split(";")[0].trim();
-//            String sessionId = cookie.split(";")[1].trim();
-            if (login.equals("logined=true")) {
+            String sessionId = cookie.split(";")[1].trim();
+            if (SessionStorage.isLoginedSession(sessionId)) {
                 Map<String, Object> model = new HashMap<>();
 
                 List<User> users = new ArrayList<>(DataBase.findAll());

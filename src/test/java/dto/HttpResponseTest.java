@@ -1,6 +1,8 @@
 package dto;
 
 import org.junit.jupiter.api.Test;
+import webserver.HttpSession;
+import webserver.SessionStorage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +31,8 @@ public class HttpResponseTest {
     @Test
     public void responseCookies() throws Exception {
         HttpResponse response = new HttpResponse(createOutputStream("Http_Cookie.txt"));
-        response.setCookie("true", "/", null);
+        HttpSession session = SessionStorage.getSession();
+        response.setCookie("/", session.getId());
         response.sendRedirect("/index.html");
     }
 

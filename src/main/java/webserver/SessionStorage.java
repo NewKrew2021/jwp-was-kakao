@@ -15,4 +15,12 @@ public class SessionStorage {
     public static HttpSession getSession(String sessionId) {
         return sessions.get(sessionId);
     }
+
+    public static boolean isLoginedSession(String sessionId) {
+        HttpSession session = sessions.get(sessionId);
+        if (session.getAttribute("USER") != null) {
+            return true;
+        }
+        return false;
+    }
 }
