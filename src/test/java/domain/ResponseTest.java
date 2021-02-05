@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Response 클래스")
 public class ResponseTest {
 
+    @DisplayName("일반 파일 요청 테스트")
     @Test
     public void defaultFileTest() throws IOException, URISyntaxException {
         String requestUrl = "/css/styles.css";
@@ -23,6 +24,7 @@ public class ResponseTest {
                 .contains("Content-Type: text/css;charset=utf-8");
     }
 
+    @DisplayName("리다이렉트 테스트")
     @Test
     public void redirectTest() {
         String requestUrl = "/index.html";
@@ -33,6 +35,7 @@ public class ResponseTest {
                 .contains("Location: /index.html");
     }
 
+    @DisplayName("동적 html생성 테스트")
     @Test
     public void dynamicHtmlTest(){
         String html = "<html><head><title>This is title</title></head><body></body></html>";
