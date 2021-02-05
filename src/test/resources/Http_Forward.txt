@@ -1,5 +1,5 @@
 HTTP/1.1 200 OK
-Content-Length: 6908
+Content-Length: 6914
 Content-Type: text/html
 
 <!DOCTYPE html>
@@ -44,7 +44,7 @@ Content-Type: text/html
                   <li><a href="https://facebook.com" target="_blank">Facebook</a></li>
                 </ul>
              </li>
-             <li><a href="./user/list.html"><i class="glyphicon glyphicon-user"></i></a></li>
+             <li><a href="./user/list"><i class="glyphicon glyphicon-user"></i></a></li>
            </ul>
         </div>	
      </div>	
@@ -75,7 +75,7 @@ Content-Type: text/html
                 <li><a href="#loginModal" role="button" data-toggle="modal">로그인</a></li>
                 <li><a href="#registerModal" role="button" data-toggle="modal">회원가입</a></li>
                 -->
-                <li><a href="#" role="button">로그아웃</a></li>
+                <li><a href="/user/logout" role="button">로그아웃</a></li>
                 <li><a href="#" role="button">개인정보수정</a></li>
             </ul>
         </div>

@@ -3,12 +3,14 @@ package user.service;
 import db.DataBase;
 import user.model.User;
 import user.vo.UserCreateValue;
+import webserver.domain.HttpSession;
 
 import java.util.Collection;
 
 public class UserService {
     public static void insert(UserCreateValue values) {
-        DataBase.addUser(new User(values.getUserId(), values.getPassword(), values.getName(), values.getEmail()));
+        User user = new User(values.getUserId(), values.getPassword(), values.getName(), values.getEmail());
+        DataBase.addUser(user);
     }
 
     public static Collection<User> findAll() {

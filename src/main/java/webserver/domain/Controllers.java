@@ -1,15 +1,13 @@
 package webserver.domain;
 
 import com.google.common.collect.Maps;
-import user.ui.CreateUserController;
-import user.ui.ListUserController;
-import user.ui.LoginController;
-import user.ui.UserProfileController;
+import user.ui.*;
 import webserver.ui.*;
 
 import java.util.Map;
 
 public class Controllers {
+    private static final String USER_LOGOUT_PATH = "/user/logout";
     private static final String USER_PROFILE_PATH = "/user/profile";
     private static final String USER_CREATE_PATH = "/user/create";
     private static final String USER_LIST_PATH = "/user/list";
@@ -19,6 +17,7 @@ public class Controllers {
     private final Map<String, Controller> controllers = Maps.newHashMap();
 
     public Controllers() {
+        controllers.put(USER_LOGOUT_PATH, new LogoutController());
         controllers.put(USER_PROFILE_PATH, new UserProfileController());
         controllers.put(USER_CREATE_PATH, new CreateUserController());
         controllers.put(USER_LIST_PATH, new ListUserController());

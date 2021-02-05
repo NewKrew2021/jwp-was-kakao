@@ -1,18 +1,20 @@
 package user.ui;
 
+import db.DataBase;
 import user.view.UserView;
 import webserver.RequestHandler;
-import webserver.domain.Body;
-import webserver.domain.HttpRequest;
-import webserver.domain.HttpResponse;
+import webserver.domain.*;
 import webserver.ui.AbstractController;
+
+import java.util.Arrays;
 
 public class ListUserController extends AbstractController {
 
     private static final String COOKIE = "Cookie";
     private static final String TEXT_HTML = "text/html";
     private static final String INDEX_HTML = "/index.html";
-    private static final String LOGINED_TRUE = "logined=true";
+    private static final String SESSION_ID = "session_id";
+    private static final String LOGINED = "logined";
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
@@ -25,6 +27,18 @@ public class ListUserController extends AbstractController {
     }
 
     private boolean isLogin(String cookie) {
-        return cookie.contains(LOGINED_TRUE);
+        Cookies cookies = new Cookies(cookie);
+
+        try {
+            HttpSession session = DataBase.findSessionById(cookies.get(SESSION_ID).getValue());
+
+            if (session != null) {
+                return session.contains(LOGINED);
+            }
+            return false;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
+
 }
