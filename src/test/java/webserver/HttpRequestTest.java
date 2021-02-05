@@ -2,6 +2,7 @@ package webserver;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import webserver.domain.HttpHeader;
 import webserver.domain.HttpMethod;
 import webserver.domain.HttpRequest;
 
@@ -22,7 +23,7 @@ class HttpRequestTest {
 
         assertEquals(HttpMethod.GET, request.getMethod());
         assertEquals("/user/create", request.getPath());
-        assertEquals("keep-alive", request.getHeaders().get("Connection"));
+        assertEquals("keep-alive", request.getHeaders().get(HttpHeader.CONNECTION));
         assertEquals("javajigi", request.getParameters().get("userId"));
     }
 
@@ -34,7 +35,7 @@ class HttpRequestTest {
 
         assertEquals(HttpMethod.POST, request.getMethod());
         assertEquals("/user/create", request.getPath());
-        assertEquals("keep-alive", request.getHeaders().get("Connection"));
+        assertEquals("keep-alive", request.getHeaders().get(HttpHeader.CONNECTION));
         assertEquals("javajigi", request.getParameters().get("userId"));
     }
 
@@ -46,7 +47,7 @@ class HttpRequestTest {
 
         assertEquals(HttpMethod.POST, request.getMethod());
         assertEquals("/user/create", request.getPath());
-        assertEquals("keep-alive", request.getHeaders().get("Connection"));
+        assertEquals("keep-alive", request.getHeaders().get(HttpHeader.CONNECTION));
         assertEquals("1", request.getParameters().get("id"));
         assertEquals("javajigi", request.getParameters().get("userId"));
     }

@@ -1,38 +1,54 @@
 package webserver.domain;
 
+import webserver.exceptions.AlreadySentException;
 import webserver.exceptions.RequiredHeaderNotFoundException;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class HttpResponse {
-    DataOutputStream dos;
-    HttpHeaders headers;
+    private final DataOutputStream dos;
+    private final HttpHeaders headers;
+    private boolean isSent;
 
     public HttpResponse(OutputStream out) throws IOException {
         dos = new DataOutputStream(out);
         headers = new HttpHeaders();
+        isSent = false;
     }
 
     public void send(HttpStatusCode code) {
-        send(code, null);
+        send(code, "");
     }
 
     public void send(HttpStatusCode code, String body) {
-        if (body == null) {
-            body = "";
+        send(code, body.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public void send(HttpStatusCode code, byte[] body) {
+        if(isSent) {
+            throw new AlreadySentException("이미 한번 이상 전송된 response입니다");
         }
-        if (body.length() > 0) {
-            headers.add(HttpHeader.CONTENT_LENGTH, String.valueOf(body.length()));
+        if (body == null) {
+            body = new byte[]{};
+        }
+        if (body.length > 0) {
+            headers.add(HttpHeader.CONTENT_LENGTH, String.valueOf(body.length));
         }
         try {
             sendHeaders(code);
             dos.writeBytes("\r\n");
-            dos.writeBytes(body);
+            dos.write(body);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.isSent = true;
+    }
+
+    public boolean isSent() {
+        return isSent;
     }
 
     private void sendHeaders(HttpStatusCode code) throws IOException {

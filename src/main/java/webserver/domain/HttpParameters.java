@@ -26,10 +26,17 @@ public class HttpParameters {
         String[] parameterToken = parameterString.split("&");
         for (String token : parameterToken) {
             if (token.indexOf('=') == -1) {
-                add(token, null);
-                return;
+                add(token, "");
+                continue;
             }
             String[] keyValue = token.split("=");
+            if(keyValue.length == 0){
+                continue;
+            }
+            if(keyValue.length == 1) {
+                add(keyValue[0], "");
+                continue;
+            }
             add(keyValue[0], keyValue[1]);
         }
     }
