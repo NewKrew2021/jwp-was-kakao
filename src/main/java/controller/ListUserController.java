@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class ListUserController extends AbstractController {
 
-    private static final String LOGIN_PAGE = "http://localhost:8080/user/login.html";
+    private static final String LOGIN_PAGE = "/user/login.html";
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {

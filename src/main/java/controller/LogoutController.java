@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public class LogoutController extends AbstractController {
 
-    private static final String INDEX_PAGE = "http://localhost:8080/index.html";
+    private static final String INDEX_PAGE = "/index.html";
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
