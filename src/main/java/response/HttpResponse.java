@@ -86,6 +86,7 @@ public class HttpResponse {
             sb.append(NEW_LINE_PREFIX);
             dos.writeBytes(sb.toString());
         }
+        dos.writeBytes(NEW_LINE_PREFIX);
     }
 
     private void writeBody() throws IOException {
