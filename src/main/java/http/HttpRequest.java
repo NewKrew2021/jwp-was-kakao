@@ -1,12 +1,9 @@
 package http;
 
+import model.PagePath;
 import org.springframework.http.HttpMethod;
-import utils.IOUtils;
 
 import java.io.*;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HttpRequest {
 
@@ -31,7 +28,7 @@ public class HttpRequest {
         return httpHeader.getHttpMethod();
     }
 
-    public String getPath() {
+    public PagePath getPath() {
         return httpHeader.getPath();
     }
 

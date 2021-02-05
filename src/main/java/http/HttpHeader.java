@@ -1,5 +1,6 @@
 package http;
 
+import model.PagePath;
 import org.springframework.http.HttpMethod;
 
 import java.io.BufferedReader;
@@ -26,7 +27,7 @@ public class HttpHeader {
     private Map<String, String> httpHeader = new HashMap<>();
     private HttpParameters httpParameters;
     private HttpMethod httpMethod;
-    private String path;
+    private PagePath pagePath;
     private String version;
 
     public HttpHeader(BufferedReader bufferedReader, HttpParameters httpParameters) throws IOException {
@@ -51,7 +52,7 @@ public class HttpHeader {
         httpMethod = HttpMethod.resolve(currentLine[0]);
 
         String[] pathAndParameter = currentLine[1].split("\\?");
-        path = pathAndParameter[0];
+        pagePath = new PagePath(pathAndParameter[0]);
 
         if( pathAndParameter.length > 1 ) {
             httpParameters.parseParameter(pathAndParameter[1]);
@@ -68,8 +69,8 @@ public class HttpHeader {
         return httpMethod;
     }
 
-    public String getPath() {
-        return path;
+    public PagePath getPath() {
+        return pagePath;
     }
 
     public String getVersion() {

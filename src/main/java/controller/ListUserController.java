@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
+import model.PagePath;
 import model.User;
 import utils.FileIoUtils;
 import http.HttpRequest;
@@ -26,7 +27,7 @@ public class ListUserController extends AbstractController {
         }
 
         try {
-            byte[] body = makeUserListBody(httpRequest.getPath());
+            byte[] body = makeUserListBody(httpRequest.getPath().getPagePath());
             httpResponse.response200Header(body.length);
             httpResponse.responseBody(body);
         } catch (IOException e) {
@@ -36,9 +37,9 @@ public class ListUserController extends AbstractController {
 
     }
 
-    private boolean isPossibleAccessUserList(String path) {
+    private boolean isPossibleAccessUserList(PagePath pagePath) {
         try {
-            return login.isLogin() && FileIoUtils.isExistFile("./templates" + path);
+            return login.isLogin() && FileIoUtils.isExistFile("./templates" + pagePath.getPagePath());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

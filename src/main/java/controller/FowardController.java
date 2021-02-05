@@ -9,13 +9,13 @@ import java.net.URISyntaxException;
 public class FowardController extends AbstractController {
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (isExistFile("./static" + httpRequest.getPath())) {
-            httpResponse.forwardStatic("./static" + httpRequest.getPath());
+        if (isExistFile("./static" + httpRequest.getPath().getPagePath())) {
+            httpResponse.forwardStatic("./static" + httpRequest.getPath().getPagePath());
             return;
         }
 
-        if (isExistFile("./templates" + httpRequest.getPath())) {
-            httpResponse.forwardTemplate("./templates" + httpRequest.getPath());
+        if (isExistFile("./templates" + httpRequest.getPath().getPagePath())) {
+            httpResponse.forwardTemplate("./templates" + httpRequest.getPath().getPagePath());
             return;
         }
 
