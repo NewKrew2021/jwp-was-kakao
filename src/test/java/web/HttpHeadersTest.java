@@ -6,7 +6,6 @@ import utils.IOUtils;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class HttpHeadersTest {
     @Test
