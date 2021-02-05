@@ -12,7 +12,7 @@ public class HttpHeaders {
     public static final String LOCATION = "Location";
     public static final String SET_COOKIE = "Set-Cookie";
     public static final String HTTP_1_1 = "HTTP/1.1 ";
-    private static final String DELIMITER = ": ";
+    private static final String DELIMITER = ":";
     private static final int SPLIT_SIZE = 2;
     private static final int KEY = 0;
     private static final int VALUE = 1;
@@ -27,7 +27,7 @@ public class HttpHeaders {
         Map<String, String> headers = new HashMap<>();
         for (String text : texts) {
             String[] keyAndValue = text.split(DELIMITER, SPLIT_SIZE);
-            headers.put(keyAndValue[KEY], keyAndValue[VALUE]);
+            headers.put(keyAndValue[KEY].trim(), keyAndValue[VALUE].trim());
         }
         return new HttpHeaders(headers);
     }
