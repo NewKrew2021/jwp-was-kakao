@@ -2,8 +2,8 @@ package controller;
 
 import db.DataBase;
 import model.User;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import http.HttpRequest;
+import http.HttpResponse;
 
 public class UserCreateController extends AbstractController {
     private static final String INDEX_URL = "/index.html";

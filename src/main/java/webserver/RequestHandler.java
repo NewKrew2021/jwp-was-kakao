@@ -2,6 +2,8 @@ package webserver;
 
 import controller.Controller;
 import controller.ControllerEntity;
+import http.HttpRequest;
+import http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

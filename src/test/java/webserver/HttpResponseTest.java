@@ -1,11 +1,10 @@
 package webserver;
 
+import http.HttpResponse;
 import org.junit.jupiter.api.Test;
 import utils.FileIoUtils;
 
 import java.io.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class HttpResponseTest {
     private String testDirectory = "./src/test/resources/";

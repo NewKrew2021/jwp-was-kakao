@@ -1,8 +1,8 @@
 package controller;
 
 import utils.TemplateUtils;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import http.HttpRequest;
+import http.HttpResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

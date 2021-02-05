@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import exception.MethodMappingException;
 

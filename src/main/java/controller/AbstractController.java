@@ -1,9 +1,9 @@
 package controller;
 
 import exception.MethodMappingException;
-import webserver.HttpMethod;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import http.HttpMethod;
+import http.HttpRequest;
+import http.HttpResponse;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

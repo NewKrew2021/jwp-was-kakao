@@ -1,9 +1,7 @@
-package webserver;
+package http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HttpRequest {
     private final HttpMethod method;

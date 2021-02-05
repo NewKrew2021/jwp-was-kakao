@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import java.util.*;
 import java.util.stream.Collectors;
