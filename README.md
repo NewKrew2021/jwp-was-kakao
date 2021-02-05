@@ -68,5 +68,12 @@
 #### Stylesheet 파일 지원 구현
 * [x] 모든 페이지에 Stylesheet 적용
 
+### 세션 구현하기
+
+#### HttpSession 정의 및 구현
+* [ ] HttpSession 객체 정의
+* [ ] HttpSession 관리하는 자료 구조 구현
+* [ ] 각 Controller에 세션 로직 구현
+
 ## 온라인 코드 리뷰 과정
 * [텍스트와 이미지로 살펴보는 온라인 코드 리뷰 과정](https://github.com/next-step/nextstep-docs/tree/master/codereview)
