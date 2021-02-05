@@ -30,14 +30,14 @@ public class RequestTest {
     void getMethodTest() throws Exception {
         InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
         Request request = Request.of(in);
-        assertEquals(request.getMethod(), HttpMethod.GET);
+        assertEquals(HttpMethod.GET, request.getMethod());
     }
 
     @Test
     void getUriTest() throws Exception {
         InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
         Request request = Request.of(in);
-        assertEquals(request.getUri(), "/index.html");
+        assertEquals("/index.html", request.getUri());
     }
 
 }

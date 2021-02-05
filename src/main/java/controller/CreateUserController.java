@@ -1,6 +1,7 @@
 package controller;
 
 import db.DataBase;
+import exception.NotDefinedMethodException;
 import model.User;
 import webserver.Request;
 import webserver.Response;
@@ -15,8 +16,6 @@ public class CreateUserController extends AbstractController {
 
     @Override
     public void doGet(Request request, Response response) throws Exception {
-        User user = User.of(request.getParameters());
-        DataBase.addUser(user);
-        response.sendRedirect("/index.html");
+        throw new NotDefinedMethodException();
     }
 }

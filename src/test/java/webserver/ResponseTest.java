@@ -2,6 +2,7 @@ package webserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
+import utils.ParseUtils;
 
 import java.io.*;
 
@@ -26,7 +27,7 @@ public class ResponseTest {
     public void responseForward() throws Exception {
         // Http_Forward.txt 결과는 응답 body에 index.html이 포함되어 있어야 한다.
         Response response = Response.of(createOutputStream("Http_Forward.txt"));
-        response.forward("/index.html");
+        response.forward("./templates/index.html");
     }
 
     @Test

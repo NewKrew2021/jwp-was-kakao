@@ -15,11 +15,11 @@ import java.util.regex.Pattern;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final int KEY_INDEX = 0;
-    private static final int VALUE_INDEX = 1;
-    private static final int METHOD_INDEX = 1;
-    private static final int URI_INDEX = 2;
-    private static final int PARAMETER_INDEX = 3;
+    private static final int KEY = 0;
+    private static final int VALUE = 1;
+    private static final int METHOD = 1;
+    private static final int REQUEST_URI = 2;
+    private static final int PARAMETER = 3;
     private static final int HTTP_VERSION = 4;
 
     private Map<String, String> headers = new HashMap<>();
@@ -59,12 +59,12 @@ public class Request {
         Pattern requestLinePattern = Pattern.compile("(GET|POST)\\s+([^?]+)(?:\\?(.+))?\\s+(HTTP/.+)");
         Matcher matcher = requestLinePattern.matcher(requestLineString);
         matcher.find();
-        method = HttpMethod.valueOf(matcher.group(METHOD_INDEX));
-        uri = URI.create(matcher.group(URI_INDEX));
+        method = HttpMethod.valueOf(matcher.group(METHOD));
+        uri = URI.create(matcher.group(REQUEST_URI));
         httpVersion = matcher.group(HTTP_VERSION);
 
-        if (matcher.group(PARAMETER_INDEX) != null) {
-            mapParameter(matcher.group(PARAMETER_INDEX));
+        if (matcher.group(PARAMETER) != null) {
+            mapParameter(matcher.group(PARAMETER));
         }
     }
 
@@ -72,7 +72,7 @@ public class Request {
         String[] tokens = body.split("&");
         for (String token : tokens) {
             String[] values = token.split("=");
-            parameters.put(values[KEY_INDEX].trim(), URLDecoder.decode(values[VALUE_INDEX],
+            parameters.put(values[KEY].trim(), URLDecoder.decode(values[VALUE],
                     java.nio.charset.StandardCharsets.UTF_8.toString()).trim());
         }
     }
@@ -80,7 +80,7 @@ public class Request {
     private void mapHeader(String line) {
         if (!line.equals("")) {
             String[] splitLine = line.split(":");
-            headers.put(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
+            headers.put(splitLine[KEY].trim(), splitLine[VALUE].trim());
         }
     }
 
