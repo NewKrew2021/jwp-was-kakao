@@ -6,20 +6,33 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
-    private String httpStatus;
-    private Map<String, String> headers;
+    private String httpStatus = "HTTP/1.1 404 NOT FOUND";
+    private Map<String, String> headers = new HashMap<>();
     private byte[] body;
 
-    public HttpResponse(String httpStatus, Map<String, String> headers, byte[] body) {
+    public void setStatus(String httpStatus) {
         this.httpStatus = httpStatus;
-        this.headers = headers;
+    }
+
+    public void setBody(byte[] body, String mimeType) throws IOException, URISyntaxException {
         this.body = body;
+        headers.put("Content-Type", mimeType);
+        headers.put("Content-Length", String.valueOf(body.length));
+    }
+
+    public void addHeader(String key, String value) {
+        headers.put(key, value);
+    }
+
+    public void addCookie(String name, String content) {
+        headers.put("Set-Cookie", name + "=" + content);
     }
 
     public void sendResponse(DataOutputStream dos) {
@@ -44,35 +57,4 @@ public class HttpResponse {
         return sb.toString();
     }
 
-    public static class Builder {
-        private String httpStatus;
-        private Map<String, String> headers = new HashMap<>();
-        private byte[] body;
-
-        public Builder status(String httpStatus) {
-            this.httpStatus = httpStatus;
-            return this;
-        }
-
-        public Builder body(byte[] body, String mimeType) throws IOException, URISyntaxException {
-            this.body = body;
-            headers.put("Content-Type", mimeType);
-            headers.put("Content-Length", String.valueOf(body.length));
-            return this;
-        }
-
-        public Builder header(String key, String value) {
-            headers.put(key, value);
-            return this;
-        }
-
-        public Builder redirect(String location) {
-            headers.put("Location", location);
-            return this;
-        }
-
-        public HttpResponse build() {
-            return new HttpResponse(httpStatus, headers, body);
-        }
-    }
 }

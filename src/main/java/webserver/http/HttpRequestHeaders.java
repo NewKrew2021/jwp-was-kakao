@@ -1,5 +1,6 @@
 package webserver.http;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,5 +28,18 @@ public class HttpRequestHeaders {
         } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    public String getCookie(String name) {
+        String cookies = getHeader("Cookie");
+        if(cookies == null) {
+            return null;
+        }
+        return Arrays.stream(cookies.split(";"))
+                .map(it -> it.split("=", 2))
+                .filter(it -> it[0].trim().equals(name))
+                .map(it -> it[1])
+                .findFirst()
+                .orElse(null);
     }
 }
