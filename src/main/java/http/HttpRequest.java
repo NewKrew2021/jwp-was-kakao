@@ -1,7 +1,12 @@
 package http;
 
+import utils.QueryStringParserUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Map;
 
 public class HttpRequest {
     private final HttpMethod method;
@@ -55,12 +60,10 @@ public class HttpRequest {
         return true;
     }
 
-    public void addParamsFromArgumentText(String argumentText) throws java.io.UnsupportedEncodingException {
-        String[] arguments = argumentText.split("&");
-        for (String argument : arguments) {
-            String[] parameter = argument.split("=");
-            parameters.addParameter(parameter[0], java.net.URLDecoder.decode(parameter[1], "UTF-8"));
-        }
+    public void addParamsFromArgumentText(String argumentText) throws UnsupportedEncodingException {
+        Map<String, String> argumentMap = QueryStringParserUtils.getParameterMapFromText(
+                URLDecoder.decode(argumentText, "UTF-8"), "&");
+        argumentMap.forEach(parameters::addParameter);
     }
 
     public String getHeaderValue(String headerName) {

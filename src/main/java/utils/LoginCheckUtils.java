@@ -1,9 +1,16 @@
 package utils;
 
+import java.util.Map;
+
 public class LoginCheckUtils {
-    public static boolean isLogin(String loginCookie) {
+
+    private static final String DELIMITER = ";";
+    private static final String LOGINED = "logined";
+
+    public static boolean isLogin(String cookie) {
         try {
-            return Boolean.parseBoolean(loginCookie.split("=")[1]);
+            Map<String, String> arguments = QueryStringParserUtils.getParameterMapFromText(cookie, DELIMITER);
+            return Boolean.parseBoolean(arguments.get(LOGINED));
         } catch (NullPointerException e) {
             return false;
         }
