@@ -3,9 +3,8 @@ package application.controller;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 
-public interface Controller {
-    String CONTENT_TYPE = "Content-Type";
-    String SET_COOKIE = "Set-Cookie";
+import java.io.IOException;
 
-    void service(HttpRequest httpRequest, HttpResponse httpResponse);
+public interface Controller {
+    void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException;
 }

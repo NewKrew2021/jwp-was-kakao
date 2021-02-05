@@ -39,16 +39,16 @@ public class RequestHandlerTest {
 
     @DisplayName("회원가입")
     @Test
-    void request_user_create() throws IOException, URISyntaxException {
+    void request_user_create() {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "1234");
-        postMap.add("name" , "def");
-        postMap.add("email" , "abc@email.com");
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+        postMap.add("userId", "abc");
+        postMap.add("password", "1234");
+        postMap.add("name", "def");
+        postMap.add("email", "abc@email.com");
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap, headers);
 
         String resourceUrl = "http://localhost:8080";
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
@@ -57,24 +57,24 @@ public class RequestHandlerTest {
 
     @DisplayName("로그인 성공")
     @Test
-    void request_user_login() throws IOException, URISyntaxException {
+    void request_user_login() {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "1234");
-        postMap.add("name" , "def");
-        postMap.add("email" , "abc@email.com");
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+        postMap.add("userId", "abc");
+        postMap.add("password", "1234");
+        postMap.add("name", "def");
+        postMap.add("email", "abc@email.com");
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap, headers);
 
         String resourceUrl = "http://localhost:8080";
         restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
 
         postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "1234");
-        request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+        postMap.add("userId", "abc");
+        postMap.add("password", "1234");
+        request = new HttpEntity<MultiValueMap<String, String>>(postMap, headers);
 
         resourceUrl = "http://localhost:8080";
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);
@@ -90,19 +90,19 @@ public class RequestHandlerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "1234");
-        postMap.add("name" , "def");
-        postMap.add("email" , "abc@email.com");
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+        postMap.add("userId", "abc");
+        postMap.add("password", "1234");
+        postMap.add("name", "def");
+        postMap.add("email", "abc@email.com");
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(postMap, headers);
 
         String resourceUrl = "http://localhost:8080";
         restTemplate.postForEntity(resourceUrl + "/user/create", request, String.class);
 
         postMap = new LinkedMultiValueMap<>();
-        postMap.add("userId" , "abc");
-        postMap.add("password" , "12345");
-        request = new HttpEntity<MultiValueMap<String, String>>(postMap,headers );
+        postMap.add("userId", "abc");
+        postMap.add("password", "12345");
+        request = new HttpEntity<MultiValueMap<String, String>>(postMap, headers);
 
         resourceUrl = "http://localhost:8080";
         ResponseEntity<String> response = restTemplate.postForEntity(resourceUrl + "/user/login", request, String.class);

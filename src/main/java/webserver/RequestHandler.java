@@ -40,7 +40,7 @@ public class RequestHandler implements Runnable {
 
             Controller controller = controllers.getOrDefault(httpRequest.getPath(), new FowardController());
 
-            controller.service(httpRequest,httpResponse);
+            controller.service(httpRequest, httpResponse);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

@@ -4,10 +4,12 @@ import org.springframework.http.HttpMethod;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
 
+import java.io.IOException;
+
 public class AbstractController implements Controller {
 
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         if (httpRequest.getHeader("Cookie").contains("logined=true")) {
             httpResponse.addHeader("Set-Cookie", "logined=true");
         }
@@ -21,11 +23,11 @@ public class AbstractController implements Controller {
         }
     }
 
-    protected void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    protected void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
 
     }
 
-    protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+    protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
 
     }
 
