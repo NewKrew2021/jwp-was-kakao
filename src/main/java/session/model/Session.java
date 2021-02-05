@@ -5,14 +5,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Session {
-    private final UUID id;
+    private final String id;
     private final Map<String, Object> session = new HashMap<>();
 
-    public Session(UUID id) {
-        this.id = id;
+    public Session() {
+        UUID id = UUID.randomUUID();
+        this.id = id.toString();
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 

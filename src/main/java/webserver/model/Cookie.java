@@ -13,6 +13,7 @@ public class Cookie {
     public static final String LOGINED = "logined";
     public static final String LOGINED_TRUE = "true";
     public static final String LOGINED_FALSE = "false";
+    public static final String SESSION = "session";
 
     private Map<String, String> cookies = new HashMap<>();
 

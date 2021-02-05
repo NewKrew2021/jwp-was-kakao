@@ -1,10 +1,14 @@
 package webserver.controller;
 
+import session.controller.SessionController;
+import session.model.Session;
 import user.controller.UserController;
 import user.model.User;
 import utils.FileIoUtils;
 import webserver.RequestHandler;
 import webserver.model.*;
+
+import java.util.Objects;
 
 public class UserLoginController implements Controller {
 
@@ -20,18 +24,18 @@ public class UserLoginController implements Controller {
         String password = httpRequest.getParameter(Parameter.PASSWORD);
         User user = UserController.findUserById(id);
 
-        String logined = Cookie.LOGINED_TRUE;
-        String location = RequestHandler.BASE_URL;
+        HttpResponse httpResponse = new HttpResponse();
 
-        if (user == null || !user.getPassword().equals(password)) {
-            logined = Cookie.LOGINED_FALSE;
-            location = FileIoUtils.LOGIN_FAIL_PATH;
+        String location = FileIoUtils.LOGIN_FAIL_PATH;
+
+        if (!Objects.isNull(user) && user.getPassword().equals(password)) {
+            location = RequestHandler.BASE_URL;
+            Session session = SessionController.createSession();
+            httpResponse.addCookie(Cookie.SESSION, session.getId());
         }
 
-        HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.FOUND);
         httpResponse.addHeader(HttpHeader.LOCATION, location);
-        httpResponse.addCookie(Cookie.LOGINED, logined);
 
         return httpResponse;
     }

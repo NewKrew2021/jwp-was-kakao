@@ -6,26 +6,24 @@ import org.slf4j.LoggerFactory;
 import session.model.Session;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class SessionController {
     private static final Logger log = LoggerFactory.getLogger(SessionController.class);
-    private static final Map<UUID, Session> sessions = Maps.newHashMap();
+    private static final Map<String, Session> sessions = Maps.newHashMap();
 
     public static Session createSession() {
-        UUID id = UUID.randomUUID();
-        Session session = new Session(id);
+        Session session = new Session();
         log.debug("new session {}", session);
-        sessions.put(id, session);
+        sessions.put(session.getId(), session);
         return session;
     }
 
-    public static Session findSession(UUID id) {
+    public static Session findSession(String id) {
         log.debug("find session {}", id);
         return sessions.get(id);
     }
 
-    public static void invalidateSession(UUID id) {
+    public static void invalidateSession(String id) {
         log.debug("invalidating session {}", id);
 //        sessions.get(id).invalidate();
         sessions.remove(id);

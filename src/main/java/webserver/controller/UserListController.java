@@ -4,12 +4,15 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import session.controller.SessionController;
+import session.model.Session;
 import user.controller.UserController;
 import utils.FileIoUtils;
 import webserver.model.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 public class UserListController implements Controller {
 
@@ -24,7 +27,7 @@ public class UserListController implements Controller {
     public HttpResponse service(HttpRequest httpRequest) {
         HttpResponse httpResponse = new HttpResponse();
 
-        if (isLogined(httpRequest)) {
+        if (!isLogined(httpRequest)) {
             return loginFailedService(httpResponse);
         }
 
@@ -32,8 +35,8 @@ public class UserListController implements Controller {
     }
 
     private boolean isLogined(HttpRequest httpRequest) {
-        return httpRequest.getCookie(Cookie.LOGINED) == null
-                || httpRequest.getCookie(Cookie.LOGINED).equals(Cookie.LOGINED_FALSE);
+        String sessionId = httpRequest.getCookie(Cookie.SESSION);
+        return !Objects.isNull(SessionController.findSession(sessionId));
     }
 
     private HttpResponse loginSuccessedService(HttpResponse httpResponse) {
