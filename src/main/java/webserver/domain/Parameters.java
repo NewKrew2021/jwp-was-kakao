@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class Parameters {
-    private static final String AMPERSAND = "&";
+    private static final String PARAM_DELIMITER = "&";
     private static final String EQUAL_SIGN = "=";
     private Map<String, String> parameters = Maps.newHashMap();
 
@@ -24,7 +24,7 @@ public class Parameters {
             return;
         }
 
-        Stream.of(line.split(AMPERSAND))
+        Stream.of(line.split(PARAM_DELIMITER))
                 .forEach(pairValue -> {
                     String[] pair = pairValue.split(EQUAL_SIGN);
                     try {
