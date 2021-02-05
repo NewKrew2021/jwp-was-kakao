@@ -4,7 +4,7 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
+import user.controller.UserController;
 import utils.FileIoUtils;
 import webserver.model.*;
 
@@ -76,7 +76,7 @@ public class UserListController implements Controller {
         Handlebars handlebars = new Handlebars(loader);
 
         Template template = handlebars.compile(path);
-        String profilePage = template.apply(DataBase.findAll());
+        String profilePage = template.apply(UserController.findAll());
 
         return profilePage;
     }

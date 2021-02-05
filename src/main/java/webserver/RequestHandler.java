@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.IOUtils;
 import webserver.controller.Controller;
+import webserver.controller.ControllerMapper;
 import webserver.model.HttpRequest;
 import webserver.model.HttpResponse;
 
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -55,8 +55,6 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-
-
     }
 
     private void writeResponse(DataOutputStream dos, HttpResponse response) throws IOException {

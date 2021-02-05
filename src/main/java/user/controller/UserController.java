@@ -1,13 +1,13 @@
-package db;
+package user.controller;
 
 import java.util.Collection;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import model.User;
+import user.model.User;
 
-public class DataBase {
+public class UserController {
     private static Map<String, User> users = Maps.newHashMap();
 
     public static void addUser(User user) {

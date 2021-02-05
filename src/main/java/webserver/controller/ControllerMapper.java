@@ -1,6 +1,6 @@
-package webserver;
+package webserver.controller;
 
-import webserver.controller.*;
+
 import webserver.model.HttpRequest;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package webserver.controller;
 
-import db.DataBase;
-import model.User;
+import user.controller.UserController;
+import user.model.User;
 import webserver.RequestHandler;
 import webserver.model.*;
 
@@ -21,7 +21,7 @@ public class UserCreateController implements Controller {
                 httpRequest.getParameter(Parameter.NAME),
                 httpRequest.getParameter(Parameter.EMAIL)
         );
-        DataBase.addUser(user);
+        UserController.addUser(user);
 
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.FOUND);

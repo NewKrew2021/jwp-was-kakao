@@ -1,5 +1,6 @@
 package webserver.model;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,18 +30,18 @@ public class HttpHeaderTest {
     @DisplayName("get Header")
     @Test
     void getHeader() {
-        assertThat(httpHeader1.getHeader("Host")).isEqualTo("localhost:8080");
-        assertThat(httpHeader1.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(httpHeader1.getHeader("Accept")).isEqualTo("*/*");
+        Assertions.assertThat(httpHeader1.getHeader("Host")).isEqualTo("localhost:8080");
+        Assertions.assertThat(httpHeader1.getHeader("Connection")).isEqualTo("keep-alive");
+        Assertions.assertThat(httpHeader1.getHeader("Accept")).isEqualTo("*/*");
     }
 
     @DisplayName("get Cookie")
     @Test
     void getCookie() {
-        assertThat(httpHeader1.getCookie("logined")).isEqualTo(null);
-        assertThat(httpHeader1.getCookie("username")).isEqualTo(null);
-        assertThat(httpHeader2.getCookie("logined")).isEqualTo("true");
-        assertThat(httpHeader2.getCookie("username")).isEqualTo("javajigi");
+        Assertions.assertThat(httpHeader1.getCookie("logined")).isEqualTo(null);
+        Assertions.assertThat(httpHeader1.getCookie("username")).isEqualTo(null);
+        Assertions.assertThat(httpHeader2.getCookie("logined")).isEqualTo("true");
+        Assertions.assertThat(httpHeader2.getCookie("username")).isEqualTo("javajigi");
     }
 
     @DisplayName("headerString")
@@ -57,8 +58,8 @@ public class HttpHeaderTest {
                 + "Set-Cookie: logined=true; Path=/\r\n"
                 + "Set-Cookie: username=javajigi; Path=/\r\n"
                 + "\r\n";
-        assertThat(httpHeader1.toString()).isEqualTo(headerString1);
-        assertThat(httpHeader2.toString()).isEqualTo(headerString2);
+        Assertions.assertThat(httpHeader1.toString()).isEqualTo(headerString1);
+        Assertions.assertThat(httpHeader2.toString()).isEqualTo(headerString2);
     }
     
 }

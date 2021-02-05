@@ -1,7 +1,7 @@
 package webserver.controller;
 
-import db.DataBase;
-import model.User;
+import user.controller.UserController;
+import user.model.User;
 import utils.FileIoUtils;
 import webserver.RequestHandler;
 import webserver.model.*;
@@ -18,7 +18,7 @@ public class UserLoginController implements Controller {
     public HttpResponse service(HttpRequest httpRequest) {
         String id = httpRequest.getParameter(Parameter.USERID);
         String password = httpRequest.getParameter(Parameter.PASSWORD);
-        User user = DataBase.findUserById(id);
+        User user = UserController.findUserById(id);
 
         String logined = Cookie.LOGINED_TRUE;
         String location = RequestHandler.BASE_URL;

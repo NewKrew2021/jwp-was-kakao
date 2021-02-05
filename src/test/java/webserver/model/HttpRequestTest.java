@@ -1,5 +1,6 @@
 package webserver.model;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class HttpRequestTest {
         InputStream is = new ByteArrayInputStream(request1.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);
-        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
+        Assertions.assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
     }
 
     @DisplayName("POST method")
@@ -50,7 +51,7 @@ public class HttpRequestTest {
         InputStream is = new ByteArrayInputStream(request3.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);
-        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
+        Assertions.assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
     }
 
     @DisplayName("path")
@@ -59,7 +60,7 @@ public class HttpRequestTest {
         InputStream is = new ByteArrayInputStream(request1.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);
-        assertThat(httpRequest.getPath()).isEqualTo("/index.html");
+        Assertions.assertThat(httpRequest.getPath()).isEqualTo("/index.html");
     }
 
     @DisplayName("query parameters")
@@ -69,9 +70,9 @@ public class HttpRequestTest {
 
         HttpRequest httpRequest = new HttpRequest(is);
 
-        assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
-        assertThat(httpRequest.getParameter("password")).isEqualTo("password");
-        assertThat(httpRequest.getParameter("name")).isEqualTo("박재성");
-        assertThat(httpRequest.getParameter("email")).isEqualTo("javajigi@slipp.net");
+        Assertions.assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
+        Assertions.assertThat(httpRequest.getParameter("password")).isEqualTo("password");
+        Assertions.assertThat(httpRequest.getParameter("name")).isEqualTo("박재성");
+        Assertions.assertThat(httpRequest.getParameter("email")).isEqualTo("javajigi@slipp.net");
     }
 }
