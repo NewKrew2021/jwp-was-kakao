@@ -1,7 +1,8 @@
 package model;
 
+import domain.Cookie;
 import org.junit.jupiter.api.Test;
-import webserver.HttpRequest;
+import domain.HttpRequest;
 
 import java.io.*;
 import java.net.URISyntaxException;

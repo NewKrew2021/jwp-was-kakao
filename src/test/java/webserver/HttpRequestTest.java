@@ -1,9 +1,7 @@
 package webserver;
 
+import domain.HttpRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 

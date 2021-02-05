@@ -2,6 +2,8 @@ package webserver;
 
 import controller.Controller;
 import controller.ControllerEntity;
+import domain.HttpRequest;
+import domain.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ public class RequestHandler implements Runnable {
 
             Controller controller = ControllerEntity.getControllers(httpRequest.getPath());
             controller.service(httpRequest, httpResponse);
+
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }

@@ -1,9 +1,10 @@
-package webserver;
+package domain;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpRequest {
     private static final String URL_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
@@ -20,6 +21,16 @@ public class HttpRequest {
 
         makeHeaders(br);
         makeParameters(br, url);
+        makeSession();
+    }
+
+    private void makeSession() {
+        Cookie cookie = new Cookie(this);
+        Optional<String> sessionId = cookie.getSession();
+
+        if(sessionId.isPresent() && !SessionHandler.getSession(sessionId)){
+            SessionHandler.addSession(sessionId.get());
+        }
     }
 
     private void makeParameters(BufferedReader br, String[] url) throws IOException {
