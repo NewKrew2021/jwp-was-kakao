@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
 public class CreateUserController extends AbstractController {
 
     @Override
-    protected void doPost(HttpRequest request, HttpResponse response) throws IOException, URISyntaxException {
+    protected void doPost(HttpRequest request, HttpResponse response) throws IOException {
         User user = User.mapOf(request.getBodies());
         DataBase.addUser(user);
         response.sendRedirect("/index.html");

@@ -15,7 +15,7 @@ import static framework.common.HttpHeaders.SET_COOKIE;
 public class LoginController extends AbstractController {
 
     @Override
-    protected void doPost(HttpRequest request, HttpResponse response) throws IOException, URISyntaxException {
+    protected void doPost(HttpRequest request, HttpResponse response) throws IOException {
         Map<String, String> parameters = request.getBodies();
         User user = DataBase.findUserById(parameters.get("userId"));
 

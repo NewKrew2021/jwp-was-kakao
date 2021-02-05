@@ -1,9 +1,6 @@
-package framework.controller.common;
+package service.controller;
 
 import framework.controller.Controller;
-import service.controller.CreateUserController;
-import service.controller.ListUserController;
-import service.controller.LoginController;
 
 import java.util.HashMap;
 import java.util.Map;
