@@ -33,7 +33,7 @@ public class ListUserController extends AbstractController {
             response.sendRedirect("/user/login.html");
         } catch (InvalidSessionException e) {
             e.printStackTrace();
-            response.badRequest();
+            response.sendRedirect("/user/login.html");
         } catch (Exception e) {
             e.printStackTrace();
             response.internalServerError();

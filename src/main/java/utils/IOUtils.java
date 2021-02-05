@@ -17,4 +17,14 @@ public class IOUtils {
         br.read(body, 0, contentLength);
         return String.copyValueOf(body);
     }
+
+    public static String readDate(BufferedReader br) throws IOException {
+        String lines = "";
+        String line;
+        while (!"".equals((line = br.readLine()))) {
+            lines += line + "\n";
+        }
+
+        return lines;
+    }
 }

@@ -12,14 +12,8 @@ import java.util.Map;
 public class HttpResponse {
     private OutputStream out;
     private String status;
-    private Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
     private byte[] body = new byte[0];
-
-    public void setBody(byte[] body, String contentType) {
-        this.body = body;
-        this.headers.put("Content-Type", contentType + ";charset=utf-8");
-        this.headers.put("Content-Length", "" + body.length);
-    }
 
     public HttpResponse(byte[] body) {
         setBody(body, "");
@@ -32,6 +26,12 @@ public class HttpResponse {
 
     public HttpResponse(OutputStream out) {
         this.out = out;
+    }
+
+    public void setBody(byte[] body, String contentType) {
+        this.body = body;
+        this.headers.put("Content-Type", contentType + ";charset=utf-8");
+        this.headers.put("Content-Length", "" + body.length);
     }
 
     public void addHeader(String key, String value) {
@@ -116,5 +116,9 @@ public class HttpResponse {
         } catch (IOException e) {
 
         }
+    }
+
+    public void setSessionId(String sessionId) {
+        headers.put("Set-Cookie", "SessionId=" + sessionId + "; Path=/");
     }
 }

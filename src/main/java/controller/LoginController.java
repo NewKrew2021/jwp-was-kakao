@@ -17,11 +17,11 @@ public class LoginController extends AbstractController {
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
-        User user = DataBase.findUserById(request.getParams().get("userId"));
-        if (user != null && user.getPassword().equals(request.getParams().get("password"))) {
+        User user = DataBase.findUserById(request.getParameter("userId"));
+        if (user != null && user.getPassword().equals(request.getParameter("password"))) {
             String sessionId = String.valueOf(UUID.randomUUID());
 
-            response.addHeader("Set-Cookie", "SessionId=" + sessionId + "; Path=/");
+            response.setSessionId(sessionId);
             response.sendRedirect("/index.html");
 
             HttpSessions.add(new HttpSession(sessionId));

@@ -1,98 +1,86 @@
 package dto;
 
+import dto.request.RequestHeaders;
+import dto.request.RequestMethod;
+import dto.request.RequestParams;
+import dto.request.RequestPath;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HttpRequest {
-    private String method;
-    private String path;
-    private final Map<String, String> params = new HashMap<>();
-    private final Map<String, String> headers = new HashMap<>();
+    public static final int FIRST_LINE = 0;
+    public static final int METHOD = 0;
+    public static final int URL = 1;
+    public static final int PATH = 0;
+    public static final int QUERY = 1;
+
+    private RequestMethod method;
+    private RequestPath path;
+    private final RequestParams params = new RequestParams();
+    private RequestHeaders headers;
+
+    public HttpRequest(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        setRequest(IOUtils.readDate(br));
+
+        if (getContentLength() != 0) {
+            setBody(IOUtils.readData(br, getContentLength()));
+        }
+    }
+
 
     private void setRequest(String message) {
         String[] lines = message.split("\n");
-        String[] firstLineTokens = lines[0].split(" ");
+        String[] firstLineTokens = lines[FIRST_LINE].split(" ");
 
-        method = firstLineTokens[0];
+        method = RequestMethod.of(firstLineTokens[METHOD]);
 
-        String[] url = firstLineTokens[1].split("\\?");
-        path = url[0];
-        if(url.length != 1) {
-            String[] queries = url[1].split("&");
-            for (String q : queries) {
-                String key = q.split("=")[0];
-                String value = q.split("=")[1];
-                params.put(key, value);
-            }
+        String[] url = firstLineTokens[URL].split("\\?");
+        path = new RequestPath(url[PATH]);
+        if (containsQuery(url)) {
+            params.putBy(url[QUERY]);
         }
 
-        for(int i = 1; i < lines.length ; i++){
-            headers.put(lines[i].split(":")[0], lines[i].split(":")[1].trim());
-        }
+        headers = new RequestHeaders(lines);
     }
 
-    public HttpRequest(InputStream in){
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String lines = "";
-            String line;
-            while (!"".equals((line = br.readLine()))) {
-                lines += line + "\n";
-            }
-            setRequest(lines);
+    private boolean containsQuery(String[] url) {
+        return url.length != 1;
+    }
 
-            if (getContentLength() != 0) {
-                setBody(IOUtils.readData(br, getContentLength()));
-            }
-
-        } catch (Exception e){
-
-        }
+    private void setBody(String body) {
+        params.putBy(body);
     }
 
     public String getMethod() {
-        return method;
+        return method.getMethod();
     }
 
     public String getPath() {
-        return path;
+        return path.getPath();
     }
 
-    public Map<String, String> getParams() {
-        return params;
-    }
-
-    private int getContentLength(){
-        if(headers.containsKey("Content-Length")){
+    private int getContentLength() {
+        if (headers.containsKey("Content-Length")) {
             return Integer.parseInt(headers.get("Content-Length"));
         }
 
         return 0;
     }
 
-    private void setBody(String body) {
-        String[] queries = body.split("&");
-        for (String q : queries) {
-            String key = q.split("=")[0];
-            String value = q.split("=")[1];
-            params.put(key, value);
-        }
-    }
-
-    public String getCookie(){
-        if(headers.containsKey("Cookie")){
+    public String getCookie() {
+        if (headers.containsKey("Cookie")) {
             return headers.get("Cookie");
         }
         return "logined=false";
     }
 
-    public String getHeader(String param){
-        if(headers.containsKey(param)){
+    public String getHeader(String param) {
+        if (headers.containsKey(param)) {
             return headers.get(param);
         }
         return "";
