@@ -3,23 +3,32 @@ package handler;
 import db.DataBase;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import web.HttpHeaders;
-import web.HttpRequest;
-import web.HttpResponse;
-import web.HttpUrl;
+import web.*;
 import webserver.HttpServlet;
+import webserver.SessionManager;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class UserLoginHandler implements HttpServlet {
+    private final SessionManager sessionManager;
+
+    public UserLoginHandler(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+    }
+
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
         Map<String, String> parameters = HttpUrl.parseParameter(httpRequest.getHttpBody().getBody());
 
         return DataBase.findUserById(parameters.get("userId"))
                 .filter(user -> user.isSamePassword(parameters.get("password")))
-                .map(user -> getResponse("/index.html", "logined=true; Path=/"))
-                .orElseGet(() -> getResponse("/user/login_failed.html", "logined=false; Path=/"));
+                .map(user -> {
+                    UUID uuid = UUID.randomUUID();
+                    sessionManager.add(HttpSession.of(uuid));
+                    return getResponse("/index.html", "SESSIONID=" + uuid.toString() + "; Path=/");
+                })
+                .orElseGet(() -> getResponse("/user/login_failed.html", "Path=/"));
     }
 
     private HttpResponse getResponse(String location, String cookie) {

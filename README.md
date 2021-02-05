@@ -28,3 +28,4 @@
 
 ## 3단계
 - [x] HttpSession 추가
+- [x] 로그인 기능에 HttpSession 적용
