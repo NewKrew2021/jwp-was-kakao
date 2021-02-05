@@ -11,7 +11,7 @@ public class Response {
     private final ResponseBody body;
     private final ContentType contentType;
 
-    public Response(HttpVersion httpVersion,
+    private Response(HttpVersion httpVersion,
                     StatusCode statusCode,
                     ResponseHeaders headers,
                     ResponseBody body,
@@ -60,7 +60,6 @@ public class Response {
                 responseBody,
                 ContentType.HTML
         );
-
     }
 
     public void addHeader(String key, String value) {
