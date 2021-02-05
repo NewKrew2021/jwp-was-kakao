@@ -2,14 +2,13 @@ package webserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
-import utils.ParseUtils;
 
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ResponseTest {
-    private String testDirectory = "./src/test/resources/";
+    private final String testDirectory = "./src/test/resources/";
 
     @Test
     public void request_POST2() throws Exception {

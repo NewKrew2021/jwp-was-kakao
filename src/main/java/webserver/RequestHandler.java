@@ -13,8 +13,8 @@ import java.util.Map;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
-    private Map<String, Controller> controllers = new HashMap<>();
+    private final Socket connection;
+    private final Map<String, Controller> controllers = new HashMap<>();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;

@@ -5,7 +5,7 @@ import annotation.web.Controller;
 
 @Controller
 public class QnaController {
-    private MyQnaService qnaService;
+    private final MyQnaService qnaService;
 
     @Autowired
     public QnaController(MyQnaService qnaService) {

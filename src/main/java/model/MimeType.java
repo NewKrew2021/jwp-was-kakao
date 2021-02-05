@@ -19,8 +19,8 @@ public enum MimeType {
     WOFF2("woff2", "application/font-woff2"),
     DEFAULT("", "application/octet-stream");
 
-    private String extension;
-    private String contentType;
+    private final String extension;
+    private final String contentType;
 
     MimeType(String extension, String contentType) {
         this.extension = extension;

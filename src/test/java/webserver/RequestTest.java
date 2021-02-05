@@ -3,14 +3,13 @@ package webserver;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RequestTest {
-    private String testDirectory = "./src/test/resources/";
+    private final String testDirectory = "./src/test/resources/";
 
     @Test
     public void request_POST() throws Exception {

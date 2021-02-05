@@ -5,12 +5,10 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
-import utils.ParseUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +16,8 @@ import java.util.Map;
 public class Response {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private DataOutputStream dos;
-    private Map<String, String> headers = new HashMap<>();
+    private final DataOutputStream dos;
+    private final Map<String, String> headers = new HashMap<>();
 
     private Response(OutputStream out) {
         dos = new DataOutputStream(out);
@@ -34,7 +32,7 @@ public class Response {
     }
 
     public void forward(String location) throws Exception {
-        logger.debug("MIME TYPE : {} {}",MimeType.getMimeType(location), location);
+        logger.debug("MIME TYPE : {} {}", MimeType.getMimeType(location), location);
 
         byte[] body = FileIoUtils.loadFileFromClasspath(location);
 
@@ -44,7 +42,7 @@ public class Response {
     }
 
     public void userListForward(String location, Collection<User> users) throws IOException {
-        logger.debug("MIME TYPE : {} {}", MimeType.getMimeType(location),location);
+        logger.debug("MIME TYPE : {} {}", MimeType.getMimeType(location), location);
 
         byte[] body = FileIoUtils.loadCompiledFileFromClassPath(location, users);
 

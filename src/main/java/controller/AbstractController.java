@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractController implements Controller {
-    private static Map<MimeType, String> contentLocation = new HashMap<>();
+    private static final Map<MimeType, String> contentLocation = new HashMap<>();
 
     static {
         contentLocation.put(MimeType.getMimeType(".ico"), "./templates");
@@ -30,7 +30,7 @@ public abstract class AbstractController implements Controller {
         }
     }
 
-    public abstract void doPost(Request request, Response response)  throws Exception;
+    public abstract void doPost(Request request, Response response) throws Exception;
 
     public abstract void doGet(Request request, Response response) throws Exception;
 }

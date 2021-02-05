@@ -21,8 +21,8 @@ public class Request {
     private static final int PARAMETER = 3;
     private static final int HTTP_VERSION = 4;
 
-    private Map<String, String> headers = new HashMap<>();
-    private Map<String, String> parameters = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> parameters = new HashMap<>();
     private HttpMethod method;
     private URI uri;
     private String httpVersion;
@@ -33,6 +33,10 @@ public class Request {
         initializeRequestLine(br);
         initializeHeader(br);
         initializeParameter(br);
+    }
+
+    public static Request of(InputStream in) throws Exception {
+        return new Request(in);
     }
 
     private void initializeRequestLine(BufferedReader br) throws Exception {
@@ -87,10 +91,6 @@ public class Request {
             Map.Entry<String, String> elem = ParseUtils.parseParametersByColon(headerText);
             headers.put(elem.getKey(), elem.getValue());
         }
-    }
-
-    public static Request of(InputStream in) throws Exception {
-        return new Request(in);
     }
 
     public HttpMethod getMethod() {

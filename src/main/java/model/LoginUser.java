@@ -3,8 +3,8 @@ package model;
 import java.util.Map;
 
 public class LoginUser {
-    private String userId;
-    private String password;
+    private final String userId;
+    private final String password;
 
     private LoginUser(String userId, String password) {
         this.userId = userId;
