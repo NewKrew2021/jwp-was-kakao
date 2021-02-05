@@ -22,7 +22,7 @@ public class HttpRequestTest {
 
         assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(httpRequest.getPath()).isEqualTo("/user/create");
-        assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(httpRequest.getHeaderValue("Connection")).isEqualTo("keep-alive");
         assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
     }
 
@@ -35,7 +35,7 @@ public class HttpRequestTest {
 
         assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
         assertThat(httpRequest.getPath()).isEqualTo("/user/create");
-        assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(httpRequest.getHeaderValue("Connection")).isEqualTo("keep-alive");
         assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
     }
 
@@ -48,7 +48,7 @@ public class HttpRequestTest {
 
         assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
         assertThat(httpRequest.getPath()).isEqualTo("/user/create");
-        assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(httpRequest.getHeaderValue("Connection")).isEqualTo("keep-alive");
         assertThat(httpRequest.getParameter("id")).isEqualTo("1");
         assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
     }

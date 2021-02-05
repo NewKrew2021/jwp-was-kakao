@@ -43,6 +43,6 @@ public class RequestHandler implements Runnable {
 
 
     private String getContentType(HttpRequest httpRequest) {
-        return httpRequest.getHeader("Accept").split(",")[0] + ";charset=utf-8";
+        return httpRequest.getHeaderValue("Accept").split(",")[0] + ";charset=utf-8";
     }
 }

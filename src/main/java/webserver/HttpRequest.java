@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
-    private HttpMethod method;
-    private String path;
-    private Map<String, String> headers;
-    private Map<String, String> parameters;
+    private final HttpMethod method;
+    private final String path;
+    private final HttpHeaders headers;
+    private final HttpParameters parameters;
 
     public HttpRequest(BufferedReader br) throws IOException {
+        headers = new HttpHeaders();
+        parameters = new HttpParameters();
         String[] request = br.readLine().split(" ");
         String[] url = request[1].split("\\?");
         method = HttpMethod.from(request[0]);
@@ -22,33 +24,23 @@ public class HttpRequest {
     }
 
     private void makeParameters(BufferedReader br, String[] url) throws IOException {
-        parameters = new HashMap<>();
-
         if (url.length > 1) {
-            parseArgument(url[1]);
+            addParamsFromArgumentText(url[1]);
         }
         if (hasBody()) {
-            int contentLength = Integer.parseInt(getHeader("Content-Length"));
+            int contentLength = Integer.parseInt(headers.getValue("Content-Length"));
             String body = utils.IOUtils.readData(br, contentLength);
-            parseArgument(body);
+            addParamsFromArgumentText(body);
         }
     }
 
     private void makeHeaders(BufferedReader br) throws IOException {
-        headers = new HashMap<>();
+
 
         String line;
         while ((line = br.readLine()) != null && !line.equals("")) {
             String[] buf = line.split(": ");
-            headers.put(buf[0], buf[1]);
-        }
-    }
-
-    protected void parseArgument(String argumentText) throws java.io.UnsupportedEncodingException {
-        String[] arguments = argumentText.split("&");
-        for (String argument : arguments) {
-            String[] parameter = argument.split("=");
-            parameters.put(parameter[0], java.net.URLDecoder.decode(parameter[1], "UTF-8"));
+            headers.addHeader(buf[0], buf[1]);
         }
     }
 
@@ -56,13 +48,25 @@ public class HttpRequest {
         if (HttpMethod.GET.equals(method)) {
             return false;
         }
-        if (getHeader("Content-Length") == null) {
+        if (headers.getValue("Content-Length") == null) {
             return false;
         }
-        if (Integer.parseInt(getHeader("Content-Length")) == 0) {
+        if (Integer.parseInt(headers.getValue("Content-Length")) == 0) {
             return false;
         }
         return true;
+    }
+
+    public void addParamsFromArgumentText(String argumentText) throws java.io.UnsupportedEncodingException {
+        String[] arguments = argumentText.split("&");
+        for (String argument : arguments) {
+            String[] parameter = argument.split("=");
+            parameters.addParameter(parameter[0], java.net.URLDecoder.decode(parameter[1], "UTF-8"));
+        }
+    }
+
+    public String getHeaderValue(String headerName) {
+        return headers.getValue(headerName);
     }
 
     public HttpMethod getMethod() {
@@ -73,11 +77,7 @@ public class HttpRequest {
         return path;
     }
 
-    public String getHeader(String header) {
-        return this.headers.get(header);
-    }
-
-    public String getParameter(String key) {
-        return parameters.get(key);
+    public String getParameter(String ParameterName) {
+        return parameters.getValue(ParameterName);
     }
 }

@@ -12,7 +12,7 @@ public class UserListController extends AbstractController {
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        if (!isLogin(httpRequest.getHeader("Cookie"))) {
+        if (!isLogin(httpRequest.getHeaderValue("Cookie"))) {
             httpResponse.sendRedirect(LOGIN_URL);
             return;
         }

@@ -6,44 +6,45 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Map<String, String> header;
-    private DataOutputStream dos;
+    private final HttpHeaders headers;
+    private final DataOutputStream dos;
 
     public HttpResponse(DataOutputStream dos) {
-        header = new HashMap<>();
+        this.headers = new HttpHeaders();
         this.dos = dos;
     }
 
-    public void addHeader(String key, String value) {
-        header.put(key, value);
-    }
-
     public void forward(byte[] body) {
-        addHeader("Content-Length", Integer.toString(body.length));
+        headers.addHeader("Content-Length", Integer.toString(body.length));
         response200Header();
         responseBody(body);
     }
 
     public void sendRedirect(String url) {
-        addHeader("Location", "http://localhost:8080" + url);
+        headers.addHeader("Location", "http://localhost:8080" + url);
         response302Header();
     }
 
     public void setCookie(String cookie) {
-        addHeader("Set-Cookie", "logined=" + cookie + "; Path=/");
+        headers.addHeader("Set-Cookie", "logined=" + cookie + "; Path=/");
+    }
+
+    public void addHeader(String headerName, String headerValue) {
+        headers.addHeader(headerName, headerValue);
     }
 
     private void response200Header() {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            for (String key : header.keySet()) {
-                dos.writeBytes(key + ": " + header.get(key) + "\r\n");
-            }
+            dos.writeBytes(String.join("\r\n", headers.toStringList()));
+            dos.writeBytes("\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -53,9 +54,8 @@ public class HttpResponse {
     private void response302Header() {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            for (String key : header.keySet()) {
-                dos.writeBytes(key + ": " + header.get(key) + "\r\n");
-            }
+            dos.writeBytes(String.join("\r\n", headers.toStringList()));
+            dos.writeBytes("\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
