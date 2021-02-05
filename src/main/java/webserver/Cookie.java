@@ -16,8 +16,8 @@ public class Cookie {
 
     public Cookie(String text) {
         Map.Entry<String, String> entry = ParseUtils.parseParametersByEqual(text);
-        this.key = entry.getKey();
-        this.value = entry.getValue();
+        this.key = entry.getKey().trim();
+        this.value = entry.getValue().trim();
     }
 
     public String getKey() {

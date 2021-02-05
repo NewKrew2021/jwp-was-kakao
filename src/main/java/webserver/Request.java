@@ -7,7 +7,9 @@ import utils.IOUtils;
 import utils.ParseUtils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,11 +28,10 @@ public class Request {
     private String method;
     private String uri;
     private BufferedReader br;
-    private Cookie cookie;
+    private List<Cookie> cookies = new ArrayList<>();
 
     private Request(InputStream in) throws Exception {
         br = new BufferedReader(new InputStreamReader(in));
-        cookie = null;
         initializeHeader();
         initializeRequest();
     }
@@ -81,10 +82,17 @@ public class Request {
         }
         Map.Entry<String, String> elem = ParseUtils.parseParametersByColon(text);
         if(elem.getKey().equals("Cookie")) {
-            cookie = new Cookie(elem.getValue());
+            addCookies(elem.getValue());
             return;
         }
         headers.put(elem.getKey(), elem.getValue());
+    }
+
+    private void addCookies(String text) {
+        for (String token : ParseUtils.parseParametersBySemicolon(text)) {
+            logger.debug("tokenized cookie : {} ", token);
+            cookies.add(new Cookie(token));
+        }
     }
 
     public static Request of(InputStream in) throws Exception {
@@ -111,12 +119,18 @@ public class Request {
         return this.parameters;
     }
 
-    public Cookie getCookie() { return cookie; }
+    private Cookie getCookie(String name) {
+        return cookies.stream()
+                .filter(cookie -> cookie.getKey().equals(name))
+                .findAny()
+                .orElseGet(() -> null);
+    }
 
     public Session getSession() {
-        if(cookie == null) {
+        Cookie sessionCookie = getCookie("sessionId");
+        if(sessionCookie == null) {
             return null;
         }
-        return SessionStorage.getSession(cookie.getValue());
+        return SessionStorage.getSession(sessionCookie.getValue());
     }
 }

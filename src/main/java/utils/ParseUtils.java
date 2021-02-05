@@ -25,13 +25,17 @@ public class ParseUtils {
     public static Map.Entry<String, String> parseParametersByColon(String line) {
         String[] splitLine = line.split(":");
         return new AbstractMap
-                .SimpleEntry<String, String>(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
+                .SimpleEntry<>(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
     }
 
     public static Map.Entry<String, String> parseParametersByEqual(String line) {
         String[] splitLine = line.split("=");
         return new AbstractMap
-                .SimpleEntry<String, String>(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
+                .SimpleEntry<>(splitLine[KEY_INDEX].trim(), splitLine[VALUE_INDEX].trim());
+    }
+
+    public static String[] parseParametersBySemicolon(String line) {
+        return line.split(";");
     }
 
     public static String parseExtension(String content) {
