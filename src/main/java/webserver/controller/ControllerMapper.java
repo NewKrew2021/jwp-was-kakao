@@ -27,6 +27,7 @@ public class ControllerMapper {
     private void initControllers() {
         controllers.add(new UserCreateController());
         controllers.add(new UserLoginController());
+        controllers.add(new UserLogoutController());
         controllers.add(new UserListController());
     }
 
