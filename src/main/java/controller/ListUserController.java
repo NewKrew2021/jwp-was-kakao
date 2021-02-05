@@ -38,7 +38,7 @@ public class ListUserController extends AbstractController {
 
     private boolean isPossibleAccessUserList(String path) {
         try {
-            return login && FileIoUtils.isExistFile("./templates" + path);
+            return login.isLogin() && FileIoUtils.isExistFile("./templates" + path);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

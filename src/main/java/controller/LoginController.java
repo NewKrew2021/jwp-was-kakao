@@ -3,6 +3,7 @@ package controller;
 import db.DataBase;
 import http.HttpRequest;
 import http.HttpResponse;
+import model.User;
 
 public class LoginController extends AbstractController {
 
@@ -10,9 +11,10 @@ public class LoginController extends AbstractController {
 
     @Override
     protected void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        boolean login = DataBase.isPossibleLogin(httpRequest.getParameter("userId"), httpRequest.getParameter("password"));
+        User user = DataBase.findUserById(httpRequest.getParameter("userId"));
+        login.updateLoginState(user.getUserId(), user.getPassword(), httpRequest.getParameter("password"));
 
-        if (login) {
+        if (login.isLogin()) {
             httpResponse.login();
             httpResponse.sendRedirect(INDEX_HTML);
             return;
