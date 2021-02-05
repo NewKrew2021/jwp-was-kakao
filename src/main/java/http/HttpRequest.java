@@ -84,10 +84,8 @@ public class HttpRequest {
     }
 
     private void mapHeader(String headerText) {
-        if (!headerText.equals("")) {
-            Map.Entry<String, String> elem = ParseUtils.parseParametersByColon(headerText);
+        Map.Entry<String, String> elem = ParseUtils.parseParametersByColon(headerText);
             headers.put(elem.getKey(), elem.getValue());
-        }
     }
 
     private void mapCookie(String cookieText) {
