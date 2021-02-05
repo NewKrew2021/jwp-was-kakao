@@ -33,13 +33,13 @@ public class HttpRequest {
     private String path;
 
     private final Map<String, String> headers;
-    private final Map<String, String> bodies;
+    private final Map<String, String> parameters;
 
     private HttpRequest(InputStream in) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         getMethodAndUrl(reader);
         headers = makeHeaders(reader);
-        bodies = makeBodies(reader);
+        parameters = makeParameters(reader);
     }
 
     public static HttpRequest of(InputStream in) {
@@ -51,7 +51,7 @@ public class HttpRequest {
         return lines.stream()
                 .skip(1)
                 .limit(lines.size() - 2)
-                .collect(Collectors.toMap(ParseUtils::parseHeaderKey,ParseUtils::parseHeaderValue));
+                .collect(Collectors.toMap(ParseUtils::parseHeaderKey, ParseUtils::parseHeaderValue));
     }
 
     private void getMethodAndUrl(BufferedReader reader) {
@@ -66,8 +66,8 @@ public class HttpRequest {
         List<String> lines = new ArrayList<>();
         lines.add(readLine(reader));
 
-        while(lines.get(lines.size() - 1) != null &&
-                !lines.get(lines.size() - 1).isEmpty()){
+        while (lines.get(lines.size() - 1) != null &&
+                !lines.get(lines.size() - 1).isEmpty()) {
             lines.add(readLine(reader));
         }
 
@@ -85,20 +85,20 @@ public class HttpRequest {
         }
     }
 
-    private Map<String, String> makeBodies(BufferedReader reader) {
+    private Map<String, String> makeParameters(BufferedReader reader) {
         try {
-            Map<String, String> bodies = new HashMap<>();
+            Map<String, String> parameters = new HashMap<>();
 
             if (ParseUtils.containRequestUrlRegex(url)) {
-                bodies.putAll(ParseUtils.getParameters(ParseUtils.getParameterPairs(url)));
+                parameters.putAll(ParseUtils.getParameters(ParseUtils.getParameterPairs(url)));
             }
 
-            if(method.equals(HttpMethod.POST)){
+            if (method.equals(HttpMethod.POST)) {
                 String body = IOUtils.readData(reader, Integer.parseInt(headers.get(CONTENT_LENGTH.getHeader())));
-                bodies.putAll(ParseUtils.getParameters(body));
+                parameters.putAll(ParseUtils.getParameters(body));
             }
 
-            return bodies;
+            return parameters;
 
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -119,7 +119,7 @@ public class HttpRequest {
         return headers;
     }
 
-    public Map<String, String> getBodies() {
-        return bodies;
+    public Map<String, String> getParameters() {
+        return parameters;
     }
 }

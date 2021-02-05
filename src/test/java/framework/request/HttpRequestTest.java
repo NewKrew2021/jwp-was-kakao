@@ -22,10 +22,10 @@ class HttpRequestTest {
         assertEquals(HttpMethod.POST, request.getMethod());
         assertEquals("/user/create", request.getPath());
         assertEquals("keep-alive", request.getHeaders().get("Connection"));
-        assertEquals("brody", request.getBodies().get("userId"));
-        assertEquals("1234", request.getBodies().get("password"));
-        assertEquals("john", request.getBodies().get("name"));
-        assertEquals("abc@abc.com", request.getBodies().get("email"));
+        assertEquals("brody", request.getParameters().get("userId"));
+        assertEquals("1234", request.getParameters().get("password"));
+        assertEquals("john", request.getParameters().get("name"));
+        assertEquals("abc@abc.com", request.getParameters().get("email"));
     }
 
     @Test

@@ -1,13 +1,11 @@
 package service.controller;
 
-import service.controller.AbstractController;
 import service.db.DataBase;
 import service.model.User;
 import framework.request.HttpRequest;
 import framework.response.HttpResponse;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import static framework.common.HttpHeaders.SET_COOKIE;
@@ -16,7 +14,7 @@ public class LoginController extends AbstractController {
 
     @Override
     protected void doPost(HttpRequest request, HttpResponse response) throws IOException {
-        Map<String, String> parameters = request.getBodies();
+        Map<String, String> parameters = request.getParameters();
         User user = DataBase.findUserById(parameters.get("userId"));
 
         if (!checkValidUser(user, parameters.get("password"))) {
