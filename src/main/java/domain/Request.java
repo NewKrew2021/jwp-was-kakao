@@ -19,7 +19,7 @@ public class Request {
 
     private Map<String, String> makeBodies(String fullUrl) {
         Map<String, String> bodies = new HashMap<>();
-        if (!fullUrl.equals("")) {
+        if (!"".equals(fullUrl)) {
             Arrays.asList(fullUrl.split("&"))
                     .forEach(query -> {
                         List<String> result = Arrays.asList(query.split("="));
@@ -47,12 +47,12 @@ public class Request {
         return requestLine.getMethod();
     }
 
-    public Map<String, String> getQueries() {
-        return requestLine.getQueries();
+    public String getQuery(String key){
+        return requestLine.getQueries().get(key);
     }
 
-    public Map<String, String> getBodies() {
-        return bodies;
+    public String getBody(String key){
+        return bodies.get(key);
     }
 
     public Cookies getCookies(){

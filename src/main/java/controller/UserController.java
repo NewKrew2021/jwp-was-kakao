@@ -35,23 +35,21 @@ public class UserController implements Controller{
     }
 
     public Response createByGet(Request request) {
-        Map<String, String> quires = request.getQueries();
         DataBase.addUser(new User(
-                quires.get("userId"),
-                quires.get("password"),
-                quires.get("name"),
-                quires.get("email")
+                request.getQuery("userId"),
+                request.getQuery("password"),
+                request.getQuery("name"),
+                request.getQuery("email")
         ));
         return Response.ofRedirect("/index.html");
     }
 
     public Response createByPost(Request request) {
-        Map<String, String> bodies = request.getBodies();
         DataBase.addUser(new User(
-                bodies.get("userId"),
-                bodies.get("password"),
-                bodies.get("name"),
-                bodies.get("email")
+                request.getBody("userId"),
+                request.getBody("password"),
+                request.getBody("name"),
+                request.getBody("email")
         ));
         return Response.ofRedirect("/index.html");
     }

@@ -40,10 +40,9 @@ public class RequestTest {
     @Test
     public void getQueriesTest() {
         Request request = new Request(testStrings);
-        Map<String, String> queries = request.getQueries();
-        assertThat(queries.get("userId")).isEqualTo("javajigi");
-        assertThat(queries.get("password")).isEqualTo("password");
-        assertThat(queries.get("name")).isEqualTo("박재성");
-        assertThat(queries.get("email")).isEqualTo("javajigi@slipp.net");
+        assertThat(request.getQuery("userId")).isEqualTo("javajigi");
+        assertThat(request.getQuery("password")).isEqualTo("password");
+        assertThat(request.getQuery("name")).isEqualTo("박재성");
+        assertThat(request.getQuery("email")).isEqualTo("javajigi@slipp.net");
     }
 }
