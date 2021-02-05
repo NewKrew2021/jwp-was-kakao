@@ -39,7 +39,7 @@ public class HttpResponse {
         httpHeader = new HttpHeader();
     }
 
-    public void forward(String path) {
+    public void forward(String path) throws FileIOException, URISyntaxException {
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath(addBasePath(path));
             httpBody = new HttpBody(body);
@@ -50,9 +50,7 @@ public class HttpResponse {
             httpHeader.addHeader(HEADER_CONTENT_LOCATION, path);
             send();
         } catch (IOException e) {
-            ExceptionHandler.getInstance().handle(new FileIOException(addBasePath(path)));
-        } catch (URISyntaxException e) {
-            ExceptionHandler.getInstance().handle(e);
+            throw new FileIOException(path);
         }
     }
 
@@ -72,7 +70,7 @@ public class HttpResponse {
         }
     }
 
-    public void forwardBody(String path, String content) {
+    public void forwardBody(String path, String content) throws HttpResponseOutputException {
         httpStatus = HttpStatus.OK;
         httpBody = new HttpBody(content);
         setContentType(path);
@@ -81,30 +79,22 @@ public class HttpResponse {
         send();
     }
 
-    public void sendRedirect(String location) {
+    public void sendRedirect(String location) throws HttpResponseOutputException {
         httpStatus = HttpStatus.FOUND;
         httpHeader.addHeader(HEADER_LOCATION, location);
         send();
     }
 
-    public void send(HttpStatus status) {
+    public void send(HttpStatus status) throws HttpResponseOutputException {
         httpStatus = status;
         send();
-    }
-    public void sendInternalServerError() {
-        try {
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            dos.writeBytes(this.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void setCookieWithPath(String key, String value, String path) {
         httpHeader.addHeader(HEADER_SET_COOKIE, String.format(SET_COOKIE_VALUE_FORMAT, key, value, path));
     }
 
-    private void send() {
+    private void send() throws HttpResponseOutputException {
         try {
             dos.writeBytes(HTTP_VERSION + " " + httpStatus + " \r\n");
             dos.writeBytes(httpHeader.toString());
@@ -113,7 +103,7 @@ public class HttpResponse {
                 dos.flush();
             }
         } catch(IOException e) {
-            ExceptionHandler.getInstance().handle(new HttpResponseOutputException());
+            throw new HttpResponseOutputException();
         }
     }
 

@@ -145,7 +145,7 @@ public class WebAcceptanceTest {
                 extract();
     }
 
-    ExtractableResponse<Response> 회원가입_GET(String path, User user) {
+    private ExtractableResponse<Response> 회원가입_GET(String path, User user) {
         return RestAssured.
                 given().log().all().
                 param("userId", user.getId()).
@@ -157,7 +157,7 @@ public class WebAcceptanceTest {
                 extract();
     }
 
-    ExtractableResponse<Response> 회원가입_POST(User user) {
+    private ExtractableResponse<Response> 회원가입_POST(User user) {
         return RestAssured.
                 given().log().all().
                 param("userId", user.getId()).

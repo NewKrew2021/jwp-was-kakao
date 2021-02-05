@@ -2,5 +2,5 @@ package exception;
 
 @FunctionalInterface
 public interface ExceptionFunction {
-    void sendResponse();
+    void sendResponse() throws HttpResponseOutputException;
 }

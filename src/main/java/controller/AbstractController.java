@@ -4,8 +4,11 @@ import annotation.web.RequestMethod;
 import domain.HttpRequest;
 import domain.HttpResponse;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 public abstract class AbstractController implements Controller {
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
         if (httpRequest.getMethod() == RequestMethod.GET) {
             doGet(httpRequest, httpResponse);
             return;
@@ -13,9 +16,9 @@ public abstract class AbstractController implements Controller {
         doPost(httpRequest, httpResponse);
     }
 
-    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
     }
 
-    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
     }
 }

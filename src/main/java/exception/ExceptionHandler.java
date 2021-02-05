@@ -37,24 +37,28 @@ public class ExceptionHandler {
 
     public void handle(Exception e) {
         printStackTrace(e);
-        exceptionToFunction.get(e.getClass()).sendResponse();
+        try {
+            exceptionToFunction.get(e.getClass()).sendResponse();
+        } catch (HttpResponseOutputException httpResponseOutputException) {
+            httpResponseOutputException.printStackTrace();
+        }
     }
 
     public void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
     }
 
-    private void sendNotFound() {
+    private void sendNotFound() throws HttpResponseOutputException {
         HttpResponse httpResponse = new HttpResponse(outputStream);
         httpResponse.send(HttpStatus.NOT_FOUND);
     }
 
-    private void sendBadRequest() {
+    private void sendBadRequest() throws HttpResponseOutputException {
         HttpResponse httpResponse = new HttpResponse(outputStream);
         httpResponse.send(HttpStatus.BAD_REQUEST);
     }
 
-    private void sendInternalServerError() {
+    private void sendInternalServerError() throws HttpResponseOutputException {
         HttpResponse httpResponse = new HttpResponse(outputStream);
         httpResponse.send(HttpStatus.INTERNAL_SERVER_ERROR);
     }
