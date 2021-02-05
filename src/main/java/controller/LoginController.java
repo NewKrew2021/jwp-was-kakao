@@ -21,7 +21,7 @@ public class LoginController implements Controller{
 
     public Response login(Request request){
         User user = DataBase.findUserById(request.getBody("userId"));
-        if(user.getPassword().equals(request.getBody("password"))){
+        if(user.isLogin(request.getBody("password"))){
             Response response = Response.ofRedirect("/index.html");
             response.addHeader("Set-Cookie", "logined=true; Path=/");
             return response;
