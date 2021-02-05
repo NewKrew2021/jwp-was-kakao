@@ -13,17 +13,6 @@ import java.util.Map;
 
 public class HttpResponse {
 
-    private final static String HTTP_VERSION = "HTTP/1.1";
-    private final static String LOCATION = "Location";
-    private final static String SET_COOKIE = "Set-Cookie";
-    private final static String PATH = "; Path=/";
-    private final static String CONTENT_TYPE = "Content-Type";
-    private final static String CONTENT_LENGTH = "Content-Length";
-    private final static String ACCEPT = "Accept";
-    private final static String HOST = "Host";
-    private final static String ENCODING = "text/html;charset=utf-8";
-    private final static String HTTP = "http://";
-
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;
     private HttpHeader httpHeader;
@@ -32,7 +21,7 @@ public class HttpResponse {
     public HttpResponse(OutputStream out, HttpHeader httpHeader) {
         dos = new DataOutputStream(out);
         this.httpHeader = httpHeader;
-        login = this.httpHeader.getHeaderByKey(SET_COOKIE);
+        login = this.httpHeader.getHeaderByKey(HttpHeader.SET_COOKIE);
     }
 
     public void login() {
@@ -41,9 +30,9 @@ public class HttpResponse {
 
     public void sendRedirect(String url) {
         try {
-            dos.writeBytes( HTTP_VERSION + " "  + HttpStatus.FOUND.toString() +"\r\n");
-            dos.writeBytes( LOCATION + ": " + HTTP + httpHeader.getHeaderByKey(HOST) + url + "\r\n");
-            dos.writeBytes( SET_COOKIE + ": " + login + PATH + "\r\n");
+            dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.FOUND.toString() +"\r\n");
+            dos.writeBytes( HttpHeader.LOCATION + ": " + HttpHeader.HTTP + httpHeader.getHeaderByKey(HttpHeader.HOST) + url + "\r\n");
+            dos.writeBytes( HttpHeader.SET_COOKIE + ": " + login + HttpHeader.PATH + "\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
@@ -54,9 +43,9 @@ public class HttpResponse {
     public void forwardStatic(String path) {
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath(path);
-            dos.writeBytes( HTTP_VERSION + " "  + HttpStatus.OK.toString() +"\r\n");
-            dos.writeBytes( CONTENT_TYPE + ": "  + httpHeader.getHeaderByKey(ACCEPT) + "\r\n");
-            dos.writeBytes( CONTENT_LENGTH + ": "  + body.length + "\r\n");
+            dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.OK.toString() +"\r\n");
+            dos.writeBytes( HttpHeader.CONTENT_TYPE + ": "  + httpHeader.getHeaderByKey(HttpHeader.ACCEPT) + "\r\n");
+            dos.writeBytes( HttpHeader.CONTENT_LENGTH + ": "  + body.length + "\r\n");
             dos.writeBytes("\r\n");
             responseBody(body);
         } catch (IOException | URISyntaxException e) {
@@ -67,9 +56,9 @@ public class HttpResponse {
     public void forwardTemplate(String path) {
         try {
             byte[] body = FileIoUtils.loadFileFromClasspath(path);
-            dos.writeBytes( HTTP_VERSION + " "  + HttpStatus.OK.toString() +"\r\n");
-            dos.writeBytes( CONTENT_TYPE + ": "  + ENCODING + "\r\n");
-            dos.writeBytes( CONTENT_LENGTH + ": "  + body.length + "\r\n");
+            dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.OK.toString() +"\r\n");
+            dos.writeBytes( HttpHeader.CONTENT_TYPE + ": "  + HttpHeader.ENCODING + "\r\n");
+            dos.writeBytes( HttpHeader.CONTENT_LENGTH + ": "  + body.length + "\r\n");
             dos.writeBytes("\r\n");
             responseBody(body);
         } catch (IOException | URISyntaxException e) {
@@ -83,10 +72,10 @@ public class HttpResponse {
 
     public void response200Header(int bodyLength) {
         try {
-            dos.writeBytes( HTTP_VERSION + " "  + HttpStatus.OK.toString() +"\r\n");
-            dos.writeBytes( CONTENT_TYPE + ": "  + ENCODING + "\r\n");
-            dos.writeBytes( CONTENT_LENGTH + ": "  + bodyLength + "\r\n");
-            dos.writeBytes( SET_COOKIE + ": " + login + PATH + "\r\n");
+            dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.OK.toString() +"\r\n");
+            dos.writeBytes( HttpHeader.CONTENT_TYPE + ": "  + HttpHeader.ENCODING + "\r\n");
+            dos.writeBytes( HttpHeader.CONTENT_LENGTH + ": "  + bodyLength + "\r\n");
+            dos.writeBytes( HttpHeader.SET_COOKIE + ": " + login + HttpHeader.PATH + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -105,7 +94,7 @@ public class HttpResponse {
 
     public void response404() {
         try {
-            dos.writeBytes( HTTP_VERSION + " "  + HttpStatus.NOT_FOUND.toString() +"\r\n");
+            dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.NOT_FOUND.toString() +"\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {

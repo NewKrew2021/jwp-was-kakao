@@ -1,5 +1,6 @@
 package controller;
 
+import exception.NotExistPathException;
 import org.springframework.http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
@@ -31,11 +32,11 @@ public abstract class AbstractController implements Controller {
     }
 
     protected void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-
+        throw new NotExistPathException();
     }
 
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-
+        throw new NotExistPathException();
     }
 
 }

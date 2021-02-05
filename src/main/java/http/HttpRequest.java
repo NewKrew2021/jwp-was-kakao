@@ -12,52 +12,27 @@ public class HttpRequest {
 
     private HttpHeader httpHeader;
     private HttpBody httpBody;
-    private Map<String, String> parameters = new HashMap<>();
-    private HttpMethod httpMethod;
-    private String path;
-    private String version;
+    private HttpParameters httpParameters = new HttpParameters();
+
 
     public HttpRequest(InputStream in) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 
         try {
-            String line = bufferedReader.readLine();
-            parseFirstLine(line);
-            httpHeader = new HttpHeader(bufferedReader);
-            httpBody = new HttpBody(bufferedReader, httpHeader.getHeaderByKey("Content-Length"));
-            parameters.putAll(httpBody.getBodyParameters());
+            httpHeader = new HttpHeader(bufferedReader, httpParameters);
+            httpBody = new HttpBody(bufferedReader, httpHeader.getHeaderByKey("Content-Length"), httpParameters);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    private void parseFirstLine(String line) throws UnsupportedEncodingException {
-        String[] currentLine = line.split(" ");
-        httpMethod = HttpMethod.resolve(currentLine[0]);
-
-        String[] pathAndParameter = currentLine[1].split("\\?");
-        path = pathAndParameter[0];
-
-        if( pathAndParameter.length > 1 ) {
-            makeParameter(pathAndParameter[1].split("=|&"));
-        }
-
-        version = currentLine[2];
-    }
-
-    private void makeParameter(String[] parameters) throws UnsupportedEncodingException {
-        for (int i = 0; i < parameters.length; i = i + 2) {
-            this.parameters.put( parameters[i] , URLDecoder.decode( parameters[i + 1], "UTF-8" ));
-        }
-    }
-
     public HttpMethod getMethod() {
-        return httpMethod;
+        return httpHeader.getHttpMethod();
     }
 
     public String getPath() {
-        return path;
+        return httpHeader.getPath();
     }
 
     public String getHeader(String key) {
@@ -65,7 +40,7 @@ public class HttpRequest {
     }
 
     public String getParameter(String key) {
-        return parameters.getOrDefault(key, "");
+        return httpParameters.getParameterByKey(key);
     }
 
     public HttpHeader getHttpHeader() {

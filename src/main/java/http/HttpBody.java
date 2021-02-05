@@ -12,9 +12,11 @@ import java.util.Map;
 public class HttpBody {
 
     private String body;
-    private Map<String, String> bodyParameters = new HashMap<>();
+    private HttpParameters httpParameters;
 
-    public HttpBody(BufferedReader bufferedReader, String bodyLength ){
+    public HttpBody(BufferedReader bufferedReader, String bodyLength, HttpParameters httpParameters ){
+        this.httpParameters = httpParameters;
+
         try {
             int length = Integer.parseInt(bodyLength);
             parseBody(bufferedReader, length);
@@ -28,17 +30,6 @@ public class HttpBody {
             return;
         }
         body = IOUtils.readData(bufferedReader, length);
-        parseParameter();
-    }
-
-    private void parseParameter() throws UnsupportedEncodingException {
-        String[] parameters = body.split("&|=");
-        for (int i = 0; i < parameters.length; i = i + 2) {
-            this.bodyParameters.put(parameters[i], URLDecoder.decode( parameters[i + 1], "UTF-8" ));
-        }
-    }
-
-    public Map<String, String> getBodyParameters() {
-        return bodyParameters;
+        httpParameters.parseParameter(body);
     }
 }
