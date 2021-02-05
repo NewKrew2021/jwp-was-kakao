@@ -76,7 +76,7 @@ public class RequestHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         assertThat(response.getHeaders().get("Location").get(0).equals("/user/login_failed.html")).isTrue();
-        assertThat(response.getHeaders().get("Set-Cookie").get(0).equals("logined=false; Path=/")).isTrue();
+        assertThat(response.getHeaders().get("Set-Cookie").get(0).contains("logined=false; Path=/")).isTrue();
     }
 
     @Test
