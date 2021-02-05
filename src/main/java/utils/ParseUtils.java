@@ -1,5 +1,7 @@
 package utils;
 
+import request.HeaderPair;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,12 +16,9 @@ public class ParseUtils {
     private static final String PARAMETER_KEY_VALUE_REGEX = "=";
     private static final String EXTENSION_REGEX = ".";
 
-    public static String parseHeaderValue(String header) {
-        return header.substring(header.indexOf(HEADER_REGEX) + 1).trim();
-    }
-
-    public static String parseHeaderKey(String header) {
-        return header.substring(START_INDEX, header.indexOf(HEADER_REGEX));
+    public static HeaderPair parseHeaderPair(String header) {
+        return HeaderPair.of(header.substring(START_INDEX, header.indexOf(HEADER_REGEX))
+                , header.substring(header.indexOf(HEADER_REGEX) + 1).trim());
     }
 
     public static Map<String, String> getParameters(String parameterPairs) {

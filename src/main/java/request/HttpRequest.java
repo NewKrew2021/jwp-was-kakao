@@ -54,7 +54,8 @@ public class HttpRequest {
         return lines.stream()
                 .skip(1)
                 .limit(lines.size() - 2)
-                .collect(Collectors.toMap(ParseUtils::parseHeaderKey,ParseUtils::parseHeaderValue));
+                .map(header -> ParseUtils.parseHeaderPair(header))
+                .collect(Collectors.toMap(HeaderPair::getKey,HeaderPair::getKey));
     }
 
     private void getMethodAndUrl(BufferedReader reader) {

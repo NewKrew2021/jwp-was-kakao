@@ -3,6 +3,7 @@ package utils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import request.HeaderPair;
 
 import java.util.Map;
 
@@ -11,17 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ParseUtilsTest {
 
     @Test
-    void parseHeaderKey() {
+    void parseHeaderPair() {
         String header = "Host: localhost:8080";
-        String expected = "Host";
-        assertThat(ParseUtils.parseHeaderKey(header)).isEqualTo(expected);
-    }
-
-    @Test
-    void parseHeaderValue() {
-        String header = "Host: localhost:8080";
-        String expected = "localhost:8080";
-        assertThat(ParseUtils.parseHeaderValue(header)).isEqualTo(expected);
+        HeaderPair expected = HeaderPair.of("Host", "localhost:8080");
+        assertThat(ParseUtils.parseHeaderPair(header)).isEqualTo(expected);
     }
 
     @Test
