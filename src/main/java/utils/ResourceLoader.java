@@ -9,7 +9,6 @@ import model.User;
 import service.UserService;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -21,12 +20,8 @@ public class ResourceLoader {
     private static final String STATIC_PATH = "./static";
     private static final String TEMPLATES_PATH = "./templates";
     private static final List<String> TEMPLATES_EXT = Arrays.asList(".html", ".ico");
-    private static final TemplateLoader loader = new ClassPathTemplateLoader();
-
-    static {
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-    }
+    private static final TemplateLoader loader = new ClassPathTemplateLoader("/templates", ".html");
+    private static final Handlebars handlebars = new Handlebars(loader);
 
     private ResourceLoader() {
     }
@@ -46,7 +41,6 @@ public class ResourceLoader {
 
     public static byte[] getDynamicPageWithUser(String filePath) {
         try {
-            Handlebars handlebars = new Handlebars(loader);
             Template template = handlebars.compile(filePath);
             List<User> users = UserService.findAllUsers();
             String page = template.apply(users);

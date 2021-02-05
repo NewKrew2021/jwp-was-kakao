@@ -11,8 +11,4 @@ public class UserCreateController extends AbstractController {
         logger.debug("create user successfully");
         httpResponse.sendRedirect("/index.html");
     }
-
-    @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-    }
 }

@@ -48,6 +48,10 @@ public class HttpResponse {
         statusCode = HttpStatusCode.NOT_FOUND;
     }
 
+    public void methodNotAllowed() {
+        statusCode = HttpStatusCode.METHOD_NOT_ALLOWED;
+    }
+
     public void writeResponse() {
         try {
             writeResponseLine();

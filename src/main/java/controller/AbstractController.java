@@ -1,7 +1,6 @@
 package controller;
 
 import exception.InvalidFileException;
-import exception.UserAuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.HttpMethod;
@@ -22,9 +21,6 @@ public abstract class AbstractController implements Controller {
                 doGet(httpRequest, httpResponse);
                 return;
             }
-        } catch (UserAuthorizationException e) {
-            logger.error(e.getMessage());
-            httpResponse.sendRedirect("/user/login.html");
         } catch (InvalidFileException e) {
             logger.error(e.getMessage());
             httpResponse.notFound();
@@ -32,7 +28,11 @@ public abstract class AbstractController implements Controller {
         httpResponse.badRequest();
     }
 
-    public abstract void doPost(HttpRequest httpRequest, HttpResponse httpResponse);
+    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+        httpResponse.methodNotAllowed();
+    }
 
-    public abstract void doGet(HttpRequest httpRequest, HttpResponse httpResponse);
+    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
+        httpResponse.methodNotAllowed();
+    }
 }

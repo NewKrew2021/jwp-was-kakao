@@ -6,10 +6,6 @@ import webserver.HttpResponse;
 
 public class ResourceController extends AbstractController {
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-    }
-
-    @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         String path = httpRequest.getPath();
         if (!isResource(path)) {
