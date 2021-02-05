@@ -1,10 +1,9 @@
 package model;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class Parameter {
-    private Map<String, String> parameter;
+    private final Map<String, String> parameter;
 
     public Parameter(Map<String, String> parameter) {
         this.parameter = parameter;
@@ -14,7 +13,4 @@ public class Parameter {
         return parameter.get(key);
     }
 
-    public Map<String, String> getAllParameter() {
-        return Collections.unmodifiableMap(parameter);
-    }
 }

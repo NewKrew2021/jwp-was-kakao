@@ -1,11 +1,10 @@
 package controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import db.DataBase;
 import exceptions.MethodNotAllowedException;
 import model.Request;
 import model.Response;
 import model.User;
+import service.UserService;
 
 import java.util.Optional;
 
@@ -17,11 +16,9 @@ public class LoginController extends AbstractController {
 
     @Override
     void doPost(Request request, Response response) {
-        ObjectMapper mapper = new ObjectMapper();
-        User loginUser = mapper.convertValue(request.getAllParameter(), User.class);
-        User user = Optional.ofNullable(DataBase.findUserById(loginUser.getUserId()))
-                .orElseThrow(NullPointerException::new);
-        if (user.getPassword().equals(loginUser.getPassword())) {
+        User loginUser = User.of(request.getParameter("userId"), request.getParameter("password"));
+        Optional<User> user = UserService.findByUserId(loginUser.getUserId());
+        if (user.isPresent() && user.get().isSamePassword(loginUser.getPassword())) {
             response.addHeader("Set-Cookie", "logined=true; Path=/");
             response.sendRedirect("/index.html");
             return;

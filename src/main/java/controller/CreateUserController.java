@@ -1,13 +1,13 @@
 package controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import db.DataBase;
 import exceptions.MethodNotAllowedException;
+import model.Parameter;
 import model.Request;
 import model.Response;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.UserService;
 
 public class CreateUserController extends AbstractController {
     private static final Logger logger = LoggerFactory.getLogger(CreateUserController.class);
@@ -19,11 +19,18 @@ public class CreateUserController extends AbstractController {
 
     @Override
     void doPost(Request request, Response response) {
-        ObjectMapper mapper = new ObjectMapper();
-        User user = mapper.convertValue(request.getAllParameter(), User.class);
-        DataBase.addUser(user);
-        logger.info("UserInfo: {}, {}, {}, {}", user.getUserId(), user.getEmail(), user.getName(), user.getPassword());
-        response.sendRedirect("/index.html");
+        User user = new User(
+                request.getParameter("userId"),
+                request.getParameter("password"),
+                request.getParameter("name"),
+                request.getParameter("email")
+        );
+        logger.debug("UserInfo : {}, {}", user.getUserId(), user.getPassword());
+        if(UserService.save(user).isPresent()){
+            response.sendRedirect("/index.html");
+        }
+        logger.debug("가입에 성공하지 못한 경우");
+        response.sendRedirect("/user/form.html");
     }
 
     @Override

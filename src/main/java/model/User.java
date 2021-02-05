@@ -17,6 +17,10 @@ public class User {
         this.email = email;
     }
 
+    public static User of(String userId, String password) {
+        return new User(userId, password, null, null);
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -31,6 +35,17 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public boolean isSamePassword(String password) {
+        return this.password.equals(password);
+    }
+
+    public boolean isFilledCreateForm() {
+        if(userId == null || password == null || name == null || email == null) {
+            return false;
+        }
+        return true;
     }
 
     @Override

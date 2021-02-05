@@ -3,7 +3,7 @@ package model;
 import java.util.Map;
 
 public class RequestHeader {
-    private Map<String, String> header;
+    private final Map<String, String> header;
 
     public RequestHeader(Map<String, String> header) {
         this.header = header;

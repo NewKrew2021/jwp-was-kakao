@@ -9,16 +9,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(Request.class);
-    private RequestMethod method;
-    private String path;
-    private Parameter parameter;
-    private RequestHeader requestHeader;
+    private final RequestMethod method;
+    private final String path;
+    private final Parameter parameter;
+    private final RequestHeader requestHeader;
 
     public Request(RequestMethod method, String path, Parameter parameter, RequestHeader requestHeader) {
         this.method = method;
@@ -41,7 +42,7 @@ public class Request {
 
         RequestHeader header = new RequestHeader(parseHeader(br));
 
-        if(method.equals(RequestMethod.POST)){
+        if (method.equals(RequestMethod.POST)) {
             parameter.putAll(parseBody(br, header));
         }
 
@@ -66,13 +67,18 @@ public class Request {
 
     private static Map<String, String> parseParams(String paramString) {
         Map<String, String> map = new HashMap<>();
-        if(!paramString.contains("=")){
+        logger.debug("paramStinrg : {}", paramString);
+
+        if(paramString == null || paramString.equals("")) {
             return map;
         }
-        for (String path : paramString.split("\\&")) {
-            String[] temp = path.split("=");
-            map.put(temp[0], temp[1]);
-        }
+
+        String[] split = paramString.split("\\&");
+        Arrays.stream(split).filter(s -> s.split("=").length > 1)
+                .forEach(s -> {
+            String[] pair = s.split("=");
+            map.put(pair[0], pair[1]);
+        });
         return map;
     }
 
@@ -84,8 +90,8 @@ public class Request {
         return parameter.get(key);
     }
 
-    public Map<String, String> getAllParameter() {
-        return parameter.getAllParameter();
+    public Parameter getParameter() {
+        return parameter;
     }
 
     public String getPath() {

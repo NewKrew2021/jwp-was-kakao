@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class Response {
-    private ResponseHeader header;
-    private DataOutputStream dos;
-    private Body body;
+    private final ResponseHeader header;
+    private final DataOutputStream dos;
+    private final Body body;
 
     public Response(ResponseHeader header, DataOutputStream dos, Body body) {
         this.header = header;

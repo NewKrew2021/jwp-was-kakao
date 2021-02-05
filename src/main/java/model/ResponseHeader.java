@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ResponseHeader {
-    private Map<String, String> header;
+    private final Map<String, String> header;
 
     public ResponseHeader() {
         this.header = new HashMap<>();
