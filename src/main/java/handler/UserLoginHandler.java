@@ -25,7 +25,7 @@ public class UserLoginHandler implements HttpServlet {
 
         return DataBase.findUserById(parameters.get("userId"))
                 .filter(user -> user.isSamePassword(parameters.get("password")))
-                .map(user -> getResponse("/index.html", "SESSIONID=" + uuidSessionManager.createSession().getId() + "; Path=/"))
+                .map(user -> getResponse("/index.html", "SESSIONID=" + uuidSessionManager.create().getId() + "; Path=/"))
                 .orElseGet(() -> getResponse("/user/login_failed.html", "Path=/"));
     }
 

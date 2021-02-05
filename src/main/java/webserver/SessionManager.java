@@ -3,6 +3,8 @@ package webserver;
 import web.HttpSession;
 
 public interface SessionManager {
-    HttpSession createSession();
+    HttpSession create();
+
+    HttpSession get(String key);
 
 }

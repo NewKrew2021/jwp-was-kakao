@@ -18,10 +18,15 @@ public class UuidSessionManager implements SessionManager {
     }
 
     @Override
-    public HttpSession createSession() {
+    public HttpSession create() {
         UUID uuid = UUID.randomUUID();
         HttpSession httpSession = HttpSession.of(uuid);
         sessions.put(httpSession.getId(), httpSession);
         return httpSession;
+    }
+
+    @Override
+    public HttpSession get(String key) {
+        return sessions.get(key);
     }
 }
