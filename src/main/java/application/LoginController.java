@@ -4,6 +4,7 @@ import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import model.User;
+import service.MemberService;
 
 public class LoginController extends AbstractController {
 
@@ -15,18 +16,24 @@ public class LoginController extends AbstractController {
     public static final String LOGIN_FAILED_HTML = "/user/login_failed.html";
     public static final String VALUE_LOGINED_FALSE = "logined=false;";
 
+    private final MemberService memberService;
+
+    public LoginController(MemberService memberService) {
+        this.memberService = memberService;
+    }
+
     @Override
     void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        User user = DataBase.findUserById(httpRequest.getParameter(KEY_USER_ID));
-        // 아이디가 없습니다.
-        boolean isLoginSuccess = user.validatePassword(httpRequest.getParameter(KEY_PASSWORD));
-        // 패스워드가 잘못됐습니다.
-        if (isLoginSuccess) {
-            httpResponse.sendRedirect(INDEX_HTML);
-            httpResponse.addHeader(KEY_SET_COOKIE, VALUE_LOGINED_TRUE);
-            return;
+        if (memberService.isExist(httpRequest)) {
+            User user = DataBase.findUserById(httpRequest.getParameter(KEY_USER_ID));
+            boolean isLoginSuccess = user.validatePassword(httpRequest.getParameter(KEY_PASSWORD));
+            if (isLoginSuccess) {
+                httpResponse.addHeader(KEY_SET_COOKIE, VALUE_LOGINED_TRUE);
+                httpResponse.sendRedirect(INDEX_HTML);
+                return;
+            }
         }
-        httpResponse.sendRedirect(LOGIN_FAILED_HTML);
         httpResponse.addHeader(KEY_SET_COOKIE, VALUE_LOGINED_FALSE);
+        httpResponse.sendRedirect(LOGIN_FAILED_HTML);
     }
 }

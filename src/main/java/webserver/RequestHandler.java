@@ -5,6 +5,7 @@ import domain.HttpRequest;
 import domain.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.MemberService;
 
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -19,8 +20,10 @@ public class RequestHandler implements Runnable {
     private static final Map<String, Controller> controllers = new HashMap<>();
 
     static {
-        controllers.put("/user/create", new CreateUserController());
-        controllers.put("/user/login", new LoginController());
+        MemberService memberService = new MemberService();
+
+        controllers.put("/user/create", new CreateUserController(memberService));
+        controllers.put("/user/login", new LoginController(memberService));
         controllers.put("/user/list", new ListUserController());
         controllers.put("/main", new MainController());
     }

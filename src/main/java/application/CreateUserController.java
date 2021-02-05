@@ -1,17 +1,25 @@
 package application;
 
-import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import model.User;
+import service.MemberService;
 
 public class CreateUserController extends AbstractController {
 
     public static final String INDEX_HTML = "/index.html";
 
+    private final MemberService memberService;
+
+    public CreateUserController(MemberService memberService) {
+        this.memberService = memberService;
+    }
+
     @Override
-    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        DataBase.addUser(new User(httpRequest.getParameters()));
+    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+        if (memberService.isInvalidMemberRequest(httpRequest)) {
+            throw new IllegalArgumentException();
+        }
+        memberService.addUser(httpRequest);
         httpResponse.sendRedirect(INDEX_HTML);
     }
 }
