@@ -24,14 +24,12 @@ public class RequestHandler implements Runnable {
 
     private final Socket connection;
     private final Dispatcher dispatcher = Dispatcher.getInstance();
-    private final List<Controller> controllers = new ArrayList<>();
-    private final UserController userController = UserController.getInstance();
-    private final LoginController loginController = LoginController.getInstance();
+    private final List<Controller> controllers = Arrays.asList(
+            UserController.getInstance(),
+            LoginController.getInstance());
 
     public RequestHandler(Socket connectionSocket) {
         connection = connectionSocket;
-        controllers.add(userController);
-        controllers.add(loginController);
         controllers.forEach(Controller::registerAll);
     }
 

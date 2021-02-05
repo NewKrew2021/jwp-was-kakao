@@ -16,10 +16,6 @@ public class RequestHeaders {
         }
     }
 
-    public void addHeader(String key, String value) {
-        headers.put(key, value);
-    }
-
     public Cookies extractCookies() {
         return new Cookies(headers.get("Cookie"));
     }
