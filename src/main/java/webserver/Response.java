@@ -1,11 +1,9 @@
 package webserver;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
+import model.MimeType;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
 import utils.ParseUtils;
 
@@ -16,27 +14,12 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class Response {
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+
     private DataOutputStream dos;
     private Map<String, String> headers = new HashMap<>();
-    private static Map<String, String> contentType = new HashMap<>();
-
-    static {
-        contentType.put("js", "text/javascript");
-        contentType.put("css", "text/css");
-        contentType.put("html", "text/html");
-        contentType.put("ico", "image/png");
-        contentType.put("png", "image/png");
-        contentType.put("jpg", "image/jpeg");
-        contentType.put("jpeg", "image/jpeg");
-        contentType.put("svg", "image/svg+xml");
-        contentType.put("eot", "application/vnd.ms-fontobject");
-        contentType.put("ttf", "application/x-font-ttf");
-        contentType.put("woff", "application/font-woff");
-        contentType.put("woff2", "application/font-woff2");
-    }
 
     private Response(OutputStream out) {
         dos = new DataOutputStream(out);
@@ -46,25 +29,26 @@ public class Response {
         return new Response(dos);
     }
 
-
-    private String getContentType(String extension) {
-        return contentType.getOrDefault(extension, "text/html");
-    }
-
     public void addHeader(String key, String value) {
         headers.put(key, value);
     }
 
-    public void forward(String location) throws IOException, URISyntaxException {
+    public void forward(String location) throws Exception {
+        logger.debug("MIME TYPE : {} {}",MimeType.getMimeType(location), location);
+
         byte[] body = FileIoUtils.loadFileFromClasspath(location);
-        addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
+
+        addHeader("Content-Type", MimeType.getMimeType(location).getContentType() + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
         writeResponse200(body);
     }
 
     public void userListForward(String location, Collection<User> users) throws IOException {
-        byte[] body = FileIoUtils.loadCompiledFileFromClassPath(location, users);;
-        addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
+        logger.debug("MIME TYPE : {} {}", MimeType.getMimeType(location),location);
+
+        byte[] body = FileIoUtils.loadCompiledFileFromClassPath(location, users);
+
+        addHeader("Content-Type", MimeType.getMimeType(location).getContentType() + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
         writeResponse200(body);
     }

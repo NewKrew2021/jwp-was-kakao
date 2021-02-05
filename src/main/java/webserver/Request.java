@@ -1,13 +1,14 @@
 package webserver;
 
+import exception.InvalidRequestLineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import utils.IOUtils;
+import utils.ParseUtils;
 
 import java.io.*;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -15,8 +16,6 @@ import java.util.regex.Pattern;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final int KEY = 0;
-    private static final int VALUE = 1;
     private static final int METHOD = 1;
     private static final int REQUEST_URI = 2;
     private static final int PARAMETER = 3;
@@ -31,10 +30,34 @@ public class Request {
     private Request(InputStream in) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-        String line = br.readLine();
-        parseRequestLine(line);
+        initializeRequestLine(br);
         initializeHeader(br);
         initializeParameter(br);
+    }
+
+    private void initializeRequestLine(BufferedReader br) throws Exception {
+        String requestLine = br.readLine();
+        logger.debug("request line : {}", requestLine);
+
+        Matcher matcher = parseRequestLine(requestLine);
+
+        method = HttpMethod.valueOf(matcher.group(METHOD));
+        uri = URI.create(matcher.group(REQUEST_URI));
+        httpVersion = matcher.group(HTTP_VERSION);
+
+        if (matcher.group(PARAMETER) != null) {
+            mapParameter(matcher.group(PARAMETER));
+        }
+    }
+
+    private Matcher parseRequestLine(String requestLine) throws InvalidRequestLineException {
+        Pattern requestLinePattern = Pattern.compile("(GET|POST)\\s+([^?]+)(?:\\?(.+))?\\s+(HTTP/.+)");
+        Matcher matcher = requestLinePattern.matcher(requestLine);
+
+        if (!matcher.find()) {
+            throw new InvalidRequestLineException();
+        }
+        return matcher;
     }
 
     private void initializeParameter(BufferedReader br) throws IOException {
@@ -47,40 +70,22 @@ public class Request {
 
     private void initializeHeader(BufferedReader br) throws IOException {
         String line = br.readLine();
-        logger.debug("request line : {}", line);
         while (!"".equals(line) && line != null) {
-            line = br.readLine();
-            mapHeader(line);
             logger.debug("header : {}", line);
+            mapHeader(line);
+            line = br.readLine();
         }
     }
 
-    private void parseRequestLine(String requestLineString) throws UnsupportedEncodingException {
-        Pattern requestLinePattern = Pattern.compile("(GET|POST)\\s+([^?]+)(?:\\?(.+))?\\s+(HTTP/.+)");
-        Matcher matcher = requestLinePattern.matcher(requestLineString);
-        matcher.find();
-        method = HttpMethod.valueOf(matcher.group(METHOD));
-        uri = URI.create(matcher.group(REQUEST_URI));
-        httpVersion = matcher.group(HTTP_VERSION);
-
-        if (matcher.group(PARAMETER) != null) {
-            mapParameter(matcher.group(PARAMETER));
-        }
+    private void mapParameter(String parameterText) throws UnsupportedEncodingException {
+        ParseUtils.parseRequestParameters(parameterText)
+                .forEach((key, value) -> parameters.put(key, value));
     }
 
-    private void mapParameter(String body) throws UnsupportedEncodingException {
-        String[] tokens = body.split("&");
-        for (String token : tokens) {
-            String[] values = token.split("=");
-            parameters.put(values[KEY].trim(), URLDecoder.decode(values[VALUE],
-                    java.nio.charset.StandardCharsets.UTF_8.toString()).trim());
-        }
-    }
-
-    private void mapHeader(String line) {
-        if (!line.equals("")) {
-            String[] splitLine = line.split(":");
-            headers.put(splitLine[KEY].trim(), splitLine[VALUE].trim());
+    private void mapHeader(String headerText) {
+        if (!headerText.equals("")) {
+            Map.Entry<String, String> elem = ParseUtils.parseParametersByColon(headerText);
+            headers.put(elem.getKey(), elem.getValue());
         }
     }
 

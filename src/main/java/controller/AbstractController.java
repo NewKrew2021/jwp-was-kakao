@@ -1,24 +1,23 @@
 package controller;
 
+import model.MimeType;
 import org.springframework.http.HttpMethod;
-import utils.ParseUtils;
 import webserver.Request;
 import webserver.Response;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public abstract class AbstractController implements Controller {
-    private static Map<String, String> contentLocation = new HashMap<>();
+    private static Map<MimeType, String> contentLocation = new HashMap<>();
 
     static {
-        contentLocation.put("ico", "./templates/");
-        contentLocation.put("html", "./templates/");
+        contentLocation.put(MimeType.getMimeType(".ico"), "./templates");
+        contentLocation.put(MimeType.getMimeType(".html"), "./templates");
     }
 
     protected static String getContentLocation(String content) {
-        return contentLocation.getOrDefault(ParseUtils.parseExtension(content), "./static") + content;
+        return contentLocation.getOrDefault(MimeType.getMimeType(content), "./static") + content;
     }
 
     @Override
