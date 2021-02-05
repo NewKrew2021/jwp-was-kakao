@@ -3,8 +3,8 @@ package controller;
 import db.DataBase;
 import model.User;
 import utils.FileIoUtils;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import domain.HttpRequest;
+import domain.HttpResponse;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

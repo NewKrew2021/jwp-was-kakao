@@ -5,9 +5,9 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
-import model.Cookie;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import domain.Cookie;
+import domain.HttpRequest;
+import domain.HttpResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
