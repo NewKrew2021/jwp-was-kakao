@@ -2,8 +2,7 @@ package controller;
 
 import request.HttpRequest;
 import response.HttpResponse;
-
-import java.util.Optional;
+import service.UserService;
 
 public class LogoutController extends AbstractController {
 
@@ -11,7 +10,7 @@ public class LogoutController extends AbstractController {
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        httpRequest.setLogin(false);
+        UserService.loginOutUser(httpRequest.getSessionId());
         httpResponse.sendNewPage(INDEX_PAGE, httpRequest.getSessionId());
     }
 

@@ -4,8 +4,6 @@ import request.HttpRequest;
 import response.HttpResponse;
 import service.UserService;
 
-import java.util.Optional;
-
 
 public class ListUserController extends AbstractController {
 
@@ -13,7 +11,7 @@ public class ListUserController extends AbstractController {
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (httpRequest.isLogined()) {
+        if (UserService.isLogined(httpRequest.getSessionId())) {
             httpResponse.forwardBody(httpResponse.responseTemplateBody(UserService.findAllUser()));
             return;
         }

@@ -16,7 +16,7 @@ public class LoginController extends AbstractController {
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         if (UserService.isLoginSuccess(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD))) {
-            httpRequest.setLogin(true);
+            UserService.loginUser(httpRequest.getSessionId());
             httpResponse.sendNewPage(INDEX_PAGE, httpRequest.getSessionId());
             return;
         }

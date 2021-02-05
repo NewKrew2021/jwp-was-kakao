@@ -14,15 +14,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class HttpRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     public static final String SESSION_ID = "sessionId";
-    public static final String LOGINED = "logined";
-    public static final String TRUE = "true";
-    public static final String FALSE = "false";
+
 
     private RequestUri requestUri;
     private RequestHeader requestHeader;
@@ -76,14 +73,6 @@ public class HttpRequest {
         Cookies.forEach(cookie -> httpSession.setAttribute(cookie.getName(), cookie.getValue()));
     }
 
-    public void setLogin(boolean login) {
-        if (login) {
-            httpSession.setAttribute(LOGINED, TRUE);
-            return;
-        }
-        httpSession.setAttribute(LOGINED, FALSE);
-    }
-
     public String getParameter(String key) {
         if (requestBody.getBodyValue(key).isPresent()) {
             return requestBody.getBodyValue(key).get();
@@ -115,11 +104,6 @@ public class HttpRequest {
 
     public String getSessionId() {
         return httpSession.getId();
-    }
-
-    public boolean isLogined() {
-        Optional<Object> loginValue = httpSession.getAttribute(LOGINED);
-        return loginValue.isPresent() && loginValue.get().toString().equals(TRUE);
     }
 
 }
