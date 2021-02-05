@@ -1,6 +1,9 @@
 package model;
 
 public class User {
+
+    private static final User NONE_USER = new User( null, null, null, null );
+
     private String userId;
     private String password;
     private String name;
@@ -27,6 +30,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public static User getNoneUser() {
+        return NONE_USER;
     }
 
     @Override
