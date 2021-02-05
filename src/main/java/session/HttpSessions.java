@@ -15,6 +15,10 @@ public class HttpSessions {
         sessions.remove(httpSession.getId());
     }
 
+    public static boolean isValidateSession(String sessionId) {
+        return sessions.containsKey(sessionId);
+    }
+
     public static HttpSession getHttpSessionById(String sessionId) {
         return sessions.get(sessionId);
     }

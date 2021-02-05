@@ -8,7 +8,12 @@ import model.User;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-public class CreateUserController extends AbstractController{
+public class CreateUserController extends AbstractController {
+
+    @Override
+    public void doGet(HttpRequest request, HttpResponse response) {
+
+    }
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {

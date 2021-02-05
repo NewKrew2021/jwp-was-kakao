@@ -3,7 +3,7 @@ package controller;
 import dto.HttpRequest;
 import dto.HttpResponse;
 
-public class AbstractController implements Controller {
+public abstract class AbstractController implements Controller {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) {
@@ -16,7 +16,7 @@ public class AbstractController implements Controller {
         }
     }
 
-    public void doPost(HttpRequest request, HttpResponse response){}
+    public abstract void doPost(HttpRequest request, HttpResponse response);
 
-    public void doGet(HttpRequest request, HttpResponse response){}
+    public abstract void doGet(HttpRequest request, HttpResponse response);
 }
