@@ -1,55 +1,75 @@
 package domain;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 class HttpResponseTest {
-    private String testDirectory = "./src/test/resources/";
+
+    private OutputStream outputStream;
+    private HttpResponse response;
+
+    @BeforeEach
+    public void setResponse() {
+        outputStream = new ByteArrayOutputStream();
+        response = new HttpResponse(new DataOutputStream(outputStream));
+    }
 
     @Test
     @DisplayName("html 리스폰스 포워드 테스트")
-    public void responseForward() throws Exception {
-        HttpResponse response = new HttpResponse(new DataOutputStream(createOutputStream("Http_Forward.txt")));
+    public void responseForward() {
+        // when
         response.forward("./templates/index.html");
-        assertThat(response.getHeaders().get("Content-Type")).isEqualTo("text/html; charset=utf-8");
+
+        // then
+        String outputString = outputStream.toString();
+        assertThat(outputString).contains("HTTP/1.1 200 OK ");
+        assertThat(outputString).contains("Content-Type: text/html; charset=utf-8");
     }
 
     @Test
     @DisplayName("css 리스프노스 포워드 테스트")
-    void responseCssForward() throws Exception {
-        HttpResponse response = new HttpResponse(new DataOutputStream(createOutputStream("Css_Forward.txt")));
+    void responseCssForward() {
+        // when
         response.forward("./static/css/styles.css");
-        assertThat(response.getHeaders().get("Content-Type")).isEqualTo("text/css; charset=utf-8");
+
+        // then
+        String outputString = outputStream.toString();
+        assertThat(outputString).contains("HTTP/1.1 200 OK ");
+        assertThat(outputString).contains("Content-Type: text/css; charset=utf-8");
     }
 
     @Test
     @DisplayName("리스폰스 리다이렉트 테스트")
-    public void responseRedirect() throws Exception {
-        // Http_Redirect.txt 결과는 응답 header에 Location 정보가 /index.html로 포함되어 있어야 한다.
-        HttpResponse response = new HttpResponse(new DataOutputStream(createOutputStream("Http_Redirect.txt")));
+    public void responseRedirect() {
+        // when
         response.sendRedirect("/index.html");
-        assertThat(response.getHeaders().get("Location")).isEqualTo("/index.html");
+
+        // then
+        String outputString = outputStream.toString();
+        assertThat(outputString).contains("HTTP/1.1 302 Found");
+        assertThat(outputString).contains("Location: /index.html");
     }
 
     @Test
-    @DisplayName("쿠키가 생성여부 테스트")
-    public void responseCookies() throws Exception {
-        // Http_Cookie.txt 결과는 응답 header에 Set-Cookie 값으로 logined=true 값이 포함되어 있어야 한다.
-        HttpResponse response = new HttpResponse(new DataOutputStream(createOutputStream("Http_Cookie.txt")));
+    @DisplayName("쿠키 생성여부 테스트")
+    public void responseCookies() {
+        // when
         response.addHeader("Set-Cookie", "logined=true");
         response.sendRedirect("/index.html");
-        assertThat(response.getHeaders().get("Set-Cookie")).isEqualTo("logined=true");
+
+        // then
+        String outputString = outputStream.toString();
+        assertThat(outputString).contains("HTTP/1.1 302 Found");
+        assertThat(outputString).contains("Set-Cookie: logined=true");
+        assertThat(outputString).contains("Location: /index.html");
     }
 
-    private OutputStream createOutputStream(String filename) throws FileNotFoundException {
-        return new FileOutputStream(testDirectory + filename);
-    }
 }

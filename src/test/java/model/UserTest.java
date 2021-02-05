@@ -4,7 +4,9 @@ import domain.HttpRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +23,7 @@ class UserTest {
 
         InputStream stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         try {
-            HttpRequest httpRequest = HttpRequest.from(new BufferedReader(new InputStreamReader(stream)));
+            HttpRequest httpRequest = HttpRequest.from(stream);
             User user = new User(httpRequest.getParameters());
             assertThat(user.getUserId()).isEqualTo("javajigi");
             assertThat(user.getPassword()).isEqualTo("password");
