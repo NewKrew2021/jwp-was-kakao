@@ -46,24 +46,29 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-            List<String> lines = Arrays.stream(IOUtils.readData(br, 5000).split("\r\n"))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
-            Request request = new Request(lines);
-
-            Response response = Response.ofDefaultFile(new ResponseBody("No Page"), ContentType.HTML);
-
-            if (FileIoUtils.pathIsFile(request.getUrlPath())) {
-                response = FileIoUtils.loadFileFromUrlPath(request.getUrlPath());
-            } else {
-                response = dispatcher.run(request);
-            }
+            Request request = receiveRequest(br);
+            Response response = prepareResponse(request);
 
             printResponse(out, response);
 
         } catch (IOException | URISyntaxException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private Request receiveRequest(BufferedReader br) throws IOException {
+        List<String> lines = Arrays.stream(IOUtils.readData(br, 5000).split("\r\n"))
+                .map(String::trim)
+                .collect(Collectors.toList());
+        Request request = new Request(lines);
+        return request;
+    }
+
+    private Response prepareResponse(Request request) throws IOException, URISyntaxException {
+        if (FileIoUtils.pathIsFile(request.getUrlPath())) {
+            return FileIoUtils.loadFileFromUrlPath(request.getUrlPath());
+        }
+        return dispatcher.run(request);
     }
 
     private void printResponse(OutputStream out, Response response) throws IOException {
