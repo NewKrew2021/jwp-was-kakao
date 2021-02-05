@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class SessionUtils {
 
     public static final int SESSION_ID_VALUE = 1;
-    private static Pattern sessionIdPattern = Pattern.compile("SessionId=([^\\ \\;]+)");
+    private static final Pattern sessionIdPattern = Pattern.compile("SessionId=([^\\ \\;]+)");
 
     public static String extractSessionId(String cookie) {
         Matcher matcher = sessionIdPattern.matcher(cookie);

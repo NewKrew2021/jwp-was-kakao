@@ -14,7 +14,7 @@ import java.net.Socket;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -28,7 +28,7 @@ public class RequestHandler implements Runnable {
             HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
             Controller controller = HandlerMapping.getController(request.getPath());
-            if(controller == null){
+            if (controller == null) {
                 response.notFound();
                 return;
             }

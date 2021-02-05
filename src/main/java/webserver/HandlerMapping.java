@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HandlerMapping {
-    private static Map<String, Controller> handlerMapping = new HashMap<>();
+    private static final Map<String, Controller> handlerMapping = new HashMap<>();
 
     static {
         handlerMapping.put("/user/create", new CreateUserController());

@@ -2,11 +2,11 @@ package controller;
 
 import com.github.jknack.handlebars.Template;
 import db.DataBase;
+import exceptions.InvalidSessionException;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
-import exceptions.InvalidSessionException;
-import model.User;
 import http.session.HttpSessions;
+import model.User;
 import utils.HandlebarsUtils;
 import utils.SessionUtils;
 
@@ -26,7 +26,8 @@ public class ListUserController extends AbstractController {
             if (HttpSessions.isValidateSession(sessionId)) {
                 String userListPage = createUserListPage();
 
-                response.forwardBody(userListPage.getBytes(), "text/html");
+                response.setBody(userListPage.getBytes(), "text/html");
+                response.ok();
                 return;
             }
 

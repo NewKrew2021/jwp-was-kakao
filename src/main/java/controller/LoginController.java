@@ -3,9 +3,9 @@ package controller;
 import db.DataBase;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
-import model.User;
 import http.session.HttpSession;
 import http.session.HttpSessions;
+import model.User;
 
 import java.util.UUID;
 
