@@ -1,14 +1,15 @@
 package controller;
 
 import db.DataBase;
-import model.User;
-import utils.FileIoUtils;
 import domain.HttpRequest;
 import domain.HttpResponse;
+import model.User;
+import utils.FileIoUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import java.util.UUID;
 
 public class UserLoginController extends AbstractController {
     private static final String INDEX_URL = "/index.html";
@@ -33,8 +34,11 @@ public class UserLoginController extends AbstractController {
         Optional<User> user = DataBase.findUserById(userId);
         try {
             user.filter(u -> u.hasSamePassword(password)).orElseThrow(RuntimeException::new);
+            httpResponse.setCookie("sessionID=" +UUID.randomUUID().toString(), SCOPE);
             httpResponse.setCookie(TRUE, SCOPE);
+
             httpResponse.sendRedirect(INDEX_URL);
+
         } catch (RuntimeException e) {
             httpResponse.setCookie(FALSE, SCOPE);
             httpResponse.sendRedirect(LOGIN_FAIL_URL);

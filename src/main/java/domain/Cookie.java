@@ -2,10 +2,12 @@ package domain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Cookie {
     private static final String LOGIN_SUCCESS = "true";
     private static final String LOGIN_COOKIE = "logined";
+    private static final String SESSION_COOKIE = "sessionId";
     private Map<String, String> cookie;
 
     public Cookie(HttpRequest httpRequest){
@@ -28,5 +30,13 @@ public class Cookie {
             return true;
         }
         return false;
+    }
+
+    public Optional<String> getSession(){
+        return Optional.ofNullable(cookie.get(SESSION_COOKIE));
+    }
+
+    public Map<String, String> getCookie(){
+        return cookie;
     }
 }
