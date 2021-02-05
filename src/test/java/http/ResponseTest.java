@@ -1,7 +1,6 @@
 package http;
 
 import http.response.Response;
-import http.response.ResponseBody;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import utils.FileIoUtils;
@@ -20,10 +19,9 @@ public class ResponseTest {
     public void ofDefaultFileTest() throws IOException, URISyntaxException {
         //given
         byte[] testFile = FileIoUtils.loadFileFromClasspath("./templates/user/login.html");
-        ResponseBody body = new ResponseBody(testFile);
 
         //when
-        Response response = Response.ofDefaultFile(body, ContentType.HTML);
+        Response response = Response.ofDefaultFile("/user/login.html");
 
         //then
         assertThat(response.toString())

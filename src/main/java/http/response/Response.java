@@ -2,6 +2,8 @@ package http.response;
 
 import http.*;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 public class Response {
@@ -23,16 +25,19 @@ public class Response {
         this.contentType = contentType;
     }
 
-    public static Response ofDefaultFile(ResponseBody body, ContentType contentType) {
+    public static Response ofDefaultFile(String urlPath) throws IOException, URISyntaxException {
         ResponseHeaders headers = new ResponseHeaders();
-        headers.addHeader("Content-Type", contentType.getType() + ";charset=utf-8");
+        ResponseFile file = new ResponseFile(urlPath);
+        ResponseBody body = new ResponseBody(file.getFileContent());
+
+        headers.addHeader("Content-Type", file.getContentType().getType() + ";charset=utf-8");
         headers.addHeader("Content-Length", body.getByteSize() + "");
         return new Response(
                 HttpVersion.HTTP1_1,
                 StatusCode.OK,
                 headers,
                 body,
-                contentType
+                file.getContentType()
         );
     }
 

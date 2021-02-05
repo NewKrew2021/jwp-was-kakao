@@ -17,10 +17,6 @@ public enum ContentType {
         this.extension = extension;
     }
 
-    public ContentType ofDefaultType() {
-        return HTML;
-    }
-
     public String getType() {
         return type;
     }

@@ -13,10 +13,8 @@ import controller.Controller;
 import controller.Dispatcher;
 import controller.LoginController;
 import controller.UserController;
-import http.*;
 import http.request.Request;
 import http.response.Response;
-import http.response.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -48,7 +46,6 @@ public class RequestHandler implements Runnable {
 
             Request request = receiveRequest(br);
             Response response = prepareResponse(request);
-
             printResponse(out, response);
 
         } catch (IOException | URISyntaxException e) {
@@ -66,7 +63,7 @@ public class RequestHandler implements Runnable {
 
     private Response prepareResponse(Request request) throws IOException, URISyntaxException {
         if (FileIoUtils.pathIsFile(request.getUrlPath())) {
-            return FileIoUtils.loadFileFromUrlPath(request.getUrlPath());
+            return Response.ofDefaultFile(request.getUrlPath());
         }
         return dispatcher.run(request);
     }
