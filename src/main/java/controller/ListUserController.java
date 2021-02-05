@@ -26,7 +26,6 @@ public class ListUserController extends AbstractController {
                 return;
             }
             System.out.println(cookie);
-            String login = cookie.split(";")[0].trim();
             String sessionId = cookie.split(";")[1].trim();
             if (SessionStorage.isLoginedSession(sessionId)) {
                 Map<String, Object> model = new HashMap<>();
