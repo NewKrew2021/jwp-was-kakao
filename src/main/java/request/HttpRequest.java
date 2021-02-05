@@ -18,8 +18,6 @@ import java.util.Map;
 public class HttpRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    public static final String SESSION_ID = "sessionId";
-
 
     private RequestUri requestUri;
     private RequestHeader requestHeader;
@@ -47,26 +45,13 @@ public class HttpRequest {
     }
 
     private static HttpSession setSession(RequestHeader requestHeader) {
-        HttpSession httpSession;
-        String sessionId = getSessionId(requestHeader);
-
-        if (SessionHandler.getSession(sessionId).isPresent()) {
-            httpSession = SessionHandler.getSession(sessionId).get();
-            setCookieOnSession(httpSession, requestHeader.getCookies());
-            return httpSession;
+        String sessionId = requestHeader.getSessionId();
+        if (!SessionHandler.getSession(sessionId).isPresent()) {
+            sessionId = SessionHandler.createSession();
         }
-
-        httpSession = SessionHandler.getSession(SessionHandler.createSession()).get();
+        HttpSession httpSession = SessionHandler.getSession(sessionId).get();
         setCookieOnSession(httpSession, requestHeader.getCookies());
         return httpSession;
-    }
-
-    private static String getSessionId(RequestHeader requestHeader) {
-        return requestHeader.getCookies()
-                .stream()
-                .filter(cookie -> cookie.getName().equals(SESSION_ID))
-                .map(Cookie::getValue).findFirst()
-                .orElse(null);
     }
 
     private static void setCookieOnSession(HttpSession httpSession, List<Cookie> Cookies) {

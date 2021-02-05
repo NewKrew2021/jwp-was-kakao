@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class RequestHeader {
+    private static final String SESSION_ID = "sessionId";
     private static final String CONTENT_LENGTH = "Content-Length";
     private static final String HEADER_DISTINGUISH_REGEX = ": ";
     private static final int KEY_INDEX = 0;
@@ -58,6 +59,13 @@ public class RequestHeader {
 
     public List<Cookie> getCookies() {
         return cookies;
+    }
+
+    public String getSessionId() {
+        return cookies.stream()
+                .filter(cookie -> cookie.getName().equals(SESSION_ID))
+                .map(Cookie::getValue).findFirst()
+                .orElse(null);
     }
 
 }
