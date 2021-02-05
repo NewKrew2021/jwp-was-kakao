@@ -1,22 +1,26 @@
 package framework.response;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public enum ResponseStatus {
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+    OK("200", "OK"),
+    FOUND("302", "Found"),
+    BAD_REQUEST("400", "Bad Request"),
+    NOT_FOUND("404", "Not Found"),
+    INTERNAL_SERVER_ERROR("500", "Internal Server Error");
 
-public interface ResponseStatus {
+    private final String code;
+    private final String message;
 
-    Logger logger = LoggerFactory.getLogger(ResponseStatus.class);
-
-    default void setStatus(DataOutputStream dos) {
-        try {
-            writeStatus(dos);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    ResponseStatus(String code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
-    void writeStatus(DataOutputStream dos) throws IOException;
+    public String getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

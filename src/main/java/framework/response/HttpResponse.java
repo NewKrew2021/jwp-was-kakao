@@ -18,12 +18,15 @@ public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
+    private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String KEY_VALUE_REGEX = ": ";
     private static final String NEW_LINE_PREFIX = "\r\n";
 
-    private Map<String, String> headers;
-    private byte[] body;
     private final DataOutputStream dos;
+
+    private ResponseStatus status;
+    private final Map<String, String> headers;
+    private byte[] body;
 
     private HttpResponse(DataOutputStream dos) {
         this.dos = dos;
@@ -45,20 +48,24 @@ public class HttpResponse {
             body = FileIoUtils.loadFileFromClasspath(fileExtension.getFilePath() + path);
             headers.put(CONTENT_TYPE.getHeader(), fileExtension.getContentType());
             headers.put(CONTENT_LENGTH.getHeader(), String.valueOf(body.length));
-            response(new Response200Status());
-        } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
-            logger.error(fsnfe.getMessage());
-            response(new Response404Status());
+            status = ResponseStatus.OK;
+            response();
+        } catch (FileSystemNotFoundException | NullPointerException e) {
+            logger.error(e.getMessage());
+            status = ResponseStatus.NOT_FOUND;
+            response();
         }
     }
 
     public void sendRedirect(String path) {
         try {
             headers.put(LOCATION.getHeader(), path);
-            response(new Response302Status());
+            status = ResponseStatus.FOUND;
+            response();
         } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
             logger.error(fsnfe.getMessage());
-            response(new Response404Status());
+            status = ResponseStatus.NOT_FOUND;
+            response();
         }
     }
 
@@ -66,42 +73,60 @@ public class HttpResponse {
         try {
             this.body = body;
             headers.put(CONTENT_LENGTH.getHeader(), String.valueOf(body.length));
-            response(new Response200Status());
+            status = ResponseStatus.OK;
+            response();
         } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
             logger.error(fsnfe.getMessage());
-            response(new Response404Status());
+            status = ResponseStatus.NOT_FOUND;
+            response();
         }
     }
 
     public void badRequest() {
         try {
-            response(new Response400Status());
+            status = ResponseStatus.BAD_REQUEST;
+            response();
         } catch (FileSystemNotFoundException | NullPointerException fsnfe) {
             logger.error(fsnfe.getMessage());
-            response(new Response404Status());
+            status = ResponseStatus.NOT_FOUND;
+            response();
         }
     }
 
-    private void response(ResponseStatus responseStatus) {
-        responseStatus.setStatus(dos);
+    private void response() {
+        writeStatus();
         writeHeader();
         writeBody();
+    }
+
+    private void writeStatus() {
+        try {
+            String statusMessage = HTTP_VERSION + " " +
+                    status.getCode() + " " +
+                    status.getMessage() + " " +
+                    NEW_LINE_PREFIX;
+            dos.writeBytes(statusMessage);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            status = ResponseStatus.INTERNAL_SERVER_ERROR;
+            response();
+        }
     }
 
     private void writeHeader() {
         try {
             for (String key : headers.keySet()) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(key);
-                sb.append(KEY_VALUE_REGEX);
-                sb.append(headers.get(key));
-                sb.append(NEW_LINE_PREFIX);
-                dos.writeBytes(sb.toString());
+                String header = key +
+                        KEY_VALUE_REGEX +
+                        headers.get(key) +
+                        NEW_LINE_PREFIX;
+                dos.writeBytes(header);
             }
             dos.writeBytes(NEW_LINE_PREFIX);
         } catch (IOException e) {
             logger.error(e.getMessage());
-            response(new Response500Status());
+            status = ResponseStatus.INTERNAL_SERVER_ERROR;
+            response();
         }
     }
 
@@ -111,7 +136,8 @@ public class HttpResponse {
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
-            response(new Response500Status());
+            status = ResponseStatus.INTERNAL_SERVER_ERROR;
+            response();
         }
     }
 }
