@@ -24,7 +24,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void request_POST() throws Exception {
+    public void request_POST_body_params() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_POST.txt"));
         HttpRequest request = new HttpRequest(in);
 
@@ -35,7 +35,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void request_POST2() throws Exception {
+    public void request_POST2_body_and_query_params() throws Exception {
         InputStream in = new FileInputStream(new File(testDirectory + "Http_POST2.txt"));
         HttpRequest request = new HttpRequest(in);
 
