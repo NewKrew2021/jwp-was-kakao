@@ -2,16 +2,11 @@ package controller;
 
 import annotation.web.RequestMethod;
 import db.DataBase;
-import utils.FileIoUtils;
-import utils.TemplateUtils;
 import webserver.Controller;
+import webserver.Model;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import webserver.http.HttpSession;
 
 public class UserListController extends Controller {
     public UserListController() {
@@ -24,23 +19,14 @@ public class UserListController extends Controller {
     }
 
     @Override
-    public HttpResponse handleRequest(HttpRequest request) throws IOException, URISyntaxException {
-        String logined = request.getRequestHeaders().getHeader("Cookie");
+    public String handleRequest(HttpRequest request, HttpResponse response, Model model) {
+        HttpSession session = DataBase.findSessionById(request.getRequestHeaders().getCookie(HttpSession.SESSION));
 
-        if ("logined=true".equals(logined)) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("users", DataBase.findAll());
-
-            return new HttpResponse.Builder()
-                    .status("HTTP/1.1 200 OK")
-                    .body(TemplateUtils.buildPage(request.getUri(), params),
-                            FileIoUtils.getMimeType("./templates/index.html")
-                    )
-                    .build();
+        if (session != null && session.getAttribute(HttpSession.USER) != null) {
+            model.addAttribute("users", DataBase.findAll());
+            return "/user/list";
+        } else {
+            return "redirect:/user/login.html";
         }
-        return new HttpResponse.Builder()
-                .status("HTTP/1.1 302 Found")
-                .redirect("/user/login.html")
-                .build();
     }
 }
