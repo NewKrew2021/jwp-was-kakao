@@ -14,6 +14,10 @@ public class HttpSession {
         this.data = data;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public static HttpSession from(String id) {
         return new HttpSession(id, new HashMap<>());
     }
@@ -36,5 +40,6 @@ public class HttpSession {
     public void invalidate() {
         this.data.clear();
     }
+
 
 }

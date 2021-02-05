@@ -5,16 +5,6 @@ import java.util.Arrays;
 
 public class HttpResponseUtils {
 
-    private static final String LOGINED_TRUE_VALUE = "logined=true; Path=/";
-    private static final String LOGINED_FALSE_VALUE = "logined=false; Path=/";
-
-    public static String makeLoginCookie(boolean login) {
-        if (login) {
-            return LOGINED_TRUE_VALUE;
-        }
-        return LOGINED_FALSE_VALUE;
-    }
-
     public static String findContentType(String path) {
         return Arrays.stream(ContentTypeUtils.values())
                 .filter(contentTypeUtil ->

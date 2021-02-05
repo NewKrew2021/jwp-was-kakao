@@ -16,10 +16,11 @@ public class LoginController extends AbstractController {
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         if (UserService.isLoginSuccess(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD))) {
-            httpResponse.sendNewPage(INDEX_PAGE, true);
+            httpRequest.setLogin(true);
+            httpResponse.sendNewPage(INDEX_PAGE, httpRequest.getSessionId());
             return;
         }
-        httpResponse.sendNewPage(LOGIN_FAIL_PAGE, false);
+        httpResponse.sendNewPage(LOGIN_FAIL_PAGE, httpRequest.getSessionId());
     }
 
 }

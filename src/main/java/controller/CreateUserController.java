@@ -4,6 +4,8 @@ import request.HttpRequest;
 import response.HttpResponse;
 import service.UserService;
 
+import java.util.Optional;
+
 public class CreateUserController extends AbstractController {
 
     private static final String INDEX_PAGE = "http://localhost:8080/index.html";
@@ -17,7 +19,7 @@ public class CreateUserController extends AbstractController {
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
         UserService.createUser(httpRequest.getParameter(USER_ID), httpRequest.getParameter(PASSWORD),
                 httpRequest.getParameter(NAME), httpRequest.getParameter(EMAIL));
-        httpResponse.sendNewPage(INDEX_PAGE, httpRequest.isLogined());
+        httpResponse.sendNewPage(INDEX_PAGE, httpRequest.getSessionId());
     }
 
 }

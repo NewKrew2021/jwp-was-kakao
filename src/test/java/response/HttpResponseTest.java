@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 
 class HttpResponseTest {
 
@@ -21,7 +22,7 @@ class HttpResponseTest {
     @Test
     void sendNewPage() throws FileNotFoundException {
         HttpResponse httpResponse = HttpResponse.from(createOutputStream("sendNewPage.txt"));
-        httpResponse.sendNewPage("http://localhost:8080/user/login_failed.html", false);
+        httpResponse.sendNewPage("http://localhost:8080/user/login_failed.html", "1");
     }
 
     private OutputStream createOutputStream(String filename) throws FileNotFoundException {

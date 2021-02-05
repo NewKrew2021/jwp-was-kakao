@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class HttpResponse {
 
@@ -25,6 +26,7 @@ public class HttpResponse {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_LENGTH = "Content-Length";
     public static final String LOCATION = "Location";
+    public static final String SESSION_ID = "sessionId";
 
     private DataOutputStream dos;
     private HttpStatus httpStatus;
@@ -78,9 +80,9 @@ public class HttpResponse {
         }
     }
 
-    public void sendNewPage(String newPage, boolean login) {
+    public void sendNewPage(String newPage, String sessionId) {
         this.httpStatus = HttpStatus.FOUND;
-        addHeader(SET_COOKIE, HttpResponseUtils.makeLoginCookie(login));
+        addHeader(SET_COOKIE, String.format("%s=%s; Path=/",SESSION_ID, sessionId));
         sendRedirect(newPage);
     }
 

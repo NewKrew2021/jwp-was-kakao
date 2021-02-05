@@ -4,6 +4,8 @@ import request.HttpRequest;
 import response.HttpResponse;
 import service.UserService;
 
+import java.util.Optional;
+
 
 public class ListUserController extends AbstractController {
 
@@ -15,7 +17,7 @@ public class ListUserController extends AbstractController {
             httpResponse.forwardBody(httpResponse.responseTemplateBody(UserService.findAllUser()));
             return;
         }
-        httpResponse.sendNewPage(LOGIN_PAGE, false);
+        httpResponse.sendNewPage(LOGIN_PAGE, httpRequest.getSessionId());
     }
 
 }

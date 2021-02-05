@@ -22,6 +22,7 @@ public class HttpRequest {
     public static final String SESSION_ID = "sessionId";
     public static final String LOGINED = "logined";
     public static final String TRUE = "true";
+    public static final String FALSE = "false";
 
     private RequestUri requestUri;
     private RequestHeader requestHeader;
@@ -75,6 +76,14 @@ public class HttpRequest {
         Cookies.forEach(cookie -> httpSession.setAttribute(cookie.getName(), cookie.getValue()));
     }
 
+    public void setLogin(boolean login) {
+        if (login) {
+            httpSession.setAttribute(LOGINED, TRUE);
+            return;
+        }
+        httpSession.setAttribute(LOGINED, FALSE);
+    }
+
     public String getParameter(String key) {
         if (requestBody.getBodyValue(key).isPresent()) {
             return requestBody.getBodyValue(key).get();
@@ -102,6 +111,10 @@ public class HttpRequest {
 
     public Map<String, String> getBody() {
         return requestBody.getBody();
+    }
+
+    public String getSessionId() {
+        return httpSession.getId();
     }
 
     public boolean isLogined() {
