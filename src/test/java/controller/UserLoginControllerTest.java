@@ -1,8 +1,5 @@
-package webserver;
+package controller;
 
-import controller.UserCreateController;
-import controller.UserListController;
-import controller.UserLoginController;
 import db.DataBase;
 import http.HttpRequest;
 import http.HttpResponse;
@@ -16,13 +13,15 @@ import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ControllerTest {
+public class UserLoginControllerTest {
     private String testDirectory = "./src/test/resources/controller";
     private DataOutputStream dos;
     private ByteArrayOutputStream bos;
+    private UserLoginController userLoginController;
 
     @BeforeEach
     void init(){
+        userLoginController = new UserLoginController();
         bos = new ByteArrayOutputStream();
         dos = new DataOutputStream(bos);
 
@@ -33,26 +32,13 @@ public class ControllerTest {
         DataBase.addUser(user2);
     }
 
-    @DisplayName("새로운 유저를 생성한 후 index.html로 redirect한다.")
-    @Test
-    void userCreate() throws IOException, URISyntaxException {
-        HttpRequest httpRequest = new HttpRequest(createBufferedReader("/Http_Create.txt"));
-        HttpResponse httpResponse = new HttpResponse(dos);
-
-        new UserCreateController().service(httpRequest, httpResponse);
-
-        String expected = readResponseFile("/Http_Create_Response.txt");
-        assertThat(DataBase.findUserById("test")).isNotEmpty();
-        assertThat(bos.toString()).isEqualTo(expected);
-    }
-
     @DisplayName("id, pw가 일치하면 쿠키를 true로 설정한다.")
     @Test
     void userLogin_success() throws IOException, URISyntaxException {
         HttpRequest httpRequest = new HttpRequest(createBufferedReader("/Http_Login.txt"));
         HttpResponse httpResponse = new HttpResponse(dos);
 
-        new UserLoginController().service(httpRequest, httpResponse);
+        userLoginController.service(httpRequest, httpResponse);
 
         String expected = readResponseFile("/Http_Login_Response.txt");
         assertThat(bos.toString()).isEqualTo(expected);
@@ -64,7 +50,7 @@ public class ControllerTest {
         HttpRequest httpRequest = new HttpRequest(createBufferedReader("/Http_Login_Fail_WrongId.txt"));
         HttpResponse httpResponse = new HttpResponse(dos);
 
-        new UserLoginController().service(httpRequest, httpResponse);
+        userLoginController.service(httpRequest, httpResponse);
 
         String expected = readResponseFile("/Http_Login_Fail_WrongId_Response.txt");
         assertThat(bos.toString()).isEqualTo(expected);
@@ -76,45 +62,9 @@ public class ControllerTest {
         HttpRequest httpRequest = new HttpRequest(createBufferedReader("/Http_Login_Fail_WrongPassword.txt"));
         HttpResponse httpResponse = new HttpResponse(dos);
 
-        new UserLoginController().service(httpRequest, httpResponse);
+        userLoginController.service(httpRequest, httpResponse);
 
         String expected = readResponseFile("/Http_Login_Fail_WrongPassword_Response.txt");
-        assertThat(bos.toString()).isEqualTo(expected);
-    }
-
-    @DisplayName("쿠키가 true면 유저 리스트를 반환한다.")
-    @Test
-    void userList() throws IOException, URISyntaxException {
-        HttpRequest httpRequest = new HttpRequest(createBufferedReader("/Http_UserList.txt"));
-        HttpResponse httpResponse = new HttpResponse(dos);
-
-        new UserListController().service(httpRequest, httpResponse);
-
-        String expected = readResponseFile("/Http_UserList_Response.txt");
-        assertThat(bos.toString()).isEqualTo(expected);
-    }
-
-    @DisplayName("쿠키가 false면 로그인 페이지로 redirect한다.")
-    @Test
-    void userList_cookie_fail() throws IOException, URISyntaxException {
-        HttpRequest httpRequest = new HttpRequest(createBufferedReader("/Http_UserList_Cookie_Fail.txt"));
-        HttpResponse httpResponse = new HttpResponse(dos);
-
-        new UserListController().service(httpRequest, httpResponse);
-
-        String expected = readResponseFile("/Http_UserList_Fail_Response.txt");
-        assertThat(bos.toString()).isEqualTo(expected);
-    }
-
-    @DisplayName("쿠키가 없으면 로그인 페이지로 redirect한다.")
-    @Test
-    void userList_cookie_null() throws IOException, URISyntaxException {
-        HttpRequest httpRequest = new HttpRequest(createBufferedReader("/Http_UserList_Cookie_Null.txt"));
-        HttpResponse httpResponse = new HttpResponse(dos);
-
-        new UserListController().service(httpRequest, httpResponse);
-
-        String expected = readResponseFile("/Http_UserList_Fail_Response.txt");
         assertThat(bos.toString()).isEqualTo(expected);
     }
 

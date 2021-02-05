@@ -9,9 +9,11 @@ import java.net.URISyntaxException;
 
 public class StaticController extends AbstractController {
 
+    private static final String STATIC_PATH = "./static";
+
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
-        byte[] body = FileIoUtils.loadFileFromClasspath("./static" + httpRequest.getPath());
+        byte[] body = FileIoUtils.loadFileFromClasspath(STATIC_PATH + httpRequest.getPath());
         httpResponse.forward(body);
     }
 }
