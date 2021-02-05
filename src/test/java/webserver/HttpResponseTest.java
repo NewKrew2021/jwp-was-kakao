@@ -1,39 +1,61 @@
 package webserver;
 
 import http.HttpResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import utils.FileIoUtils;
 
 import java.io.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class HttpResponseTest {
     private String testDirectory = "./src/test/resources/";
+    private DataOutputStream dos;
+    private ByteArrayOutputStream bos;
 
+    @BeforeEach
+    void init(){
+        bos = new ByteArrayOutputStream();
+        dos = new DataOutputStream(bos);
+    }
+
+    @DisplayName("body를 전달한다.")
     @Test
     public void responseForward() throws Exception {
-        // Http_Forward.txt 결과는 응답 body에 index.html이 포함되어 있어야 한다.
         byte[] body = FileIoUtils.loadFileFromClasspath("./templates/index.html");
 
-        HttpResponse response = new HttpResponse(createOutputStream("Http_Forward.txt"));
+        HttpResponse response = new HttpResponse(dos);
         response.forward(body);
+
+        String expected = readResponseFile("Http_Forward.txt");
+        assertThat(bos.toString()).isEqualTo(expected);
     }
 
+    @DisplayName("/index.html로 redirect한다.")
     @Test
     public void responseRedirect() throws Exception {
-        // Http_Redirect.txt 결과는 응답 headere에 Location 정보가 /index.html로 포함되어 있어야 한다.
-        HttpResponse response = new HttpResponse(createOutputStream("Http_Redirect.txt"));
+        HttpResponse response = new HttpResponse(dos);
         response.sendRedirect("/index.html");
+
+        String expected = readResponseFile("Http_Redirect.txt");
+        assertThat(bos.toString()).isEqualTo(expected);
     }
 
+    @DisplayName("set-cookie 헤더를 설정하여 응답한다.")
     @Test
     public void responseCookies() throws Exception {
-        // Http_Cookie.txt 결과는 응답 header에 Set-Cookie 값으로 logined=true 값이 포함되어 있어야 한다.
-        HttpResponse response = new HttpResponse(createOutputStream("Http_Cookie.txt"));
+        HttpResponse response = new HttpResponse(dos);
         response.addHeader("Set-Cookie", "logined=true");
         response.sendRedirect("/index.html");
+
+        String expected = readResponseFile("Http_Cookie.txt");
+        assertThat(bos.toString()).isEqualTo(expected);
     }
 
-    private DataOutputStream createOutputStream(String filename) throws FileNotFoundException {
-        return new DataOutputStream(new FileOutputStream(new File(testDirectory + filename)));
+    private String readResponseFile(String filename) throws IOException {
+        InputStream in = new FileInputStream(testDirectory + filename);
+        return new String(in.readAllBytes());
     }
 }
