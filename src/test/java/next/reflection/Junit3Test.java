@@ -1,4 +1,4 @@
-package study.reflection;
+package next.reflection;
 
 public class Junit3Test {
     public void test1() throws Exception {

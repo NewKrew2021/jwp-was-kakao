@@ -1,4 +1,4 @@
-package utils;
+package webserver.domain;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -21,8 +21,8 @@ public class HandlebarsTest {
 
         Template template = handlebars.compile("user/profile");
 
-        User user = new User("javajigi", "password", "자바지기", "javajigi@gmail.com");
-        String profilePage = template.apply(user);
+        User user2 = new User("javajigi", "password", "자바지기", "javajigi@gmail.com");
+        String profilePage = template.apply(user2);
         log.debug("ProfilePage : {}", profilePage);
     }
 }
