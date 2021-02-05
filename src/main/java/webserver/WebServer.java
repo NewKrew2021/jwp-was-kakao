@@ -2,6 +2,8 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.domain.Controllers;
+import webserver.domain.SessionStorage;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,9 +23,10 @@ public class WebServer {
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);
 
+            Controllers controllers = new Controllers(new SessionStorage());
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                Thread thread = new Thread(new RequestHandler(connection));
+                Thread thread = new Thread(new RequestHandler(connection, controllers));
                 thread.start();
             }
         }

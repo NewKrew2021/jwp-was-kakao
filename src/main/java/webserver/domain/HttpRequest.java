@@ -13,6 +13,9 @@ public class HttpRequest {
     private static final String BLANK = "";
     private static final String ZERO = "0";
     private static final String CONTENT_LENGTH = "Content-Length";
+    private static final int URI_INDEX = 1;
+    private static final int REQUEST_METHOD_INDEX = 0;
+    private static final int HTTP_VERSION_INDEX = 2;
     private final RequestMethod requestMethod;
     private final URI uri;
     private final HttpVersion httpVersion;
@@ -26,9 +29,9 @@ public class HttpRequest {
 
         checkValidRequest(token);
 
-        requestMethod = RequestMethod.of(token[0]);
-        uri = new URI(token[1]);
-        httpVersion = new HttpVersion(token[2]);
+        requestMethod = RequestMethod.of(token[REQUEST_METHOD_INDEX]);
+        uri = new URI(token[URI_INDEX]);
+        httpVersion = new HttpVersion(token[HTTP_VERSION_INDEX]);
         headers = new Headers(br);
 
         requestBody = new RequestBody(new Parameters(uri.getQueryString(), getBodyData(br)));

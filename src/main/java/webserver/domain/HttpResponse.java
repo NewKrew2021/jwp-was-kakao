@@ -16,7 +16,7 @@ public class HttpResponse {
     private static final String KEY_HEADER = "%s: %s";
     private static final String NEXT_LINE = "\r\n";
     private static final String HTTP_1_1_STATUS_MESSAGE = "HTTP/1.1 %d %s";
-    private Map<String, String> headers = Maps.newHashMap();
+    private Headers headers = new Headers();
     private DataOutputStream dos;
 
     public HttpResponse(OutputStream os) {
@@ -47,7 +47,7 @@ public class HttpResponse {
 
         String resultHeaders = headers.keySet()
                 .stream()
-                .map(key -> String.format(KEY_HEADER, key, headers.get(key)))
+                .map(key -> String.format(KEY_HEADER, key, headers.get(key, "")))
                 .collect(Collectors.joining(NEXT_LINE));
 
         try {
