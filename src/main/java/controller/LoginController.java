@@ -3,11 +3,15 @@ package controller;
 import db.DataBase;
 import model.User;
 import request.HttpRequest;
+import request.HttpSession;
+import request.HttpSessions;
 import response.HttpResponse;
+import webserver.WebServer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Optional;
 
 import static common.HttpHeaders.SET_COOKIE;
 
@@ -19,12 +23,14 @@ public class LoginController extends AbstractController {
         User user = DataBase.findUserById(parameters.get("userId"));
 
         if (!checkValidUser(user, parameters.get("password"))) {
-            response.addHeader(SET_COOKIE.getHeader(), "logined=false");
             response.sendRedirect("/user/login_failed.html");
             return;
         }
 
-        response.addHeader(SET_COOKIE.getHeader(), "logined=true; Path=/");
+        HttpSession httpSession = HttpSessions.findHttpSessionById(parameters.get(SET_COOKIE.getHeader()))
+                .orElse(HttpSessions.getNewHttpSession(user.getEmail()));
+
+        response.addHeader(SET_COOKIE.getHeader(), httpSession.getId());
         response.sendRedirect("/index.html");
     }
 

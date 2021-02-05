@@ -7,7 +7,10 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import model.User;
 import request.HttpRequest;
+import request.HttpSessions;
 import response.HttpResponse;
+import utils.ParseUtils;
+import webserver.WebServer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,7 +25,8 @@ public class ListUserController extends AbstractController {
 
     @Override
     protected void doGet(HttpRequest request, HttpResponse response) throws IOException, URISyntaxException {
-        if(!isLogin(request.getHeaders().get(COOKIE.getHeader()))){
+        String cookie = request.getHeaders().get(COOKIE.getHeader());
+        if(!isLogin(ParseUtils.getSessionId(cookie))){
             response.sendRedirect("/user/login.html");
             return;
         }
@@ -43,7 +47,7 @@ public class ListUserController extends AbstractController {
         response.responseBody(profilePage.getBytes());
     }
 
-    private boolean isLogin(String cookie) {
-        return cookie != null && cookie.contains("logined=true");
+    private boolean isLogin(String sessionId) {
+        return sessionId != null && HttpSessions.existHttpSession(sessionId);
     }
 }

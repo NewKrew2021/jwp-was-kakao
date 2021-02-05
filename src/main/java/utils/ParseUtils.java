@@ -4,7 +4,6 @@ import request.HeaderPair;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ParseUtils {
@@ -15,6 +14,7 @@ public class ParseUtils {
     private static final String PARAMETER_PAIR_REGEX = "&";
     private static final String PARAMETER_KEY_VALUE_REGEX = "=";
     private static final String EXTENSION_REGEX = ".";
+    private static final String SESSION_REGEX = ";";
 
     public static HeaderPair parseHeaderPair(String header) {
         return HeaderPair.of(header.substring(START_INDEX, header.indexOf(HEADER_REGEX))
@@ -51,5 +51,9 @@ public class ParseUtils {
         }
 
         return path.substring(index);
+    }
+
+    public static String getSessionId(String cookie){
+        return cookie.split(SESSION_REGEX)[START_INDEX];
     }
 }

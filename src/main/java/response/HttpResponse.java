@@ -58,6 +58,7 @@ public class HttpResponse {
     }
 
     public void responseBody(byte[] body) {
+        this.body = body;
         headers.put(CONTENT_LENGTH.getHeader(), String.valueOf(body.length));
         response(new Response200Status());
     }
@@ -78,14 +79,14 @@ public class HttpResponse {
     }
 
     private void writeHeader() throws IOException {
+        StringBuilder sb = new StringBuilder();
         for (String key : headers.keySet()) {
-            StringBuilder sb = new StringBuilder();
             sb.append(key);
             sb.append(KEY_VALUE_REGEX);
             sb.append(headers.get(key));
             sb.append(NEW_LINE_PREFIX);
-            dos.writeBytes(sb.toString());
         }
+        dos.writeBytes(sb.toString());
         dos.writeBytes(NEW_LINE_PREFIX);
     }
 
