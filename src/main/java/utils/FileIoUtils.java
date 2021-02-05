@@ -37,4 +37,12 @@ public class FileIoUtils {
             throw new FileNotFoundException();
         }
     }
+
+    public static String getDirectoryPath(String extension) {
+        extension = extension.toLowerCase();
+        if(extension.equals("html") || extension.equals("ico")) {
+            return "templates";
+        }
+        return "static";
+    }
 }

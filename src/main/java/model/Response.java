@@ -37,18 +37,10 @@ public class Response {
     }
 
     private void addContentType(String path) {
-        if (path.contains(".html")) {
-            this.body.setBody(FileIoUtils.loadFileFromClasspath("templates" + path));
-            header.addHeader("Content-Type", "text/html");
-        }
-        if (path.contains(".css")) {
-            this.body.setBody(FileIoUtils.loadFileFromClasspath("static" + path));
-            header.addHeader("Content-Type", "text/css");
-        }
-        if (path.contains(".js")) {
-            this.body.setBody(FileIoUtils.loadFileFromClasspath("static" + path));
-            header.addHeader("Content-Type", "application/javascript");
-        }
+        int pos = path.lastIndexOf( "." );
+        String ext = path.substring( pos + 1 ).toUpperCase();
+        body.setBody(FileIoUtils.loadFileFromClasspath(FileIoUtils.getDirectoryPath(ext) + path));
+        header.addHeader("Content-Type", ContentType.valueOf(ext).getMimetype());
     }
 
     public void forwardBody(String body) {
