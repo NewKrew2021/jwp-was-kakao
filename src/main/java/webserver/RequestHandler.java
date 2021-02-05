@@ -19,11 +19,11 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private final SessionManager sessionManager;
+    private final UuidSessionManager uuidSessionManager;
 
-    public RequestHandler(Socket connectionSocket, SessionManager sessionManager) {
+    public RequestHandler(Socket connectionSocket, UuidSessionManager uuidSessionManager) {
         this.connection = connectionSocket;
-        this.sessionManager = sessionManager;
+        this.uuidSessionManager = uuidSessionManager;
     }
 
     public void run() {
@@ -34,7 +34,7 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = HttpRequest.of(in);
             DataOutputStream dos = new DataOutputStream(out);
 
-            HandlerMapper handlerMapper = new HandlerMapper(sessionManager);
+            HandlerMapper handlerMapper = new HandlerMapper(uuidSessionManager);
             HttpServlet httpServlet = handlerMapper.map(httpRequest);
             if (httpServlet instanceof FontsHandler) {
                 writeResponse(dos, httpServlet.service(httpRequest), StandardCharsets.ISO_8859_1);

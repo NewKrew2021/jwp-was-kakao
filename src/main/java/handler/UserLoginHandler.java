@@ -3,18 +3,20 @@ package handler;
 import db.DataBase;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import web.*;
+import web.HttpHeaders;
+import web.HttpRequest;
+import web.HttpResponse;
+import web.HttpUrl;
 import webserver.HttpServlet;
-import webserver.SessionManager;
+import webserver.UuidSessionManager;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class UserLoginHandler implements HttpServlet {
-    private final SessionManager sessionManager;
+    private final UuidSessionManager uuidSessionManager;
 
-    public UserLoginHandler(SessionManager sessionManager) {
-        this.sessionManager = sessionManager;
+    public UserLoginHandler(UuidSessionManager uuidSessionManager) {
+        this.uuidSessionManager = uuidSessionManager;
     }
 
     @Override
@@ -23,11 +25,7 @@ public class UserLoginHandler implements HttpServlet {
 
         return DataBase.findUserById(parameters.get("userId"))
                 .filter(user -> user.isSamePassword(parameters.get("password")))
-                .map(user -> {
-                    UUID uuid = UUID.randomUUID();
-                    sessionManager.add(HttpSession.of(uuid));
-                    return getResponse("/index.html", "SESSIONID=" + uuid.toString() + "; Path=/");
-                })
+                .map(user -> getResponse("/index.html", "SESSIONID=" + uuidSessionManager.createSession().getId() + "; Path=/"))
                 .orElseGet(() -> getResponse("/user/login_failed.html", "Path=/"));
     }
 
