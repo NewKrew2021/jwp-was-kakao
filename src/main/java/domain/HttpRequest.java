@@ -6,6 +6,9 @@ import utils.KeyValueTokenizer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +27,8 @@ public class HttpRequest {
         this.httpParameters = httpParameters;
     }
 
-    public static HttpRequest from(BufferedReader br) throws IOException {
+    public static HttpRequest from(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         HttpRequestStartLine startLine = HttpRequestStartLine.of(br.readLine());
         Map<String, String> params = new HashMap<>();
         if (startLine.hasParameter()) {

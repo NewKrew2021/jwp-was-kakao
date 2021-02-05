@@ -6,12 +6,10 @@ import domain.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class RequestHandler implements Runnable {
@@ -29,9 +27,8 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-             OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = HttpRequest.from(br);
+        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+            HttpRequest httpRequest = HttpRequest.from(in);
             HttpResponse httpResponse = new HttpResponse(new DataOutputStream(out));
 
             String url = httpRequest.getUrl();
