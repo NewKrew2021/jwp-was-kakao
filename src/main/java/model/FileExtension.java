@@ -1,12 +1,12 @@
 package model;
 
-public class File {
-    private String extenstion;
+public class FileExtension {
+    private String extension;
     private String location;
     private String contentType;
 
-    public File(String extenstion, String location, String contentType) {
-        this.extenstion = extenstion;
+    public FileExtension(String extension, String location, String contentType) {
+        this.extension = extension;
         this.location = location;
         this.contentType = contentType;
     }
