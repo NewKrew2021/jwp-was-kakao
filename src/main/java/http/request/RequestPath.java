@@ -1,4 +1,4 @@
-package dto.request;
+package http.request;
 
 import exceptions.InvalidRequestPathException;
 

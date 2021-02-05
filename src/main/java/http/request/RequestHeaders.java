@@ -1,10 +1,10 @@
-package dto.request;
+package http.request;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static dto.request.RequestParams.KEY;
-import static dto.request.RequestParams.VALUE;
+import static http.request.RequestParams.KEY;
+import static http.request.RequestParams.VALUE;
 
 public class RequestHeaders {
 

@@ -1,11 +1,11 @@
 package controller;
 
 import db.DataBase;
-import dto.HttpRequest;
-import dto.HttpResponse;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 import model.User;
-import session.HttpSession;
-import session.HttpSessions;
+import http.session.HttpSession;
+import http.session.HttpSessions;
 
 import java.util.UUID;
 

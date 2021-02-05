@@ -1,5 +1,6 @@
-package dto;
+package http;
 
+import http.request.HttpRequest;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

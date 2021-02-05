@@ -1,8 +1,8 @@
 package controller;
 
 import db.DataBase;
-import dto.HttpRequest;
-import dto.HttpResponse;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 import model.User;
 
 import java.io.UnsupportedEncodingException;

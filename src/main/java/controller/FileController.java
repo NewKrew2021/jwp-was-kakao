@@ -1,7 +1,7 @@
 package controller;
 
-import dto.HttpRequest;
-import dto.HttpResponse;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 
 public class FileController extends AbstractController {
 

@@ -1,9 +1,5 @@
-package dto;
+package http.request;
 
-import dto.request.RequestHeaders;
-import dto.request.RequestMethod;
-import dto.request.RequestParams;
-import dto.request.RequestPath;
 import utils.IOUtils;
 
 import java.io.BufferedReader;

@@ -1,4 +1,4 @@
-package dto.request;
+package http.request;
 
 import java.util.HashMap;
 import java.util.Map;

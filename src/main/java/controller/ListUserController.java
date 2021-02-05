@@ -2,11 +2,11 @@ package controller;
 
 import com.github.jknack.handlebars.Template;
 import db.DataBase;
-import dto.HttpRequest;
-import dto.HttpResponse;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 import exceptions.InvalidSessionException;
 import model.User;
-import session.HttpSessions;
+import http.session.HttpSessions;
 import utils.HandlebarsUtils;
 import utils.SessionUtils;
 
