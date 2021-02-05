@@ -6,19 +6,19 @@ import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 import web.*;
 import webserver.HttpServlet;
-import webserver.UuidSessionManager;
+import webserver.SessionManager;
 
 public class UserListHandler implements HttpServlet {
-    private final UuidSessionManager uuidSessionManager;
+    private final SessionManager sessionManager;
 
-    public UserListHandler(UuidSessionManager uuidSessionManager) {
-        this.uuidSessionManager = uuidSessionManager;
+    public UserListHandler(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
         Cookie cookie = Cookie.of(httpRequest);
-        if (!uuidSessionManager.contains(cookie.get("SESSIONID"))) {
+        if (!sessionManager.contains(cookie)) {
             HttpResponse httpResponse = HttpResponse.of(HttpStatus.FOUND);
             httpResponse.addHeader(HttpHeaders.LOCATION, "/user/login.html");
             return httpResponse;

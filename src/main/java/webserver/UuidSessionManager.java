@@ -1,5 +1,6 @@
 package webserver;
 
+import web.Cookie;
 import web.HttpSession;
 
 import java.util.HashMap;
@@ -13,8 +14,9 @@ public class UuidSessionManager implements SessionManager {
         this.sessions = new HashMap<>();
     }
 
-    public boolean contains(String key) {
-        return sessions.containsKey(key);
+    @Override
+    public boolean contains(Cookie cookie) {
+        return sessions.containsKey(cookie.get("SESSIONID"));
     }
 
     @Override
@@ -26,7 +28,12 @@ public class UuidSessionManager implements SessionManager {
     }
 
     @Override
-    public HttpSession get(String key) {
+    public HttpSession getByKey(String key) {
         return sessions.get(key);
+    }
+
+    @Override
+    public String getSessionCookie(HttpSession httpSession) {
+        return "SESSIONID=" + httpSession.getId();
     }
 }

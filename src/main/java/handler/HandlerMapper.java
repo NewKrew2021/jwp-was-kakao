@@ -2,6 +2,7 @@ package handler;
 
 import web.HttpRequest;
 import webserver.HttpServlet;
+import webserver.SessionManager;
 import webserver.UuidSessionManager;
 
 import java.util.Arrays;
@@ -10,7 +11,7 @@ import java.util.List;
 public class HandlerMapper {
     private final List<HttpServlet> handlers;
 
-    public HandlerMapper(UuidSessionManager uuidSessionManager) {
+    public HandlerMapper(SessionManager sessionManager) {
         handlers = Arrays.asList(
                 new CssHandler(),
                 new FontsHandler(),
@@ -18,8 +19,8 @@ public class HandlerMapper {
                 new IcoHandler(),
                 new JsHandler(),
                 new UserCreateHandler(),
-                new UserListHandler(uuidSessionManager),
-                new UserLoginHandler(uuidSessionManager)
+                new UserListHandler(sessionManager),
+                new UserLoginHandler(sessionManager)
         );
     }
 
