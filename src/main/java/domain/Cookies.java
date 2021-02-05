@@ -1,5 +1,7 @@
 package domain;
 
+import exception.InvaliCookieException;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +19,9 @@ public class Cookies {
                         List<String> split = Arrays.stream(cookie.split("="))
                                 .map(String::trim)
                                 .collect(Collectors.toList());
+                        if (split.size() != 2) {
+                            throw new InvaliCookieException();
+                        }
                         cookies.put(split.get(0), split.get(1));
                     });
         }
