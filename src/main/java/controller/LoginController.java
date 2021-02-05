@@ -17,7 +17,6 @@ public class LoginController implements Controller{
         this.dispatcher.register("/user/logout", "GET", this::logout);
     }
 
-    //TODO : 유저 없을때 custom exception 발생하도록 처리해야함
     public Response login(Request request){
         User user = DataBase.findUserById(request.getBodies().get("userId"));
         if(user.getPassword().equals(request.getBodies().get("password"))){
