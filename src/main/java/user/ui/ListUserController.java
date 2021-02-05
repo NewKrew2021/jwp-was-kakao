@@ -17,8 +17,8 @@ public class ListUserController extends AbstractController {
     private static final String LOGINED = "logined";
 
     @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (isLogin(httpRequest.getHeader(COOKIE))) {
+    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse, SessionStorage sessionStorage) {
+        if (isLogin(httpRequest.getHeader(COOKIE), sessionStorage)) {
             httpResponse.forwardBody(new Body(UserView.getUserListHtml(), TEXT_HTML));
             return;
         }
@@ -26,11 +26,11 @@ public class ListUserController extends AbstractController {
         httpResponse.sendRedirect(INDEX_HTML);
     }
 
-    private boolean isLogin(String cookie) {
+    private boolean isLogin(String cookie, SessionStorage sessionStorage) {
         Cookies cookies = new Cookies(cookie);
 
         try {
-            HttpSession session = DataBase.findSessionById(cookies.get(SESSION_ID).getValue());
+            HttpSession session = sessionStorage.findSessionById(cookies.get(SESSION_ID).getValue());
 
             if (session != null) {
                 return session.contains(LOGINED);

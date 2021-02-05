@@ -15,19 +15,21 @@ public class Controllers {
     private static final String DEFAULT = "*";
     private static final String DOT = ".";
     private final Map<String, Controller> controllers = Maps.newHashMap();
+    private final SessionStorage sessionStorage;
 
-    public Controllers() {
+    public Controllers(SessionStorage sessionStorage) {
         controllers.put(USER_LOGOUT_PATH, new LogoutController());
         controllers.put(USER_PROFILE_PATH, new UserProfileController());
         controllers.put(USER_CREATE_PATH, new CreateUserController());
         controllers.put(USER_LIST_PATH, new ListUserController());
         controllers.put(USER_LOGIN_PATH, new LoginController());
         controllers.put(DEFAULT, new ForwardController());
+        this.sessionStorage = sessionStorage;
     }
 
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
         controllers.getOrDefault(processedPath(httpRequest.getPath()), controllers.get(DEFAULT))
-                .service(httpRequest, httpResponse);
+                .service(httpRequest, httpResponse, sessionStorage);
     }
 
     private String processedPath(String path) {

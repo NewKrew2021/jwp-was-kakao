@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import webserver.domain.Controllers;
 import webserver.domain.HttpRequest;
 import webserver.domain.HttpResponse;
+import webserver.domain.SessionStorage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,10 +16,13 @@ public class RequestHandler implements Runnable {
     public static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private static Controllers controllers = new Controllers();
+    private Controllers controllers;
+    private final SessionStorage sessionStorage;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, SessionStorage sessionStorage) {
         this.connection = connectionSocket;
+        this.sessionStorage = sessionStorage;
+        this.controllers = new Controllers(sessionStorage);
     }
 
     public void run() {

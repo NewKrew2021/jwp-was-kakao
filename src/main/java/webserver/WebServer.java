@@ -2,6 +2,7 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.domain.SessionStorage;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,7 +24,7 @@ public class WebServer {
 
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                Thread thread = new Thread(new RequestHandler(connection));
+                Thread thread = new Thread(new RequestHandler(connection, new SessionStorage()));
                 thread.start();
             }
         }
