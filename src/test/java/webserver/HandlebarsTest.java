@@ -1,22 +1,19 @@
-package utils;
+package webserver;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
-import db.DataBase;
 import model.User;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static service.JwpService.getProfilePage;
-
 public class HandlebarsTest {
     private static final Logger log = LoggerFactory.getLogger(HandlebarsTest.class);
 
     @Test
-    void name() throws Exception {
+    void Handlebars() throws Exception {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
         loader.setSuffix(".html");
@@ -24,14 +21,9 @@ public class HandlebarsTest {
 
         Template template = handlebars.compile("user/profile");
 
-        User user = new User("javajigi", "password", "자바지기", "javajigi@gmail.com");
-        String profilePage = template.apply(user);
+        User user2 = new User("javajigi", "password", "자바지기", "javajigi@gmail.com");
+        String profilePage = template.apply(user2);
+        System.out.println(profilePage);
         log.debug("ProfilePage : {}", profilePage);
     }
-    @Test
-    void getProfilePageTest() throws Exception {
-        DataBase.addUser(new User("danny", "password", "재호", "kcoms555@naver.com"));
-        System.out.println(getProfilePage());
-    }
-
 }

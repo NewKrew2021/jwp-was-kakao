@@ -1,18 +1,54 @@
 package webserver;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import webserver.domain.HttpHeader;
+import webserver.domain.HttpMethod;
+import webserver.domain.HttpRequest;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
-public class HttpRequestTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class HttpRequestTest {
+    private String testDirectory = "src/test/resources/";
+
+    @DisplayName("GET Url Parameter")
     @Test
-    void request_resttemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        String resourceUrl = "https://edu.nextstep.camp";
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl + "/c/4YUvqn9V", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    public void request_GET() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "Http_GET.txt"));
+        HttpRequest request = new HttpRequest(in);
+
+        assertEquals(HttpMethod.GET, request.getMethod());
+        assertEquals("/user/create", request.getPath());
+        assertEquals("keep-alive", request.getHeaders().get(HttpHeader.CONNECTION));
+        assertEquals("javajigi", request.getParameters().get("userId"));
+    }
+
+    @DisplayName("POST Body Parameter")
+    @Test
+    public void request_POST1() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "Http_POST1.txt"));
+        HttpRequest request = new HttpRequest(in);
+
+        assertEquals(HttpMethod.POST, request.getMethod());
+        assertEquals("/user/create", request.getPath());
+        assertEquals("keep-alive", request.getHeaders().get(HttpHeader.CONNECTION));
+        assertEquals("javajigi", request.getParameters().get("userId"));
+    }
+
+    @DisplayName("POST Body, Url Parameter")
+    @Test
+    public void request_POST2() throws Exception {
+        InputStream in = new FileInputStream(new File(testDirectory + "Http_POST2.txt"));
+        HttpRequest request = new HttpRequest(in);
+
+        assertEquals(HttpMethod.POST, request.getMethod());
+        assertEquals("/user/create", request.getPath());
+        assertEquals("keep-alive", request.getHeaders().get(HttpHeader.CONNECTION));
+        assertEquals("1", request.getParameters().get("id"));
+        assertEquals("javajigi", request.getParameters().get("userId"));
     }
 }
