@@ -22,9 +22,9 @@ public class UserService {
         return DataBase.findAll();
     }
 
-    public static boolean isLoginSuccess(String userId, String password) {
-        Optional<User> user = DataBase.findUserById(userId);
-        return user.isPresent() && user.get().getPassword().equals(password);
+    public static boolean isLoginSuccess(UserDto userDto) {
+        Optional<User> user = DataBase.findUserById(userDto.getUserId());
+        return user.isPresent() && user.get().getPassword().equals(userDto.getPassword());
     }
 
     public static void loginUser(String sessionId) {
