@@ -17,7 +17,7 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private ControllerMapper controllerMapper = new ControllerMapper();
+    private DispatcherServlet servlet = new DispatcherServlet();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -29,22 +29,14 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             String request = IOUtils.buildString(in);
-            System.out.println(request);
             HttpRequest httpRequest = HttpRequestParser.getRequest(request);
+            HttpResponse httpResponse = new HttpResponse();
+
+            servlet.doService(httpRequest, httpResponse);
+
             DataOutputStream dos = new DataOutputStream(out);
-
-            Optional<Controller> controller = controllerMapper.findController(httpRequest);
-
-            HttpResponse response;
-            if (controller.isPresent()) {
-                response = controller.get().handleRequest(httpRequest);
-            } else {
-                response = new HttpResponse.Builder()
-                        .status("HTTP/1.1 404 Not Found")
-                        .build();
-            }
-            response.sendResponse(dos);
-        } catch (IOException | URISyntaxException e) {
+            httpResponse.sendResponse(dos);
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }

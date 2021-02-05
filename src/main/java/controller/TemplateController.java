@@ -2,16 +2,11 @@ package controller;
 
 import annotation.web.RequestMethod;
 import webserver.Controller;
+import webserver.Model;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import utils.FileIoUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class TemplateController extends Controller {
-    private static final String prefix = "./templates";
-
     public TemplateController() {
         super(RequestMethod.GET, "");
     }
@@ -22,11 +17,7 @@ public class TemplateController extends Controller {
     }
 
     @Override
-    public HttpResponse handleRequest(HttpRequest request) throws IOException, URISyntaxException {
-        String path = prefix + request.getUri();
-        return new HttpResponse.Builder()
-                .status("HTTP/1.1 200 OK")
-                .body(FileIoUtils.loadFileFromClasspath(path), FileIoUtils.getMimeType(path))
-                .build();
+    public String handleRequest(HttpRequest request, HttpResponse response, Model model) {
+        return "template";
     }
 }
