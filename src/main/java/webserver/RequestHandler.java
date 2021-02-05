@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import framework.request.HttpRequest;
 import framework.response.HttpResponse;
+import service.controller.AbstractController;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,10 +32,10 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = HttpRequest.of(in);
             HttpResponse httpResponse = HttpResponse.of(new DataOutputStream(out));
 
-            Controller controller = Controller.of(httpRequest.getPath());
+            Controller controller = AbstractController.of(httpRequest.getPath());
             controller.service(httpRequest, httpResponse);
 
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }

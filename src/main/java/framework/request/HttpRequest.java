@@ -21,22 +21,19 @@ public class HttpRequest {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
-    private final String REQUEST_FIRST_LINE_REGEX = " ";
-    private final String DEFAULT_LINE = "";
-    private final int METHOD_INDEX = 0;
-    private final int URL_INDEX = 1;
-    private final int VERSION_INDEX = 2;
+    private static final String REQUEST_FIRST_LINE_REGEX = " ";
+    private static final String DEFAULT_LINE = "";
+    private static final int METHOD_INDEX = 0;
+    private static final int URL_INDEX = 1;
+    private static final int VERSION_INDEX = 2;
 
     private HttpMethod method;
     private String url;
     private String version;
     private String path;
 
-    private Map<String, String> headers;
-    private Map<String, String> bodies;
-
-    public HttpRequest() {
-    }
+    private final Map<String, String> headers;
+    private final Map<String, String> bodies;
 
     private HttpRequest(InputStream in) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -114,16 +111,8 @@ public class HttpRequest {
         return method;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     public String getPath() {
         return path;
-    }
-
-    public String getVersion() {
-        return version;
     }
 
     public Map<String, String> getHeaders() {

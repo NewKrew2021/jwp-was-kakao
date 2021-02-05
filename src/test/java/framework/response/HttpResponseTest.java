@@ -12,16 +12,6 @@ class HttpResponseTest {
     private String testDirectory = "./src/test/resources/";
 
     @Test
-    @DisplayName("Http_Forward.txt 결과는 응답 body에 index.html이 포함되어 있어야 한다.")
-    public void responseForward() throws Exception {
-        HttpResponse response = HttpResponse.of(createOutputStream("Http_Forward.txt"));
-        response.forward("/index.html");
-
-        BufferedReader reader = createBufferedReader("Http_Forward.txt");
-        assertThat(reader.lines().filter(line -> line.contains("SLiPP Java Web Programming")).count()).isGreaterThanOrEqualTo(1L);
-    }
-
-    @Test
     @DisplayName("Http_Redirect.txt 결과는 응답 headere에 Location 정보가 /index.html로 포함되어 있어야 한다.")
     public void responseRedirect() throws Exception {
         HttpResponse response = HttpResponse.of(createOutputStream("Http_Redirect.txt"));
