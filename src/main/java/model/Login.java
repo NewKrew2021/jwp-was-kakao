@@ -6,7 +6,7 @@ public class Login {
     private final static String LOGIN_TRUE = "logined=true";
 
     public void isRequestLogin(String loginCookie) {
-        if (loginCookie.equals(LOGIN_TRUE)) {
+        if (loginCookie != null && loginCookie.equals(LOGIN_TRUE)) {
             login = true;
         }
     }

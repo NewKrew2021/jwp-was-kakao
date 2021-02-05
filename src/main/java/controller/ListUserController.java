@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
+import model.Login;
 import model.PagePath;
 import model.User;
 import utils.FileIoUtils;
@@ -21,7 +22,7 @@ public class ListUserController extends AbstractController {
 
     @Override
     protected void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (!isPossibleAccessUserList(httpRequest.getPath())) {
+        if (!isPossibleAccessUserList(httpResponse.getLogin() , httpRequest.getPath())) {
             httpResponse.sendRedirect(USER_LOGIN_URL);
             return;
         }
@@ -37,7 +38,7 @@ public class ListUserController extends AbstractController {
 
     }
 
-    private boolean isPossibleAccessUserList(PagePath pagePath) {
+    private boolean isPossibleAccessUserList(Login login, PagePath pagePath) {
         try {
             return login.isLogin() && FileIoUtils.isExistFile("./templates" + pagePath.getPagePath());
         } catch (URISyntaxException e) {

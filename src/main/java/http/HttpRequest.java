@@ -1,5 +1,6 @@
 package http;
 
+import model.Login;
 import model.PagePath;
 import org.springframework.http.HttpMethod;
 
@@ -43,4 +44,5 @@ public class HttpRequest {
     public HttpHeader getHttpHeader() {
         return httpHeader;
     }
+
 }

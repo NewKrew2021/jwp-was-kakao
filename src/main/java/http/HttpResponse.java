@@ -1,5 +1,6 @@
 package http;
 
+import model.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileIoUtils;
@@ -16,23 +17,17 @@ public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;
     private HttpHeader httpHeader;
-    private String login;
 
     public HttpResponse(OutputStream out, HttpHeader httpHeader) {
         dos = new DataOutputStream(out);
         this.httpHeader = httpHeader;
-        login = this.httpHeader.getHeaderByKey(HttpHeader.SET_COOKIE);
-    }
-
-    public void login() {
-        login = "logined=true";
     }
 
     public void sendRedirect(String url) {
         try {
             dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.FOUND.toString() +"\r\n");
             dos.writeBytes( HttpHeader.LOCATION + ": " + HttpHeader.HTTP + httpHeader.getHeaderByKey(HttpHeader.HOST) + url + "\r\n");
-            dos.writeBytes( HttpHeader.SET_COOKIE + ": " + login + HttpHeader.PATH + "\r\n");
+            dos.writeBytes( HttpHeader.SET_COOKIE + ": " + httpHeader.getLogin().isLogin() + HttpHeader.PATH + "\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
@@ -75,7 +70,7 @@ public class HttpResponse {
             dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.OK.toString() +"\r\n");
             dos.writeBytes( HttpHeader.CONTENT_TYPE + ": "  + HttpHeader.ENCODING + "\r\n");
             dos.writeBytes( HttpHeader.CONTENT_LENGTH + ": "  + bodyLength + "\r\n");
-            dos.writeBytes( HttpHeader.SET_COOKIE + ": " + login + HttpHeader.PATH + "\r\n");
+            dos.writeBytes( HttpHeader.SET_COOKIE + ": " + httpHeader.getLogin().isLogin() + HttpHeader.PATH + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -91,7 +86,6 @@ public class HttpResponse {
         }
     }
 
-
     public void response404() {
         try {
             dos.writeBytes( HttpHeader.HTTP_VERSION + " "  + HttpStatus.NOT_FOUND.toString() +"\r\n");
@@ -100,5 +94,9 @@ public class HttpResponse {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    public Login getLogin() {
+        return httpHeader.getLogin();
     }
 }
