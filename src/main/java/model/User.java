@@ -7,6 +7,9 @@ public class User {
     private String email;
 
     public User(String userId, String password, String name, String email) {
+        if(userId.isEmpty() || password.isEmpty() || name.isEmpty() || email.isEmpty()) {
+            throw new IllegalArgumentException("유저 정보는 공백일 수 없습니다.");
+        }
         this.userId = userId;
         this.password = password;
         this.name = name;
