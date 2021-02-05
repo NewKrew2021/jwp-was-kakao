@@ -16,7 +16,7 @@ public class Dispatcher {
 
     public static Handler findMatchingHandlers(HttpRequest request) {
         return Arrays.stream(DispatchInfo.values())
-                .filter(dispatchInfo -> dispatchInfo.getHttpRequest().matchWith(request))
+                .filter(dispatchInfo -> dispatchInfo.matchWith(request))
                 .findAny()
                 .map(DispatchInfo::getRequestHandler)
                 .orElseThrow(RuntimeException::new);

@@ -1,0 +1,4 @@
+GET /images/80-text.png HTTP/1.1
+Host: localhost:8080
+Accept: text/css,*/*;q=0.1
+Connection: keep-alive

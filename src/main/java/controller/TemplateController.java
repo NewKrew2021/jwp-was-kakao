@@ -1,15 +1,13 @@
 package controller;
 
 import http.HttpResponse;
+import org.springframework.http.HttpStatus;
 
 public class TemplateController {
-    public static Handler htmlHandler = (request) -> new HttpResponse.Builder()
-            .status("HTTP/1.1 200 OK")
-            .body("./templates" + request.getUri())
-            .build();
+    public static final String TEMPLATES = "./templates";
 
-    public static Handler faviconHandler = (request) -> new HttpResponse.Builder()
-            .status("HTTP/1.1 200 OK")
-            .body("./templates" + request.getUri())
+    public static Handler templateHandler = (request) -> new HttpResponse.Builder()
+            .status(HttpStatus.OK)
+            .body(TEMPLATES + request.getUri())
             .build();
 }

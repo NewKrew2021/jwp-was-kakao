@@ -17,16 +17,18 @@ public class User {
         return userId;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getName() {
         return name;
     }
 
     public String getEmail() {
         return email;
+    }
+
+    public void verifyPassword(String password) {
+        if (!this.password.equals(password)) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override

@@ -1,22 +1,26 @@
 package http;
 
 import annotation.web.RequestMethod;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import utils.IOUtils;
 
-import java.util.Map;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class HttpRequestParserTest {
-    private HttpRequestParser parser = new HttpRequestParser("GET /user/create?userId=id&password=pw&name=jyp&email=jyp@email.com HTTP/1.1\n" +
-            "Host: localhost:8080\n" +
-            "Connection: keep-alive\n" +
-            "Accept: */*\n" +
-            "\n" +
-            "userId=id&password=pw&name=jyp&email=jyp@email.com");
+    public static final String PATH = "./src/test/resources/";
+    private HttpRequestParser parser;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        parser = new HttpRequestParser(IOUtils.readRequest(new FileInputStream(PATH + "get-user-create.txt")));
+    }
 
     @DisplayName("올바른 RequestMethod를 반환하는지 테스트")
     @Test
@@ -38,7 +42,7 @@ class HttpRequestParserTest {
     @ParameterizedTest
     @CsvSource({"userId,id", "password,pw", "name,jyp", "email,jyp@email.com"})
     void getParams(String key, String value) {
-        Map<String, String> params = parser.getParams();
+        Params params = parser.getParams();
 
         assertThat(params.get(key)).isEqualTo(value);
     }
@@ -55,9 +59,10 @@ class HttpRequestParserTest {
 
     @DisplayName("올바른 body를 반환하는지 테스트")
     @ParameterizedTest
-    @CsvSource({"userId,id", "password,pw", "name,jyp", "email,jyp@email.com"})
-    void getBody(String key, String value) {
-        Map<String, String> body = parser.getBody();
+    @CsvSource({"userId,javajigi", "password,password", "name,박재성", "email,javajigi@slipp.net"})
+    void getBody(String key, String value) throws IOException {
+        parser = new HttpRequestParser(IOUtils.readRequest(new FileInputStream(PATH + "post-user-create.txt")));
+        Body body = parser.getBody();
 
         assertThat(body.get(key)).isEqualTo(value);
     }

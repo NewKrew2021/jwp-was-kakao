@@ -1,6 +1,8 @@
 package http;
 
 public class Cookie {
+    public static final String SET_COOKIE = "Set-Cookie";
+    public static final String PATH = "Path";
     private String name;
     private String value;
     private String path;
@@ -33,9 +35,9 @@ public class Cookie {
     }
 
     public String toSetCookie() {
-        String cookie = "Set-Cookie: " + name + "=" + value;
+        String cookie = String.format("%s: %s=%s", SET_COOKIE, name, value);
         if (path != null) {
-            cookie += "; " + "Path=" + path;
+            cookie += String.format("; %s=%s", PATH, path);
         }
         return cookie;
     }
