@@ -1,0 +1,22 @@
+package framework.response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+public interface ResponseStatus {
+
+    Logger logger = LoggerFactory.getLogger(ResponseStatus.class);
+
+    default void setStatus(DataOutputStream dos) {
+        try {
+            writeStatus(dos);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    void writeStatus(DataOutputStream dos) throws IOException;
+}

@@ -1,6 +1,6 @@
 package next.examples;
 
-import annotation.Repository;
+import framework.annotation.Repository;
 
 @Repository
 public class JdbcUserRepository implements UserRepository {

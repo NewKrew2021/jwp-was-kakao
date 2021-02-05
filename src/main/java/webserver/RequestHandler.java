@@ -1,10 +1,10 @@
 package webserver;
 
-import controller.Controller;
+import framework.controller.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import request.HttpRequest;
-import response.HttpResponse;
+import framework.request.HttpRequest;
+import framework.response.HttpResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
-    public synchronized void run() {
+    public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 

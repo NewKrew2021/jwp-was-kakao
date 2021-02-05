@@ -1,7 +1,7 @@
 package next.examples;
 
-import annotation.Autowired;
-import annotation.Service;
+import framework.annotation.Autowired;
+import framework.annotation.Service;
 
 @Service
 public class MyQnaService {

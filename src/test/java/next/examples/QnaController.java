@@ -1,7 +1,7 @@
 package next.examples;
 
-import annotation.Autowired;
-import annotation.web.Controller;
+import framework.annotation.Autowired;
+import framework.annotation.web.Controller;
 
 @Controller
 public class QnaController {
