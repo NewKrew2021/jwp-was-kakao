@@ -21,7 +21,7 @@ public class ListUserController extends AbstractController {
         try {
             String cookie = request.getCookie();
             if (cookie == null) {
-                response.sendRedirect("http://" + request.getHost() + "/user/login.html");
+                response.sendRedirect( "/user/login.html");
                 return;
             }
             System.out.println(cookie);
@@ -47,7 +47,7 @@ public class ListUserController extends AbstractController {
                 return;
             }
 
-            response.sendRedirect("http://" + request.getHost() + "/user/login.html");
+            response.sendRedirect("/user/login.html");
 
         } catch (Exception e) {
             response.internalServerError();

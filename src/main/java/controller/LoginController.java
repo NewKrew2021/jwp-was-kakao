@@ -17,11 +17,11 @@ public class LoginController extends AbstractController {
             HttpSession session = HttpServletRequest.getSession();
             session.setAttribute("USER", userSessionVO);
             response.setCookie("true", "/", session.getId());
-            response.sendRedirect("http://" + request.getHost() + "/index.html");
+            response.sendRedirect("/index.html");
 
         }
         response.setCookie("false", "/", null);
-        response.sendRedirect("http://" + request.getHost() + "/user/login_failed.html");
+        response.sendRedirect("/user/login_failed.html");
 
     }
 }
