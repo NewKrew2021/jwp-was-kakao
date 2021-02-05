@@ -3,7 +3,6 @@ package utils;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import model.User;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,12 +18,12 @@ public class FileIoUtils {
         return Files.readAllBytes(path);
     }
 
-    public static byte[] loadCompiledFileFromClassPath(String filePath, Collection<User> users) throws IOException {
+    public static <T>byte[] loadCompiledFileFromClassPath(String filePath, Collection<T> objects) throws IOException {
         ClassPathTemplateLoader templateLoader = new ClassPathTemplateLoader();
         templateLoader.setPrefix("/templates");
         templateLoader.setSuffix("");
         Handlebars handlebars = new Handlebars(templateLoader);
         Template template = handlebars.compile(filePath);
-        return template.apply(users).getBytes(StandardCharsets.UTF_8);
+        return template.apply(objects).getBytes(StandardCharsets.UTF_8);
     }
 }

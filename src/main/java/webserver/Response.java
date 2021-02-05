@@ -1,6 +1,5 @@
 package webserver;
 
-import model.User;
 import utils.FileIoUtils;
 import utils.ParseUtils;
 
@@ -46,8 +45,7 @@ public class Response {
     }
 
     public void forward(String location) throws IOException, URISyntaxException {
-        byte[] body = FileIoUtils
-                .loadFileFromClasspath(location);
+        byte[] body = FileIoUtils.loadFileFromClasspath(location);
         addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
         writeResponse200(body);
@@ -82,8 +80,8 @@ public class Response {
         headers.put("Set-Cookie", cookie.toString());
     }
 
-    public void userListForward(String location, Collection<User> users) throws IOException {
-        byte[] body = FileIoUtils.loadCompiledFileFromClassPath(location, users);
+    public <T> void templateAndForward(String location, Collection<T> objects) throws IOException {
+        byte[] body = FileIoUtils.loadCompiledFileFromClassPath(location, objects);
         addHeader("Content-Type", getContentType(ParseUtils.parseExtension(location)) + ";charset=utf-8");
         addHeader("Content-Length", Integer.toString(body.length));
         writeResponse200(body);

@@ -16,7 +16,7 @@ public class ListUserController extends AbstractController {
     public void doGet(Request request, Response response) throws Exception {
         Session session = request.getSession();
         if (session != null && (Boolean) session.getAttribute("logined")) {
-            response.userListForward(request.getUri(), DataBase.findAll());
+            response.templateAndForward(request.getUri(), DataBase.findAll());
             return;
         }
         response.sendRedirect("/user/login.html");
