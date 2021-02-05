@@ -3,7 +3,7 @@ package web;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginCookie {
+public class Cookie {
     private static final int KEY = 0;
     private static final int VALUE = 1;
     private static final int SPLIT_SIZE = 2;
@@ -11,14 +11,14 @@ public class LoginCookie {
 
     private final Map<String, String> cookieValue;
 
-    private LoginCookie(Map<String, String> cookieValue) {
+    private Cookie(Map<String, String> cookieValue) {
         this.cookieValue = cookieValue;
     }
 
-    public static LoginCookie of(HttpRequest httpRequest) {
+    public static Cookie of(HttpRequest httpRequest) {
         String cookie = httpRequest.getHttpHeaders().get("Cookie");
         String[] cookies = cookie.split(";");
-        return new LoginCookie(toValueMap(cookies));
+        return new Cookie(toValueMap(cookies));
     }
 
     private static Map<String, String> toValueMap(String[] cookies) {
