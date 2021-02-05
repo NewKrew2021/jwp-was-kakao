@@ -6,14 +6,18 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Cookies {
+    private static final String COOKIE_DELIMITER = ";";
+    private static final String KEY_VALUE_DELIMITER = "=";
+    private static final int KEY_INDEX = 0;
+    private static final int VALUE_INDEX = 1;
     private List<Cookie> cookies = Lists.newArrayList();
 
     public Cookies(String cookies) {
-        Arrays.stream(cookies.split(";"))
+        Arrays.stream(cookies.split(COOKIE_DELIMITER))
                 .map(String::trim)
                 .forEach(cookie -> {
-                    String[] token = cookie.split("=");
-                    this.cookies.add(new Cookie(token[0], token[1]));
+                    String[] token = cookie.split(KEY_VALUE_DELIMITER);
+                    this.cookies.add(new Cookie(token[KEY_INDEX], token[VALUE_INDEX]));
                 });
     }
 
