@@ -1,6 +1,12 @@
 package domain;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+
+import static utils.FileIoUtils.loadFileFromClasspath;
 
 public class Response {
     private final HttpVersion httpVersion;
@@ -59,6 +65,29 @@ public class Response {
                 ContentType.HTML
         );
 
+    }
+
+    public static Response ofFileFromUrlPath(String urlPath) throws IOException, URISyntaxException {
+        if (urlPath.contains(".html")) {
+            return Response.ofDefaultFile(
+                    new ResponseBody(loadFileFromClasspath("./templates" + urlPath)),
+                    ContentType.HTML
+            );
+        }
+        if (urlPath.contains(".ico")) {
+            return Response.ofDefaultFile(
+                    new ResponseBody(loadFileFromClasspath("./templates" + urlPath)),
+                    ContentType.ICO);
+        }
+        if (urlPath.matches("(.*)(.js|.css|.eot|.svg|.ttf|.woff|.woff2|.png)")) {
+            List<String> split = Arrays.asList(urlPath.split("\\."));
+            String extension = split.get(split.size() - 1);
+            return Response.ofDefaultFile(
+                    new ResponseBody(loadFileFromClasspath("./static" + urlPath)),
+                    ContentType.valueOf(extension.toUpperCase()));
+        }
+        return Response.ofDefaultFile(new ResponseBody("No Page!"),
+                ContentType.HTML);
     }
 
     public void addHeader(String key, String value) {

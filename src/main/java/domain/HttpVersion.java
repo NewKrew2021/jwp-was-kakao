@@ -9,10 +9,6 @@ public enum HttpVersion {
         this.value = value;
     }
 
-    HttpVersion ofDefault(){
-        return HTTP1_1;
-    }
-
     public String getValue() {
         return value;
     }

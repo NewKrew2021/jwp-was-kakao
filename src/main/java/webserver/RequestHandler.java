@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +14,6 @@ import controller.UserController;
 import domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileIoUtils;
 import utils.IOUtils;
 
 
@@ -50,10 +48,14 @@ public class RequestHandler implements Runnable {
     }
 
     private Response getResponseByRequest(Request request) throws IOException, URISyntaxException {
-        if (FileIoUtils.pathIsFile(request.getUrlPath())) {
-            return FileIoUtils.loadFileFromUrlPath(request.getUrlPath());
+        if (pathIsFile(request.getUrlPath())) {
+            return Response.ofFileFromUrlPath(request.getUrlPath());
         }
         return dispatcher.run(request);
+    }
+
+    private boolean pathIsFile(String urlPath) {
+        return urlPath.matches("(.*)(.html|.js|.css|.eot|.svg|.ttf|.woff|.woff2|.png|.ico)");
     }
 
     private Request getRequestByInput(InputStream in) throws IOException {
