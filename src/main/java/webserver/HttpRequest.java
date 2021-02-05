@@ -1,5 +1,6 @@
 package webserver;
 
+import exception.RequestHeaderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.IOUtils;
@@ -15,17 +16,21 @@ public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     private static final String NOT_EXIST_MESSAGE = "(이)가 존재하지 않습니다.";
+    private static final String NOT_EXIST_COOKIE_MESSAGE = ": 쿠키가 존재하지 않습니다.";
     private static final String CONTENT_LENGTH = "Content-Length";
 
     private final HttpMethod httpMethod;
     private final String path;
     private final Map<String, String> header;
     private final Map<String, String> parameters;
+    private final Map<String, String> cookies;
 
-    private HttpRequest(HttpMethod httpMethod, String path, Map<String, String> header, Map<String, String> parameters) {
+    private HttpRequest(HttpMethod httpMethod, String path,
+                        Map<String, String> header, Map<String, String> cookies, Map<String, String> parameters) {
         this.httpMethod = httpMethod;
         this.path = path;
         this.header = header;
+        this.cookies = cookies;
         this.parameters = parameters;
     }
 
@@ -39,11 +44,12 @@ public class HttpRequest {
 
             List<String> requestHeader = readRequestHeader(br);
             Map<String, String> header = getHeaderFromRequestHeader(requestHeader);
+            Map<String, String> cookies = getCookiesFromHeader(header);
 
             int contentLength = header.containsKey(CONTENT_LENGTH) ? Integer.parseInt(header.get(CONTENT_LENGTH)) : 0;
             String requestBody = readRequestBody(br, contentLength);
             parameters.putAll(getParametersFromRequestBody(requestBody));
-            return new HttpRequest(httpMethod, path, header, parameters);
+            return new HttpRequest(httpMethod, path, header, cookies, parameters);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -96,6 +102,25 @@ public class HttpRequest {
         return header;
     }
 
+    private static Map<String, String> getCookiesFromHeader(Map<String, String> header) {
+        Map<String, String> cookies = new HashMap<>();
+        if (!header.containsKey("Cookie")) {
+            return cookies;
+        }
+        String cookieValue = header.get("Cookie");
+        String[] cookieValues = cookieValue.split(";(\\s*)");
+        return parseEachCookies(cookieValues);
+    }
+
+    private static Map<String, String> parseEachCookies(String[] cookieValues) {
+        Map<String, String> cookies = new HashMap<>();
+        for (String cookieValue : cookieValues) {
+            String[] data = cookieValue.split("=");
+            cookies.put(data[0], data[1]);
+        }
+        return cookies;
+    }
+
     private static String readRequestBody(BufferedReader br, int contentLength) throws IOException {
         return IOUtils.readData(br, contentLength);
     }
@@ -129,9 +154,18 @@ public class HttpRequest {
         if (!header.containsKey(key)) {
             String message = key + NOT_EXIST_MESSAGE;
             logger.error(message);
-            throw new RuntimeException(message);
+            throw new RequestHeaderException(message);
         }
         return header.get(key);
+    }
+
+    public String getCookie(String cookieName) {
+        if (!cookies.containsKey(cookieName)) {
+            String message = cookieName + NOT_EXIST_COOKIE_MESSAGE;
+            logger.error(message);
+            throw new RequestHeaderException(message);
+        }
+        return cookies.get(cookieName);
     }
 
     public String getParameter(String key) {
