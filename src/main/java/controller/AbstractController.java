@@ -23,9 +23,13 @@ public abstract class AbstractController implements Controller {
     }
 
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+        throw new MethodMappingException(
+                String.format("잘못된 요청입니다: %s %s", httpRequest.getMethod().name(), httpRequest.getPath()));
     }
 
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
+        throw new MethodMappingException(
+                String.format("잘못된 요청입니다: %s %s", httpRequest.getMethod().name(), httpRequest.getPath()));
     }
 
 }
