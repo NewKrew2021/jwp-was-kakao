@@ -1,0 +1,4 @@
+HTTP/1.1 302 Found
+Set-Cookie: Path=/; sessionId=5835134c-9530-4f94-aee5-5752a1f3d9a9
+Location: /index.html
+
