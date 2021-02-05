@@ -13,10 +13,11 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("Request 클래스")
 public class RequestTest {
     List<String> testStrings = Arrays.asList(
-            "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1"
-            , "Host: localhost:8080"
-            , "Connection: keep-alive"
-            , "Accept: */*"
+            "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1",
+            "Host: localhost:8080",
+            "Connection: keep-alive",
+            "Accept: */*",
+            ""
     );
 
     @DisplayName("urlPath 확인")

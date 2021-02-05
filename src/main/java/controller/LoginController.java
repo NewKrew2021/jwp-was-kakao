@@ -5,7 +5,7 @@ import http.request.Request;
 import http.response.Response;
 import model.User;
 
-public class LoginController {
+public class LoginController implements Controller{
     private static final LoginController instance = new LoginController();
     private final Dispatcher dispatcher = Dispatcher.getInstance();
 

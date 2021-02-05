@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class UserController {
+public class UserController implements Controller {
     private static final UserController instance = new UserController();
     private final Dispatcher dispatcher = Dispatcher.getInstance();
 
@@ -54,7 +54,6 @@ public class UserController {
         return Response.ofRedirect("/index.html");
     }
 
-    //TODO : 예외 처리 만들어야함
     public Response list(Request request) {
         if (!request.getCookies().getValueOf("logined").equals("true")) {
             return Response.ofRedirect("/user/login.html");

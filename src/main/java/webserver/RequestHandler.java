@@ -4,10 +4,12 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import controller.Controller;
 import controller.Dispatcher;
 import controller.LoginController;
 import controller.UserController;
@@ -26,13 +28,15 @@ public class RequestHandler implements Runnable {
 
     private final Socket connection;
     private final Dispatcher dispatcher = Dispatcher.getInstance();
-    private final UserController userController = UserController.getInstance();
-    private final LoginController loginController = LoginController.getInstance();
+    private final List<Controller> controllers;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        userController.registerAll();
-        loginController.registerAll();
+
+        controllers = new ArrayList<>();
+        controllers.add(UserController.getInstance());
+        controllers.add(LoginController.getInstance());
+        controllers.stream().forEach(Controller::registerAll);
     }
 
     public void run() {
@@ -40,7 +44,6 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             List<String> lines = Arrays.stream(IOUtils.readData(br, 5000).split("\r\n"))
