@@ -17,12 +17,10 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
     private Controllers controllers;
-    private final SessionStorage sessionStorage;
 
-    public RequestHandler(Socket connectionSocket, SessionStorage sessionStorage) {
+    public RequestHandler(Socket connectionSocket, Controllers controllers) {
         this.connection = connectionSocket;
-        this.sessionStorage = sessionStorage;
-        this.controllers = new Controllers(sessionStorage);
+        this.controllers = controllers;
     }
 
     public void run() {
