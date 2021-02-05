@@ -72,7 +72,7 @@
 
 #### HttpSession 정의 및 구현
 * [x] HttpSession 객체 정의
-* [ ] HttpSession 관리하는 자료 구조 구현
+* [x] HttpSession 관리하는 자료 구조 구현
 * [ ] 각 Controller에 세션 로직 구현
 
 ## 온라인 코드 리뷰 과정
