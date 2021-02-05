@@ -103,12 +103,8 @@ public class HttpResponse {
         return this;
     }
 
-    public HttpResponse addSetCookieHeader(boolean isLogined){
-        if(isLogined){
-            addHeader(SET_COOKIE, "logined=true; Path=/");
-            return this;
-        }
-        addHeader(SET_COOKIE, "logined=false; Path=/");
+    public HttpResponse addSetCookieHeaderSessionId(String sessionId){
+        addHeader(SET_COOKIE, "session="+ sessionId);
         return this;
     }
 

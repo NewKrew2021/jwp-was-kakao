@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import requestTextForTest.FilePathName;
 import response.HttpResponse;
-import response.HttpResponseStatusCode;
 import responseTextForTest.ResponseFilePathName;
 import webserver.ControllerHandler;
 
@@ -81,7 +80,7 @@ public class HttpRequestTest {
         while(!(tmp = br.readLine()).equals("")){
             resultResponse = (resultResponse == null ? new StringBuilder("null") : resultResponse).append(tmp);
         }
-        assertThat(resultResponse).contains("Set-Cookie: logined=true; Path=/");
+        assertThat(resultResponse).contains("Set-Cookie: session=");
     }
 
     @DisplayName("리소스 파일을 요청시에 정상응답 코드를 받는다")
@@ -107,7 +106,5 @@ public class HttpRequestTest {
         }
         assertThat(resultResponse).contains("HTTP/1.1 200 OK");
     }
-
-
 
 }

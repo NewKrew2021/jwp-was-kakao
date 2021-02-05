@@ -1,13 +1,10 @@
 package controller;
 
-import db.DataBase;
-import model.User;
 import request.HttpRequest;
 import response.HttpResponse;
 import response.HttpResponseStatusCode;
 import service.LoginService;
-
-import java.util.Optional;
+import javax.security.auth.login.LoginException;
 
 public class LoginController extends AbstractController {
 
@@ -16,18 +13,20 @@ public class LoginController extends AbstractController {
     private final LoginService loginService = new LoginService();
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
-        if (loginService.login(httpRequest)) {
+        try {
+            String sessionId = loginService.login(httpRequest);
             httpResponse
                     .addRedirectionLocationHeader(INDEX_HTML)
-                    .addSetCookieHeader(true)
+                    .addSetCookieHeaderSessionId(sessionId)
                     .send(HttpResponseStatusCode.FOUND)
                     .build();
-            return;
+        } catch (LoginException e) {
+            httpResponse
+                    .addRedirectionLocationHeader(LOGIN_FAIL_PAGE)
+                    .send(HttpResponseStatusCode.FOUND)
+                    .build();
+            e.printStackTrace();
         }
-        httpResponse
-                .addRedirectionLocationHeader(LOGIN_FAIL_PAGE)
-                .send(HttpResponseStatusCode.FOUND)
-                .build();
     }
 
 }

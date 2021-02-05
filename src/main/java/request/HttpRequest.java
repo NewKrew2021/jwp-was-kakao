@@ -4,6 +4,7 @@ import annotation.web.RequestMethod;
 import exceptions.HeaderNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import session.Sessions;
 import webserver.RequestHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,8 +16,6 @@ import java.util.Optional;
 public class HttpRequest {
 
     private static final String COOKIE = "Cookie";
-    private static final String COOKIE_TRUE_VALUE = "logined=true";
-
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private RequestUri requestUri;
@@ -72,8 +71,12 @@ public class HttpRequest {
 
 
     public boolean isLogined() {
-        Optional<String> cookieValue = requestHeader.getHeaderValue(COOKIE);
-        return cookieValue.isPresent() && cookieValue.get().equals(COOKIE_TRUE_VALUE);
+        String sessionId = getSessionId();
+        return Sessions.isContain(sessionId);
     }
 
+    public String getSessionId(){
+        Optional<String> sessionLine = requestHeader.getHeaderValue(COOKIE);
+        return sessionLine.map(s -> s.split("=")[1]).orElse(null);
+    }
 }
