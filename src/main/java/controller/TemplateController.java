@@ -1,14 +1,14 @@
 package controller;
 
-import utils.FileIoUtils;
 import http.HttpRequest;
 import http.HttpResponse;
+import utils.FileIoUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class UserFormController extends AbstractController {
-    @Override
+public class TemplateController extends AbstractController {
+
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException {
         byte[] body = FileIoUtils.loadFileFromClasspath("./templates" + httpRequest.getPath());
         httpResponse.forward(body);

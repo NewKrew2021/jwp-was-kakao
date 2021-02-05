@@ -10,14 +10,15 @@ public class ControllerEntity {
     private static Map<String, Controller> controllers;
 
     static {
+        TemplateController templateController = new TemplateController();
         controllers = new HashMap<>();
-        controllers.put("/index.html", new IndexController());
-        controllers.put("/user/login.html", new UserLoginPageController());
+        controllers.put("/index.html", templateController);
+        controllers.put("/user/login.html", templateController);
         controllers.put("/user/login", new UserLoginController());
-        controllers.put("/user/login_failed.html", new UserLoginFailedController());
+        controllers.put("/user/login_failed.html", templateController);
         controllers.put("/user/list.html", new UserListController());
         controllers.put("/user/create", new UserCreateController());
-        controllers.put("/user/form.html", new UserFormController());
+        controllers.put("/user/form.html", templateController);
         controllers.put("/favicon.ico", new FaviconController());
 
         controllers.put("/static", new StaticController());
