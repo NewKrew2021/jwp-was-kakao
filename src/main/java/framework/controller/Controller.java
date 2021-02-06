@@ -8,5 +8,5 @@ import java.net.URISyntaxException;
 
 public interface Controller {
 
-    void service(HttpRequest request, HttpResponse response) throws IOException;
+    void service(HttpRequest request, HttpResponse response) throws Exception;
 }

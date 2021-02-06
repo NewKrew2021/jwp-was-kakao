@@ -17,7 +17,7 @@ import static framework.common.HttpHeaders.COOKIE;
 public class ListUserController extends AbstractController {
 
     @Override
-    protected void doGet(HttpRequest request, HttpResponse response) throws IOException {
+    protected void doGet(HttpRequest request, HttpResponse response) throws Exception {
         if (!isLogin(request.getHeaders().get(COOKIE.getHeader()))) {
             response.sendRedirect("/user/login.html");
             return;

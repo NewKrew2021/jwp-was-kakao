@@ -13,7 +13,7 @@ import static framework.common.HttpHeaders.SET_COOKIE;
 public class LoginController extends AbstractController {
 
     @Override
-    protected void doPost(HttpRequest request, HttpResponse response) throws IOException {
+    protected void doPost(HttpRequest request, HttpResponse response) throws Exception {
         Map<String, String> parameters = request.getParameters();
         User user = DataBase.findUserById(parameters.get("userId"));
 

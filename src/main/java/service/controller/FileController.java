@@ -17,7 +17,7 @@ public class FileController extends AbstractController {
     private static final String TEMPLATE_PATH = "./templates";
 
     @Override
-    protected void doGet(HttpRequest request, HttpResponse response) throws IOException {
+    protected void doGet(HttpRequest request, HttpResponse response) throws Exception {
         try {
             byte[] body = readFromPath(request.getPath());
             response.addHeader(CONTENT_TYPE.getHeader(), getContentType(request.getPath()));
