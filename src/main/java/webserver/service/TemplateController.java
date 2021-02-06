@@ -1,10 +1,10 @@
-package webserver.controller;
+package webserver.service;
 
 import webserver.http.AbstractController;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 
-public class ForwardController extends AbstractController {
+public class TemplateController extends AbstractController {
     private static final String TEMPLATES_DIRECTORY = "./templates";
 
     @Override

@@ -1,4 +1,4 @@
-package webserver.controller;
+package webserver.service;
 
 import webserver.http.AbstractController;
 import webserver.http.HttpRequest;
@@ -14,7 +14,7 @@ public class StaticController extends AbstractController {
 
     @Override
     public boolean supports(String path) {
-        boolean isFile = path.matches("\\.\\w+$");
+        boolean isFile = path.matches(".*\\.\\w+$");
         return isFile;
     }
 }

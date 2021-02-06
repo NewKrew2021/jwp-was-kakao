@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StaticsAcceptanceTest extends AcceptanceTest {
-    @DisplayName("static 파일이 알맞게 오는지 확인 ")
+    @DisplayName("static 파일이 알맞게 오는지 확인")
     @ParameterizedTest
     @CsvSource({"/index.html,text/html",
             "user/login.html,text/html",

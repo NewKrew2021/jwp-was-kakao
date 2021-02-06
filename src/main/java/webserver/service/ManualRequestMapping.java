@@ -5,8 +5,6 @@ import user.controller.UserListController;
 import user.controller.UserLoginController;
 import user.controller.UserProfileController;
 import webserver.controller.DefaultController;
-import webserver.controller.ForwardController;
-import webserver.controller.StaticController;
 import webserver.http.Controller;
 import webserver.http.RequestMapping;
 
@@ -24,7 +22,7 @@ public class ManualRequestMapping implements RequestMapping {
                 new UserCreateController(),
                 new UserListController(),
                 new UserLoginController(),
-                new ForwardController(),
+                new TemplateController(),
                 new StaticController());
 
         controllers = controllersToAdd.stream()

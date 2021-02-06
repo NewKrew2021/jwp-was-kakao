@@ -27,4 +27,9 @@ public class ExceptionHandler extends AbstractController {
             httpResponse.sendStatusWithBody(ResponseStatus.INTERNAL_SERVER_ERROR, new Body(e.getMessage()));
         }
     }
+
+    @Override
+    public boolean supports(String path) {
+        return controller.supports(path);
+    }
 }

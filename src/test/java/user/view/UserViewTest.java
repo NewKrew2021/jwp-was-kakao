@@ -18,7 +18,7 @@ public class UserViewTest {
 
     @Test
     void testUserProfileHtml() {
-        DataBase.addUser(new User("testUser", "testPassword", "testName", "testEmail@email.com"));
-        assertThat(new String(UserView.getUserProfileHtml("testUser"))).contains("testName", "testEmail@email.com");
+        DataBase.addUser(new User("profileUser", "testPassword", "testName", "testEmail@email.com"));
+        assertThat(new String(UserView.getUserProfileHtml("profileUser"))).contains("testName", "testEmail@email.com");
     }
 }
