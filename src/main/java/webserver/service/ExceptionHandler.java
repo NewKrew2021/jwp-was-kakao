@@ -17,7 +17,9 @@ public class ExceptionHandler extends AbstractController {
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
         try {
             controller.service(httpRequest, httpResponse);
-        } catch (IllegalUserValuesException | IllegalArgumentException e) {
+        } catch (IllegalUserValuesException e) {
+            httpResponse.sendRedirect("/user/form.html");
+        } catch (IllegalArgumentException e) {
             httpResponse.sendStatusWithBody(ResponseStatus.BAD_REQUEST, new Body(e.getMessage()));
         } catch (NoSuchElementException e) {
             httpResponse.sendStatusWithBody(ResponseStatus.NOT_FOUND, new Body(e.getMessage()));
