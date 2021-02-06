@@ -1,7 +1,6 @@
 package framework.common;
 
 import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 
@@ -11,14 +10,16 @@ import java.util.Map;
 
 public class TemplateEngine {
 
-    public static String apply(String path, Map<String, List> parameters) throws IOException {
+    private static final Handlebars handlebars;
+
+    static {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/templates");
         loader.setSuffix(".html");
+        handlebars = new Handlebars(loader);
+    }
 
-        Handlebars handlebars = new Handlebars(loader);
-        Template template = handlebars.compile(path);
-
-        return template.apply(parameters);
+    public static String apply(String path, Map<String, List> parameters) throws IOException {
+        return handlebars.compile(path).apply(parameters);
     }
 }

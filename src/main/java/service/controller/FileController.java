@@ -13,8 +13,8 @@ import static framework.common.HttpHeaders.CONTENT_TYPE;
 
 public class FileController extends AbstractController {
 
-    private static final String static_path = "./static";
-    private static final String template_path = "./templates";
+    private static final String STATIC_PATH = "./static";
+    private static final String TEMPLATE_PATH = "./templates";
 
     @Override
     protected void doGet(HttpRequest request, HttpResponse response) throws IOException {
@@ -41,9 +41,9 @@ public class FileController extends AbstractController {
     private String attachBasePath(String path) {
         FileExtension fileExtension = FileExtension.getFileExtensionToExtension(ParseUtils.getExtension(path));
         if(fileExtension.getResourceType().equals(FileExtension.ResourceType.STATIC)) {
-            return static_path + path;
+            return STATIC_PATH + path;
         }
-        return template_path + path;
+        return TEMPLATE_PATH + path;
     }
 
 }

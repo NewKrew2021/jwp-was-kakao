@@ -15,7 +15,7 @@ public enum FileExtension {
     WOFF(".woff", "application/font-woff", ResourceType.STATIC),
     WOFF2(".woff2", "application/font-woff", ResourceType.STATIC),
     ICO(".ico", "image/x-icon", ResourceType.TEMPLATE),
-    HTML(".html", "text/html", ResourceType.TEMPLATE);
+    HTML(".html", "text/html; charset=utf-8", ResourceType.TEMPLATE);
 
     private static Map<String, FileExtension> fileExtensions = new HashMap<>();
 
