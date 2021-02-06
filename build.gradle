@@ -20,6 +20,9 @@ ext {
 }
 
 dependencies {
+    // https://hc.apache.org/httpcomponents-client-5.0.x/httpclient5-testing/dependency-info.html
+    compile 'org.apache.httpcomponents.client5:httpclient5-testing:5.0.3'
+
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'org.reflections:reflections:0.9.12'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
