@@ -34,7 +34,7 @@ public class UserCreateAcceptanceTest extends AcceptanceTest {
         creationFailure(response);
     }
 
-    private ExtractableResponse<Response> createUserRequest(String body) {
+    public static ExtractableResponse<Response> createUserRequest(String body) {
         return RestAssured
                 .given().log().all()
                 .body(body)

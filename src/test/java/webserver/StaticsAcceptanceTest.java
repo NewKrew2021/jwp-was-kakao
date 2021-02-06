@@ -26,7 +26,7 @@ public class StaticsAcceptanceTest extends AcceptanceTest {
         respondedWith(response, expected);
     }
 
-    private ExtractableResponse<Response> requestView(String templatePath) {
+    public static ExtractableResponse<Response> requestView(String templatePath) {
         return RestAssured
                 .given().log().all()
                 .when().get(templatePath)
