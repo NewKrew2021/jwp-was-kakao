@@ -5,8 +5,8 @@ import annotation.Service;
 
 @Service
 public class MyQnaService {
-    private UserRepository userRepository;
-    private QuestionRepository questionRepository;
+    private final UserRepository userRepository;
+    private final QuestionRepository questionRepository;
 
     @Autowired
     public MyQnaService(UserRepository userRepository, QuestionRepository questionRepository) {

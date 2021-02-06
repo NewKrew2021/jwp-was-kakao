@@ -1,3 +1,7 @@
+HTTP/1.1 200 OK
+Content-Length: 7153
+Content-Type: text/html;charset=utf-8
+
 <!DOCTYPE html>
 <html lang="kr">
 <head>
@@ -149,3 +153,4 @@
 <script src="js/scripts.js"></script>
 </body>
 </html>
+

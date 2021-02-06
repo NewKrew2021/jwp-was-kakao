@@ -3,7 +3,7 @@ package study.examples;
 import javax.sql.DataSource;
 
 public class MyJdbcTemplate {
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     public MyJdbcTemplate(DataSource dataSource) {
         this.dataSource = dataSource;
