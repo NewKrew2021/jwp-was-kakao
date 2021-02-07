@@ -1,6 +1,6 @@
 package utils;
 
-import exceptions.InvalidRequestException;
+import exception.InvalidRequestException;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -4,83 +4,111 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import exception.ResponseCreateFailException;
 import model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import utils.FileIoUtils;
+import utils.HttpResponseUtils;
 import utils.IOUtils;
-import webserver.RequestHandler;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public class HttpResponse {
 
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final String SET_COOKIE = "Set-Cookie";
+    public static final String HTTP_1_1 = "HTTP/1.1";
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String LOCATION = "Location";
+    public static final String SESSION_ID = "sessionId";
+
     private DataOutputStream dos;
+    private HttpStatus httpStatus;
+    private List<String> headers;
+    private String contentType;
 
     private HttpResponse(DataOutputStream dos) {
         this.dos = dos;
+        this.httpStatus = HttpStatus.OK;
+        this.headers = new ArrayList<>();
     }
 
     public static HttpResponse from(OutputStream out) {
         return new HttpResponse(new DataOutputStream(out));
     }
 
-    public void response200Header(int lengthOfBodyContent, String type) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/" + type + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    public void forwardBody(byte[] body) {
+        if (contentType != null) {
+            addHeader(CONTENT_TYPE, contentType);
         }
-    }
-
-    public void responseBody(byte[] body) {
+        addHeader(CONTENT_LENGTH, String.valueOf(body.length));
         try {
+            writeResponseHeader();
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            throw new ResponseCreateFailException();
         }
     }
 
-    public void response302Header(String location) {
+    public byte[] responseBody(String path) {
         try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: http://localhost:8080" + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+            return FileIoUtils.loadFileFromClasspath(HttpResponseUtils.findPath(path));
+        } catch (IOException | URISyntaxException e) {
+            throw new ResponseCreateFailException();
         }
     }
 
-    public void response302Header(String location, String logined) {
+    public byte[] responseTemplateBody(Collection<User> users) {
         try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: http://localhost:8080" + location + "\r\n");
-            dos.writeBytes("Set-Cookie: logined=" + logined + "; Path=/\r\n");
-            dos.writeBytes("\r\n");
+            TemplateLoader loader = new ClassPathTemplateLoader();
+            loader.setPrefix("/templates");
+            loader.setSuffix(".html");
+            Handlebars handlebars = new Handlebars(loader);
+            Template template = handlebars.compile("user/list");
+            String result = template.apply(users);
+            result = IOUtils.decodeData(result);
+            return result.getBytes("UTF-8");
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            throw new ResponseCreateFailException();
         }
     }
 
-    public void responseTemplate(Collection<User> users) throws IOException {
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-        Handlebars handlebars = new Handlebars(loader);
+    public void sendNewPage(String newPage, String sessionId) {
+        this.httpStatus = HttpStatus.FOUND;
+        addHeader(SET_COOKIE, String.format("%s=%s; Path=/",SESSION_ID, sessionId));
+        sendRedirect(newPage);
+    }
 
-        Template template = handlebars.compile("user/list");
-        String result = template.apply(users);
-        result = IOUtils.decodeData(result);
-        byte[] body = result.getBytes("UTF-8");
-        response200Header(body.length, "html");
-        responseBody(body);
+    private void sendRedirect(String location) {
+        addHeader(LOCATION, location);
+        try {
+            writeResponseHeader();
+        } catch (IOException e) {
+            throw new ResponseCreateFailException();
+        }
+    }
+
+    private void writeResponseHeader() throws IOException {
+        dos.writeBytes(String.format("%s %s \r\n", HTTP_1_1, httpStatus.toString()));
+        for (String header : headers) {
+            dos.writeBytes(String.format("%s \r\n", header));
+        }
+        dos.writeBytes("\r\n");
+    }
+
+    private void addHeader(String key, String value) {
+        headers.add(key + ": " + value);
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
 }

@@ -21,7 +21,6 @@ public abstract class AbstractController implements Controller {
     }
 
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
-
     }
 
 }

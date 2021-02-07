@@ -1,4 +1,4 @@
-package exceptions;
+package exception;
 
 public class ResponseCreateFailException extends RuntimeException{
     private static final String RESPONSE_CREATE_FAIL_MESSAGE = "응답을 생성하는데 실패하였습니다.";
