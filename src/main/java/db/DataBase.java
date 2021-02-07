@@ -1,7 +1,7 @@
 package db;
 
 import com.google.common.collect.Maps;
-import user.exceptions.IllegalUserValuesException;
+import user.exceptions.InvalidFormInputException;
 import user.model.User;
 
 import java.util.Collection;
@@ -12,7 +12,7 @@ public class DataBase {
 
     public static void addUser(User user) {
         if (users.get(user.getUserId()) != null) {
-            throw new IllegalUserValuesException(String.format("User with userId: %s already exists", user.getUserId()));
+            throw new InvalidFormInputException(String.format("User with userId: %s already exists", user.getUserId()));
         }
 
         users.put(user.getUserId(), user);

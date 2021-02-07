@@ -1,8 +1,5 @@
 package user.model;
 
-import com.github.jknack.handlebars.internal.lang3.StringUtils;
-import user.exceptions.IllegalUserValuesException;
-
 public class User {
     private final String userId;
     private final String password;
@@ -14,8 +11,6 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
-
-        checkIsValidUser();
     }
 
     public boolean same(String password) {
@@ -36,33 +31,5 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    @Override
-    public String toString() {
-        return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
-    }
-
-    private void checkIsValidUser() {
-        if (StringUtils.isBlank(userId)) {
-            throw new IllegalUserValuesException("Please check userId");
-        }
-
-        if (StringUtils.isBlank(password)) {
-            throw new IllegalUserValuesException("Please check password");
-        }
-
-        if (StringUtils.isBlank(name)) {
-            throw new IllegalUserValuesException("Please check name");
-        }
-
-        if (!isValidEmail()) {
-            throw new IllegalUserValuesException("Please check email");
-        }
-    }
-
-    private boolean isValidEmail() {
-        String pattern = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
-        return email.matches(pattern);
     }
 }

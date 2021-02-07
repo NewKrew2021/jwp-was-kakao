@@ -18,4 +18,8 @@ public class UserService {
     public static User findById(String userId) {
         return DataBase.findUserById(userId);
     }
+
+    private static boolean userIdIsDuplicate(String userId) {
+        return DataBase.findUserById(userId) != null;
+    }
 }

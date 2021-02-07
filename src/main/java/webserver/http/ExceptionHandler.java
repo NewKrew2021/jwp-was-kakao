@@ -1,8 +1,7 @@
-package webserver.service;
+package webserver.http;
 
 import annotation.web.ResponseStatus;
-import user.exceptions.IllegalUserValuesException;
-import webserver.http.*;
+import user.exceptions.InvalidFormInputException;
 
 import java.util.NoSuchElementException;
 
@@ -17,7 +16,7 @@ public class ExceptionHandler extends AbstractController {
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
         try {
             controller.service(httpRequest, httpResponse);
-        } catch (IllegalUserValuesException e) {
+        } catch (InvalidFormInputException e) {
             httpResponse.sendRedirect("/user/form.html");
         } catch (IllegalArgumentException e) {
             httpResponse.sendStatusWithBody(ResponseStatus.BAD_REQUEST, new Body(e.getMessage()));

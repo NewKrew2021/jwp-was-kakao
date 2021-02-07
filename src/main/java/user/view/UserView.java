@@ -5,6 +5,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
+import user.service.UserService;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
@@ -26,11 +27,11 @@ public class UserView {
     }
 
     public static byte[] getUserListHtml() {
-        return getTemplateWithContentsApplied(LIST_TEMPLATE, DataBase.findAll());
+        return getTemplateWithContentsApplied(LIST_TEMPLATE, UserService.findAll());
     }
 
     public static byte[] getUserProfileHtml(String userId) {
-        return getTemplateWithContentsApplied(PROFILE_TEMPLATE, DataBase.findUserById(userId));
+        return getTemplateWithContentsApplied(PROFILE_TEMPLATE, UserService.findById(userId));
     }
 
     private static Template registerNewTemplate(Handlebars handlebars, String templatePath) {

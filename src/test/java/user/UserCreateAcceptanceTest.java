@@ -49,7 +49,7 @@ public class UserCreateAcceptanceTest extends AcceptanceTest {
     }
 
     private void creationFailure(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(ResponseStatus.FOUND.getStatusCode());
-        assertThat(response.header("Location")).isEqualTo("/user/form.html");
+        assertThat(response.statusCode()).isEqualTo(ResponseStatus.CONFLICT.getStatusCode());
+        assertThat(response.body().asString()).contains("already exists");
     }
 }
