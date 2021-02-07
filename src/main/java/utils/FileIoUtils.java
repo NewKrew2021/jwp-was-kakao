@@ -11,4 +11,8 @@ public class FileIoUtils {
         Path path = Paths.get(FileIoUtils.class.getClassLoader().getResource(filePath).toURI());
         return Files.readAllBytes(path);
     }
+
+    public static boolean pathIsFile(String urlPath) {
+        return urlPath.matches("(.*)(.html|.js|.css|.eot|.svg|.ttf|.woff|.woff2|.png|.ico)");
+    }
 }
