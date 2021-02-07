@@ -1,27 +1,18 @@
 package webserver.service;
 
-import user.controller.UserCreateController;
-import user.controller.UserListController;
-import user.controller.UserLoginController;
-import user.controller.UserProfileController;
-import webserver.controller.DefaultController;
 import webserver.http.Controller;
+import webserver.http.ExceptionHandler;
 import webserver.http.RequestMapping;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ManualRequestMapping implements RequestMapping {
-    private static final Controller DEFAULT_CONTROLLER = new DefaultController();
+public class WebServerRequestMapping implements RequestMapping {
     private final List<Controller> controllers;
 
-    public ManualRequestMapping() {
+    public WebServerRequestMapping() {
         List<Controller> controllersToAdd = Arrays.asList(
-                new UserProfileController(),
-                new UserCreateController(),
-                new UserListController(),
-                new UserLoginController(),
                 new TemplateController(),
                 new StaticController());
 
@@ -35,6 +26,6 @@ public class ManualRequestMapping implements RequestMapping {
         return controllers.stream()
                 .filter(controller -> controller.supports(path))
                 .findFirst()
-                .orElse(DEFAULT_CONTROLLER);
+                .orElse(null);
     }
 }

@@ -6,6 +6,16 @@ import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 
 public class DefaultController extends AbstractController {
+    private static DefaultController defaultController = null;
+
+    public static DefaultController of() {
+        if (defaultController == null) {
+            defaultController = new DefaultController();
+        }
+
+        return defaultController;
+    }
+
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
         httpResponse.sendStatus(ResponseStatus.NOT_FOUND);
