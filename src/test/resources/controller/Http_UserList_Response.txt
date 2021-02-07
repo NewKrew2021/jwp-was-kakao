@@ -1,3 +1,6 @@
+HTTP/1.1 200 OK 
+Content-Length: 4847
+
 <!DOCTYPE html>
 <html lang="kr">
 <head>
@@ -84,11 +87,15 @@
                 </tr>
               </thead>
               <tbody>
-                {{#each}}
+                
                 <tr>
-                    <td></td> <td>{{userId}}</td> <td>{{name}}</td> <td>{{email}}</td><td><a href="#" class="btn btn-success" role="button">수정</a></td>
+                    <td></td> <td>javajigi2</td> <td>name</td> <td>email</td><td><a href="#" class="btn btn-success" role="button">수정</a></td>
                 </tr>
-                {{/each}}
+                
+                <tr>
+                    <td></td> <td>javajigi</td> <td>name</td> <td>email</td><td><a href="#" class="btn btn-success" role="button">수정</a></td>
+                </tr>
+                
               </tbody>
           </table>
         </div>
