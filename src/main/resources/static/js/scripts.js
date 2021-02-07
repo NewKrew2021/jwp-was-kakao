@@ -7,3 +7,17 @@ String.prototype.format = function() {
         ;
   });
 };
+
+logout = function () {
+  removeCookie("logined");
+  goHome();
+};
+
+removeCookie = function(key) {
+  let date = new Date();
+  document.cookie = key + "= " + "; expired=" + date.toUTCString() + "; path=/";
+};
+
+goHome = function() {
+  location.href = "/index.html";
+};

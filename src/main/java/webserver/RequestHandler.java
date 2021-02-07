@@ -1,18 +1,20 @@
 package webserver;
 
-import java.io.DataOutputStream;
+import controller.Controller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import view.InputView;
+import view.OutputView;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -23,33 +25,30 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            handle(in, out);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void handle(InputStream in, OutputStream out) throws IOException {
+        InputView inputView = InputView.from(in);
+        OutputView outputView = OutputView.from(out);
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+            HttpRequest request = inputView.getHttpRequest();
+            request.logRequestMessage();
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+            ControllerMapper mapper = ControllerMapper.getInstance();
+            Controller controller = mapper.getController(request.getPath());
+
+            HttpResponse response = controller.service(request);
+            response.logResponseHeader();
+            outputView.write(response);
+        } catch (Exception exception) {
+            logger.error(exception.getMessage());
+            HttpResponse response = ExceptionHandler.handle(exception);
+            response.logResponseHeader();
+            outputView.write(response);
         }
     }
 }
