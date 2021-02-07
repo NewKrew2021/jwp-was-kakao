@@ -1,9 +1,6 @@
 package model.response;
 
-import exception.http.IllegalExtensionException;
-import exception.http.IllegalHttpRequestException;
-import exception.http.IllegalLocationException;
-import exception.http.IllegalStatusCodeException;
+import exception.http.*;
 import exception.utils.NoFileException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +61,7 @@ public class HttpResponse {
         try {
             body = FileIoUtils.loadFileFromClasspath(basePath + path);
         }catch (NoFileException e){
-            throw new NoFileException(path);
+            throw new IllegalHttpResponseException();
         }
 
         String extension = path.substring(path.lastIndexOf(".")+1);
@@ -103,7 +100,7 @@ public class HttpResponse {
             dos.flush();
             log.info("{}", startLine);
         }catch (IOException e){
-            throw new IllegalHttpRequestException();
+            throw new IllegalHttpResponseException();
         }
     }
 
@@ -125,7 +122,7 @@ public class HttpResponse {
             sendFile(basePath, path);
             ok();
         }catch (NoFileException e){
-            throw new NoFileException(path);
+            throw new IllegalHttpResponseException();
         }
 
     }
