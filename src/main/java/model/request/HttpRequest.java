@@ -16,15 +16,15 @@ public class HttpRequest {
 
     private String body = "";
 
-    public HttpRequest(InputStream in) throws IOException {
-        this(new BufferedReader(new InputStreamReader(in)));
-    }
-
-    public HttpRequest(BufferedReader br) throws IOException {
+    private HttpRequest(BufferedReader br) throws IOException {
         String line = br.readLine();
         httpRequestLine = new HttpRequestLine(line);
         httpRequestHeader = new HttpRequestHeader(br);
         setBody(br);
+    }
+
+    public static HttpRequest of(InputStream in) throws IOException {
+        return new HttpRequest(new BufferedReader(new InputStreamReader(in)));
     }
 
     private void setBody(BufferedReader br) throws IOException {

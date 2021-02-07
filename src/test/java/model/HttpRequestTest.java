@@ -28,8 +28,7 @@ public class HttpRequestTest {
     }
 
     private static HttpRequest makeRequest(InputStream inputStream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        return new HttpRequest(br);
+        return HttpRequest.of(inputStream);
     }
 
     @Test

@@ -31,7 +31,7 @@ public class ControllerManager {
 
     public static void runControllers(Socket connection) {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = new HttpRequest(in);
+            HttpRequest httpRequest = HttpRequest.of(in);
             HttpResponse httpResponse = HttpResponse.of(out);
             List<Controller> selectedControllers = controllers.stream()
                     .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
