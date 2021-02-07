@@ -3,19 +3,21 @@ package model.response;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpStatus {
-    private static final Map<Integer, String> httpStatusCode = new HashMap<>();
-    static {
-        httpStatusCode.put(200, "OK");
-        httpStatusCode.put(201, "CREATED");
-        httpStatusCode.put(302, "FOUND");
-        httpStatusCode.put(400, "BAD REQUEST");
-        httpStatusCode.put(401, "Unauthorized");
-        httpStatusCode.put(404, "NOT FOUND");
-        httpStatusCode.put(500, "INTERNAL SERVER ERROR");
+public enum HttpStatus {
+    OK(200),
+    CREATED(201),
+    FOUND(302),
+    BAD_REQUEST(400),
+    UNAUTHORIZED(401),
+    NOT_FOUND(404),
+    INTERNAL_SERVER_ERROR(500);
+
+    private final int code;
+    HttpStatus(int code) {
+        this.code = code;
     }
 
-    public String get(Integer key){
-        return httpStatusCode.get(key);
+    public int getCode(){
+        return code;
     }
 }

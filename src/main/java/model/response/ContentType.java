@@ -3,18 +3,24 @@ package model.response;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContentType {
-    private static final Map<String, String> contentType = new HashMap<>();
-    static {
-        contentType.put(".js", "text/js");
-        contentType.put(".html", "text/html");
-        contentType.put(".css", "text/css");
-        contentType.put(".woff", "application/font-woff");
-        contentType.put(".ttf", "application/x-font-ttf");
-        contentType.put(".ico", "image/x-icon");
+public enum ContentType {
+    js("text/js"),
+    html("text/html"),
+    css("text/css"),
+    woff("application/font-woff"),
+    ttf("application/x-font-ttf"),
+    ico("image/x-icon");
+
+    private final String contentType;
+    ContentType(String contentType) {
+        this.contentType = contentType;
     }
 
-    public String get(String extension) {
-        return contentType.get(extension);
+    public String getExtension(){
+        return ".".concat(name());
+    }
+
+    public String getContentType(){
+        return contentType;
     }
 }

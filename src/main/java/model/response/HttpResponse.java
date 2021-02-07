@@ -25,8 +25,6 @@ public class HttpResponse {
     private byte[] body;
 
     private final HttpHeader httpHeader = new HttpHeader();
-    private final ContentType contentType = new ContentType();
-    private final HttpStatus httpStatus = new HttpStatus();
 
     private HttpResponse(DataOutputStream dos) {
         this.dos = dos;
@@ -36,13 +34,10 @@ public class HttpResponse {
         return new HttpResponse(new DataOutputStream(os));
     }
 
-    public HttpResponse setStatus(int statusCode) {
-        if (httpStatus.get(statusCode) == null)
-            throw new IllegalStatusCodeException();
-
-        status = statusCode;
+    public HttpResponse setStatus(HttpStatus status) {
         startLine = String.join(" ", PROTOCOL,
-                String.valueOf(statusCode), httpStatus.get(statusCode));
+                String.valueOf(status.getCode()), status.name());
+        this.status = status.getCode();
 
         return this;
     }
@@ -72,10 +67,15 @@ public class HttpResponse {
             throw new NoFileException(path);
         }
 
-        String extension = path.substring(path.lastIndexOf("."));
-        if (contentType.get(extension) == null)
+        String extension = path.substring(path.lastIndexOf(".")+1);
+        ContentType contentType;
+        try {
+            contentType = ContentType.valueOf(extension);
+        }catch (RuntimeException e){
             throw new IllegalExtensionException();
-        setHeader("Content-Type", contentType.get(extension) + ";charset=utf-8");
+        }
+
+        setHeader("Content-Type", contentType.getContentType() + ";charset=utf-8");
         setHeader("Content-Length", String.valueOf(body.length));
 
         return this;
@@ -83,7 +83,7 @@ public class HttpResponse {
 
     public void sendHtml(byte[] body) {
         this.body = body;
-        setHeader("Content-Type", contentType.get("html") + ";charset=utf-8");
+        setHeader("Content-Type", ContentType.html.getContentType() + ";charset=utf-8");
         setHeader("Content-Length", String.valueOf(body.length));
     }
 
@@ -108,20 +108,20 @@ public class HttpResponse {
     }
 
     public void sendView(byte[] body) {
-        setStatus(200);
+        setStatus(HttpStatus.OK);
         sendHtml(body);
         ok();
     }
 
     public void sendRedirect(String url) {
-        setStatus(302);
+        setStatus(HttpStatus.FOUND);
         setLocation(url);
         ok();
     }
 
     public void forward(String basePath, String path) throws NoFileException {
         try{
-            setStatus(200);
+            setStatus(HttpStatus.OK);
             sendFile(basePath, path);
             ok();
         }catch (NoFileException e){

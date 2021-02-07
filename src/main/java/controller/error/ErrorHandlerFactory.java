@@ -13,6 +13,6 @@ public class ErrorHandlerFactory {
         if (e instanceof IOException) {
             return new IOExceptionHandler();
         }
-        return new RuntimeExceptionHandler();
+        return new BadRequestExceptionHandler();
     }
 }
