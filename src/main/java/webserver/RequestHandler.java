@@ -4,6 +4,7 @@ import handler.HandlerMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.HttpRequest;
+import web.SessionStorage;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest httpRequest = HttpRequest.of(in);
+            httpRequest.setHttpSession(SessionStorage.from(httpRequest));
             HttpServlet httpServlet = HandlerMapper.map(httpRequest);
 
             DataOutputStream dos = new DataOutputStream(out);

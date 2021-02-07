@@ -27,6 +27,10 @@ public class HttpResponse {
         httpHeaders.add(key, value);
     }
 
+    public void setCookie(HttpCookies cookie) {
+        httpHeaders.add(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
     public void setBody(byte[] body) {
         httpBody = new HttpBody(body);
     }
