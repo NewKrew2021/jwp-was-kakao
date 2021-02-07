@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
 public class ControllerManager {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     private static final List<Controller> controllers = new ArrayList<>();
+    static {
+        registerController(new UserController());
+        registerController(new ViewController());
+    }
 
     public static void registerController(Controller controller) {
         controllers.add(controller);
