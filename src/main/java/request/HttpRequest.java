@@ -65,7 +65,7 @@ public class HttpRequest {
         if (requestUri.getUriValue(key).isPresent()) {
             return requestUri.getUriValue(key).get();
         }
-        throw new ParameterNotFoundException();
+        return null;
     }
 
     public String getHeader(String key) {
