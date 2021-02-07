@@ -15,14 +15,15 @@ public class ViewController extends Controller {
         putHandler("/css/.*", "GET", this::handleFile);
         putHandler("/fonts/.*", "GET", this::handleFile);
         putHandler("/favicon.ico", "GET", this::handleFile);
-        putHandler("/.*", "GET", this::handleView);
+        putHandler("/index.html", "GET", this::handleView);
+        putHandler("/", "GET", this::handleView);
     }
 
-    public void handleFile(HttpRequest request, HttpResponse response) throws NoFileException, IOException {
+    public void handleFile(HttpRequest request, HttpResponse response) throws NoFileException {
         response.forward("./static", request.getPath());
     }
 
-    public void handleView(HttpRequest request, HttpResponse response) throws NoFileException, IOException {
+    public void handleView(HttpRequest request, HttpResponse response) throws NoFileException {
         response.forward("./templates",
                 (request.getPath().equals("/") ? "/index.html" : request.getPath()));
     }

@@ -58,11 +58,7 @@ public class HttpResponse {
     }
 
     public HttpResponse sendFile(String basePath, String path) throws NoFileException {
-        try {
-            body = FileIoUtils.loadFileFromClasspath(basePath + path);
-        }catch (NoFileException e){
-            throw new IllegalHttpResponseException();
-        }
+        body = FileIoUtils.loadFileFromClasspath(basePath + path);
 
         String extension = path.substring(path.lastIndexOf(".")+1);
         ContentType contentType;
@@ -116,15 +112,10 @@ public class HttpResponse {
         ok();
     }
 
-    public void forward(String basePath, String path) throws NoFileException {
-        try{
-            setStatus(HttpStatus.OK);
-            sendFile(basePath, path);
-            ok();
-        }catch (NoFileException e){
-            throw new IllegalHttpResponseException();
-        }
-
+    public void forward(String basePath, String path) throws NoFileException{
+        setStatus(HttpStatus.OK);
+        sendFile(basePath, path);
+        ok();
     }
 
     public Map<String, String> getHeaders() {
