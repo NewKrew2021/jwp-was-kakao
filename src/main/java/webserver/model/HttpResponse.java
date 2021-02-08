@@ -7,12 +7,12 @@ public class HttpResponse {
 
     private HttpStatus status;
     private HttpHeader header;
-    private HttpBody body;
+    private HttpResponseBody body;
 
     public HttpResponse() {
         status = HttpStatus.NOT_FOUND;
         header = new HttpHeader();
-        body = new HttpBody();
+        body = new HttpResponseBody();
     }
 
     public void addHeader(String key, String value) {
@@ -41,7 +41,6 @@ public class HttpResponse {
 
         String headerString = header.toString();
         String bodyString = body.toString();
-
 
         return startString + StringUtils.NEW_LINE + headerString + StringUtils.NEW_LINE + bodyString;
     }

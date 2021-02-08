@@ -11,6 +11,8 @@ import webserver.model.*;
 import java.util.Objects;
 
 public class UserLoginController implements Controller {
+    private static final String USERID = "userId";
+    private static final String PASSWORD = "password";
 
     private static final String path = "/user/login";
 
@@ -20,8 +22,8 @@ public class UserLoginController implements Controller {
 
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
-        String id = httpRequest.getParameter(Parameter.USERID);
-        String password = httpRequest.getParameter(Parameter.PASSWORD);
+        String id = httpRequest.getParameter(USERID);
+        String password = httpRequest.getParameter(PASSWORD);
         User user = UserController.findUserById(id);
 
         HttpResponse httpResponse = new HttpResponse();

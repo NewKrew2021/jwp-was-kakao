@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Parameter {
-    public static final String USERID = "userId";
-    public static final String PASSWORD = "password";
-    public static final String NAME = "name";
-    public static final String EMAIL = "email";
 
     private Map<String, String> parameters = new HashMap<>();
 

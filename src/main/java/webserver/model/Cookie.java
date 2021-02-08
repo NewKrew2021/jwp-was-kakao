@@ -10,9 +10,6 @@ public class Cookie {
     public static final String COOKIE_STRING_DELIMITER = "; ";
     public static final String COOKIE_END_WITH = "; Path=/";
     public static final String COOKIE_START_WITH = "Set-Cookie: ";
-    public static final String LOGINED = "logined";
-    public static final String LOGINED_TRUE = "true";
-    public static final String LOGINED_FALSE = "false";
     public static final String SESSION = "session";
 
     private Map<String, String> cookies = new HashMap<>();
@@ -33,19 +30,6 @@ public class Cookie {
 
     public String get(String key) {
         return cookies.get(key);
-    }
-
-    public String toString(String key) {
-        if (!cookies.containsKey(key)) {
-            return null;
-        }
-
-        String cookieString = StringUtils.concatThree(
-                COOKIE_START_WITH,
-                String.join(COOKIE_DELIMITER, key, cookies.get(key)),
-                COOKIE_END_WITH
-        );
-        return cookieString.concat(StringUtils.NEW_LINE);
     }
 
     public String toString() {

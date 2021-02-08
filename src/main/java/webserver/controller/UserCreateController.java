@@ -6,6 +6,10 @@ import webserver.RequestHandler;
 import webserver.model.*;
 
 public class UserCreateController implements Controller {
+    private static final String USERID = "userId";
+    private static final String PASSWORD = "password";
+    private static final String NAME = "name";
+    private static final String EMAIL = "email";
 
     private static final String path = "/user/create";
 
@@ -16,10 +20,10 @@ public class UserCreateController implements Controller {
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
         User user = new User(
-                httpRequest.getParameter(Parameter.USERID),
-                httpRequest.getParameter(Parameter.PASSWORD),
-                httpRequest.getParameter(Parameter.NAME),
-                httpRequest.getParameter(Parameter.EMAIL)
+                httpRequest.getParameter(USERID),
+                httpRequest.getParameter(PASSWORD),
+                httpRequest.getParameter(NAME),
+                httpRequest.getParameter(EMAIL)
         );
         UserController.addUser(user);
 
