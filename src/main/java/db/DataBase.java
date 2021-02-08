@@ -1,16 +1,20 @@
 package db;
 
+import com.google.common.collect.Maps;
+import user.exceptions.InvalidFormInputException;
+import user.model.User;
+
 import java.util.Collection;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
-import model.User;
-
 public class DataBase {
-    private static Map<String, User> users = Maps.newHashMap();
+    private static final Map<String, User> users = Maps.newHashMap();
 
     public static void addUser(User user) {
+        if (users.get(user.getUserId()) != null) {
+            throw new InvalidFormInputException(String.format("User with userId: %s already exists", user.getUserId()));
+        }
+
         users.put(user.getUserId(), user);
     }
 
