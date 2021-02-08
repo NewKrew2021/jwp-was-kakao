@@ -48,11 +48,6 @@ public class FileController implements Controller {
         if (path.startsWith("/css")) {
             return "text/css";
         }
-//        if (path.startsWith("/fonts")
-//                || path.startsWith("/images")
-//                || path.startsWith("/js")) {
-//
-//        }
         return "text/html";
     }
 
