@@ -2,12 +2,20 @@ package webserver.model;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class CookieTest {
 
-    Cookie cookie1 = new Cookie("logined=true");
-    Cookie cookie2 = new Cookie("logined=true; aaa=bbb");
+    Cookie cookie1;
+    Cookie cookie2;
+
+    @BeforeEach
+    public void setUp() {
+        cookie1 = new Cookie("logined=true");
+        cookie2 = new Cookie("logined=true; aaa=bbb");
+    }
 
     @Test
     void create() {
@@ -17,7 +25,6 @@ public class CookieTest {
 
     @Test
     void makeCookieString() {
-
         assertThat(cookie1.toString()).isEqualTo("Set-Cookie: logined=true; Path=/\r\n");
         assertThat(cookie2.toString()).isEqualTo("Set-Cookie: aaa=bbb; Path=/\r\n" + "Set-Cookie: logined=true; Path=/\r\n");
     }

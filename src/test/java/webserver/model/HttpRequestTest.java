@@ -9,8 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class HttpRequestTest {
     String request1 = "GET /index.html HTTP/1.1\n" +
             "Host: localhost:8080\n" +

@@ -27,7 +27,7 @@ public class HttpHeaderTest {
         httpHeader2 = new HttpHeader(headerStrings);
     }
 
-    @DisplayName("get Header")
+    @DisplayName("특정 헤더 가져오기")
     @Test
     void getHeader() {
         Assertions.assertThat(httpHeader1.getHeader("Host")).isEqualTo("localhost:8080");
@@ -35,7 +35,7 @@ public class HttpHeaderTest {
         Assertions.assertThat(httpHeader1.getHeader("Accept")).isEqualTo("*/*");
     }
 
-    @DisplayName("get Cookie")
+    @DisplayName("특정 쿠기 가져오기")
     @Test
     void getCookie() {
         Assertions.assertThat(httpHeader1.getCookie("logined")).isEqualTo(null);
@@ -44,7 +44,7 @@ public class HttpHeaderTest {
         Assertions.assertThat(httpHeader2.getCookie("username")).isEqualTo("javajigi");
     }
 
-    @DisplayName("headerString")
+    @DisplayName("헤더스트링")
     @Test
     void headerString() {
         String headerString1 = "Accept: */*\r\n"
