@@ -28,47 +28,6 @@ public class WebAcceptanceTest {
         user = new User(id, password, name, email);
     }
 
-    @DisplayName("GET /index.html")
-    @Test
-    void index() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                when().get("/index.html").
-                then().log().all().
-                statusCode(HttpStatus.OK.value()).
-                extract();
-//        assertThat(response.body().asByteArray()).isEqualTo(indexBody);
-    }
-
-    @DisplayName("GET /")
-    @Test
-    void index2() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all().
-                when().get("/").
-                then().log().all().
-                statusCode(HttpStatus.OK.value()).
-                extract();
-//        assertThat(response.body().asByteArray()).isEqualTo(indexBody);
-    }
-
-    @DisplayName("GET /user/create")
-    @Test
-    void signUpAndRedirection_GET() {
-        String path = "/user/create";
-
-        ExtractableResponse<Response> response = 회원가입_GET(path, user);
-
-//        assertThat(response.body().asByteArray()).isEqualTo(indexBody);
-//        assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
-    }
-
-    @DisplayName("POST /user/create")
-    @Test
-    void signUpAndRedirection_POST() {
-        String path = "/user/create";
-
-        ExtractableResponse<Response> response = 회원가입_POST(path, user);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.FOUND.value());
-    }
 
     @DisplayName("POST /user/login success")
     @Test

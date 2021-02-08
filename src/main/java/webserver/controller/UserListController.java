@@ -25,13 +25,11 @@ public class UserListController implements Controller {
 
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
-        HttpResponse httpResponse = new HttpResponse();
-
         if (!isLogined(httpRequest)) {
-            return loginFailedService(httpResponse);
+            return loginFailedService();
         }
 
-        return loginSuccessedService(httpResponse);
+        return loginSuccessedService();
     }
 
     private boolean isLogined(HttpRequest httpRequest) {
@@ -39,7 +37,8 @@ public class UserListController implements Controller {
         return !Objects.isNull(SessionController.findSession(sessionId));
     }
 
-    private HttpResponse loginSuccessedService(HttpResponse httpResponse) {
+    private HttpResponse loginSuccessedService() {
+        HttpResponse httpResponse = new HttpResponse();
         String body = null;
         try {
             body = makeUserListHTML();
@@ -55,7 +54,8 @@ public class UserListController implements Controller {
         return httpResponse;
     }
 
-    private HttpResponse loginFailedService(HttpResponse httpResponse) {
+    private HttpResponse loginFailedService() {
+        HttpResponse httpResponse = new HttpResponse();
         String body = null;
         try {
             body = FileIoUtils.loadFileStringFromClasspath(FileIoUtils.TEMPLATES_PATH + FileIoUtils.LOGIN_PATH);
