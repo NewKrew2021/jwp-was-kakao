@@ -9,20 +9,25 @@ import java.util.Map;
 
 public class ControllerMapper {
 
-    private Map<String, Controller> map = new HashMap<>();
-    private Controller defaultController;
+    private static Map<String, Controller> map = new HashMap<>();
+    private static Controller defaultController;
+    private static final ControllerMapper controllerMapper = new ControllerMapper();
 
-    public ControllerMapper() {
+    static {
         List<Controller> controllers = initControllers();
         mapControllers(controllers);
         initDefaultController();
+    }
+
+    public static ControllerMapper getInstance() {
+        return controllerMapper;
     }
 
     public Controller assignController(HttpRequest httpRequest) {
         return map.getOrDefault(httpRequest.getPath(), defaultController);
     }
 
-    private List<Controller> initControllers() {
+    private static List<Controller> initControllers() {
         List<Controller> controllers = new ArrayList<>();
 
         controllers.add(new UserCreateController());
@@ -33,11 +38,11 @@ public class ControllerMapper {
         return controllers;
     }
 
-    private void initDefaultController() {
+    private static void initDefaultController() {
         defaultController = new FileController();
     }
 
-    private void mapControllers(List<Controller> controllers) {
+    private static void mapControllers(List<Controller> controllers) {
         for (Controller controller : controllers) {
             map.put(controller.getPath(), controller);
         }

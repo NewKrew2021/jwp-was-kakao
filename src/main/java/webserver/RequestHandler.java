@@ -20,11 +20,9 @@ public class RequestHandler implements Runnable {
     public static final String BASE_URL = "http://localhost:8080/index.html";
 
     private final Socket connection;
-    private final ControllerMapper controllerMapper;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        this.controllerMapper = new ControllerMapper();
     }
 
     public void run() {
@@ -45,6 +43,7 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
+            ControllerMapper controllerMapper = ControllerMapper.getInstance();
             Controller controller = controllerMapper.assignController(request);
 
             HttpResponse response = controller.service(request);
