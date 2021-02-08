@@ -1,15 +1,23 @@
 package webserver;
 
+import framework.controller.Controller;
+import framework.request.HttpMethod;
+import framework.request.HttpRequest;
+import framework.response.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import service.controller.AbstractController;
+import service.controller.CreateUserController;
+import service.controller.ListUserController;
+import service.controller.LoginController;
+
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class RequestHandler implements Runnable {
+
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
@@ -23,33 +31,19 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
-        } catch (IOException e) {
+            HttpRequest httpRequest = HttpRequest.of(in);
+            HttpResponse httpResponse = HttpResponse.of(new DataOutputStream(out));
+
+            AbstractController.enroll("/user/list", new ListUserController());
+            AbstractController.enroll("/user/create", new CreateUserController());
+            AbstractController.enroll("/user/login", new LoginController());
+
+            Controller controller = AbstractController.of(httpRequest.getPath());
+            controller.service(httpRequest, httpResponse);
+
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 }
