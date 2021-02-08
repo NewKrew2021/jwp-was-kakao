@@ -1,7 +1,7 @@
 package controller;
 
 import controller.error.ErrorHandlerFactory;
-import controller.handler.Handler;
+import controller.handler.ErrorHandler;
 import exception.http.CannotHandleException;
 import exception.utils.NoFileException;
 import model.HttpRequest;
@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,45 +30,42 @@ public class ControllerDispatcher {
 
     public static void dispatch(Socket connection) {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest httpRequest = new HttpRequest(in);
-            List<Controller> selectedControllers = controllers.stream()
-                    .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
-                    .collect(Collectors.toList());
-            handleRequest(out, httpRequest, selectedControllers);
+            HttpRequest httpRequest = new HttpRequest(in, connection);
+            HttpResponse response = handleRequest(httpRequest, selectControllers(httpRequest));
+            response.ok(new DataOutputStream(out));
+            log.info("{} {}", httpRequest.getRemoteAddress(), response.getStartLine());
         } catch (IOException e) {
             log.error("{} {}", e.getMessage(), e.getStackTrace());
         }
     }
 
-    private static void handleRequest(OutputStream out, HttpRequest httpRequest, List<Controller> controllers) {
+    private static List<Controller> selectControllers(HttpRequest httpRequest) {
+        return controllers.stream()
+                .filter(controller -> controller.hasSameBasePath(httpRequest.getPath()))
+                .collect(Collectors.toList());
+    }
+
+    private static HttpResponse handleRequest(HttpRequest httpRequest, List<Controller> controllers) {
         try {
-            HttpResponse response = tryControllers(out, httpRequest, controllers);
-            response.ok();
-            log.info("{}", response.getStartLine());
+            return tryControllers(httpRequest, controllers);
         } catch (NoFileException | IOException | RuntimeException e) {
-            handleError(out, httpRequest, e);
+            return handleError(httpRequest, e);
         }
     }
 
-    private static void handleError(OutputStream out, HttpRequest httpRequest, Exception e) {
-        Handler errorHandler = ErrorHandlerFactory.getHandler(e);
-        try {
-            HttpResponse response = errorHandler.handle(httpRequest, out);
-            response.ok();
-            log.warn(e.getMessage());
-        } catch (Exception handleError) {
-            log.error("{} {}", handleError.getMessage(), handleError.getStackTrace());
-        }
+    private static HttpResponse handleError(HttpRequest httpRequest, Exception e) {
+        ErrorHandler errorHandler = ErrorHandlerFactory.getHandler(e);
+        return errorHandler.handle(httpRequest);
     }
 
-    private static HttpResponse tryControllers(OutputStream out, HttpRequest httpRequest, List<Controller> controllers)
+    private static HttpResponse tryControllers(HttpRequest httpRequest, List<Controller> controllers)
             throws NoFileException, IOException {
         Iterator<Controller> iter = controllers.iterator();
         HttpResponse response = null;
 
         while (iter.hasNext() && response == null) {
             Controller controller = iter.next();
-            response = controller.handle(httpRequest, out);
+            response = controller.handle(httpRequest);
         }
 
         if (response == null) {

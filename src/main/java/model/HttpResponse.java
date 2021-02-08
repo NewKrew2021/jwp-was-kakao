@@ -2,31 +2,24 @@ package model;
 
 import exception.http.IllegalLocationException;
 import exception.utils.NoFileException;
+import model.httpinfo.ContentType;
+import model.httpinfo.HttpStatusMessage;
 import utils.FileIoUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
     private static final String PROTOCOL = "HTTP/1.1";
 
-    private final DataOutputStream dos;
     private final Map<String, String> headers = new HashMap<>();
 
     private int status;
     private String startLine;
     private byte[] body;
-
-    private HttpResponse(DataOutputStream dos) {
-        this.dos = dos;
-    }
-
-    public static HttpResponse of(OutputStream os) {
-        return new HttpResponse(new DataOutputStream(os));
-    }
 
     public HttpResponse setStatus(int statusCode) {
         status = statusCode;
@@ -42,6 +35,11 @@ public class HttpResponse {
 
     public HttpResponse setCookie(String cookie) {
         headers.put("Set-Cookie", cookie + "; Path=/; HttpOnly");
+        return this;
+    }
+
+    public HttpResponse setBody(String body) {
+        this.body = body.getBytes(StandardCharsets.UTF_8);
         return this;
     }
 
@@ -87,26 +85,26 @@ public class HttpResponse {
         return this;
     }
 
-    public void ok() throws IOException {
-        setStartLine();
-        setHeader();
-        setBody();
+    public void ok(DataOutputStream dos) throws IOException {
+        writeStartLine(dos);
+        writeHeader(dos);
+        writeBody(dos);
         dos.flush();
     }
 
-    private void setStartLine() throws IOException {
+    private void writeStartLine(DataOutputStream dos) throws IOException {
         dos.writeBytes(startLine);
         dos.writeBytes("\r\n");
     }
 
-    private void setHeader() throws IOException {
+    private void writeHeader(DataOutputStream dos) throws IOException {
         for (Map.Entry<String, String> header : headers.entrySet()) {
             dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
         }
         dos.writeBytes("\r\n");
     }
 
-    private void setBody() throws IOException {
+    private void writeBody(DataOutputStream dos) throws IOException {
         if (body != null && body.length != 0)
             dos.write(body, 0, body.length);
     }
@@ -118,4 +116,6 @@ public class HttpResponse {
     public String getStartLine() {
         return startLine;
     }
+
+    public byte[] getBody(){ return body; }
 }
