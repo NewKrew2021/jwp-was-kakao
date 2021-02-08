@@ -25,7 +25,6 @@ public class SessionController {
 
     public static void invalidateSession(String id) {
         log.debug("invalidating session {}", id);
-//        sessions.get(id).invalidate();
-        sessions.remove(id);
+        sessions.get(id).invalidate();
     }
 }

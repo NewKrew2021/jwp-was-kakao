@@ -1,6 +1,5 @@
 package webserver.controller;
 
-
 import webserver.model.HttpRequest;
 
 import java.util.ArrayList;
@@ -10,32 +9,35 @@ import java.util.Map;
 
 public class ControllerMapper {
 
-    private List<Controller> controllers = new ArrayList<>();
-    private Controller defaultController;
     private Map<String, Controller> map = new HashMap<>();
+    private Controller defaultController;
 
     public ControllerMapper() {
-        initControllers();
+        List<Controller> controllers = initControllers();
+        mapControllers(controllers);
         initDefaultController();
-        initMap();
     }
 
     public Controller assignController(HttpRequest httpRequest) {
         return map.getOrDefault(httpRequest.getPath(), defaultController);
     }
 
-    private void initControllers() {
+    private List<Controller> initControllers() {
+        List<Controller> controllers = new ArrayList<>();
+
         controllers.add(new UserCreateController());
         controllers.add(new UserLoginController());
         controllers.add(new UserLogoutController());
         controllers.add(new UserListController());
+
+        return controllers;
     }
 
     private void initDefaultController() {
         defaultController = new FileController();
     }
 
-    private void initMap() {
+    private void mapControllers(List<Controller> controllers) {
         for (Controller controller : controllers) {
             map.put(controller.getPath(), controller);
         }
