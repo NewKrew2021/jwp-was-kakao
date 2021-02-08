@@ -68,7 +68,6 @@ public class HttpResponse {
 
         public Builder body(String path, Map<String, Object> parameter) throws IOException {
             this.body = TemplateUtils.getTemplatePage(path, parameter);
-            logger.debug(new String(body));
             headers.put(HttpHeader.CONTENT_LENGTH, String.valueOf(this.body.length));
             return this;
         }
