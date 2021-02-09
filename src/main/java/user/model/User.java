@@ -1,20 +1,20 @@
-package model;
+package user.model;
 
 public class User {
-    private String userId;
+    private String id;
     private String password;
     private String name;
     private String email;
 
-    public User(String userId, String password, String name, String email) {
-        this.userId = userId;
+    public User(String id, String password, String name, String email) {
+        this.id = id;
         this.password = password;
         this.name = name;
         this.email = email;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
     public String getPassword() {
@@ -31,6 +31,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
+        return "User [userId=" + id + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
 }
