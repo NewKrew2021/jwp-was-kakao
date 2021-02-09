@@ -10,11 +10,8 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 
 public class UserCreateController extends AbstractController {
-
     private static final String INDEX_URL = "/index.html";
     private static final String USER_CREATE_URL = "/user/create";
-    private static final String TEMPLATE = "/templates";
-
 
     //Todo Parameter에 값이 없을 경우 예외 처리
     @Override
@@ -26,8 +23,8 @@ public class UserCreateController extends AbstractController {
     HttpResponse doPost(HttpRequest httpRequest) throws HttpException {
         User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
         DataBase.addUser(user);
-        return new HttpResponse.Builder(HttpStatus.FOUND)
-                .addHeader("Location", INDEX_URL)
+        return new HttpResponse.Builder()
+                .redirect(INDEX_URL)
                 .build();
     }
 

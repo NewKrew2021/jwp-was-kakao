@@ -25,13 +25,13 @@ public class UserListController extends AbstractController {
     HttpResponse doGet(HttpRequest httpRequest) throws HttpException {
         if (httpRequest.getCookie(LOGIN_COOKIE_KEY) == null
                 || httpRequest.getCookie(LOGIN_COOKIE_KEY).equals(LOGIN_COOKIE_VALUE_FALSE)) {
-            return new HttpResponse.Builder(HttpStatus.FOUND)
-                    .addHeader("Location", USER_LOGIN_HTML_URL)
+            return new HttpResponse.Builder()
+                    .redirect(USER_LOGIN_HTML_URL)
                     .build();
         }
 
-        return new HttpResponse.Builder(HttpStatus.OK)
-                .body(makeProfilePage().getBytes())
+        return new HttpResponse.Builder()
+                .ok(makeProfilePage().getBytes())
                 .build();
     }
 

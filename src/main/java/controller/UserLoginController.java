@@ -22,13 +22,14 @@ public class UserLoginController extends AbstractController {
     @Override
     HttpResponse doPost(HttpRequest httpRequest) throws HttpException {
         if (DataBase.login(httpRequest.getParameter(PARAMETER_NAME_ID), httpRequest.getParameter(PARAMETER_NAME_PASSWORD))) {
-            return new HttpResponse.Builder(HttpStatus.FOUND)
-                    .addHeader("Location", INDEX_URL)
+            return new HttpResponse.Builder()
+                    .redirect(INDEX_URL)
                     .setCookie(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_TRUE, LOGIN_COOKIE_PATH)
                     .build();
         }
-        return new HttpResponse.Builder(HttpStatus.FOUND)
-                .addHeader("Location", LOGIN_FAIL_URL)
+
+        return new HttpResponse.Builder()
+                .redirect(LOGIN_FAIL_URL)
                 .setCookie(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_FALSE, LOGIN_COOKIE_PATH)
                 .build();
     }

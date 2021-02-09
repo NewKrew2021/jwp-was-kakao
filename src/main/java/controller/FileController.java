@@ -3,10 +3,9 @@ package controller;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import exception.HttpException;
-import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
-import static domain.HttpHeader.HEADER_CONTENT_TYPE;
+import static domain.HttpHeader.HEADER_CONTENT_LENGTH;
 
 public class FileController extends AbstractController {
     private static final String ROOT_URL = "/";
@@ -28,9 +27,9 @@ public class FileController extends AbstractController {
             path = INDEX_URL;
         }
 
-        return new HttpResponse.Builder(HttpStatus.OK)
-                .addHeader(HEADER_CONTENT_TYPE, getContentType(path))
-                .body(FileIoUtils.loadFileFromClasspath(addBasePath(path)))
+        return new HttpResponse.Builder()
+                .ok(FileIoUtils.loadFileFromClasspath(addBasePath(path)))
+                .addHeader(HEADER_CONTENT_LENGTH, getContentType(path))
                 .build();
     }
 

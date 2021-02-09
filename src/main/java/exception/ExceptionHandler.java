@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 public class ExceptionHandler {
@@ -26,12 +27,12 @@ public class ExceptionHandler {
 
         try {
             sendResponse(exceptionStatus);
-        } catch (HttpException httpException) {
-            httpException.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 
-    private void sendResponse(HttpStatus httpStatus) throws HttpException {
+    private void sendResponse(HttpStatus httpStatus) throws IOException {
         HttpResponse httpResponse = new HttpResponse.Builder(httpStatus).build();
         httpResponse.send(outputStream);
     }
