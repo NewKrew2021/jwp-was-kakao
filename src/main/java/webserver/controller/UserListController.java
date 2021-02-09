@@ -1,17 +1,12 @@
 package webserver.controller;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
 import session.controller.SessionController;
-import session.model.Session;
 import user.controller.UserController;
+import user.model.User;
 import utils.FileIoUtils;
 import webserver.model.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Objects;
 
 public class UserListController implements Controller {
@@ -39,11 +34,10 @@ public class UserListController implements Controller {
 
     private HttpResponse loginSuccessedService() {
         HttpResponse httpResponse = new HttpResponse();
-        String body = null;
-        try {
-            body = makeUserListHTML();
-        } catch (IOException e) {
-        }
+
+        Collection<User> users = UserController.findAll();
+
+        String body = FileIoUtils.loadHandleBarFromClasspath(path, users);
 
         httpResponse.setStatus(HttpStatus.OK);
         httpResponse.addHeader(HttpHeader.CONTENT_TYPE, findContentType(path) + "; charset=utf-8");
@@ -56,12 +50,7 @@ public class UserListController implements Controller {
 
     private HttpResponse loginFailedService() {
         HttpResponse httpResponse = new HttpResponse();
-        String body = null;
-        try {
-            body = FileIoUtils.loadFileStringFromClasspath(FileIoUtils.TEMPLATES_PATH + FileIoUtils.LOGIN_PATH);
-        } catch (IOException e) {
-        } catch (URISyntaxException e) {
-        }
+        String body = FileIoUtils.loadFileStringFromClasspath(FileIoUtils.TEMPLATES_PATH + FileIoUtils.LOGIN_PATH);
 
         httpResponse.setStatus(HttpStatus.OK);
         httpResponse.addHeader(HttpHeader.CONTENT_TYPE, "text/html; charset=utf-8");
@@ -72,23 +61,10 @@ public class UserListController implements Controller {
         return httpResponse;
     }
 
-    private String makeUserListHTML() throws IOException {
-        TemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setPrefix("/templates");
-        loader.setSuffix(".html");
-        Handlebars handlebars = new Handlebars(loader);
-
-        Template template = handlebars.compile(path);
-        String profilePage = template.apply(UserController.findAll());
-
-        return profilePage;
-    }
-
     private String findContentType(String path) {
         if (path.startsWith("/css")) {
             return "text/css";
         }
-
         return "text/html";
     }
 
