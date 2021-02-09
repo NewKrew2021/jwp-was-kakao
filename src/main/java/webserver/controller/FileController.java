@@ -19,19 +19,12 @@ public class FileController implements Controller {
 
     @Override
     public HttpResponse service(HttpRequest httpRequest) {
-
-
         String path = httpRequest.getPath();
         if (path.equals(FileIoUtils.BASE_PATH)) {
             path = FileIoUtils.INDEX_PATH;
         }
 
-        String body = null;
-        try {
-            body = FileIoUtils.loadFileStringFromClasspath(addBasePath(path));
-        } catch (IOException e) {
-        } catch (URISyntaxException e) {
-        }
+        String body = FileIoUtils.loadFileStringFromClasspath(addBasePath(path));
 
         HttpResponse httpResponse = new HttpResponse();
 
