@@ -11,8 +11,9 @@ public class SessionController {
     private static final Logger log = LoggerFactory.getLogger(SessionController.class);
     private static final Map<String, Session> sessions = Maps.newHashMap();
 
-    public static Session createSession() {
+    public static Session createSession(String userId) {
         Session session = new Session();
+        session.setAttribute(Session.USER_ID, userId);
         log.debug("new session {}", session);
         sessions.put(session.getId(), session);
         return session;

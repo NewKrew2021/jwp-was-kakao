@@ -32,7 +32,7 @@ public class UserLoginController implements Controller {
 
         if (!Objects.isNull(user) && user.getPassword().equals(password)) {
             location = RequestHandler.BASE_URL;
-            Session session = SessionController.createSession();
+            Session session = SessionController.createSession(user.getId());
             httpResponse.addCookie(Cookie.SESSION, session.getId());
         }
 

@@ -1,6 +1,7 @@
 package webserver.controller;
 
 import session.controller.SessionController;
+import session.model.Session;
 import user.controller.UserController;
 import user.model.User;
 import utils.FileIoUtils;
@@ -29,7 +30,9 @@ public class UserListController implements Controller {
 
     private boolean isLogined(HttpRequest httpRequest) {
         String sessionId = httpRequest.getCookie(Cookie.SESSION);
-        return !Objects.isNull(SessionController.findSession(sessionId));
+        Session session = SessionController.findSession(sessionId);
+        return !Objects.isNull(session)
+                && !Objects.isNull(session.getAttribute(Session.USER_ID));
     }
 
     private HttpResponse loginSuccessedService() {
