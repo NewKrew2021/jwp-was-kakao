@@ -16,10 +16,10 @@ public class HttpResponse {
 
     private HttpStatusCode httpStatusCode;
     private Map<String, String> headers;
-    private List<Cookie> cookies;
+    private Cookies cookies;
     private byte[] body;
 
-    public HttpResponse(HttpStatusCode httpStatusCode, Map<String, String> headers, List<Cookie> cookies, byte[] body) {
+    public HttpResponse(HttpStatusCode httpStatusCode, Map<String, String> headers, Cookies cookies, byte[] body) {
         this.httpStatusCode = httpStatusCode;
         this.headers = headers;
         this.cookies = cookies;
@@ -43,18 +43,15 @@ public class HttpResponse {
                 .append(": ")
                 .append(headers.get(key))
                 .append("\r\n"));
+        sb.append(cookies.toString());
 
-        cookies.forEach(cookie -> sb.append(HttpHeader.SET_COOKIE)
-                .append(": ")
-                .append(cookie.toString())
-                .append("\r\n"));
         return sb.toString();
     }
 
     public static class Builder {
         private HttpStatusCode httpStatusCode;
         private Map<String, String> headers = new HashMap<>();
-        private List<Cookie> cookies = new ArrayList<>();
+        private Cookies cookies = new Cookies();
         private byte[] body;
 
         public Builder status(HttpStatusCode httpStatusCode) {
@@ -71,13 +68,12 @@ public class HttpResponse {
 
         public Builder body(String path, Map<String, Object> parameter) throws IOException {
             this.body = TemplateUtils.getTemplatePage(path, parameter);
-            logger.debug(new String(body));
             headers.put(HttpHeader.CONTENT_LENGTH, String.valueOf(this.body.length));
             return this;
         }
 
         public Builder cookie(Cookie cookie) {
-            this.cookies.add(cookie);
+            this.cookies.addCookie(cookie);
             return this;
         }
 

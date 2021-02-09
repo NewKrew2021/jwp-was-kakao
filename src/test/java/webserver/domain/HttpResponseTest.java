@@ -34,7 +34,7 @@ public class HttpResponseTest {
     public void responseCookies() throws Exception {
         new HttpResponse.Builder()
                 .status(HttpStatusCode.FOUND)
-                .cookie(new Cookie("logined","true"))
+                .cookie(new Cookie("logined=true"))
                 .redirect("/index.html")
                 .build()
                 .sendResponse(createOutputStream("Http_Cookie.txt"));

@@ -105,9 +105,15 @@ public class HttpRequest {
     }
 
     public boolean containsCookie(String cookie) {
-        return this.headers
-                .get(HttpHeader.COOKIE)
-                .contains(cookie);
+        String requestCookie = this.headers.get(HttpHeader.COOKIE);
+        if (requestCookie != null) {
+            return requestCookie.contains(cookie);
+        }
+        return false;
+    }
+
+    public Cookies getCookies() {
+        return new Cookies(headers.get(HttpHeader.COOKIE));
     }
 
     public boolean isTemplate() {
