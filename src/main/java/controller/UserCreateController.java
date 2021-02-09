@@ -11,6 +11,8 @@ public class UserCreateController extends AbstractController {
 
     private static final String INDEX_URL = "/index.html";
     private static final String USER_CREATE_URL = "/user/create";
+    private static final String TEMPLATE = "/templates";
+
 
     //Todo Parameter에 값이 없을 경우 예외 처리
     @Override
@@ -22,7 +24,7 @@ public class UserCreateController extends AbstractController {
     void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
         DataBase.addUser(user);
-        httpResponse.sendRedirect(INDEX_URL);
+        httpResponse.redirect(INDEX_URL).send();
     }
 
     @Override

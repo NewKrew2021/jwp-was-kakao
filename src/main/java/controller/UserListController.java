@@ -25,11 +25,13 @@ public class UserListController extends AbstractController {
     void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws HttpResponseOutputException, FileIOException {
         if (httpRequest.getCookie(LOGIN_COOKIE_KEY) == null
                 || httpRequest.getCookie(LOGIN_COOKIE_KEY).equals(LOGIN_COOKIE_VALUE_FALSE)) {
-            httpResponse.sendRedirect(USER_LOGIN_HTML_URL);
+            httpResponse.redirect(USER_LOGIN_HTML_URL).send();
             return;
         }
 
-        httpResponse.forwardBody(USER_LIST_URL, makeProfilePage());
+        httpResponse.ok(USER_LIST_URL)
+                .body(makeProfilePage().getBytes())
+                .send();
     }
 
     private String makeProfilePage() throws FileIOException {

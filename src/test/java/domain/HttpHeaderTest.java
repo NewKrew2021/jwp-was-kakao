@@ -1,5 +1,6 @@
 package domain;
 
+import exception.HeaderNotFoundException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +27,7 @@ public class HttpHeaderTest {
     @DisplayName("get Header")
     @ParameterizedTest
     @CsvSource({"Host,localhost:8080", "Connection,keep-alive"})
-    void getHeader(String key, String value) {
+    void getHeader(String key, String value) throws HeaderNotFoundException {
         assertThat(httpHeader.getHeader(key)).isEqualTo(value);
     }
 

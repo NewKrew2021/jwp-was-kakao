@@ -48,7 +48,7 @@ public class HttpRequest {
     }
 
     private void validateStatusLine(String[] parsed) throws HttpRequestFormatException {
-        if(parsed.length != 2) {
+        if(parsed.length != 3) {
             throw new HttpRequestFormatException();
         }
     }

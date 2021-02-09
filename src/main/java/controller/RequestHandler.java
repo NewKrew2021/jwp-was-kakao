@@ -46,6 +46,7 @@ public class RequestHandler implements Runnable {
             logger.debug(httpRequest.toString());
             logger.debug(httpResponse.toString());
         } catch (Exception e) {
+            e.printStackTrace();
             exceptionHandler.handle(e);
         }
     }

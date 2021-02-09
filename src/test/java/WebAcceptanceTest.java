@@ -1,3 +1,4 @@
+import exception.NoSuchFileException;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -18,7 +19,7 @@ public class WebAcceptanceTest {
     User user;
 
     @BeforeEach
-    public void setUp() throws IOException, URISyntaxException {
+    public void setUp() throws IOException, URISyntaxException, NoSuchFileException {
         indexBody = FileIoUtils.loadFileFromClasspath("./templates/index.html");
 
         String id = "javajigi";
@@ -110,28 +111,27 @@ public class WebAcceptanceTest {
         회원가입_POST(user);
         ExtractableResponse<Response> loginResponse = 로그인요청(loginPath, user.getId(), user.getPassword());
         ExtractableResponse<Response> response = 사용자리스트요청(path, loginResponse.cookie("logined"));
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.header("Content-Location")).isEqualTo("/user/list");
+//        assertThat(response.body()).isEqualTo("/user/list");
     }
 
     @DisplayName("GET /user/list fail")
     @Test
-    void userListFail() {
+    void userListFail() throws Exception {
         String loginPath = "/user/login";
         String path = "/user/list";
         회원가입_POST(user);
         ExtractableResponse<Response> loginResponse = 로그인요청(loginPath, "NotUser", "NotUser");
         ExtractableResponse<Response> response = 사용자리스트요청(path, loginResponse.cookie("logined"));
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.header("Content-Location")).isEqualTo("/user/login.html");
+        assertThat(response.body().asByteArray()).isEqualTo(FileIoUtils.loadFileFromClasspath("./templates/user/login.html"));
     }
 
+    // TODO redirect false
     private ExtractableResponse<Response> 사용자리스트요청(String path, String logined) {
         return RestAssured.
                 given().log().all().cookie("logined", logined).
                 when().get(path).
                 then().log().all().
-                statusCode(HttpStatus.OK.value()).
+//                statusCode(HttpStatus.FOUND.value()).
                 extract();
     }
 

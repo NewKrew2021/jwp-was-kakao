@@ -40,26 +40,23 @@ public class HttpResponse {
         httpHeader = new HttpHeader();
     }
 
-    public void forward(String path) throws FileIOException, URISyntaxException, NoSuchFileException {
-        try {
-            byte[] body = FileIoUtils.loadFileFromClasspath(addBasePath(path));
-            httpBody = new HttpBody(body);
-
-            httpStatus = HttpStatus.OK;
-            setContentType(path);
-            httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(httpBody.getBytesSize()));
-            httpHeader.addHeader(HEADER_CONTENT_LOCATION, path);
-            send();
-        } catch (IOException e) {
-            throw new FileIOException(path);
-        }
+    public HttpResponse body(byte[] body) {
+        httpBody = new HttpBody(body);
+        httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
+        return this;
     }
 
-    private String addBasePath(String path) {
-        if (path.endsWith(EXTENSION_HTML) || path.endsWith(EXTENSION_ICO)) {
-            return TEMPLATE_BASE_PATH + path;
-        }
-        return STATIC_BASE_PATH + path;
+    public void send(HttpStatus httpStatus) throws HttpResponseOutputException {
+        this.httpStatus = httpStatus;
+        httpHeader = new HttpHeader();
+        httpBody = null;
+        send();
+    }
+
+    public HttpResponse ok(String path) {
+        httpStatus = HttpStatus.OK;
+        setContentType(path);
+        return this;
     }
 
     private void setContentType(String path) {
@@ -71,31 +68,17 @@ public class HttpResponse {
         }
     }
 
-    public void forwardBody(String path, String content) throws HttpResponseOutputException {
-        httpStatus = HttpStatus.OK;
-        httpBody = new HttpBody(content);
-        setContentType(path);
-        httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(httpBody.getBytesSize()));
-        httpHeader.addHeader(HEADER_CONTENT_LOCATION, path);
-        send();
-    }
-
-    public void sendRedirect(String location) throws HttpResponseOutputException {
+    public HttpResponse redirect(String location) {
         httpStatus = HttpStatus.FOUND;
         httpHeader.addHeader(HEADER_LOCATION, location);
-        send();
-    }
-
-    public void send(HttpStatus status) throws HttpResponseOutputException {
-        httpStatus = status;
-        send();
+        return this;
     }
 
     public void setCookieWithPath(String key, String value, String path) {
         httpHeader.addHeader(HEADER_SET_COOKIE, String.format(SET_COOKIE_VALUE_FORMAT, key, value, path));
     }
 
-    private void send() throws HttpResponseOutputException {
+    public void send() throws HttpResponseOutputException {
         try {
             dos.writeBytes(HTTP_VERSION + " " + httpStatus + " \r\n");
             dos.writeBytes(httpHeader.toString());

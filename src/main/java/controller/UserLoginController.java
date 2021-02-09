@@ -22,11 +22,11 @@ public class UserLoginController extends AbstractController {
     void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws HttpResponseOutputException {
         if (DataBase.login(httpRequest.getParameter(PARAMETER_NAME_ID), httpRequest.getParameter(PARAMETER_NAME_PASSWORD))) {
             httpResponse.setCookieWithPath(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_TRUE, LOGIN_COOKIE_PATH);
-            httpResponse.sendRedirect(INDEX_URL);
+            httpResponse.redirect(INDEX_URL).send();
             return;
         }
         httpResponse.setCookieWithPath(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_FALSE, LOGIN_COOKIE_PATH);
-        httpResponse.sendRedirect(LOGIN_FAIL_URL);
+        httpResponse.redirect(LOGIN_FAIL_URL).send();
     }
 
     @Override
