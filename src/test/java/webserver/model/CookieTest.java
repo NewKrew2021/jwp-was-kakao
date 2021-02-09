@@ -10,6 +10,7 @@ public class CookieTest {
 
     Cookie cookie1;
     Cookie cookie2;
+    Cookie cookie3;
 
     @BeforeEach
     public void setUp() {
