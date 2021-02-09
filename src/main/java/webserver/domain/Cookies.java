@@ -20,9 +20,7 @@ public class Cookies {
     public Cookies(String cookiesString) {
         cookies = new HashMap<>();
         Arrays.stream(cookiesString.trim().split(";")).forEach(str -> {
-
             String[] keyValue = str.split("=");
-            logger.debug(str);
             cookies.put(keyValue[0].trim(), new Cookie(keyValue[0].trim(), keyValue[1].trim()));
         });
     }

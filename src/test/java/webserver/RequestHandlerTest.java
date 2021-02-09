@@ -96,6 +96,8 @@ public class RequestHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         assertThat(response.getHeaders().get("Location").get(0).equals("/index.html")).isTrue();
         assertThat(response.getHeaders().get("Set-Cookie").get(0).equals("logined=true; Path=/")).isTrue();
+        assertThat(response.getHeaders().get("Set-Cookie").get(1).contains("Session")).isTrue();
+
     }
 
     @Test
@@ -146,6 +148,24 @@ public class RequestHandlerTest {
 
         assertThatExceptionOfType(HttpClientErrorException.MethodNotAllowed.class)
                 .isThrownBy(() -> restTemplate.exchange(resourceUrl + url, HttpMethod.DELETE, null, String.class));
+    }
+
+    @Test
+    @DisplayName("세션 추가 후 로그아웃")
+    void logout() {
+        RestTemplate restTemplate = new RestTemplate();
+        String resourceUrl = "http://localhost:8080";
+        String createUrl = "/user/create";
+        String loginUrl = "/user/login";
+        String logoutUrl = "/user/logout";
+        restTemplate.postForEntity(resourceUrl + createUrl, "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net", String.class);
+        ResponseEntity<String> loginResponse = restTemplate.postForEntity(resourceUrl + loginUrl, "userId=javajigi&password=password", String.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", "Session=" + loginResponse.getHeaders().get("Set-Cookie").get(0));
+        final HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> logoutResponse = restTemplate.exchange(resourceUrl + logoutUrl, HttpMethod.GET, entity, String.class);
+        assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
     }
 
     private void printResponse(ResponseEntity<String> response) {

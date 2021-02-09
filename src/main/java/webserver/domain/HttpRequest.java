@@ -112,6 +112,10 @@ public class HttpRequest {
         return false;
     }
 
+    public Cookies getCookies() {
+        return new Cookies(headers.get(HttpHeader.COOKIE));
+    }
+
     public boolean isTemplate() {
         return Arrays.stream(templateList).anyMatch(str -> path.contains(str));
     }
