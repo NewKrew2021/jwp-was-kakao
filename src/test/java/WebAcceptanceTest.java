@@ -1,4 +1,4 @@
-import exception.NoSuchFileException;
+import exception.HttpException;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -9,9 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class WebAcceptanceTest {
@@ -19,7 +16,7 @@ public class WebAcceptanceTest {
     User user;
 
     @BeforeEach
-    public void setUp() throws IOException, URISyntaxException, NoSuchFileException {
+    public void setUp() throws HttpException {
         indexBody = FileIoUtils.loadFileFromClasspath("./templates/index.html");
 
         String id = "javajigi";

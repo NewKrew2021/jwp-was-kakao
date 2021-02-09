@@ -1,9 +1,6 @@
 package domain;
 
-import exception.ExceptionHandler;
-import exception.FileIOException;
-import exception.HttpResponseOutputException;
-import exception.NoSuchFileException;
+import exception.*;
 import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
@@ -24,61 +21,52 @@ public class HttpResponse {
     private static final String CONTENT_TYPE_CSS = "text/css; charset=utf-8";
     private static final String CONTENT_TYPE_HTML = "text/html; charset=utf-8";
 
-    private static final String EXTENSION_CSS = ".css";
-    private static final String EXTENSION_ICO = ".ico";
-    private static final String EXTENSION_HTML = ".html";
-
     private static final String SET_COOKIE_VALUE_FORMAT = "%s=%s; Path=%s";
 
-    private DataOutputStream dos;
     private HttpHeader httpHeader;
     private HttpStatus httpStatus;
     private HttpBody httpBody;
 
-    public HttpResponse(OutputStream out) {
-        dos = new DataOutputStream(out);
-        httpHeader = new HttpHeader();
-    }
+    public static class Builder {
+        private final HttpStatus httpStatus;
+        private final HttpHeader httpHeader;
+        private HttpBody httpBody;
 
-    public HttpResponse body(byte[] body) {
-        httpBody = new HttpBody(body);
-        httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
-        return this;
-    }
-
-    public void send(HttpStatus httpStatus) throws HttpResponseOutputException {
-        this.httpStatus = httpStatus;
-        httpHeader = new HttpHeader();
-        httpBody = null;
-        send();
-    }
-
-    public HttpResponse ok(String path) {
-        httpStatus = HttpStatus.OK;
-        setContentType(path);
-        return this;
-    }
-
-    private void setContentType(String path) {
-        if (path.endsWith(EXTENSION_CSS)) {
-            httpHeader.addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_CSS);
-        }
-        if(path.endsWith(EXTENSION_HTML)) {
+        public Builder(HttpStatus httpStatus) {
+            this.httpStatus = httpStatus;
+            httpHeader = new HttpHeader();
             httpHeader.addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_HTML);
         }
+
+        public Builder addHeader(String key, String value) {
+            httpHeader.addHeader(key, value);
+            return this;
+        }
+
+        public Builder setCookie(String key, String value, String path) {
+            httpHeader.addHeader(HEADER_SET_COOKIE, String.format(SET_COOKIE_VALUE_FORMAT, key, value, path));
+            return this;
+        }
+
+        public Builder body(byte[] body) {
+            httpBody = new HttpBody(body);
+            httpHeader.addHeader(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
+            return this;
+        }
+
+        public HttpResponse build() {
+            return new HttpResponse(this);
+        }
     }
 
-    public HttpResponse redirect(String location) {
-        httpStatus = HttpStatus.FOUND;
-        httpHeader.addHeader(HEADER_LOCATION, location);
-        return this;
+    private HttpResponse(Builder builder) {
+        this.httpStatus = builder.httpStatus;
+        this.httpHeader = builder.httpHeader;
+        this.httpBody = builder.httpBody;
     }
 
-    public void setCookieWithPath(String key, String value, String path) {
-        httpHeader.addHeader(HEADER_SET_COOKIE, String.format(SET_COOKIE_VALUE_FORMAT, key, value, path));
-    }
-
-    public void send() throws HttpResponseOutputException {
+    public void send(OutputStream out) throws HttpException {
+        DataOutputStream dos = new DataOutputStream(out);
         try {
             dos.writeBytes(HTTP_VERSION + " " + httpStatus + " \r\n");
             dos.writeBytes(httpHeader.toString());
@@ -87,7 +75,7 @@ public class HttpResponse {
                 dos.flush();
             }
         } catch(IOException e) {
-            throw new HttpResponseOutputException();
+            throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

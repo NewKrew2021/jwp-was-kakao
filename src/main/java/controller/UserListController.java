@@ -7,8 +7,8 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import exception.FileIOException;
-import exception.HttpResponseOutputException;
+import exception.HttpException;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
@@ -22,19 +22,20 @@ public class UserListController extends AbstractController {
     private static final String USER_LIST_SUFFIX = ".html";
 
     @Override
-    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws HttpResponseOutputException, FileIOException {
+    HttpResponse doGet(HttpRequest httpRequest) throws HttpException {
         if (httpRequest.getCookie(LOGIN_COOKIE_KEY) == null
                 || httpRequest.getCookie(LOGIN_COOKIE_KEY).equals(LOGIN_COOKIE_VALUE_FALSE)) {
-            httpResponse.redirect(USER_LOGIN_HTML_URL).send();
-            return;
+            return new HttpResponse.Builder(HttpStatus.FOUND)
+                    .addHeader("Location", USER_LOGIN_HTML_URL)
+                    .build();
         }
 
-        httpResponse.ok(USER_LIST_URL)
+        return new HttpResponse.Builder(HttpStatus.OK)
                 .body(makeProfilePage().getBytes())
-                .send();
+                .build();
     }
 
-    private String makeProfilePage() throws FileIOException {
+    private String makeProfilePage() throws HttpException {
         String profilePage = null;
         try {
             TemplateLoader loader = new ClassPathTemplateLoader();
@@ -44,7 +45,7 @@ public class UserListController extends AbstractController {
             Template template = handlebars.compile("user/list");
             profilePage = template.apply(DataBase.findAll());
         } catch (IOException e) {
-            throw new FileIOException(USER_LIST_URL);
+            throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return profilePage;

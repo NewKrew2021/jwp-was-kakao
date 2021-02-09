@@ -1,7 +1,7 @@
 package annotation.web;
 
-import exception.HttpRequestFormatException;
-import exception.HttpResponseOutputException;
+import exception.HttpException;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 
@@ -22,10 +22,10 @@ public enum RequestMethod {
         this.value = value;
     }
 
-    public static RequestMethod of(String method) throws HttpRequestFormatException {
+    public static RequestMethod of(String method) throws HttpException {
         return Arrays.stream(RequestMethod.values())
                 .filter(requestMethod -> requestMethod.value.equals(method))
                 .findFirst()
-                .orElseThrow(HttpRequestFormatException::new);
+                .orElseThrow(() -> new HttpException(HttpStatus.METHOD_NOT_ALLOWED));
     }
 }

@@ -1,10 +1,8 @@
 package domain;
 
 import annotation.web.RequestMethod;
-import exception.ExceptionHandler;
-import exception.HeaderNotFoundException;
-import exception.HttpRequestFormatException;
-import exception.HttpRequestInputException;
+import exception.*;
+import org.springframework.http.HttpStatus;
 import utils.IOUtils;
 
 import java.io.BufferedReader;
@@ -24,7 +22,7 @@ public class HttpRequest {
     private HttpParameter httpParameter;
     private HttpHeader httpHeader;
 
-    public HttpRequest(InputStream in) throws HttpRequestInputException, HttpRequestFormatException {
+    public HttpRequest(InputStream in) throws HttpException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
@@ -32,13 +30,13 @@ public class HttpRequest {
             setHeader(br);
             setParameter(br);
         } catch (IOException e) {
-            throw new HttpRequestInputException();
+            throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NullPointerException | HeaderNotFoundException e) {
-            throw new HttpRequestFormatException();
+            throw new HttpException(HttpStatus.BAD_REQUEST);
         }
     }
 
-    private void setMethodAndPath(BufferedReader br) throws IOException, HttpRequestFormatException {
+    private void setMethodAndPath(BufferedReader br) throws IOException, HttpException {
         String line = IOUtils.readLine(br);
         String[] parsed = line.split(STATUS_DELIMITER);
         validateStatusLine(parsed);
@@ -47,9 +45,9 @@ public class HttpRequest {
         path = parsed[1];
     }
 
-    private void validateStatusLine(String[] parsed) throws HttpRequestFormatException {
+    private void validateStatusLine(String[] parsed) throws HttpException {
         if(parsed.length != 3) {
-            throw new HttpRequestFormatException();
+            throw new HttpException(HttpStatus.BAD_REQUEST);
         }
     }
 

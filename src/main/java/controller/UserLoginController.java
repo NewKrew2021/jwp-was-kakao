@@ -3,7 +3,8 @@ package controller;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import exception.HttpResponseOutputException;
+import exception.HttpException;
+import org.springframework.http.HttpStatus;
 
 public class UserLoginController extends AbstractController {
     private static final String INDEX_URL = "/index.html";
@@ -19,14 +20,17 @@ public class UserLoginController extends AbstractController {
     private static final String LOGIN_COOKIE_PATH = "/";
 
     @Override
-    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws HttpResponseOutputException {
+    HttpResponse doPost(HttpRequest httpRequest) throws HttpException {
         if (DataBase.login(httpRequest.getParameter(PARAMETER_NAME_ID), httpRequest.getParameter(PARAMETER_NAME_PASSWORD))) {
-            httpResponse.setCookieWithPath(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_TRUE, LOGIN_COOKIE_PATH);
-            httpResponse.redirect(INDEX_URL).send();
-            return;
+            return new HttpResponse.Builder(HttpStatus.FOUND)
+                    .addHeader("Location", INDEX_URL)
+                    .setCookie(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_TRUE, LOGIN_COOKIE_PATH)
+                    .build();
         }
-        httpResponse.setCookieWithPath(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_FALSE, LOGIN_COOKIE_PATH);
-        httpResponse.redirect(LOGIN_FAIL_URL).send();
+        return new HttpResponse.Builder(HttpStatus.FOUND)
+                .addHeader("Location", LOGIN_FAIL_URL)
+                .setCookie(LOGIN_COOKIE_KEY, LOGIN_COOKIE_VALUE_FALSE, LOGIN_COOKIE_PATH)
+                .build();
     }
 
     @Override

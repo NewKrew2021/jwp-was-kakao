@@ -1,8 +1,7 @@
 package domain;
 
 import annotation.web.RequestMethod;
-import exception.HttpRequestFormatException;
-import exception.HttpRequestInputException;
+import exception.HttpException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,7 @@ public class HttpRequestTest {
 
     @DisplayName("GET method")
     @Test
-    void method_GET() throws HttpRequestInputException, HttpRequestFormatException {
+    void method_GET() throws HttpException {
         InputStream is = new ByteArrayInputStream(request1.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);
@@ -48,7 +47,7 @@ public class HttpRequestTest {
 
     @DisplayName("POST method")
     @Test
-    void method_POST() throws HttpRequestInputException, HttpRequestFormatException {
+    void method_POST() throws HttpException {
         InputStream is = new ByteArrayInputStream(request3.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);
@@ -57,7 +56,7 @@ public class HttpRequestTest {
 
     @DisplayName("path")
     @Test
-    void path() throws HttpRequestInputException, HttpRequestFormatException {
+    void path() throws HttpException {
         InputStream is = new ByteArrayInputStream(request1.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);
@@ -66,7 +65,7 @@ public class HttpRequestTest {
 
     @DisplayName("query parameters")
     @Test
-    void queryParameter() throws HttpRequestInputException, HttpRequestFormatException {
+    void queryParameter() throws HttpException {
         InputStream is = new ByteArrayInputStream(request2.getBytes());
 
         HttpRequest httpRequest = new HttpRequest(is);

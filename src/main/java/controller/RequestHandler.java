@@ -3,8 +3,10 @@ package controller;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import exception.ExceptionHandler;
+import exception.HttpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,15 +41,18 @@ public class RequestHandler implements Runnable {
             exceptionHandler = new ExceptionHandler(out);
 
             HttpRequest httpRequest = new HttpRequest(in);
-            HttpResponse httpResponse = new HttpResponse(out);
             Controller controller = findController(httpRequest.getPath());
-            controller.service(httpRequest, httpResponse);
+            HttpResponse httpResponse = controller.service(httpRequest);
+            httpResponse.send(out);
 
             logger.debug(httpRequest.toString());
             logger.debug(httpResponse.toString());
-        } catch (Exception e) {
+        } catch (HttpException e) {
             e.printStackTrace();
             exceptionHandler.handle(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            exceptionHandler.handle(new HttpException(HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
 

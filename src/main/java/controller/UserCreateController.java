@@ -3,7 +3,9 @@ package controller;
 import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
+import exception.HttpException;
 import model.User;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
@@ -16,15 +18,17 @@ public class UserCreateController extends AbstractController {
 
     //Todo Parameter에 값이 없을 경우 예외 처리
     @Override
-    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        doPost(httpRequest, httpResponse);
+    HttpResponse doGet(HttpRequest httpRequest) throws HttpException {
+        return doPost(httpRequest);
     }
 
     @Override
-    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+    HttpResponse doPost(HttpRequest httpRequest) throws HttpException {
         User user = new User(httpRequest.getParameter("userId"), httpRequest.getParameter("password"), httpRequest.getParameter("name"), httpRequest.getParameter("email"));
         DataBase.addUser(user);
-        httpResponse.redirect(INDEX_URL).send();
+        return new HttpResponse.Builder(HttpStatus.FOUND)
+                .addHeader("Location", INDEX_URL)
+                .build();
     }
 
     @Override

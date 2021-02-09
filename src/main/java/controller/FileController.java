@@ -2,12 +2,11 @@ package controller;
 
 import domain.HttpRequest;
 import domain.HttpResponse;
-import exception.FileIOException;
-import exception.NoSuchFileException;
+import exception.HttpException;
+import org.springframework.http.HttpStatus;
 import utils.FileIoUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import static domain.HttpHeader.HEADER_CONTENT_TYPE;
 
 public class FileController extends AbstractController {
     private static final String ROOT_URL = "/";
@@ -16,23 +15,28 @@ public class FileController extends AbstractController {
     private static final String STATIC_BASE_PATH = "./static";
 
     private static final String EXTENSION_HTML = ".html";
+    private static final String EXTENSION_CSS = ".css";
     private static final String EXTENSION_ICO = ".ico";
 
+    private static final String CONTENT_TYPE_CSS = "text/css; charset=utf-8";
+    private static final String CONTENT_TYPE_HTML = "text/html; charset=utf-8";
+
     @Override
-    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws URISyntaxException, NoSuchFileException, IOException {
+    HttpResponse doGet(HttpRequest httpRequest) throws HttpException {
         String path = httpRequest.getPath();
         if(path.equals(ROOT_URL)) {
             path = INDEX_URL;
         }
 
-        httpResponse.ok(path)
+        return new HttpResponse.Builder(HttpStatus.OK)
+                .addHeader(HEADER_CONTENT_TYPE, getContentType(path))
                 .body(FileIoUtils.loadFileFromClasspath(addBasePath(path)))
-                .send();
+                .build();
     }
 
     @Override
-    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException, NoSuchFileException {
-        doGet(httpRequest, httpResponse);
+    HttpResponse doPost(HttpRequest httpRequest) throws HttpException {
+        return doGet(httpRequest);
     }
 
     @Override
@@ -45,5 +49,12 @@ public class FileController extends AbstractController {
             return TEMPLATE_BASE_PATH + path;
         }
         return STATIC_BASE_PATH + path;
+    }
+
+    private String getContentType(String path) {
+        if (path.endsWith(EXTENSION_CSS)) {
+            return CONTENT_TYPE_CSS;
+        }
+        return CONTENT_TYPE_HTML;
     }
 }

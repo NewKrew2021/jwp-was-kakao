@@ -3,28 +3,26 @@ package controller;
 import annotation.web.RequestMethod;
 import domain.HttpRequest;
 import domain.HttpResponse;
-import exception.NoSuchFileException;
-import exception.UnsupportedMethodException;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
+import exception.HttpException;
+import org.springframework.http.HttpStatus;
 
 public abstract class AbstractController implements Controller {
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException, UnsupportedMethodException, NoSuchFileException {
+    public HttpResponse service(HttpRequest httpRequest) throws HttpException {
         if (httpRequest.getMethod() == RequestMethod.GET) {
-            doGet(httpRequest, httpResponse);
-            return;
+            return doGet(httpRequest);
+
         }
         if(httpRequest.getMethod() == RequestMethod.POST) {
-            doPost(httpRequest, httpResponse);
-            return;
+            return doPost(httpRequest);
         }
-        throw new UnsupportedMethodException();
+        throw new HttpException(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-    void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException, NoSuchFileException {
+    HttpResponse doGet(HttpRequest httpRequest) throws HttpException {
+        throw new HttpException(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-    void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException, NoSuchFileException {
+    HttpResponse doPost(HttpRequest httpRequest) throws HttpException {
+        throw new HttpException(HttpStatus.METHOD_NOT_ALLOWED);
     }
 }

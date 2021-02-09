@@ -2,14 +2,10 @@ package controller;
 
 import domain.HttpRequest;
 import domain.HttpResponse;
-import exception.NoSuchFileException;
-import exception.UnsupportedMethodException;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
+import exception.HttpException;
 
 public interface Controller {
-    void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, URISyntaxException, UnsupportedMethodException, NoSuchFileException;
+    HttpResponse service(HttpRequest httpRequest) throws HttpException;
     boolean isSupport(String path);
 }
 
