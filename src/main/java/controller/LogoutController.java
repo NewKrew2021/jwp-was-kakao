@@ -16,6 +16,7 @@ public class LogoutController extends AbstractController {
 
         httpResponse
                 .addRedirectionLocationHeader(INDEX_HTML)
+                .addDeleteCookieHeader()
                 .send(HttpResponseStatusCode.FOUND)
                 .build();
     }

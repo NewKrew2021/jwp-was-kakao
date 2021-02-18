@@ -2,6 +2,8 @@ package response;
 
 import exceptions.InvalidResponseStatusCodeException;
 
+import java.util.Arrays;
+
 public enum HttpResponseStatusCode {
     OK(200, "HTTP/1.1 200 OK "),
     FOUND(302, "HTTP/1.1 302 Found "),
@@ -17,19 +19,14 @@ public enum HttpResponseStatusCode {
     }
 
     public static HttpResponseStatusCode of(int code){
-        if(code == 200){
-            return OK;
-        }
-        if(code == 302){
-            return FOUND;
-        }
-        if(code == 400){
-            return BAD_REQUEST;
-        }
-        if(code == 404){
-            return NOT_FOUND;
-        }
-        throw new InvalidResponseStatusCodeException();
+        return Arrays.stream(HttpResponseStatusCode.values())
+                .filter(StatusCode -> StatusCode.getCode() == code)
+                .findFirst()
+                .orElseThrow(InvalidResponseStatusCodeException::new);
+    }
+    
+    public int getCode(){
+        return this.code;
     }
 
     public String getMessage(){

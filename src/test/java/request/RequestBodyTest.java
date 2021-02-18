@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import requestTextForTest.FilePathName;
 import webserver.RequestHandler;
 
 import java.io.*;
@@ -24,7 +23,7 @@ public class RequestBodyTest {
     @BeforeAll
     public static void setup() throws IOException {
         //given
-        InputStream in = new FileInputStream(FilePathName.POST_HTTP_CREATE_USER_REQUEST);
+        InputStream in = new FileInputStream("src/test/resources/requestTextForTest/postHttpCreateUserRequest");
 
         br = new BufferedReader(new InputStreamReader(in));
         br.readLine();

@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import requestTextForTest.FilePathName;
 import webserver.RequestHandler;
 
 import java.io.*;
@@ -22,7 +21,7 @@ public class RequestHeaderTest {
     @DisplayName("")
     @BeforeAll
     public static void setup() throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(FilePathName.HTTP_REQUEST_HEADER);
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/requestTextForTest/httpRequestHeader");
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
         BufferedReader br = new BufferedReader(inputStreamReader);
         requestHeader = RequestHeader.of(br, logger);

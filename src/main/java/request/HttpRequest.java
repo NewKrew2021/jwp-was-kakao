@@ -10,13 +10,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
 public class HttpRequest {
 
     private static final String COOKIE = "Cookie";
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     private RequestUri requestUri;
     private RequestHeader requestHeader;
@@ -77,6 +78,10 @@ public class HttpRequest {
 
     public String getSessionId(){
         Optional<String> sessionLine = requestHeader.getHeaderValue(COOKIE);
-        return sessionLine.map(s -> s.split("=")[1]).orElse(null);
+
+        return sessionLine.flatMap(value -> Arrays.stream(value.split(";"))
+                .filter(s -> s.split("=")[0].equals("sessionid"))
+                .findFirst()
+                .map(s -> s.split("=")[1])).orElse(null);
     }
 }

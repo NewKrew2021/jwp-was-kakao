@@ -4,9 +4,7 @@ import annotation.web.RequestMethod;
 import controller.Controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import requestTextForTest.FilePathName;
 import response.HttpResponse;
-import responseTextForTest.ResponseFilePathName;
 import webserver.ControllerHandler;
 
 import java.io.*;
@@ -20,7 +18,7 @@ public class HttpRequestTest {
     @Test
     public void request_POST() throws Exception {
         //given
-        InputStream in = new FileInputStream(FilePathName.POST_HTTP_CREATE_USER_REQUEST);
+        InputStream in = new FileInputStream("src/test/resources/requestTextForTest/postHttpCreateUserRequest");
 
         //when
         HttpRequest request = HttpRequest.from(in);
@@ -36,7 +34,7 @@ public class HttpRequestTest {
     @Test
     public void request_POST_2() throws Exception {
         //given
-        InputStream in = new FileInputStream(FilePathName.POST_HTTP_CREATE_USER_REQUEST);
+        InputStream in = new FileInputStream("src/test/resources/requestTextForTest/postHttpCreateUserRequest");
 
         //when
         HttpRequest request = HttpRequest.from(in);
@@ -55,7 +53,7 @@ public class HttpRequestTest {
         //회원가입
         HttpResponse response1 = new HttpResponse( new ByteArrayOutputStream());
 
-        HttpRequest request1 = HttpRequest.from(new FileInputStream(FilePathName.POST_HTTP_CREATE_USER_REQUEST));
+        HttpRequest request1 = HttpRequest.from(new FileInputStream("src/test/resources/requestTextForTest/postHttpCreateUserRequest"));
 
         ControllerHandler controllers = new ControllerHandler();
         Controller controller1 = controllers.getController(request1.getPath());
@@ -63,11 +61,11 @@ public class HttpRequestTest {
 
 
         //로그인
-        File resultFile = new File(ResponseFilePathName.RESPONSE_RESULT);
+        File resultFile = new File("src/test/resources/responseTextForTest/responseResult");
         OutputStream outputStream = new FileOutputStream(resultFile);
         HttpResponse response2 = new HttpResponse(outputStream);
 
-        FileInputStream fileInputStream = new FileInputStream(FilePathName.POST_HTTP_LOGIN_REQUEST);
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/requestTextForTest/postHttpLoginRequest");
         HttpRequest request2 = HttpRequest.from(fileInputStream);
 
         Controller controller = controllers.getController(request2.getPath());
@@ -86,11 +84,11 @@ public class HttpRequestTest {
     @DisplayName("리소스 파일을 요청시에 정상응답 코드를 받는다")
     @Test
     public void 리소스_파일_정상응답_테스트() throws IOException {
-        File resultFile = new File(ResponseFilePathName.RESPONSE_RESULT);
+        File resultFile = new File("src/test/resources/responseTextForTest/responseResult");
         OutputStream outputStream = new FileOutputStream(resultFile);
         HttpResponse response = new HttpResponse(outputStream);
 
-        FileInputStream fileInputStream = new FileInputStream(FilePathName.GET_HTTP_STATIC_FILE_REQUEST);
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/requestTextForTest/getHttpStaticFileRequest");
         HttpRequest request = HttpRequest.from(fileInputStream);
 
         ControllerHandler controllers = new ControllerHandler();

@@ -108,6 +108,11 @@ public class HttpResponse {
         return this;
     }
 
+    public HttpResponse addDeleteCookieHeader(){
+        addHeader(SET_COOKIE, "expires=Thu, 01 Jan 1970 00:00:00 GMT");
+        return this;
+    }
+
     public HttpResponse addResponseBody(byte[] body) {
         this.body = body;
         return this;

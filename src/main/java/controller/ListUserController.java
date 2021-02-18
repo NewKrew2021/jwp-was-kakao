@@ -1,14 +1,19 @@
 package controller;
 
 import db.DataBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import request.HttpRequest;
 import response.HttpResponse;
 import response.HttpResponseStatusCode;
+import service.ListUserService;
 import utils.TemplateUtils;
 import java.io.IOException;
 
 public class ListUserController extends AbstractController {
 
+    private final ListUserService listUserService = new ListUserService();
+    private static final Logger logger = LoggerFactory.getLogger(ListUserController.class);
     private static final String LOGIN_PAGE = "/user/login.html";
 
     @Override
@@ -16,11 +21,11 @@ public class ListUserController extends AbstractController {
         if (httpRequest.isLogined()) {
             try {
                 httpResponse
-                        .addResponseBody(TemplateUtils.makeListUserTemplate(DataBase.findAll()))
+                        .addResponseBody(listUserService.makeTemplateBodyByUser())
                         .send(HttpResponseStatusCode.OK)
                         .build();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
             return;
         }
