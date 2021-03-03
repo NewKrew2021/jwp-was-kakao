@@ -3,6 +3,8 @@ package model;
 import domain.HttpRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -12,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserTest {
+
+    private Logger logger = LoggerFactory.getLogger(UserTest.class.getName());
 
     @Test
     @DisplayName("유저를 올바르게 생성")
@@ -30,7 +34,7 @@ class UserTest {
             assertThat(user.getName()).isEqualTo("자바지기");
             assertThat(user.getEmail()).isEqualTo("javajigi%40slipp.net");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
         }
     }
 }

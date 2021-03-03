@@ -8,6 +8,8 @@ import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class ListUserController extends AbstractController {
     public static final String LOGINED_TRUE = "logined=true";
     public static final String TEMPLATES = "/templates";
     public static final String HTML = ".html";
+
+    private final Logger logger = LoggerFactory.getLogger(ListUserController.class.getName());
 
     boolean isLogin(String header) {
         return header.equals(LOGINED_TRUE);
@@ -47,7 +51,7 @@ public class ListUserController extends AbstractController {
             byte[] body = compileHtmlBody(url);
             httpResponse.forward(url, body);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
         }
     }
 }
