@@ -1,7 +1,5 @@
 package model;
 
-import utils.KeyValueTokenizer;
-
 import java.util.Map;
 
 public class User {
@@ -17,16 +15,8 @@ public class User {
         this.email = email;
     }
 
-    public User(Map<String, String> parameters) {
-        this.userId = parameters.get("userId");
-        this.password = parameters.get("password");
-        this.name = parameters.get("name");
-        this.email = parameters.get("email");
-    }
-
-    public static User of(String input) {
-        Map<String, String> parameters = KeyValueTokenizer.of(input);
-        return new User(parameters);
+    public User(Map<String, String> params) {
+        this(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
     }
 
     public boolean validatePassword(String password) {
