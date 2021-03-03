@@ -42,7 +42,8 @@ public class HttpRequest {
         }
 
         if (headers.containsKey(CONTENT_LENGTH)) {
-            params.putAll(KeyValueTokenizer.of(IOUtils.readData(br, Integer.parseInt(headers.get(CONTENT_LENGTH)))));
+            String content = IOUtils.readData(br, Integer.parseInt(headers.get(CONTENT_LENGTH)));
+            params.putAll(KeyValueTokenizer.of(content));
         }
 
         HttpHeaders httpHeaders = new HttpHeaders(headers);
