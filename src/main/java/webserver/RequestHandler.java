@@ -24,7 +24,7 @@ public class RequestHandler implements Runnable {
 
         controllers.put("/user/create", new CreateUserController(memberService));
         controllers.put("/user/login", new LoginController(memberService));
-        controllers.put("/user/list", new ListUserController());
+        controllers.put("/user/list.html", new ListUserController());
         controllers.put("/main", new MainController());
     }
 
@@ -47,7 +47,7 @@ public class RequestHandler implements Runnable {
             controller.service(httpRequest, httpResponse);
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 }
