@@ -1,19 +1,19 @@
 package domain;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class HttpHeaders {
 
-    public static final String NO_KEY = "No Key";
+    private final Map<String, List<String>> headers;
 
-    private final Map<String, String> headers;
-
-    public HttpHeaders(Map<String, String> headers) {
+    public HttpHeaders(Map<String, List<String>> headers) {
         this.headers = headers;
     }
 
-    public String getHeader(String key) {
-        return headers.getOrDefault(key, NO_KEY);
+    public List<String> getHeader(String key) {
+        return headers.getOrDefault(key, Collections.emptyList());
     }
 
 }
