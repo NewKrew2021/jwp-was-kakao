@@ -21,18 +21,17 @@ public class ListUserController extends AbstractController {
     public static final String LOGIN_HTML = "login.html";
     public static final String LOGINED_TRUE = "logined=true";
     public static final String TEMPLATES = "/templates";
-    public static final String HTML = ".html";
 
     private final Logger logger = LoggerFactory.getLogger(ListUserController.class.getName());
 
-    boolean isLogin(String header) {
-        return header.equals(LOGINED_TRUE);
+    boolean isLogin(List<String> cookieValues) {
+        return cookieValues.contains(LOGINED_TRUE);
     }
 
     private byte[] compileHtmlBody(String url) throws IOException {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix(TEMPLATES);
-        loader.setSuffix(HTML);
+        loader.setSuffix("");
         Handlebars handlebars = new Handlebars(loader);
 
         Template template = handlebars.compile(url);
