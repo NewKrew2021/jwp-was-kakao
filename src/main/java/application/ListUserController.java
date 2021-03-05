@@ -19,13 +19,14 @@ public class ListUserController extends AbstractController {
 
     public static final String COOKIE = "Cookie";
     public static final String LOGIN_HTML = "login.html";
-    public static final String LOGINED_TRUE = "logined=true";
+    public static final String LOGINED_TRUE = "logined=true *";
     public static final String TEMPLATES = "/templates";
 
     private final Logger logger = LoggerFactory.getLogger(ListUserController.class.getName());
 
     boolean isLogin(List<String> cookieValues) {
-        return cookieValues.contains(LOGINED_TRUE);
+        return cookieValues.stream()
+                .anyMatch(value -> value.matches(LOGINED_TRUE));
     }
 
     private byte[] compileHtmlBody(String url) throws IOException {
