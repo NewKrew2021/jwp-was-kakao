@@ -15,22 +15,19 @@ class UserTest {
 
     @Test
     @DisplayName("유저를 올바르게 생성")
-    void create_user() {
+    void create_user() throws IOException {
         String input = "GET /user/create?userId=javajigi&password=password&name=자바지기&email=javajigi%40slipp.net HTTP/1.1\n" +
                 "Host: localhost:8080\n" +
                 "Connection: keep-alive\n" +
                 "Accept: *\n";
 
         InputStream stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
-        try {
-            HttpRequest httpRequest = HttpRequest.from(stream);
-            User user = new User(httpRequest.getParameters());
-            assertThat(user.getUserId()).isEqualTo("javajigi");
-            assertThat(user.getPassword()).isEqualTo("password");
-            assertThat(user.getName()).isEqualTo("자바지기");
-            assertThat(user.getEmail()).isEqualTo("javajigi%40slipp.net");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        HttpRequest httpRequest = HttpRequest.from(stream);
+        User user = new User(httpRequest.getParameters());
+        assertThat(user.getUserId()).isEqualTo("javajigi");
+        assertThat(user.getPassword()).isEqualTo("password");
+        assertThat(user.getName()).isEqualTo("자바지기");
+        assertThat(user.getEmail()).isEqualTo("javajigi%40slipp.net");
     }
 }

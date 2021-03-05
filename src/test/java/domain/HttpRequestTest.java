@@ -31,7 +31,7 @@ public class HttpRequestTest {
 
         assertEquals(HttpMethod.POST, request.getMethod());
         assertEquals("/user/create", request.getUrl());
-        assertEquals("keep-alive", request.getHeader("Connection"));
+        assertEquals("keep-alive", request.getHeader("Connection").get(0));
         assertEquals("javajigi", request.getParameter("userId"));
     }
 }

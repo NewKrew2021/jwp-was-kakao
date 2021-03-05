@@ -90,7 +90,4 @@ public class HttpResponse {
         dos.writeBytes("\r\n");
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
 }

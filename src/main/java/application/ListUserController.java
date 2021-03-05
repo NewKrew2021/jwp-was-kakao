@@ -8,6 +8,8 @@ import db.DataBase;
 import domain.HttpRequest;
 import domain.HttpResponse;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,18 +19,20 @@ public class ListUserController extends AbstractController {
 
     public static final String COOKIE = "Cookie";
     public static final String LOGIN_HTML = "login.html";
-    public static final String LOGINED_TRUE = "logined=true";
+    public static final String LOGINED_TRUE = "logined=true *";
     public static final String TEMPLATES = "/templates";
-    public static final String HTML = ".html";
 
-    boolean isLogin(String header) {
-        return header.equals(LOGINED_TRUE);
+    private final Logger logger = LoggerFactory.getLogger(ListUserController.class.getName());
+
+    boolean isLogin(List<String> cookieValues) {
+        return cookieValues.stream()
+                .anyMatch(value -> value.matches(LOGINED_TRUE));
     }
 
     private byte[] compileHtmlBody(String url) throws IOException {
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix(TEMPLATES);
-        loader.setSuffix(HTML);
+        loader.setSuffix("");
         Handlebars handlebars = new Handlebars(loader);
 
         Template template = handlebars.compile(url);
@@ -47,7 +51,7 @@ public class ListUserController extends AbstractController {
             byte[] body = compileHtmlBody(url);
             httpResponse.forward(url, body);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
         }
     }
 }
